@@ -34,13 +34,19 @@ def rotation_error(current, target):
 
 
 class Yam:
-    def __init__(self, k, seed):
+    def __init__(self, k, seed, *, fixture=None):
         # Opposite 0.5 m transfers are inside a common, explicitly checked arm workspace.
         self.carry = np.array([.5 if seed % 2 == 0 else -.5, 0., 0.])
         self.pick = -self.carry / 2
+        self.rotation = ROTATION if fixture is None else fixture['rotation']
         self.initial_target = self.pick + [0., 0., k.size[2] / 2 + .0001]
         desc = build(k, omega_max=A.OMEGA_MAX)
-        built = A.scene(desc, self.initial_target, pads=())
+        if fixture is None:
+            built = A.scene(desc, self.initial_target, pads=())
+        else:
+            built = fixture['built']
+            desc = built.desc
+            self.initial_target = np.asarray(fixture['target'], dtype=float)
         root = ET.fromstring(built.xml)
         robot = ET.parse(ASSET / 'yam_linear_4310.xml').getroot()
         root.insert(0, ET.Element('compiler', angle='radian'))
@@ -53,8 +59,9 @@ class Yam:
             assets.append(node)
         world = root.find('worldbody')
         table = world.find("geom[@name='table']")
-        table.set('pos', '0 0 -0.025')
-        table.set('size', '1 .22 .025')
+        if fixture is None:
+            table.set('pos', '0 0 -0.025')
+            table.set('size', '1 .22 .025')
         arm = deepcopy(robot.find("worldbody/body[@name='arm']"))
         arm.set('pos', '0 -.30 .12')
         arm.set('quat', '.707106781187 0 0 .707106781187')
@@ -72,7 +79,7 @@ class Yam:
         root.find('equality').extend(deepcopy(list(robot.find('equality'))))
         root.append(deepcopy(robot.find('actuator')))
         # Explicit fingertip-content pairs preserve the experiment's 40 N/mm contact convention.
-        for names in finger_names.values():
+        for names in (finger_names.values() if fixture is None else ()):
             for name in names:
                 for i, segment in enumerate(desc.segments):
                     mass = k.mass if k.rigid else segment.mass
@@ -83,11 +90,11 @@ class Yam:
                         friction=f'{k.surface_friction} {k.surface_friction} .005 .0001 .0001',
                         solref=f'{-kd} {-damping}', solreffriction=f'{-kd} {-bf}', solimp='.99 .99 .001')
         built.xml = ET.tostring(root, encoding='unicode')
-        self.sim = A.Sim(built)
+        self.sim = (A.Sim if fixture is None else fixture['sim_factory'])(built)
         m, d = self.sim.m, self.sim.d
         # Package long axis is world y; its narrow side aligns with the actual finger closing axis.
         for j in range(m.njnt):
-            if m.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE:
+            if fixture is None and m.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE:
                 a = m.jnt_qposadr[j]
                 p = d.qpos[a:a+2] - self.pick[:2]
                 d.qpos[a:a+2] = self.pick[:2] + [-p[1],p[0]]
@@ -137,7 +144,7 @@ class Yam:
         mujoco.mj_kinematics(self.sim.m,self.kin)
         mujoco.mj_comPos(self.sim.m,self.kin)
         return np.r_[4*(target-self.kin.site_xpos[self.site]),
-                     rotation_error(self.kin.site_xmat[self.site].reshape(3,3),ROTATION)]
+                     rotation_error(self.kin.site_xmat[self.site].reshape(3,3),self.rotation)]
 
     def solve(self, target, multistart=False):
         m = self.sim.m
