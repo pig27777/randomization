@@ -1,0 +1,57 @@
+{
+  "checks": {
+    "asset_hashes_unchanged": true,
+    "policy_hash_unchanged": true,
+    "dev_result_hash": true,
+    "dev_source_snapshots": true,
+    "dev_complete_unique_matrix": true,
+    "dev_matched_objects": true,
+    "dev_equal_thresholds": true,
+    "test_result_hash": true,
+    "test_source_snapshots": true,
+    "test_complete_unique_matrix": true,
+    "test_matched_objects": true,
+    "test_equal_thresholds": true,
+    "development_test_ids_disjoint": true,
+    "development_test_seeds_disjoint": true,
+    "runtime_code_unchanged_since_test_start": true,
+    "all_48_probe_prefixes_identical": true,
+    "arm_force_limits_respected": true,
+    "no_nonfinger_or_self_penetration": false
+  },
+  "all_passed": false,
+  "robot": {
+    "ik_max_position_mm": 0.09999871436969736,
+    "ik_max_rotation_deg": 0.00027688674922181773,
+    "tracking_max_mm": 62.168637990517546,
+    "nonfinger_max_penetration_mm": 0.6142777895362002,
+    "self_max_penetration_mm": 0.0,
+    "episode_tracking_p95_median_mm": 37.99118817199942,
+    "actuator_peak_Nm": [
+      3.021320590943297,
+      4.399312468974756,
+      2.2881191039438704,
+      1.1769116920876144,
+      2.5467405391148867,
+      1.0039291354724451
+    ],
+    "control_clip_steps": 0
+  },
+  "paired_success_diagnostics": {
+    "feedback_minus_direct": {
+      "both_success_pairs": 46,
+      "mean_sim_time_difference_s": 1.7446869565254206,
+      "mean_peak_force_difference_N": -4.113074998112412,
+      "force_choice_changes": 48
+    },
+    "feedback_minus_probe_blind": {
+      "both_success_pairs": 46,
+      "mean_sim_time_difference_s": 0.0,
+      "mean_peak_force_difference_N": 0.0,
+      "force_choice_changes": 0
+    }
+  },
+  "failure_reasons": {
+    "both contacts lost for >50 ms": 5
+  }
+}
