@@ -215,3 +215,7 @@
 
 ## 2026-11-08 · 硬物 R3 诊断审阅
 - 改动：内容物报告追加“硬物 R3 诊断审阅”（I-38）；decisions 加续条，并把 11/08 平台/松装条标为用户已下发采用、判法改为已定。核对：Closer 只被 protocols.py 内部及验证/标定脚本引用，top_grasp.py、policy_protocol.py 不引用（rg 结果）；增益公式见 protocols.py:131。
+
+## 2026-11-08 · Git 初始化（用户要求，两台机器共用）
+- 改动：新增 `.gitignore`（字节码、工作目录 MuJoCo 日志、袋子静置缓存、pstats）、`envs/mjwarp-requirements.txt`（uv freeze，12 包）；AGENTS.md §8 加“两台机器”一条；`git init -b main` 并首次提交 96f4b6b（8606 文件，.git 394 MB）。
+- 检查：已暂存文件中无 __pycache__/.pyc/cache；单文件最大 56 MB（r3 诊断 gpu.json，<100 MB GitHub 上限）；未发现凭据类文件名。未推送：尚无远端，本机 gh 未登录。
