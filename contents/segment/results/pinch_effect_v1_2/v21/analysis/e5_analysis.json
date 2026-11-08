@@ -1,0 +1,71 @@
+{
+  "passed": false,
+  "groups": {
+    "hard": {
+      "total": 76,
+      "valid": 76,
+      "simulation_failures": 0,
+      "successes": 0,
+      "success_rate_valid": 0.0,
+      "success_rate_lower": 0.0,
+      "outcomes": {
+        "grasp_fail": 76
+      }
+    },
+    "bendable": {
+      "total": 68,
+      "valid": 50,
+      "simulation_failures": 18,
+      "successes": 2,
+      "success_rate_valid": 0.04,
+      "success_rate_lower": 0.029411764705882353,
+      "outcomes": {
+        "sim_fail": 18,
+        "grasp_fail": 33,
+        "over_squeeze": 13,
+        "drop": 2,
+        "success": 2
+      }
+    },
+    "compressible": {
+      "total": 56,
+      "valid": 54,
+      "simulation_failures": 2,
+      "successes": 1,
+      "success_rate_valid": 0.018518518518518517,
+      "success_rate_lower": 0.017857142857142856,
+      "outcomes": {
+        "over_squeeze": 27,
+        "grasp_fail": 26,
+        "success": 1,
+        "sim_fail": 2
+      }
+    },
+    "all": {
+      "total": 200,
+      "valid": 180,
+      "simulation_failures": 20,
+      "successes": 3,
+      "success_rate_valid": 0.016666666666666666,
+      "success_rate_lower": 0.015,
+      "outcomes": {
+        "grasp_fail": 135,
+        "sim_fail": 20,
+        "over_squeeze": 40,
+        "drop": 2,
+        "success": 3
+      }
+    }
+  },
+  "failure_phases": {
+    "approach": 14,
+    "close": 6
+  },
+  "failure_types": {
+    "compression": 10,
+    "adjacent": 3,
+    "bending": 7
+  },
+  "all_failures_before_weld": true,
+  "rest_failures": 0
+}

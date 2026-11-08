@@ -1,0 +1,244 @@
+{
+  "asset_count": 4,
+  "assets": [
+    {
+      "key": "pe",
+      "folder": "assets/01_pe_film",
+      "title_zh": "PE 薄膜快递袋",
+      "category_zh": "薄膜类",
+      "nominal_dimensions_mm": [
+        350,
+        450
+      ],
+      "flap_mm": 50,
+      "geometry": {
+        "vertices": 549,
+        "triangles": 1064,
+        "dofs": 1647,
+        "mass_kg": 0.015295000000000001
+      },
+      "effective_parameters": {
+        "bending_rigidity_nm": 2e-06,
+        "plastic_yield_angle_deg": 35.0,
+        "plastic_hardening_ratio": 0.04,
+        "plasticity": false,
+        "precreased_stiffness_ratio": 1.0,
+        "precreased_panel_ids": [],
+        "precreased_panel_boundaries": false,
+        "memory_ratio": 0.25,
+        "recovery_tau_s": 0.8,
+        "bending_damping_nms": 1e-09,
+        "timestep_s": 5e-05,
+        "frame_dt_s": 0.01,
+        "collision_radius_m": 0.00025,
+        "collision_patch_faces": 28,
+        "contact_timeconst_s": 0.0002,
+        "friction": 0.35,
+        "velocity_damping_per_s": 2.0,
+        "self_contact": true,
+        "self_contact_front_panel_ids": [
+          0
+        ],
+        "self_contact_back_panel_ids": [
+          1,
+          2
+        ],
+        "gravity": true,
+        "edge_solref_s": 0.0002,
+        "edge_solimp": [
+          0.99,
+          0.999,
+          0.0001
+        ],
+        "iterations": 150,
+        "solver": "Newton",
+        "tolerance": 1e-08
+      },
+      "deformable": true,
+      "physically_calibrated": false,
+      "exact_material_grade_confirmed": false
+    },
+    {
+      "key": "kraft",
+      "folder": "assets/02_kraft_paper",
+      "title_zh": "牛皮纸邮寄袋",
+      "category_zh": "纸袋类",
+      "nominal_dimensions_mm": [
+        250,
+        50,
+        350
+      ],
+      "flap_mm": 90,
+      "geometry": {
+        "vertices": 413,
+        "triangles": 792,
+        "dofs": 1239,
+        "mass_kg": 0.028037894582216283
+      },
+      "effective_parameters": {
+        "bending_rigidity_nm": 0.00135,
+        "plastic_yield_angle_deg": 25,
+        "plastic_hardening_ratio": 0.08,
+        "plasticity": true,
+        "precreased_stiffness_ratio": 0.01,
+        "precreased_panel_ids": [
+          6
+        ],
+        "precreased_panel_boundaries": true,
+        "memory_ratio": 0.6,
+        "recovery_tau_s": 2.0,
+        "bending_damping_nms": 3e-07,
+        "timestep_s": 0.0001,
+        "frame_dt_s": 0.01,
+        "collision_radius_m": 0.00035,
+        "collision_patch_faces": 32,
+        "contact_timeconst_s": 0.0002,
+        "friction": 0.45,
+        "velocity_damping_per_s": 3.0,
+        "self_contact": true,
+        "self_contact_front_panel_ids": [
+          0
+        ],
+        "self_contact_back_panel_ids": [
+          3,
+          7
+        ],
+        "gravity": true,
+        "edge_solref_s": 0.0002,
+        "edge_solimp": [
+          0.99,
+          0.999,
+          0.0001
+        ],
+        "iterations": 200,
+        "solver": "CG",
+        "tolerance": 1e-08
+      },
+      "deformable": true,
+      "physically_calibrated": false,
+      "exact_material_grade_confirmed": false
+    },
+    {
+      "key": "paperboard",
+      "folder": "assets/03_paperboard_envelope",
+      "title_zh": "纸板文件封",
+      "category_zh": "纸板封套类",
+      "nominal_dimensions_mm": [
+        325,
+        230
+      ],
+      "flap_mm": 52,
+      "geometry": {
+        "vertices": 268,
+        "triangles": 504,
+        "dofs": 804,
+        "mass_kg": 0.041438244616958504
+      },
+      "effective_parameters": {
+        "bending_rigidity_nm": 0.012,
+        "plastic_yield_angle_deg": 35,
+        "plastic_hardening_ratio": 0.08,
+        "plasticity": true,
+        "precreased_stiffness_ratio": 1.0,
+        "precreased_panel_ids": [],
+        "precreased_panel_boundaries": true,
+        "memory_ratio": 0.6,
+        "recovery_tau_s": 2.0,
+        "bending_damping_nms": 3e-07,
+        "timestep_s": 2.5e-05,
+        "frame_dt_s": 0.01,
+        "collision_radius_m": 0.00035,
+        "collision_patch_faces": 32,
+        "contact_timeconst_s": 0.0002,
+        "friction": 0.45,
+        "velocity_damping_per_s": 3.0,
+        "self_contact": true,
+        "self_contact_front_panel_ids": [
+          0
+        ],
+        "self_contact_back_panel_ids": [
+          1,
+          2
+        ],
+        "gravity": true,
+        "edge_solref_s": 0.0002,
+        "edge_solimp": [
+          0.99,
+          0.999,
+          0.0001
+        ],
+        "iterations": 200,
+        "solver": "CG",
+        "tolerance": 1e-08
+      },
+      "deformable": true,
+      "physically_calibrated": false,
+      "exact_material_grade_confirmed": false
+    },
+    {
+      "key": "legacy",
+      "folder": "assets/04_generic_experimental",
+      "title_zh": "通用实验软袋",
+      "category_zh": "材质未确认的等效软壳",
+      "nominal_dimensions_mm": [
+        180,
+        240
+      ],
+      "flap_mm": null,
+      "geometry": {
+        "vertices": 570,
+        "triangles": 1108,
+        "dofs": 1710,
+        "mass_kg": 0.14
+      },
+      "effective_parameters": {
+        "nx": 14,
+        "ny": 18,
+        "width_mm": 180.0,
+        "height_mm": 240.0,
+        "mass_g": 140.0,
+        "young_pa": 20000000.0,
+        "poisson": 0.3,
+        "thickness_mm": 2.0,
+        "bend": 0.0004,
+        "seam": 6.0,
+        "knee_deg": 12.0,
+        "post_ratio": 0.2,
+        "bend_damping": 2e-07,
+        "drag": 120.0,
+        "rayleigh": 0.004,
+        "travel_mm": 0,
+        "ramp_s": 2.0,
+        "grip_height": 0.6,
+        "gravity": true,
+        "self_contact": true,
+        "ipc": false,
+        "timestep": 0.00025,
+        "frame_dt": 0.01,
+        "iterations": 600,
+        "tolerance": 1e-06,
+        "rest_gap_mm": 2.25,
+        "imperfection_mm": 0.0,
+        "radius_mm": 1.0,
+        "margin_mm": 0.1,
+        "memory_ratio": 0.8,
+        "recovery_tau_s": 0.6,
+        "plasticity": false,
+        "longitudinal_stiffness": 6.0,
+        "rigid_seams": false,
+        "bottom_mode": "sealed",
+        "release_s": 0.6,
+        "centered_grip": false,
+        "stiff_bottom": false,
+        "grip_patch_mm": 24.0,
+        "crease_memory": true,
+        "crease_onset_deg": 25.0,
+        "crease_width_deg": 35.0,
+        "crease_max_softening": 0.65
+      },
+      "deformable": true,
+      "physically_calibrated": false,
+      "exact_material_grade_confirmed": false
+    }
+  ]
+}

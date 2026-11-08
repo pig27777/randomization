@@ -1,0 +1,65 @@
+{
+  "protocol": "v2.2",
+  "status": "not_frozen",
+  "tag": null,
+  "E1": {
+    "passed": true,
+    "tests": 34,
+    "failures": 0,
+    "errors": 0
+  },
+  "E2": {
+    "passed": true,
+    "basis": "Reviewed 12/12 bitwise v1 regression retained; ordinary physical core unchanged"
+  },
+  "E3": {
+    "passed": true,
+    "repeats_per_anchor": 3,
+    "measured": {
+      "hard": 0.0,
+      "bendable": 0.978470131480262,
+      "compressible": 2.0104432384292856
+    }
+  },
+  "static_following": {
+    "hard": {
+      "measured_cases": 0,
+      "max_error_mm": null,
+      "passed": true
+    },
+    "bendable": {
+      "measured_cases": 180,
+      "max_error_mm": 0.5401722822168278,
+      "passed": true
+    },
+    "compressible": {
+      "measured_cases": 264,
+      "max_error_mm": 1.5686091387302785,
+      "passed": true
+    }
+  },
+  "E4": {
+    "passed": false,
+    "total": 684,
+    "simulation_failures": 0,
+    "reason": "Success sets not nested",
+    "adjacent_counterexamples": 6,
+    "all_pair_counterexamples": 8,
+    "default_successes": {
+      "bendable": 56,
+      "compressible": 60
+    },
+    "hard_rejections": 36
+  },
+  "E5": {
+    "status": "not_run",
+    "reason": "E4 failed",
+    "planned_new_seed": 20261126
+  },
+  "E6": {
+    "status": "not_run",
+    "reason": "E4 failed"
+  },
+  "source": "candidate_source.json",
+  "evidence": "analysis/audit.json"
+}

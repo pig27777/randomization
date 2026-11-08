@@ -1,0 +1,91 @@
+{
+  "valid_soft_responses": 4,
+  "failed": [
+    {
+      "job": {
+        "category": "bendable",
+        "test": "r3"
+      },
+      "stage": "s5_bendable_readback_fixed"
+    }
+  ],
+  "frozen_archive_unchanged": true,
+  "original_files_changed": [
+    "test/policy/README.md"
+  ],
+  "only_contact_readback_repaired": true,
+  "latest_sources_match": {
+    "validate_warp.py": true,
+    "warp_mechanics.py": true,
+    "warp_effects.py": true,
+    "warp_cpu.py": true,
+    "mjwarp_backend.py": true
+  },
+  "load": {
+    "hard_lower_bound_review": {
+      "start": "2026-11-06T18:24:40.672142+08:00",
+      "end": "2026-11-06T18:24:40.680975+08:00",
+      "loadavg_before": [
+        0.2490234375,
+        0.2958984375,
+        0.587890625
+      ],
+      "loadavg_after": [
+        0.2490234375,
+        0.2958984375,
+        0.587890625
+      ],
+      "busy_percent": null,
+      "average_busy_logical_cpus": null,
+      "note": "subsecond read-only audit; CPU tick resolution is insufficient"
+    },
+    "s5_soft_responses": {
+      "start": "2026-11-06T18:26:01.040481+08:00",
+      "end": "2026-11-06T18:32:26.173552+08:00",
+      "loadavg_before": [
+        0.111328125,
+        0.234375,
+        0.53662109375
+      ],
+      "loadavg_after": [
+        1.2724609375,
+        1.0,
+        0.80419921875
+      ],
+      "busy_percent": 3.760405632850927,
+      "average_busy_logical_cpus": 1.2033298025122967
+    },
+    "s5_readback_repair": {
+      "start": "2026-11-06T18:38:10.621525+08:00",
+      "end": "2026-11-06T18:38:13.699567+08:00",
+      "loadavg_before": [
+        0.240234375,
+        0.470703125,
+        0.62158203125
+      ],
+      "loadavg_after": [
+        0.30126953125,
+        0.4794921875,
+        0.6240234375
+      ],
+      "busy_percent": 3.731570920183025,
+      "average_busy_logical_cpus": 1.194102694458568
+    },
+    "s5_bendable_readback_fixed": {
+      "start": "2026-11-06T18:38:54.445252+08:00",
+      "end": "2026-11-06T18:44:13.967507+08:00",
+      "loadavg_before": [
+        0.15283203125,
+        0.41748046875,
+        0.5966796875
+      ],
+      "loadavg_after": [
+        1.27734375,
+        1.025390625,
+        0.82568359375
+      ],
+      "busy_percent": 3.6853487732310675,
+      "average_busy_logical_cpus": 1.1793116074339416
+    }
+  }
+}

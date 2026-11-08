@@ -1,0 +1,41 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Module newton._src.geometry.inertia ffeb5ba load on device 'cuda:0' took 0.41 ms  (cached)
+Module newton._src.geometry.sdf_texture 2c3033b load on device 'cuda:0' took 1.07 ms  (cached)
+Module warp._src.coloring 5014867 load on device 'cpu' took 0.63 ms  (cached)
+Module newton._src.utils.mesh 8cb6ac2 load on device 'cpu' took 0.16 ms  (cached)
+Module validate_and_correct_inertia_kernel_0dd217c5 0dd217c load on device 'cuda:0' took 0.30 ms  (cached)
+Module newton._src.geometry.bvh c108a72 load on device 'cuda:0' took 0.35 ms  (cached)
+Module newton._src.geometry.kernels 78c444a load on device 'cuda:0' took 0.51 ms  (cached)
+Module newton._src.solvers.vbd.rigid_vbd_kernels 7a4759f load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.vbd.rigid_vbd_kernels bc7c465 load on device 'cuda:0' took 1.51 ms  (cached)
+Module newton._src.solvers.solver e6bdade load on device 'cuda:0' took 0.28 ms  (cached)
+Module grasp 95bdd49 load on device 'cuda:0' took 0.32 ms  (cached)
+Module newton._src.sim.collide f8ad45d load on device 'cuda:0' took 0.29 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 92014d2 load on device 'cuda:0' took 0.25 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False 3cf6427 load on device 'cuda:0' took 0.26 ms  (cached)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only 7d090a1 load on device 'cuda:0' took 0.67 ms  (cached)
+Module newton._src.geometry.narrow_phase dde4959 load on device 'cuda:0' took 0.35 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 0e67ab9 load on device 'cuda:0' took 0.35 ms  (cached)
+Module newton._src.geometry.sdf_contact 2b10f82 load on device 'cuda:0' took 0.24 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 9347255 load on device 'cuda:0' took 0.25 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_3056c3cf e0a2de2 load on device 'cuda:0' took 0.93 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 5dfadad load on device 'cuda:0' took 0.29 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True_False_True_True_True_False 71d7054 load on device 'cuda:0' took 0.54 ms  (cached)
+Module export_reduced_contacts_write_contact e63426e load on device 'cuda:0' took 0.29 ms  (cached)
+Module newton._src.geometry.soft_contacts_sdf 26c9aac load on device 'cuda:0' took 5.62 ms  (cached)
+Module newton._src.geometry.kernels 072158d load on device 'cuda:0' took 0.98 ms  (cached)
+Module newton._src.geometry.kernels 4b5b4cf load on device 'cuda:0' took 0.76 ms  (cached)
+Module newton._src.solvers.xpbd.kernels 134aae4 load on device 'cuda:0' took 1.89 ms  (cached)
+Module newton._src.solvers.vbd.particle_vbd_kernels bf48e92 load on device 'cuda:0' took 0.47 ms  (cached)
+Module create_accumulate_body_body_contacts_per_body__locals__accumulate_body_body_contacts_per_body_168b0782 7e24e86 load on device 'cuda:0' took 0.29 ms  (cached)
+Module create_update_duals_body_body_contacts__locals__update_duals_body_body_contacts_17f226ea 3a764b0 load on device 'cuda:0' took 0.26 ms  (cached)
+Module make_solve_elasticity_tile__locals__solve_elasticity_tile_kernel_beef3880 ec1eaef load on device 'cuda:0' took 0.29 ms  (cached)
+Module benchmark 7a4bb43 load on device 'cuda:0' took 0.40 ms  (cached)
+Module __main__ 7b3cd91 load on device 'cuda:0' took 0.23 ms  (cached)
+{"name": "bag_b1_r3_firm_off5", "failure": null, "summary": {"com_rise_mm": 45.106947339789755, "carried_fraction": 0.9021389467957951, "pads_on_system_over_weight": 1.0790450625286694, "bag_on_sponge_over_weight": 1.012405063367148, "rigid_on_sponge_N": [0.0, 0.0, 0.0], "ground_N": 0.0, "system_momentum_balance_pct": 7.937956195343412, "sponge_momentum_balance_pct": 1.2456507992925123, "particle_contact_pair_imbalance_N": 1.3512655808889131e-05, "squeeze_N": 14.054999501444904, "squeeze_imbalance_pct": 0.11746080214539503, "slip_mm_s": 1.6104453408315869, "max_speed_mm_s": 19.466701910247487, "sponge_max_speed_mm_s": 3.714271590179334, "median_speed_mm_s": 1.8750807355046266, "nodes_over_1mm_s": 923.5, "max_speed_50ms_mm_s": 14.932774472236634, "bag_max_area_stretch": 0.04203191879329893, "min_J": 0.5275575605401025, "impulse_window_s": 0.4500000000000002, "bag_into_sponge_mm": 0.0, "bag_nodes_in_sponge": 0, "sponge_nodes_in_pads": 0, "bag_nodes_in_pads": 0, "bag_mass_kg": 0.006517855572383269}, "checks": {"finished": true, "carried": true, "pads_carry_bag_and_sponge": false, "bag_carries_sponge": true, "momentum_balance": false, "squeeze_balanced": true, "no_slip": false, "no_inversion": true, "no_penetration": true, "settled": false}, "wall_s": 72.3}

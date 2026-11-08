@@ -1,0 +1,253 @@
+{
+  "S1": {
+    "passed": true,
+    "rows": [
+      {
+        "anchor": "hard",
+        "kind": "side",
+        "wall_s": 0.770534420851618,
+        "seconds": {
+          "mujoco": 0.38246528850868344,
+          "setup": 0.002758245449513197,
+          "python_other": 0.3853108868934214
+        },
+        "shares": {
+          "mujoco": 0.4963636641773526,
+          "setup": 0.0035796524786844697,
+          "python_other": 0.5000566833439629
+        },
+        "outcome": "success",
+        "sim_s": 4.95479999999952
+      },
+      {
+        "anchor": "hard",
+        "kind": "top",
+        "wall_s": 0.390888350084424,
+        "seconds": {
+          "mujoco": 0.04244024446234107,
+          "setup": 0.0024599824100732803,
+          "pinch": 0.010340918321162462,
+          "python_other": 0.3356472048908472
+        },
+        "shares": {
+          "mujoco": 0.10857382793110829,
+          "setup": 0.006293312168403007,
+          "pinch": 0.0264549156272604,
+          "python_other": 0.8586779442732283
+        },
+        "outcome": "grasp_fail",
+        "sim_s": 0.8119999999999759
+      },
+      {
+        "anchor": "bendable",
+        "kind": "side",
+        "wall_s": 3.686837052926421,
+        "seconds": {
+          "mujoco": 1.8676296109333634,
+          "setup": 0.017334019299596548,
+          "bushing": 1.0041513568721712,
+          "compaction": 0.3735900525934994,
+          "python_other": 0.4241320132277906
+        },
+        "shares": {
+          "mujoco": 0.506566898434238,
+          "setup": 0.004701596260089037,
+          "bushing": 0.27236119808309067,
+          "compaction": 0.10133077411082296,
+          "python_other": 0.11503953311175943
+        },
+        "outcome": "grasp_fail",
+        "sim_s": 2.9927999999997357
+      },
+      {
+        "anchor": "bendable",
+        "kind": "top",
+        "wall_s": 11.090170106850564,
+        "seconds": {
+          "mujoco": 3.9073130041360855,
+          "setup": 0.017723916098475456,
+          "pinch": 0.48514333739876747,
+          "bushing": 2.7006887425668538,
+          "compaction": 0.8793721995316446,
+          "python_other": 3.0999289071187377
+        },
+        "shares": {
+          "mujoco": 0.3523221886130024,
+          "setup": 0.0015981644941160215,
+          "pinch": 0.04374534680032429,
+          "bushing": 0.2435209484206737,
+          "compaction": 0.07929294060047314,
+          "python_other": 0.27952041107141046
+        },
+        "outcome": "success",
+        "sim_s": 7.890799999999197
+      },
+      {
+        "anchor": "compressible",
+        "kind": "side",
+        "wall_s": 8.813400061801076,
+        "seconds": {
+          "mujoco": 5.127589905168861,
+          "setup": 0.0250921119004488,
+          "bushing": 2.0816058134660125,
+          "compaction": 0.7518129032105207,
+          "python_other": 0.8272993280552328
+        },
+        "shares": {
+          "mujoco": 0.5817947522197244,
+          "setup": 0.0028470410652527514,
+          "bushing": 0.2361864659347624,
+          "compaction": 0.08530339005817045,
+          "python_other": 0.09386835072208996
+        },
+        "outcome": "grasp_fail",
+        "sim_s": 5.521999999999458
+      },
+      {
+        "anchor": "compressible",
+        "kind": "top",
+        "wall_s": 14.055909050162882,
+        "seconds": {
+          "mujoco": 5.627127151470631,
+          "setup": 0.025122512131929398,
+          "pinch": 0.5783113362267613,
+          "bushing": 3.254129575099796,
+          "compaction": 1.0397561066783965,
+          "python_other": 3.531462368555367
+        },
+        "shares": {
+          "mujoco": 0.40033889884947876,
+          "setup": 0.0017873274536902525,
+          "pinch": 0.04114364529272903,
+          "bushing": 0.23151327768886543,
+          "compaction": 0.07397288236340342,
+          "python_other": 0.25124396835183305
+        },
+        "outcome": "success",
+        "sim_s": 8.710400000000684
+      }
+    ]
+  },
+  "risk": {
+    "short_rest_passed": true,
+    "simulation_seconds": 0.3,
+    "native_gpu_backend_validated": false,
+    "rows": [
+      {
+        "anchor": "hard",
+        "damped_tendons": 0,
+        "steps": 750,
+        "ntendon": 0,
+        "neq": 0,
+        "passed": true
+      },
+      {
+        "anchor": "bendable",
+        "damped_tendons": 504,
+        "steps": 750,
+        "ntendon": 1368,
+        "neq": 72,
+        "passed": true
+      },
+      {
+        "anchor": "compressible",
+        "damped_tendons": 728,
+        "steps": 750,
+        "ntendon": 1976,
+        "neq": 104,
+        "passed": true
+      }
+    ]
+  },
+  "S2": {
+    "passed": false,
+    "completed": 6,
+    "planned": 65,
+    "hard_bitwise_cases": 5,
+    "failing_case": {
+      "category": "bendable",
+      "test": "r1y"
+    },
+    "trace": {
+      "common_steps": 12483,
+      "reference_steps": 12493,
+      "candidate_steps": 12483,
+      "first_nonzero_step": 2,
+      "first_nonzero_max_abs_diff": 3.586655136029928e-21,
+      "first_exceeding_step": 18,
+      "first_exceeding_t": 0.007200000000000001,
+      "first_exceeding_max_abs_diff": 0.40657648324640216,
+      "common_prefix_max_abs_diff": 3.731322528448212,
+      "qpos_max_abs_diff": 0.00573301169094384,
+      "qvel_max_abs_diff": 3.731322528448212,
+      "eq_active_different_steps": 51
+    },
+    "stiffness_reference": 0.5011508539825948,
+    "stiffness_candidate": 0.49658196416970884,
+    "stiffness_abs_diff": 0.004568889812886001,
+    "stiffness_relative_diff": -0.009116795425125002
+  },
+  "S3": "not run: S2 failed; CPU speedup not established",
+  "S4": "not run: only the short resting diagnostic is complete",
+  "S5": "not run",
+  "S6": "not run; no evaluate throughput claim",
+  "released_v1_2_1": false,
+  "load": {
+    "risk_formal_checked": {
+      "start": "2026-11-06T16:28:01.628021+08:00",
+      "end": "2026-11-06T16:28:20.686059+08:00",
+      "loadavg_before": [
+        3.65771484375,
+        0.8662109375,
+        0.5751953125
+      ],
+      "loadavg_after": [
+        3.06884765625,
+        0.87353515625,
+        0.58251953125
+      ],
+      "system_busy_percent": 3.773182340390613,
+      "average_busy_logical_cpus": 1.207418348924996
+    },
+    "s1_profile": {
+      "start": "2026-11-06T16:30:00.016607+08:00",
+      "end": "2026-11-06T16:30:38.216485+08:00",
+      "loadavg_before": [
+        0.57568359375,
+        0.62109375,
+        0.5185546875
+      ],
+      "loadavg_after": [
+        0.8359375,
+        0.685546875,
+        0.54736328125
+      ],
+      "system_busy_percent": 3.6805968709298753,
+      "average_busy_logical_cpus": 1.17779099869756
+    },
+    "s2_bushing_regression": {
+      "start": "2026-11-06T16:36:46.720886+08:00",
+      "end": "2026-11-06T16:37:05.393204+08:00",
+      "loadavg_before": [
+        0.08349609375,
+        0.35009765625,
+        0.43505859375
+      ],
+      "loadavg_after": [
+        0.28759765625,
+        0.3828125,
+        0.4453125
+      ],
+      "system_busy_percent": 3.677024876455315,
+      "average_busy_logical_cpus": 1.1766479604657007
+    }
+  },
+  "archive_unchanged": true,
+  "frozen_archive_sha256": "e75f2a8cc718bcde7d99b6ea34afa170e712784e8960482eec62937232e23919",
+  "active_frozen_files_changed": [],
+  "side_dependency_unchanged": true,
+  "source_sha256": {
+    "validate_acceleration.py": "6f045433badbcf43d94645e88be5456fdc276830444c33d91de28dbb80c0ab1a",
+    "warp_mechanics.py": "e181c0fedd8db3c11819026a4850daee52386c2734f55a2ec87eb3a50977ef79"
+  }
+}

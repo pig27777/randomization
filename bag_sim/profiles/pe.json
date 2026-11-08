@@ -1,0 +1,47 @@
+{
+  "title_zh": "PE 薄膜快递袋",
+  "geometry": "geometry/pe.npz",
+  "texture": "textures/pe.png",
+  "notes_zh": "参数与 01_pe_film/material.json 相同；membrane_model 可改为 tension_only 以允许网格以下的起皱；Newton 自接触模量 2e6 Pa/m（节点仅 28 mg，2e8 时包住内容物会弹开），撑袋初始化保证前后片至少相隔 2r+0.2 mm",
+  "params": {
+    "membrane_model": "inextensible",
+    "bending_rigidity_nm": 2e-06,
+    "plasticity": false,
+    "plastic_yield_angle_deg": 35.0,
+    "plastic_hardening_ratio": 0.04,
+    "memory_ratio": 0.25,
+    "recovery_tau_s": 0.8,
+    "bending_damping_nms": 1e-09,
+    "timestep_s": 5e-05,
+    "frame_dt_s": 0.01,
+    "collision_radius_m": 0.00025,
+    "collision_patch_faces": 28,
+    "friction": 0.35,
+    "table_friction": 0.35,
+    "velocity_damping_per_s": 2.0,
+    "self_contact": true,
+    "gravity": true,
+    "edge_solref_s": 0.0002,
+    "edge_solimp": [
+      0.99,
+      0.999,
+      0.0001
+    ],
+    "iterations": 150,
+    "solver": "Newton",
+    "tolerance": 1e-08,
+    "contact_timeconst_s": 0.0002,
+    "self_contact_front_panel_ids": [
+      0
+    ],
+    "self_contact_back_panel_ids": [
+      1,
+      2
+    ],
+    "precreased_panel_boundaries": false,
+    "precreased_stiffness_ratio": 1.0,
+    "precreased_panel_ids": [],
+    "newton_self_contact": true,
+    "newton_self_contact_modulus_pa_per_m": 2000000.0
+  }
+}

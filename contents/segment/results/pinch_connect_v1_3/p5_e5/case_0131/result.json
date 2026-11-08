@@ -1,0 +1,156 @@
+{
+  "kind": "random",
+  "category": "compressible",
+  "kappa": {
+    "category": "compressible",
+    "size": [
+      0.1882331549517518,
+      0.13378100348192928,
+      0.13378100348192928
+    ],
+    "mass": 0.1433966839887695,
+    "com_offset": [
+      0.04138151024109926,
+      0.06200262723038874,
+      -0.0805522825935022
+    ],
+    "segments": [
+      6,
+      3,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.12299449236766327,
+    "squeeze_stiffness_z": 0.18583278571649317,
+    "lock_strain_y": 0.18563831524904412,
+    "lock_strain_z": 0.23061539017026556,
+    "droop_ratio": 0.10807769740928,
+    "damping_ratio": 0.4484840171096175,
+    "mobile": true,
+    "mobile_frac": 0.16148137234625534,
+    "mobile_range": 0.020916986933874802,
+    "mobile_freq": 1.968514979953706,
+    "surface_friction": 0.26694561462788435,
+    "skin_compliance": 2.10796676565544e-05,
+    "pinch_coeff": 0.1137747656955542
+  },
+  "seed": 20261332,
+  "grasp": {
+    "u": 0.3698983137480585,
+    "v": 0.18282038705361092,
+    "psi": 1.146879355357894,
+    "w": 0.06031355046034993,
+    "d": 0.014963262495416681,
+    "F": 26.271965388810397,
+    "v_lift": 0.29650803959281874,
+    "a_max": 0.6113248298797817
+  },
+  "index": 131,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 0.8374499564001743,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 0.9999995775759206,
+    "speed_median_mm_s": 0.013243996543808664,
+    "speed_max_mm_s": 0.05770385536233011,
+    "drift_mm": 0.037937509505022435,
+    "max_joint_strain": 0.033582468607836556
+  },
+  "result": {
+    "outcome": "over_squeeze",
+    "reason": "15.236310 N in lift",
+    "cls": "compressible",
+    "max_grip_force_N": 15.236309655158738,
+    "lift_height_mm": null,
+    "slip_mm": 0.0,
+    "wall_s": 4.180657656863332,
+    "sim_s": 2.699599999999768,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 1.0078372052897064,
+    "pinch_events": [
+      {
+        "t": 2.6959999999997684,
+        "event": "bind",
+        "segment": 50,
+        "segments": [
+          50,
+          41,
+          44,
+          53
+        ]
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.9815999999999572,
+        "phase": "press"
+      },
+      {
+        "t": 2.4779999999997924,
+        "phase": "close"
+      },
+      {
+        "t": 2.6959999999997684,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.014963262495416681,
+    "contact_height_m": 0.13206900353805628,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "depth",
+      "t": 2.4779999999997924,
+      "force_N": 2.634938296221343,
+      "depth_m": 0.014959999999998353
+    },
+    "press_peak_vertical_force_N": 8.52624216930889,
+    "actual_depth_m": 0.014959999999998353,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.9815999999999572,
+      "forces": {
+        "pA": [
+          -0.006359171298536784,
+          -0.004329317809356517,
+          0.07015820583696912
+        ],
+        "pB": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "max_real_grip_force_N": 1.4771752324140357,
+    "max_spring_force_N": 31.558382293749577,
+    "rest_grip_to_com_gap_mm": 81.67324893752243,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": null,
+    "hang_end": null,
+    "stop_swing_mm": null,
+    "stop_window_samples": 0
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 6.676693435758352
+}

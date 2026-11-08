@@ -1,0 +1,91 @@
+{
+  "kind": "scan",
+  "category": "compressible",
+  "seed": 20261118,
+  "coefficient_scale": 0.5,
+  "grasp": {
+    "w": 0.04,
+    "d": 0.01,
+    "F": 5.0
+  },
+  "index": 275,
+  "kappa": {
+    "category": "compressible",
+    "size": [
+      0.35,
+      0.25,
+      0.12
+    ],
+    "mass": 0.5,
+    "com_offset": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "segments": [
+      4,
+      4,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.1,
+    "squeeze_stiffness_z": 0.2,
+    "lock_strain_y": 0.25,
+    "lock_strain_z": 0.25,
+    "droop_ratio": 0.15,
+    "damping_ratio": 0.5,
+    "mobile": false,
+    "mobile_frac": 0.3,
+    "mobile_range": 0.02,
+    "mobile_freq": 2.0,
+    "surface_friction": 0.8,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 1.0
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "COM rose only 43.042 mm",
+    "cls": "compressible",
+    "max_grip_force_N": 4.999999999999844,
+    "lift_height_mm": 43.04224043906382,
+    "slip_mm": 19.737920542046467,
+    "wall_s": 4.805117560084909,
+    "sim_s": 3.9587999999996293,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 4.185000263800553,
+    "pinch_events": [
+      {
+        "t": 2.7579999999997615,
+        "event": "bind",
+        "segment": 29
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 1.345999999999917,
+        "phase": "press"
+      },
+      {
+        "t": 2.346399999999807,
+        "phase": "close"
+      },
+      {
+        "t": 2.7579999999997615,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.01,
+    "contact_height_m": 0.11464400007997318,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 4.8055345746688545
+}

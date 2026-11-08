@@ -1,0 +1,99 @@
+{
+  "index": 129,
+  "job": {
+    "category": "compressible",
+    "test": "e5",
+    "kappa": {
+      "category": "compressible",
+      "size": [
+        0.26951009875045007,
+        0.2182686021645524,
+        0.16232992515542669
+      ],
+      "mass": 0.2958780010770387,
+      "com_offset": [
+        0.1375437692667291,
+        -0.04133537652223386,
+        -0.04951443011813328
+      ],
+      "segments": [
+        6,
+        4,
+        2
+      ],
+      "rigid": false,
+      "squeeze_stiffness_y": 0.057850084710580424,
+      "squeeze_stiffness_z": 0.26165799813786594,
+      "lock_strain_y": 0.230154765360226,
+      "lock_strain_z": 0.15783305034324105,
+      "droop_ratio": 0.111024693212959,
+      "damping_ratio": 0.38606346514104956,
+      "mobile": true,
+      "mobile_frac": 0.20179654732988728,
+      "mobile_range": 0.03207720600101485,
+      "mobile_freq": 1.412674061283465,
+      "surface_friction": 0.3411025642458325,
+      "skin_compliance": 0.0,
+      "pinch_coeff": 0.2827466044837697
+    },
+    "grasp": {
+      "u": 0.2996223699348045,
+      "v": -0.4001987638293887,
+      "psi": 0.30404425045001093,
+      "w": 0.0481677905385514,
+      "d": 0.016271687256182422,
+      "F": 29.731468668402115,
+      "v_lift": 0.25956009583277134,
+      "a_max": 1.868702320913066
+    },
+    "original_index": 13,
+    "seed": 20261139,
+    "repeat": 0
+  },
+  "reference": "grasp_fail",
+  "candidate": "over_squeeze",
+  "agreed": false,
+  "execution_error": false,
+  "boundary_evidence": {
+    "reference": {
+      "outcome": "grasp_fail",
+      "reason": "top pinch conditions or current grip force absent",
+      "over_squeeze_margin_N": 0.5066728617780818,
+      "pinch_events": [],
+      "nearest_recorded_capacity_margin": null,
+      "actual_depth_m": 0.016267999999998208,
+      "press_stop": {
+        "reason": "depth",
+        "t": 2.799999999999757,
+        "force_N": 1.8285983871384635,
+        "depth_m": 0.016267999999998208
+      },
+      "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+    },
+    "candidate": {
+      "outcome": "over_squeeze",
+      "reason": "15.312891 N in lift",
+      "over_squeeze_margin_N": -0.31289099785675134,
+      "pinch_events": [
+        {
+          "t": 3.0195999999997327,
+          "event": "bind",
+          "segment": 33
+        }
+      ],
+      "nearest_recorded_capacity_margin": {
+        "t": 3.0199999999997327,
+        "phase": "lift",
+        "margin_N": 5.212272361222689
+      },
+      "actual_depth_m": 0.016267999999998208,
+      "press_stop": {
+        "reason": "depth",
+        "t": 2.799999999999757,
+        "force_N": 2.2246773704596197,
+        "depth_m": 0.016267999999998208
+      },
+      "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+    }
+  }
+}

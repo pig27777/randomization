@@ -1,0 +1,44 @@
+{
+  "status": "not_frozen",
+  "gate_stopped_at": "E4",
+  "E1": {
+    "status": "passed",
+    "tests": 31,
+    "evidence": "e1_final_logging/summary.json"
+  },
+  "E2": {
+    "status": "passed",
+    "comparisons": 12,
+    "evidence": "e2_comparison/summary.json"
+  },
+  "E3": {
+    "status": "passed",
+    "repeats_per_anchor": 3,
+    "measured": {
+      "hard": 0,
+      "bendable": 1.0075141202501297,
+      "compressible": 2.009548868366693
+    },
+    "evidence": "e3_formal/summary.json"
+  },
+  "E4": {
+    "status": "failed",
+    "total": 513,
+    "execution_errors": 0,
+    "compressible_default_successes": 0,
+    "compressible_default_total": 81,
+    "compressible_max_COM_lift_mm": 43.05505699357424,
+    "confirmed_sim_failures_in_grid": 54,
+    "evidence": "e4_formal/summary.json"
+  },
+  "E5": {
+    "status": "not_run",
+    "reason": "E4 failed"
+  },
+  "E6": {
+    "status": "not_run",
+    "reason": "E4 failed"
+  },
+  "source_fingerprint": "candidate_source.json",
+  "audit": "analysis/audit.json"
+}

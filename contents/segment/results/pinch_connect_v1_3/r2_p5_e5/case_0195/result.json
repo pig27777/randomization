@@ -1,0 +1,156 @@
+{
+  "kind": "random",
+  "category": "compressible",
+  "kappa": {
+    "category": "compressible",
+    "size": [
+      0.23496998933827026,
+      0.23496998933827026,
+      0.12969569767704853
+    ],
+    "mass": 1.0372715527303071,
+    "com_offset": [
+      0.07073280605657853,
+      0.022691519700427265,
+      -0.05401814278238415
+    ],
+    "segments": [
+      2,
+      4,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.12317170521593515,
+    "squeeze_stiffness_z": 0.26168667212307534,
+    "lock_strain_y": 0.32435232786468327,
+    "lock_strain_z": 0.20322683919872533,
+    "droop_ratio": 0.0988823486465843,
+    "damping_ratio": 0.8106150751609,
+    "mobile": false,
+    "mobile_frac": 0.4144527022386144,
+    "mobile_range": 0.035208299959633545,
+    "mobile_freq": 1.059189999776976,
+    "surface_friction": 0.40237399359453263,
+    "skin_compliance": 2.6154038517092626e-05,
+    "pinch_coeff": 1.2865289486430038
+  },
+  "seed": 20261397,
+  "grasp": {
+    "u": 0.0590061315020447,
+    "v": -0.22910249927594228,
+    "psi": 0.8012962844273258,
+    "w": 0.021174300549319628,
+    "d": 0.025456378827417227,
+    "F": 19.484826992301635,
+    "v_lift": 0.25745686207342516,
+    "a_max": 2.220451313919485
+  },
+  "index": 195,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 1.649821457727926,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 1.0000000003436844,
+    "speed_median_mm_s": 0.00013119468088140706,
+    "speed_max_mm_s": 0.0004122381960257644,
+    "drift_mm": 2.499884189193188e-05,
+    "max_joint_strain": 0.0939558943099229
+  },
+  "result": {
+    "outcome": "over_squeeze",
+    "reason": "15.056422 N in lift",
+    "cls": "compressible",
+    "max_grip_force_N": 15.056421534860242,
+    "lift_height_mm": null,
+    "slip_mm": 1.794023654585777,
+    "wall_s": 3.6925690793432295,
+    "sim_s": 3.9743999999996276,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 3.4841373071982265,
+    "pinch_events": [
+      {
+        "t": 3.960399999999629,
+        "event": "bind",
+        "segment": 17,
+        "segments": [
+          17,
+          14,
+          5,
+          2
+        ]
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 1.1995999999999332,
+        "phase": "press"
+      },
+      {
+        "t": 3.7455999999996528,
+        "phase": "close"
+      },
+      {
+        "t": 3.960399999999629,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.025456378827417227,
+    "contact_height_m": 0.12580369771595906,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "depth",
+      "t": 3.7455999999996528,
+      "force_N": 6.147342359190745,
+      "depth_m": 0.025455999999997196
+    },
+    "press_peak_vertical_force_N": 11.345361971156297,
+    "actual_depth_m": 0.025455999999997196,
+    "lift_table": null,
+    "first_contact": {
+      "t": 1.1995999999999332,
+      "forces": {
+        "pA": [
+          0.009168659570312862,
+          0.010519865452734836,
+          0.048637262471993944
+        ],
+        "pB": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "max_real_grip_force_N": 0.617509820559039,
+    "max_spring_force_N": 24.161680245191956,
+    "rest_grip_to_com_gap_mm": 72.32350171306345,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": null,
+    "hang_end": null,
+    "stop_swing_mm": null,
+    "stop_window_samples": 0
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 4.962273207027465
+}

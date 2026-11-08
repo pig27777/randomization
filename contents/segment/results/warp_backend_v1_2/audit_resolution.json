@@ -1,0 +1,580 @@
+{
+  "S2": {
+    "reviewed_numeric_responses_accepted": true,
+    "originally_executed_numeric_cases": 7,
+    "originally_unexecuted_numeric_cases": 8,
+    "classifications_passed": true,
+    "classes": {
+      "e4": {
+        "groups": 30,
+        "paired_runs": 90,
+        "matches": 90,
+        "agreement": 1.0,
+        "reference_outcomes": {
+          "grasp_fail": 39,
+          "success": 30,
+          "drop": 3,
+          "over_squeeze": 18
+        },
+        "candidate_outcomes": {
+          "grasp_fail": 39,
+          "success": 30,
+          "drop": 3,
+          "over_squeeze": 18
+        }
+      },
+      "e5": {
+        "groups": 20,
+        "paired_runs": 60,
+        "matches": 57,
+        "agreement": 0.95,
+        "reference_outcomes": {
+          "grasp_fail": 42,
+          "over_squeeze": 18
+        },
+        "candidate_outcomes": {
+          "grasp_fail": 39,
+          "over_squeeze": 21
+        },
+        "rest_failures": {
+          "reference": [],
+          "candidate": []
+        }
+      }
+    },
+    "execution_errors": 0,
+    "mismatches": [
+      {
+        "index": 129,
+        "job": {
+          "category": "compressible",
+          "test": "e5",
+          "kappa": {
+            "category": "compressible",
+            "size": [
+              0.26951009875045007,
+              0.2182686021645524,
+              0.16232992515542669
+            ],
+            "mass": 0.2958780010770387,
+            "com_offset": [
+              0.1375437692667291,
+              -0.04133537652223386,
+              -0.04951443011813328
+            ],
+            "segments": [
+              6,
+              4,
+              2
+            ],
+            "rigid": false,
+            "squeeze_stiffness_y": 0.057850084710580424,
+            "squeeze_stiffness_z": 0.26165799813786594,
+            "lock_strain_y": 0.230154765360226,
+            "lock_strain_z": 0.15783305034324105,
+            "droop_ratio": 0.111024693212959,
+            "damping_ratio": 0.38606346514104956,
+            "mobile": true,
+            "mobile_frac": 0.20179654732988728,
+            "mobile_range": 0.03207720600101485,
+            "mobile_freq": 1.412674061283465,
+            "surface_friction": 0.3411025642458325,
+            "skin_compliance": 0.0,
+            "pinch_coeff": 0.2827466044837697
+          },
+          "grasp": {
+            "u": 0.2996223699348045,
+            "v": -0.4001987638293887,
+            "psi": 0.30404425045001093,
+            "w": 0.0481677905385514,
+            "d": 0.016271687256182422,
+            "F": 29.731468668402115,
+            "v_lift": 0.25956009583277134,
+            "a_max": 1.868702320913066
+          },
+          "original_index": 13,
+          "seed": 20261139,
+          "repeat": 0
+        },
+        "reference": "grasp_fail",
+        "candidate": "over_squeeze",
+        "agreed": false,
+        "execution_error": false,
+        "boundary_evidence": {
+          "reference": {
+            "outcome": "grasp_fail",
+            "reason": "top pinch conditions or current grip force absent",
+            "over_squeeze_margin_N": 0.5066728617780818,
+            "pinch_events": [],
+            "nearest_recorded_capacity_margin": null,
+            "actual_depth_m": 0.016267999999998208,
+            "press_stop": {
+              "reason": "depth",
+              "t": 2.799999999999757,
+              "force_N": 1.8285983871384635,
+              "depth_m": 0.016267999999998208
+            },
+            "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+          },
+          "candidate": {
+            "outcome": "over_squeeze",
+            "reason": "15.312891 N in lift",
+            "over_squeeze_margin_N": -0.31289099785675134,
+            "pinch_events": [
+              {
+                "t": 3.0195999999997327,
+                "event": "bind",
+                "segment": 33
+              }
+            ],
+            "nearest_recorded_capacity_margin": {
+              "t": 3.0199999999997327,
+              "phase": "lift",
+              "margin_N": 5.212272361222689
+            },
+            "actual_depth_m": 0.016267999999998208,
+            "press_stop": {
+              "reason": "depth",
+              "t": 2.799999999999757,
+              "force_N": 2.2246773704596197,
+              "depth_m": 0.016267999999998208
+            },
+            "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+          }
+        }
+      },
+      {
+        "index": 130,
+        "job": {
+          "category": "compressible",
+          "test": "e5",
+          "kappa": {
+            "category": "compressible",
+            "size": [
+              0.26951009875045007,
+              0.2182686021645524,
+              0.16232992515542669
+            ],
+            "mass": 0.2958780010770387,
+            "com_offset": [
+              0.1375437692667291,
+              -0.04133537652223386,
+              -0.04951443011813328
+            ],
+            "segments": [
+              6,
+              4,
+              2
+            ],
+            "rigid": false,
+            "squeeze_stiffness_y": 0.057850084710580424,
+            "squeeze_stiffness_z": 0.26165799813786594,
+            "lock_strain_y": 0.230154765360226,
+            "lock_strain_z": 0.15783305034324105,
+            "droop_ratio": 0.111024693212959,
+            "damping_ratio": 0.38606346514104956,
+            "mobile": true,
+            "mobile_frac": 0.20179654732988728,
+            "mobile_range": 0.03207720600101485,
+            "mobile_freq": 1.412674061283465,
+            "surface_friction": 0.3411025642458325,
+            "skin_compliance": 0.0,
+            "pinch_coeff": 0.2827466044837697
+          },
+          "grasp": {
+            "u": 0.2996223699348045,
+            "v": -0.4001987638293887,
+            "psi": 0.30404425045001093,
+            "w": 0.0481677905385514,
+            "d": 0.016271687256182422,
+            "F": 29.731468668402115,
+            "v_lift": 0.25956009583277134,
+            "a_max": 1.868702320913066
+          },
+          "original_index": 13,
+          "seed": 20261140,
+          "repeat": 1
+        },
+        "reference": "grasp_fail",
+        "candidate": "over_squeeze",
+        "agreed": false,
+        "execution_error": false,
+        "boundary_evidence": {
+          "reference": {
+            "outcome": "grasp_fail",
+            "reason": "top pinch conditions or current grip force absent",
+            "over_squeeze_margin_N": 0.5066728617780818,
+            "pinch_events": [],
+            "nearest_recorded_capacity_margin": null,
+            "actual_depth_m": 0.016267999999998208,
+            "press_stop": {
+              "reason": "depth",
+              "t": 2.799999999999757,
+              "force_N": 1.8285983871384635,
+              "depth_m": 0.016267999999998208
+            },
+            "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+          },
+          "candidate": {
+            "outcome": "over_squeeze",
+            "reason": "15.312891 N in lift",
+            "over_squeeze_margin_N": -0.31289099785675134,
+            "pinch_events": [
+              {
+                "t": 3.0195999999997327,
+                "event": "bind",
+                "segment": 33
+              }
+            ],
+            "nearest_recorded_capacity_margin": {
+              "t": 3.0199999999997327,
+              "phase": "lift",
+              "margin_N": 5.212272361222689
+            },
+            "actual_depth_m": 0.016267999999998208,
+            "press_stop": {
+              "reason": "depth",
+              "t": 2.799999999999757,
+              "force_N": 2.2246773704596197,
+              "depth_m": 0.016267999999998208
+            },
+            "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+          }
+        }
+      },
+      {
+        "index": 131,
+        "job": {
+          "category": "compressible",
+          "test": "e5",
+          "kappa": {
+            "category": "compressible",
+            "size": [
+              0.26951009875045007,
+              0.2182686021645524,
+              0.16232992515542669
+            ],
+            "mass": 0.2958780010770387,
+            "com_offset": [
+              0.1375437692667291,
+              -0.04133537652223386,
+              -0.04951443011813328
+            ],
+            "segments": [
+              6,
+              4,
+              2
+            ],
+            "rigid": false,
+            "squeeze_stiffness_y": 0.057850084710580424,
+            "squeeze_stiffness_z": 0.26165799813786594,
+            "lock_strain_y": 0.230154765360226,
+            "lock_strain_z": 0.15783305034324105,
+            "droop_ratio": 0.111024693212959,
+            "damping_ratio": 0.38606346514104956,
+            "mobile": true,
+            "mobile_frac": 0.20179654732988728,
+            "mobile_range": 0.03207720600101485,
+            "mobile_freq": 1.412674061283465,
+            "surface_friction": 0.3411025642458325,
+            "skin_compliance": 0.0,
+            "pinch_coeff": 0.2827466044837697
+          },
+          "grasp": {
+            "u": 0.2996223699348045,
+            "v": -0.4001987638293887,
+            "psi": 0.30404425045001093,
+            "w": 0.0481677905385514,
+            "d": 0.016271687256182422,
+            "F": 29.731468668402115,
+            "v_lift": 0.25956009583277134,
+            "a_max": 1.868702320913066
+          },
+          "original_index": 13,
+          "seed": 20261141,
+          "repeat": 2
+        },
+        "reference": "grasp_fail",
+        "candidate": "over_squeeze",
+        "agreed": false,
+        "execution_error": false,
+        "boundary_evidence": {
+          "reference": {
+            "outcome": "grasp_fail",
+            "reason": "top pinch conditions or current grip force absent",
+            "over_squeeze_margin_N": 0.5066728617780818,
+            "pinch_events": [],
+            "nearest_recorded_capacity_margin": null,
+            "actual_depth_m": 0.016267999999998208,
+            "press_stop": {
+              "reason": "depth",
+              "t": 2.799999999999757,
+              "force_N": 1.8285983871384635,
+              "depth_m": 0.016267999999998208
+            },
+            "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+          },
+          "candidate": {
+            "outcome": "over_squeeze",
+            "reason": "15.312891 N in lift",
+            "over_squeeze_margin_N": -0.31289099785675134,
+            "pinch_events": [
+              {
+                "t": 3.0195999999997327,
+                "event": "bind",
+                "segment": 33
+              }
+            ],
+            "nearest_recorded_capacity_margin": {
+              "t": 3.0199999999997327,
+              "phase": "lift",
+              "margin_N": 5.212272361222689
+            },
+            "actual_depth_m": 0.016267999999998208,
+            "press_stop": {
+              "reason": "depth",
+              "t": 2.799999999999757,
+              "force_N": 2.2246773704596197,
+              "depth_m": 0.016267999999998208
+            },
+            "note": "10ms sampled margins describe proximity; they do not prove the cause of a branch difference"
+          }
+        }
+      }
+    ]
+  },
+  "S4": {
+    "resting_passed": true,
+    "rest_worlds_per_anchor": 2,
+    "rest_seconds": 2,
+    "full_protocol_v22_and_remaining_stability_tests": "not completed; numerical response gate failed"
+  },
+  "S5_entry": {
+    "passed": false,
+    "completed": 1,
+    "failure": {
+      "job": {
+        "category": "hard",
+        "test": "r1y"
+      },
+      "passed": false,
+      "metrics": [
+        {
+          "metric": "stiffness",
+          "reference": 161.96591339936433,
+          "candidate": 186.6877670586538,
+          "relative_error": 0.15263615127667046,
+          "abs_diff": 24.72185365928948,
+          "nominal_absolute_tolerance": 3.2393182679872865,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 3.2393182679872865,
+          "resolution_used": false,
+          "passed": false
+        },
+        {
+          "metric": "lock_strain",
+          "reference": null,
+          "candidate": null,
+          "relative_error": null,
+          "abs_diff": null,
+          "nominal_absolute_tolerance": null,
+          "grid_step": 0.0025,
+          "effective_absolute_tolerance": null,
+          "resolution_used": false,
+          "passed": true
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        },
+        "lower_bound": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    }
+  },
+  "S6": "not run; no evaluate/s or peak-VRAM result",
+  "candidate_training_ready": false,
+  "hard_r1y_model": {
+    "same_frozen_xml": true,
+    "ntendon": 0,
+    "neq": 0,
+    "nbody": 4,
+    "timestep": 0.0004,
+    "solver": 2,
+    "integrator": 3,
+    "iterations": 100,
+    "ls_iterations": 20,
+    "tolerance": 1e-08
+  },
+  "provenance": {
+    "resolution_review": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true
+      },
+      "load": {
+        "start": "2026-11-06T17:55:49.147401+08:00",
+        "end": "2026-11-06T17:55:49.152160+08:00",
+        "loadavg_before": [
+          0.08203125,
+          0.08740234375,
+          0.08984375
+        ],
+        "loadavg_after": [
+          0.08203125,
+          0.08740234375,
+          0.08984375
+        ],
+        "busy_percent": 6.25,
+        "average_busy_logical_cpus": 2.0
+      }
+    },
+    "classes_smoke": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true
+      },
+      "load": {
+        "start": "2026-11-06T17:56:07.975510+08:00",
+        "end": "2026-11-06T17:56:17.142533+08:00",
+        "loadavg_before": [
+          0.13818359375,
+          0.0986328125,
+          0.09375
+        ],
+        "loadavg_after": [
+          0.3447265625,
+          0.14501953125,
+          0.10888671875
+        ],
+        "busy_percent": 6.45216323188208,
+        "average_busy_logical_cpus": 2.0646922342022656
+      }
+    },
+    "s2_classes": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true
+      },
+      "load": {
+        "start": "2026-11-06T17:58:20.847665+08:00",
+        "end": "2026-11-06T18:02:03.349488+08:00",
+        "loadavg_before": [
+          0.0615234375,
+          0.10400390625,
+          0.09033203125
+        ],
+        "loadavg_after": [
+          7.44921875,
+          4.1640625,
+          1.75537109375
+        ],
+        "busy_percent": 24.401455552070306,
+        "average_busy_logical_cpus": 7.808465776662498
+      }
+    },
+    "gpu_rest_smoke": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:04:26.698880+08:00",
+        "end": "2026-11-06T18:04:30.537205+08:00",
+        "loadavg_before": [
+          0.92724609375,
+          2.642578125,
+          1.525390625
+        ],
+        "loadavg_after": [
+          0.93310546875,
+          2.615234375,
+          1.5224609375
+        ],
+        "busy_percent": 3.6028692533420226,
+        "average_busy_logical_cpus": 1.1529181610694472
+      }
+    },
+    "s4_gpu_rest": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:05:50.457302+08:00",
+        "end": "2026-11-06T18:06:40.419624+08:00",
+        "loadavg_before": [
+          0.40380859375,
+          2.04345703125,
+          1.4091796875
+        ],
+        "loadavg_after": [
+          0.74267578125,
+          1.88037109375,
+          1.384765625
+        ],
+        "busy_percent": 3.6014999467882003,
+        "average_busy_logical_cpus": 1.152479982972224
+      }
+    },
+    "s4_gpu_responses": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:08:53.611953+08:00",
+        "end": "2026-11-06T18:09:10.595010+08:00",
+        "loadavg_before": [
+          0.12451171875,
+          1.2470703125,
+          1.212890625
+        ],
+        "loadavg_after": [
+          0.3994140625,
+          1.2509765625,
+          1.21435546875
+        ],
+        "busy_percent": 3.6526736539630456,
+        "average_busy_logical_cpus": 1.1688555692681746
+      }
+    }
+  },
+  "frozen_archive_unchanged": true,
+  "original_files_changed": [],
+  "latest_sources_match": {
+    "validate_warp.py": true,
+    "warp_mechanics.py": true,
+    "warp_effects.py": true,
+    "warp_cpu.py": true,
+    "mjwarp_backend.py": true
+  },
+  "source_syntax_passed": true
+}

@@ -1,0 +1,159 @@
+{
+ "exploration": true,
+ "formal": false,
+ "arguments": {
+  "backend": "both",
+  "max_time": null
+ },
+ "versions": {
+  "mujoco": "3.17.0",
+  "warp": "1.19.0",
+  "mjwarp": "3.17.0"
+ },
+ "source_sha256": {
+  "diagnose_r3_v13.py": "3da9fc8817a04169c18bbf1cee13a84d7c7d25d775d03e66323eee601db4462e",
+  "mj_adapter.py": "904e545b12105587b046ef5541fe74c3c9d4b424f0607d25730eb160b5052be6",
+  "model.py": "55c85511bc321d7dbac268c9e1075de20b0c70a0b0803ba7840fc09bbbc3e9e6",
+  "protocols.py": "fbcffe01adc218de73412fdfe3fac00008269bbe0b651a33e2c51af4e3fe7cfe",
+  "metrics.py": "cb9b0755c888913615d1f8e9999d9c07349e8279e76f3ea30bcd248bc1606891",
+  "mjwarp_backend.py": "b4fbc6e777a147a974006c48e6ea269355e4c939a53482a24682e72fbd5bd006",
+  "warp_effects.py": "921d015cd59b34340620fbe2f6ba94e6c874b3b9b4489f171ecf4609f6c3a360",
+  "warp_mechanics.py": "e181c0fedd8db3c11819026a4850daee52386c2734f55a2ec87eb3a50977ef79"
+ },
+ "source_unchanged": true,
+ "summary": {
+  "cpu": {
+   "result": {
+    "test": "R3",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 13.026349521012513,
+    "sim_t": 3.8819999999996377,
+    "events": {
+     "lift": 0.582,
+     "pre": 1.582,
+     "move": 2.082,
+     "hold": 2.882
+    },
+    "closed": 0.3816000000000068,
+    "diagnostics": [],
+    "failure_state": null,
+    "grip_force": 18.924050331584173,
+    "capped": false,
+    "slip_mm": 0.6019959967504945,
+    "interior_motion_mm": 0.5972680615046824,
+    "com_swing_mm": 0.03615144412815267,
+    "com_decay_s": 0.9979999999996365,
+    "decay_unfinished": true,
+    "force_p2p": 0.612119604613703,
+    "dropped": false,
+    "pad_fz_ratio": 0.9999999999999997,
+    "table_touch": false
+   },
+   "close_stop": [
+    {
+     "event": "close_stop",
+     "t": 0.3816000000000068,
+     "forces_N": {
+      "pA": 171.54788972368698,
+      "pB": 171.39092858799944
+     },
+     "filtered_force_N": {
+      "pA": 26.940421029854175,
+      "pB": 20.934214274881562
+     },
+     "squeeze_m": 5.5511614350839345e-06,
+     "targets_m": {
+      "pA": [
+       0.0,
+       -0.08897444883856492,
+       0.025
+      ],
+      "pB": [
+       0.0,
+       0.08898444883856492,
+       0.025
+      ]
+     }
+    }
+   ],
+   "samples": 532,
+   "max_decoder_difference_N": 0.0,
+   "pre_means": {
+    "pad_gap_y_m": 0.16989765657093772,
+    "pad_indentation_m": 0.00010236855360689079,
+    "object_compression_m": -2.5124544603682964e-08,
+    "independent_force_N": 18.913081567997462,
+    "legacy_force_N": 18.91308156799746,
+    "contact_count": 64.0
+   }
+  },
+  "gpu": {
+   "result": {
+    "test": "R3",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 0.07488794672139804,
+    "sim_t": 3.881599999999638,
+    "events": {
+     "lift": 0.582,
+     "pre": 1.582,
+     "move": 2.082,
+     "hold": 2.882
+    },
+    "closed": 0.3812000000000068,
+    "diagnostics": [],
+    "failure_state": null,
+    "grip_force": 7.420247563123703,
+    "capped": false,
+    "slip_mm": 0.6027989185895457,
+    "interior_motion_mm": 0.5981593678404851,
+    "com_swing_mm": 0.0333413481712343,
+    "com_decay_s": 0.9983999999996365,
+    "decay_unfinished": true,
+    "force_p2p": 0.08224160969257355,
+    "dropped": false,
+    "pad_fz_ratio": 1.00000010070773,
+    "table_touch": false
+   },
+   "close_stop": [
+    {
+     "event": "close_stop",
+     "t": 0.3812000000000068,
+     "forces_N": {
+      "pA": 7.361196413636208,
+      "pB": 7.361194372177124
+     },
+     "filtered_force_N": {
+      "pA": 21.3015596759908,
+      "pB": 21.301601387018692
+     },
+     "squeeze_m": 0.0,
+     "targets_m": {
+      "pA": [
+       0.0,
+       -0.08898,
+       0.025
+      ],
+      "pB": [
+       0.0,
+       0.08898,
+       0.025
+      ]
+     }
+    }
+   ],
+   "samples": 532,
+   "max_decoder_difference_N": 0.0,
+   "pre_means": {
+    "pad_gap_y_m": 0.16995970956608647,
+    "pad_indentation_m": 4.029349588217712e-05,
+    "object_compression_m": -3.0619686836041995e-09,
+    "independent_force_N": 7.419918169677257,
+    "legacy_force_N": 7.419918169677257,
+    "contact_count": 64.0
+   },
+   "max_native_export_force_difference_N": 0.0
+  }
+ }
+}

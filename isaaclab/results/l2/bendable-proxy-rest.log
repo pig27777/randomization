@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/segment_adapter.py", line 192, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/segment_adapter.py", line 152, in main
+    mapping = add_content(builder, desc, args.loop_mode)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/segment_adapter.py", line 128, in add_content
+    "mujoco:eq_solimp": wp.vec(length=5, dtype=wp.float32)(0.95, 0.99, 0.0005, 0.5, 2.0),
+                        ^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/__init__.py", line 607, in __getattr__
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+AttributeError: module 'warp' has no attribute 'vec'. Did you mean: 'vec2'?

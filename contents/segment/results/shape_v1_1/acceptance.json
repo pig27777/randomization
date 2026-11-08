@@ -1,0 +1,351 @@
+{
+  "checked_at": "2026-11-05T21:08:42.614877+08:00",
+  "frozen": false,
+  "source_sha256": {
+    "bushing.py": "b6283564922010ee82f900e9402f367a386fd344014648e5ef825d58b1471c6b",
+    "calibrate.py": "fb447fce7eae145f016748f4cb346b7f2caabc043306c0c9690ca3ed1231c5b4",
+    "freeze_v1.py": "0741ebf3beb88c22f8fdfe57bd87759813bda465478e2e92427b0aa3d72e0ea6",
+    "metrics.py": "cb9b0755c888913615d1f8e9999d9c07349e8279e76f3ea30bcd248bc1606891",
+    "mj_adapter.py": "3fcdfddca000a5c0917eb049b4589dfa5c0c9505b4fd71314488124adc242736",
+    "mjwarp_speed.py": "24ea169c338c9a96fb75113b85cb15127a5f65e982d0f6f57a93411ba29148c6",
+    "mjwarp_validate.py": "e41204c774cf7258633f9dd32b0db010af492da1be5e5ae9b9d96b29986092f6",
+    "model.py": "2f521a7435aa38a8a0539a09b07ea6e5d3a4eb74d59e78ce268b8f6af0c9ca76",
+    "newton_check.py": "2c86a48cbf0fa5eb3ecd13fb551ad93e7cec36bbc61d3826bdb99b36424de6d8",
+    "policy_protocol.py": "e61788679a8e366c206367e4ebd449bff321ea3727e26653a53936c3d2d35f17",
+    "protocols.py": "fbcffe01adc218de73412fdfe3fac00008269bbe0b651a33e2c51af4e3fe7cfe",
+    "run_round1.py": "b7871b589ca70d4457639d155619137a4ca6f05beebbbe76f96a712fc06f3d8e",
+    "run_round2.py": "1321350e7f4c1a15a3f0c9de0ded118d52be8900f28e3899502ed7515549c6f2",
+    "sampling.py": "3e604877cc5cf28ca5c85051dd8c07906bdb603ab4fc58845f52fe3e4ae7a232",
+    "shape_geometry.py": "e400ffc5d2f40dbf47745006976f5a5f8cefe1dc8d7d229b6806f356abd87d64",
+    "shape_observation.py": "6a8c1cf4563784678f58ffcfaacf78a2a5c6f26d6ad5f594f6b636477b207c65",
+    "stability_estimate.py": "d731f5bb3c71ddcba022364afca01aa97ed0ac6c1d7c6a24d49de3a12ee386d1",
+    "validate_model.py": "8d57d9bd8cc1ae010077a5641815a9787ed8031654582fec4c3e8ddc741ef6f1",
+    "validate_shape.py": "01bd7e73fe74d2f4e4ceaebfba474cc73f2c4182d85477091153ccf41ecaa2a5",
+    "view_m2.py": "6ede9fbf43d7a67c31a11f4ff70d119bb013eb64985aeec22800e5db28d9019b",
+    "tests/test_acceptance_entry.py": "c4fe4dc257c3b066e841ea32f6923d4aaefcb68028ec7b4a8cace8d99522c83f",
+    "tests/test_bushing.py": "29f7709905397ebcb08991547a4f91c0e4765a1094f35cf955ace72fcf27487d",
+    "tests/test_freeze_interfaces.py": "eab223b1c5eefc28102e8b1ba2b6ad31d2d40d81f770f50af979fd1c3660b46c",
+    "tests/test_sampling.py": "db2a2bc6de62a0aea94953f9693316ef079e6c0648240f587dc63698539957d0",
+    "tests/test_scene_extensions.py": "fdcee6c613a275d1af3a256719ac10396d42b445ba5536c27fdd9030fdb36ff2",
+    "tests/test_shape_geometry.py": "fbfdc7077e03cf3a929d17799cf33bbb1c7fe2a198149bd635abc439631ebea4"
+  },
+  "source_matches_formal_batches": {
+    "geometry_formal": true,
+    "observation_formal": true,
+    "box_regression": true
+  },
+  "v1_archive_hash_verified": true,
+  "status": {
+    "V1": "passed",
+    "V2": "failed",
+    "V3": "not_run_after_V2_failure",
+    "V4": "not_completed_after_V2_failure",
+    "V5": "not_run_after_V2_failure",
+    "V6": "passed"
+  },
+  "units": {
+    "tests": 28,
+    "failures": 0,
+    "errors": 0
+  },
+  "geometry": {
+    "cases": 18,
+    "max_mass_error": 1.1102230246251565e-16,
+    "max_com_normalized_error": 2.2681848994217553e-08,
+    "max_inertia_relative_error": 2.075414038711449e-08,
+    "removed_segment_counts": [
+      0,
+      8
+    ]
+  },
+  "V2": {
+    "within_5_percent": 7,
+    "total": 12,
+    "rows": [
+      {
+        "category": "hard",
+        "test": "r1z",
+        "metric": "stiffness",
+        "v1": 368.6511542457683,
+        "candidate": 309.2581829878112,
+        "relative_change": -0.16110887101240867,
+        "within_5_percent": false,
+        "v1_lower_bound": true,
+        "candidate_lower_bound": true,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "hard",
+        "test": "r1y",
+        "metric": "stiffness",
+        "v1": 161.96591339936433,
+        "candidate": 157.8675104072442,
+        "relative_change": -0.025304108167590655,
+        "within_5_percent": true,
+        "v1_lower_bound": true,
+        "candidate_lower_bound": true,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "hard",
+        "test": "r3",
+        "metric": "slip_mm",
+        "v1": 0.6019959967504945,
+        "candidate": 0.942838129620306,
+        "relative_change": 0.5661867100605955,
+        "within_5_percent": false,
+        "v1_lower_bound": null,
+        "candidate_lower_bound": null,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "hard",
+        "test": "r2",
+        "metric": "droop",
+        "v1": 0.003825885750391486,
+        "candidate": 0.02629232776621178,
+        "relative_change": 5.872219789501399,
+        "within_5_percent": false,
+        "v1_lower_bound": null,
+        "candidate_lower_bound": null,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "bendable",
+        "test": "r1z",
+        "metric": "stiffness",
+        "v1": 0.3019819639643874,
+        "candidate": 0.2994879027191071,
+        "relative_change": -0.008258974186863943,
+        "within_5_percent": true,
+        "v1_lower_bound": false,
+        "candidate_lower_bound": false,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "bendable",
+        "test": "r1y",
+        "metric": "stiffness",
+        "v1": 0.5011508539825948,
+        "candidate": 0.5240635605446522,
+        "relative_change": 0.04572017862480404,
+        "within_5_percent": true,
+        "v1_lower_bound": false,
+        "candidate_lower_bound": false,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "bendable",
+        "test": "r3",
+        "metric": "slip_mm",
+        "v1": 0.7380576331795597,
+        "candidate": 0.7161528304639958,
+        "relative_change": -0.029678986749581915,
+        "within_5_percent": true,
+        "v1_lower_bound": null,
+        "candidate_lower_bound": null,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "bendable",
+        "test": "r2",
+        "metric": "droop",
+        "v1": 0.3199022748330566,
+        "candidate": 0.3312953004130091,
+        "relative_change": 0.03561408116243636,
+        "within_5_percent": true,
+        "v1_lower_bound": null,
+        "candidate_lower_bound": null,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "compressible",
+        "test": "r1z",
+        "metric": "stiffness",
+        "v1": 0.19075512522075705,
+        "candidate": 0.18888446324990918,
+        "relative_change": -0.009806614468067298,
+        "within_5_percent": true,
+        "v1_lower_bound": false,
+        "candidate_lower_bound": false,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "compressible",
+        "test": "r3",
+        "metric": "slip_mm",
+        "v1": 0.756036646849749,
+        "candidate": 1.4910812538813398,
+        "relative_change": 0.9722340975062151,
+        "within_5_percent": false,
+        "v1_lower_bound": null,
+        "candidate_lower_bound": null,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "compressible",
+        "test": "r1y",
+        "metric": "stiffness",
+        "v1": 0.10077548097706772,
+        "candidate": 0.09777589147652029,
+        "relative_change": -0.029765072530192338,
+        "within_5_percent": true,
+        "v1_lower_bound": false,
+        "candidate_lower_bound": false,
+        "candidate_sim_fail": null
+      },
+      {
+        "category": "compressible",
+        "test": "r2",
+        "metric": "droop",
+        "v1": 0.3584986548421871,
+        "candidate": 0.2800662203352872,
+        "relative_change": -0.21878027559524948,
+        "within_5_percent": false,
+        "v1_lower_bound": null,
+        "candidate_lower_bound": null,
+        "candidate_sim_fail": null
+      }
+    ],
+    "note": "hard R1 values are lower bounds, not exact material stiffness; soft R2/R3 differences independently fail V2"
+  },
+  "V6": {
+    "rows": [
+      {
+        "shape": "box",
+        "features": {
+          "footprint_fill_ratio": 0.990078686281218,
+          "edge_height_ratio": 0.9729786365428853,
+          "maximum_height_m": 0.04999047517776489,
+          "foreground_pixels": 34728,
+          "edge_fraction": 0.1
+        },
+        "kappa": {
+          "category": "hard",
+          "shape_p": 12.0,
+          "shape_q": 12.0,
+          "size": [
+            0.24,
+            0.17,
+            0.05
+          ],
+          "mass": 0.8,
+          "com_offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "segments": [
+            4,
+            3,
+            2
+          ],
+          "rigid": true,
+          "squeeze_stiffness_y": 50.0,
+          "squeeze_stiffness_z": 50.0,
+          "lock_strain_y": 0.02,
+          "lock_strain_z": 0.02,
+          "droop_ratio": 0.0,
+          "damping_ratio": 0.5,
+          "mobile": false,
+          "mobile_frac": 0.3,
+          "mobile_range": 0.02,
+          "mobile_freq": 2.0,
+          "surface_friction": 0.8,
+          "skin_compliance": 0.0
+        }
+      },
+      {
+        "shape": "cylinder",
+        "features": {
+          "footprint_fill_ratio": 0.990078686281218,
+          "edge_height_ratio": 0.7939815325996366,
+          "maximum_height_m": 0.04997968673706055,
+          "foreground_pixels": 34728,
+          "edge_fraction": 0.1
+        },
+        "kappa": {
+          "category": "hard",
+          "shape_p": 2.0,
+          "shape_q": 12.0,
+          "size": [
+            0.24,
+            0.17,
+            0.05
+          ],
+          "mass": 0.8,
+          "com_offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "segments": [
+            4,
+            3,
+            2
+          ],
+          "rigid": true,
+          "squeeze_stiffness_y": 50.0,
+          "squeeze_stiffness_z": 50.0,
+          "lock_strain_y": 0.02,
+          "lock_strain_z": 0.02,
+          "droop_ratio": 0.0,
+          "damping_ratio": 0.5,
+          "mobile": false,
+          "mobile_frac": 0.3,
+          "mobile_range": 0.02,
+          "mobile_freq": 2.0,
+          "surface_friction": 0.8,
+          "skin_compliance": 0.0
+        }
+      },
+      {
+        "shape": "ellipsoid",
+        "features": {
+          "footprint_fill_ratio": 0.7837837837837838,
+          "edge_height_ratio": 0.6777208068750364,
+          "maximum_height_m": 0.04996359348297119,
+          "foreground_pixels": 27492,
+          "edge_fraction": 0.1
+        },
+        "kappa": {
+          "category": "hard",
+          "shape_p": 2.0,
+          "shape_q": 2.0,
+          "size": [
+            0.24,
+            0.17,
+            0.05
+          ],
+          "mass": 0.8,
+          "com_offset": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "segments": [
+            4,
+            3,
+            2
+          ],
+          "rigid": true,
+          "squeeze_stiffness_y": 50.0,
+          "squeeze_stiffness_z": 50.0,
+          "lock_strain_y": 0.02,
+          "lock_strain_z": 0.02,
+          "droop_ratio": 0.0,
+          "damping_ratio": 0.5,
+          "mobile": false,
+          "mobile_frac": 0.3,
+          "mobile_range": 0.02,
+          "mobile_freq": 2.0,
+          "surface_friction": 0.8,
+          "skin_compliance": 0.0
+        }
+      }
+    ],
+    "preprocessing": "3x3 median; 10% oriented-box edge band"
+  },
+  "stopped_before": "v1.2",
+  "next_step": "review contact/measurement pose dependence and shape-conditioned calibration; no threshold changes"
+}

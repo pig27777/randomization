@@ -1,0 +1,466 @@
+1 r2 --bag flex --content box_fit --set '{"edge": 0.035, "radius": 0.003}' --tag 'F4 bag' --out f4.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 578, in main
+    res = r2(a.content, bag, a.dt, a.end if a.end is not None else (1 if a.bag == "flex" else -1))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 459, in r2
+    bag_r = bag.resolved(k.size)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 88, in resolved
+    raise ValueError(f"bag {size} too small for content {content_size}")
+ValueError: bag (0.35, 0.25) too small for content (0.33, 0.23, 0.03)
+1 r3 --bag flex --content box_fit --set '{"edge": 0.035, "radius": 0.003}' --tag 'F4 bag' --out f4.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 580, in main
+    res = r3(a.content, bag, a.dt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 491, in r3
+    bag_r = bag.resolved(k.size)
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 88, in resolved
+    raise ValueError(f"bag {size} too small for content {content_size}")
+ValueError: bag (0.35, 0.25) too small for content (0.33, 0.23, 0.03)
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,10,0.1,2]' --seed 0 --tag 'F3 empty_end' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,10,0.1,2]' --seed 1 --tag 'F3 empty_end' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,10,0.1,2]' --seed 1 --tag 'F3 centre' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,10,0.1,2]' --seed 2 --tag 'F3 centre' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,10,0.1,2]' --seed 2 --tag 'F3 corner' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,10,0.1,2]' --seed 0 --tag 'F3 centre' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,10,0.1,2]' --seed 1 --tag 'F3 corner' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,10,0.1,2]' --seed 0 --tag 'F3 corner' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+1 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,10,0.1,2]' --seed 2 --tag 'F3 empty_end' --out f3.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 370, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 279, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.061
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.002,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.002,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.002,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.002,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.002,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.002,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.006,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.006,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.006,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.006,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.006,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.012,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.012,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.006,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.012,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.012,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.002,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.012,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.03,0.012,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.002,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,20,0.1,2]' --seed 1 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.002,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.002,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,20,0.1,2]' --seed 0 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.002,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,20,0.1,2]' --seed 2 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.002,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.006,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.006,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.006,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.006,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.006,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.006,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.012,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.012,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.012,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.012,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.012,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.06,0.012,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.002,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.002,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.002,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.002,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.002,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.002,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.006,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.006,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.012,10,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.006,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.006,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.006,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.006,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.012,10,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.002,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.012,10,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.012,30,0.1,2]' --seed 0 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.012,30,0.1,2]' --seed 2 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.002,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,0.09,0.012,30,0.1,2]' --seed 1 --tag 'F5 middle' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.002,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.002,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.002,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.002,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.006,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.006,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.006,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.006,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.006,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.006,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.012,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.012,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.012,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.012,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.012,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.03,0.012,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.002,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.002,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.002,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.002,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.002,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.002,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,20,0.1,2]' --seed 0 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.006,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,20,0.1,2]' --seed 2 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.006,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,20,0.1,2]' --seed 2 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,20,0.1,2]' --seed 0 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.006,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,20,0.1,2]' --seed 1 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.006,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,20,0.1,2]' --seed 1 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.006,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.006,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.012,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.012,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.012,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.012,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.012,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.002,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.002,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.06,0.012,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.002,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.002,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.002,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.002,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.006,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.006,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.006,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.006,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.006,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.006,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.012,10,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.012,10,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.012,10,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.012,30,0.1,2]' --seed 0 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.012,30,0.1,2]' --seed 1 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.03,0.002,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003}' --params '[0.4,0,1.570796,0.09,0.012,30,0.1,2]' --seed 2 --tag 'F5 empty' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.06,0.002,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.09,0.002,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.06,0.006,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.03,0.006,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.09,0.006,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.03,0.012,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.06,0.012,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.003, "selfcollide": "auto"}' --params '[0.4,0,1.570796,0.09,0.012,10,0.1,2]' --seed 0 --tag 'F5 empty selfcollide' --out f5.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,15,0.1,2]' --seed 2 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,15,0.1,2]' --seed 1 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,15,0.1,2]' --seed 0 --tag 'F3 corner' --out f3.jsonl
+1 r3 --bag flex --content box_fit --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --tag 'F4sel bag' --out f4_sel.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 580, in main
+    res = r3(a.content, bag, a.dt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 492, in r3
+    sim = make(k, bag, [("pA", 1, (0, -1, 0.5)), ("pB", 1, (0, 1, 0.5))], dt=dt)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 373, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 282, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.064
+1 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.005}' --params '[0.42,0.42,0.785398,15,0.1,2]' --seed 0 --tag 'F3sel corner' --out f3_sel.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 373, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 282, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.355
+1 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.005}' --params '[0,0,1.570796,15,0.1,2]' --seed 0 --tag 'F3sel centre' --out f3_sel.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 373, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 282, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.355
+1 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.005}' --params '[0.42,0,1.570796,15,0.1,2]' --seed 0 --tag 'F3sel empty_end' --out f3_sel.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 584, in main
+    res = evaluate(spec, json.loads(a.params), a.seed)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 168, in evaluate
+    sim = make(k, bag, [] if top else park, big_table=True, dt=object_spec.get("dt"), fingertips=park if top else ())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 373, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 282, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.355
+1 r2 --bag flex --content box_fit --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --tag 'F4sel bag' --out f4_sel.jsonl
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 596, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 578, in main
+    res = r2(a.content, bag, a.dt, a.end if a.end is not None else (1 if a.bag == "flex" else -1))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 468, in r2
+    sim = built([("pA", 2, (0, 0, 0.5)), ("pB", 2, (0, 0, -0.5))])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 462, in built
+    s = make(k, bag, pads, table_xmin=table_xmin, dt=dt)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/loose_protocols.py", line 105, in make
+    lb = loose_scene(desc, bag, pads, table_xmin=table_xmin, dt=dt, fingertips=fingertips)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 373, in loose_scene
+    q, faces, z_c, seal, boundary = _flex_mesh(bag, (Lx, Ly, Lz), (off[0], off[1], 0))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/mj_loose.py", line 282, in _flex_mesh
+    raise ValueError(f"wrapped flex strains edges by {report['maximum_edge_strain']:.3f}")
+ValueError: wrapped flex strains edges by 0.064
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.03,0.002,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.03,0.006,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.06,0.002,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.06,0.006,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.03,0.012,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.09,0.002,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.03,0.002,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.06,0.012,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.03,0.006,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.09,0.006,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.03,0.012,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.06,0.002,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.06,0.006,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.09,0.002,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,0.09,0.012,10,0.1,2]' --seed 0 --tag 'F5sel middle' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.06,0.012,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.09,0.006,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.4,0,1.570796,0.09,0.012,10,0.1,2]' --seed 0 --tag 'F5sel empty' --out f5_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.42,0.42,0.785398,20,0.1,2]' --seed 2 --tag 'F3sel corner' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.42,0.42,0.785398,20,0.1,2]' --seed 0 --tag 'F3sel corner' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.42,0.42,0.785398,20,0.1,2]' --seed 1 --tag 'F3sel corner' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.42,0,1.570796,20,0.1,2]' --seed 0 --tag 'F3sel empty_end' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,20,0.1,2]' --seed 2 --tag 'F3sel centre' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.42,0,1.570796,20,0.1,2]' --seed 2 --tag 'F3sel empty_end' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0.42,0,1.570796,20,0.1,2]' --seed 1 --tag 'F3sel empty_end' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,20,0.1,2]' --seed 0 --tag 'F3sel centre' --out f3_sel.jsonl
+0 eval --bag flex --content box_loose --set '{"edge": 0.035, "radius": 0.005}' --dt 0.0008 --params '[0,0,1.570796,20,0.1,2]' --seed 1 --tag 'F3sel centre' --out f3_sel.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,15,0.1,2]' --seed 1 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,15,0.1,2]' --seed 0 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,15,0.1,2]' --seed 2 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,15,0.1,2]' --seed 1 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,15,0.1,2]' --seed 2 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content bendable --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,15,0.1,2]' --seed 0 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,10,0.1,2]' --seed 0 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,10,0.1,2]' --seed 1 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0.42,0.785398,10,0.1,2]' --seed 2 --tag 'F3 corner' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,10,0.1,2]' --seed 0 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,10,0.1,2]' --seed 2 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0,0,1.570796,10,0.1,2]' --seed 1 --tag 'F3 centre' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,10,0.1,2]' --seed 0 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,10,0.1,2]' --seed 2 --tag 'F3 empty_end' --out f3.jsonl
+0 eval --bag flex --content compressible --set '{"edge": 0.035, "radius": 0.003}' --params '[0.42,0,1.570796,10,0.1,2]' --seed 1 --tag 'F3 empty_end' --out f3.jsonl

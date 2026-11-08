@@ -1,0 +1,152 @@
+{
+  "kind": "random",
+  "category": "bendable",
+  "kappa": {
+    "category": "bendable",
+    "size": [
+      0.28870645249767846,
+      0.18862320108576258,
+      0.03046207016790588
+    ],
+    "mass": 0.6250337468716877,
+    "com_offset": [
+      0.05893194392851947,
+      -0.006484475813876678,
+      0.04035813472378644
+    ],
+    "segments": [
+      4,
+      4,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.30142692358869055,
+    "squeeze_stiffness_z": 0.6684229646428559,
+    "lock_strain_y": 0.1494954584056624,
+    "lock_strain_z": 0.18356443124186578,
+    "droop_ratio": 0.3172206619400035,
+    "damping_ratio": 0.24781282994073028,
+    "mobile": false,
+    "mobile_frac": 0.4835752229978598,
+    "mobile_range": 0.01009138090024407,
+    "mobile_freq": 2.197015603963247,
+    "surface_friction": 0.2994530626864494,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.12455529222329684
+  },
+  "seed": 20261162,
+  "grasp": {
+    "u": 0.17772572113008434,
+    "v": 0.2536141702716531,
+    "psi": 0.3380482631884155,
+    "w": 0.06814683724438308,
+    "d": 0.016870576477845872,
+    "F": 14.970098598628187,
+    "v_lift": 0.2682254650601927,
+    "a_max": 3.9890886319682552
+  },
+  "index": 36,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 0.9643331685792933,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 0.9999999992640162,
+    "speed_median_mm_s": 4.427555963104618e-05,
+    "speed_max_mm_s": 0.0011432376545598018,
+    "drift_mm": 3.994076370053811e-05,
+    "max_joint_strain": 0.09997126551716588
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "both contacts lost for >50 ms",
+    "cls": "bendable",
+    "max_grip_force_N": 14.780572604558554,
+    "lift_height_mm": null,
+    "slip_mm": 28.7904992802204,
+    "wall_s": 3.440063063055277,
+    "sim_s": 1.8899999999998571,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 5.571648810588259,
+    "pinch_events": [
+      {
+        "t": 1.7687999999998705,
+        "event": "bind",
+        "segment": 35
+      },
+      {
+        "t": 1.8379999999998629,
+        "event": "overload",
+        "segment": 35,
+        "overload_s": 0.02,
+        "force": 2.7379486933787747,
+        "limit": 1.864434477728084
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.9423999999999615,
+        "phase": "press"
+      },
+      {
+        "t": 1.5491999999998947,
+        "phase": "close"
+      },
+      {
+        "t": 1.7687999999998705,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.016870576477845872,
+    "contact_height_m": 0.02914207020810821,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 1.5491999999998947,
+      "force_N": 22.724962492164583,
+      "depth_m": 0.006063999999999331
+    },
+    "press_peak_vertical_force_N": 22.724962492164583,
+    "actual_depth_m": 0.006063999999999331,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.9423999999999615,
+      "forces": {
+        "pA": [
+          -0.005759435449605452,
+          -0.003348438194085544,
+          0.050252383835352535
+        ],
+        "pB": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "max_real_grip_force_N": 5.891991461167755,
+    "max_spring_force_N": 15.394511100619567,
+    "rest_grip_to_com_gap_mm": 13.181166432434887,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 5.6144952909089625
+}

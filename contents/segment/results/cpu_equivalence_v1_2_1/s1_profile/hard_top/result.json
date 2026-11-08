@@ -1,0 +1,92 @@
+{
+  "anchor": "hard",
+  "kind": "top",
+  "wall_s": 0.390888350084424,
+  "seconds": {
+    "mujoco": 0.04244024446234107,
+    "setup": 0.0024599824100732803,
+    "pinch": 0.010340918321162462,
+    "python_other": 0.3356472048908472
+  },
+  "shares": {
+    "mujoco": 0.10857382793110829,
+    "setup": 0.006293312168403007,
+    "pinch": 0.0264549156272604,
+    "python_other": 0.8586779442732283
+  },
+  "calls": {
+    "mujoco": 2032,
+    "setup": 1,
+    "pinch": 10157
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "top pinch conditions or current grip force absent",
+    "cls": "hard",
+    "max_grip_force_N": 15.533801906840894,
+    "lift_height_mm": null,
+    "slip_mm": 0.0,
+    "wall_s": 0.3906885120086372,
+    "sim_s": 0.8119999999999759,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 0.0,
+    "pinch_events": [],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8111999999999759,
+        "phase": "press"
+      },
+      {
+        "t": 0.8111999999999759,
+        "phase": "close"
+      }
+    ],
+    "effective_depth_m": 0.015,
+    "contact_height_m": 0.04999205765983348,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 0.8111999999999759,
+      "force_N": 72.07479149173892,
+      "depth_m": 0.0
+    },
+    "press_peak_vertical_force_N": 72.07479149173892,
+    "actual_depth_m": 0.0,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.8111999999999759,
+      "forces": {
+        "pA": [
+          7.33442968915379e-07,
+          -4.911398421440008e-07,
+          36.03739551490024
+        ],
+        "pB": [
+          7.334429663198456e-07,
+          -4.911398430285802e-07,
+          36.03739597683868
+        ]
+      }
+    },
+    "max_real_grip_force_N": 792.2238970081308,
+    "max_spring_force_N": 0.0,
+    "rest_grip_to_com_gap_mm": null,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "side_source_sha256": "267c0460c2b212054ed7948618814270a3dabd690495a62eeeab84c43a777d01",
+  "note": "Instrumented single run; cProfile/timer overhead included; not a speed benchmark"
+}

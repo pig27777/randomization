@@ -1,0 +1,53 @@
+{
+  "title_zh": "气泡信封袋（原通用实验软袋）",
+  "geometry": "geometry/bubble_180x240.npz",
+  "texture": "textures/bubble_film.png",
+  "notes_zh": "质量按 110–140 g/m² 克重估为 12 g；缓冲、摩擦与弯曲为未标定的起点，需实测力-间隙曲线与悬臂后替换",
+  "params": {
+    "mass_kg": 0.012,
+    "membrane_model": "elastic",
+    "young_pa": 20000000.0,
+    "poisson": 0.3,
+    "membrane_thickness_m": 0.002,
+    "membrane_damping": 0.004,
+    "bending_rigidity_nm": 0.000133,
+    "region_bending_scale": {
+      "1": 6.0
+    },
+    "anisotropy_ratio": 1.0,
+    "bending_knee_deg": 12.0,
+    "bending_post_ratio": 0.2,
+    "plasticity": false,
+    "memory_ratio": 0.8,
+    "recovery_tau_s": 0.6,
+    "bending_damping_nms": 2e-07,
+    "crease_softening": true,
+    "crease_onset_deg": 25.0,
+    "crease_width_deg": 35.0,
+    "crease_max_softening": 0.65,
+    "precreased_panel_boundaries": false,
+    "collision_radius_m": 0.00175,
+    "collision_patch_faces": 32,
+    "cushion": true,
+    "cushion_range_m": 0.0014,
+    "cushion_soft_modulus_pa_per_m": 5000000.0,
+    "cushion_lock_ratio": 10.0,
+    "cushion_damping_ratio": 1.0,
+    "friction": 0.5,
+    "table_friction": 0.8,
+    "self_contact": true,
+    "self_contact_front_panel_ids": [
+      0
+    ],
+    "self_contact_back_panel_ids": [
+      1
+    ],
+    "velocity_damping_per_s": 3.0,
+    "gravity": true,
+    "timestep_s": 0.0001,
+    "frame_dt_s": 0.01,
+    "iterations": 100,
+    "solver": "Newton",
+    "tolerance": 1e-08
+  }
+}

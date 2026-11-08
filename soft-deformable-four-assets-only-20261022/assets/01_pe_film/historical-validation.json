@@ -1,0 +1,102 @@
+{
+  "asset_id": "gray_pe_mailer_350x450",
+  "physical_calibration": false,
+  "tests": [
+    {
+      "test": "compile_and_forward",
+      "passed": true,
+      "state": {
+        "time_s": 0.0,
+        "accepted_steps": 0,
+        "callback_calls": 1,
+        "topology": {
+          "vertices": 549,
+          "faces": 1064,
+          "edges": 1612,
+          "hinges": 1580,
+          "boundary_edges": 32,
+          "area_m2": 0.3325,
+          "nonmanifold_edges": 0,
+          "world_fixed_nodes": 0,
+          "rigid_internal_supports": 0,
+          "precreased_hinges": 64
+        },
+        "mass_kg": 0.015295000000000001,
+        "finite": true,
+        "max_abs_edge_strain": 0.0026377741296461643,
+        "min_vertex_z_m": 0.025,
+        "max_vertex_z_m": 0.04037683227307083,
+        "max_speed_m_s": 0.0,
+        "max_permanent_crease_deg": 0.0,
+        "plastic_dissipated_j": 0.0,
+        "memory_dissipated_j": 0.0,
+        "warnings": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "contacts": 50,
+        "expected_contact_patch_compiler_notices": 38,
+        "unexpected_compiler_warnings": [],
+        "physical_calibration": false
+      }
+    },
+    {
+      "test": "0.2_second_free_gravity_rollout",
+      "passed": true,
+      "state": {
+        "time_s": 0.20000000000000367,
+        "accepted_steps": 1000,
+        "callback_calls": 1001,
+        "topology": {
+          "vertices": 549,
+          "faces": 1064,
+          "edges": 1612,
+          "hinges": 1580,
+          "boundary_edges": 32,
+          "area_m2": 0.3325,
+          "nonmanifold_edges": 0,
+          "world_fixed_nodes": 0,
+          "rigid_internal_supports": 0,
+          "precreased_hinges": 64
+        },
+        "mass_kg": 0.015295000000000001,
+        "finite": true,
+        "max_abs_edge_strain": 0.0058858584441767725,
+        "min_vertex_z_m": -0.0003014857992550908,
+        "max_vertex_z_m": 0.018746347668635956,
+        "max_speed_m_s": 1.2527006291983285,
+        "max_permanent_crease_deg": 17.862312701531884,
+        "plastic_dissipated_j": 9.688940332251163e-06,
+        "memory_dissipated_j": 2.6135213591000974e-06,
+        "warnings": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "contacts": 204,
+        "expected_contact_patch_compiler_notices": 38,
+        "unexpected_compiler_warnings": [],
+        "physical_calibration": false
+      }
+    }
+  ],
+  "wall_seconds": 11.060609876178205,
+  "passed": true,
+  "scope": "Native MuJoCo compile, forward and short free-gravity rollout. No physical calibration, robot grasp or interaction validation.",
+  "cancelled_checks": [
+    {
+      "test": "1_second_free_gravity_rollout",
+      "status": "interrupted_before_completion",
+      "reason": "Parent requested consolidated corner-force/release verification instead of duplicate gravity rollouts. No 1 s result claimed."
+    }
+  ]
+}

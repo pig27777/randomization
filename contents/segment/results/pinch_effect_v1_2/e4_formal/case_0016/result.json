@@ -1,0 +1,81 @@
+{
+  "kind": "scan",
+  "category": "hard",
+  "seed": 20261116,
+  "coefficient_scale": 1.0,
+  "grasp": {
+    "w": 0.06,
+    "d": 0.03,
+    "F": 15.0
+  },
+  "index": 16,
+  "kappa": {
+    "category": "hard",
+    "size": [
+      0.24,
+      0.17,
+      0.05
+    ],
+    "mass": 0.8,
+    "com_offset": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "segments": [
+      4,
+      3,
+      2
+    ],
+    "rigid": true,
+    "squeeze_stiffness_y": 50.0,
+    "squeeze_stiffness_z": 50.0,
+    "lock_strain_y": 0.02,
+    "lock_strain_z": 0.02,
+    "droop_ratio": 0.0,
+    "damping_ratio": 0.5,
+    "mobile": false,
+    "mobile_frac": 0.3,
+    "mobile_range": 0.02,
+    "mobile_freq": 2.0,
+    "surface_friction": 0.8,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.0
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "top pinch conditions or current grip force absent",
+    "cls": "hard",
+    "max_grip_force_N": 0.0,
+    "lift_height_mm": null,
+    "slip_mm": 0.0,
+    "wall_s": 0.8302329159341753,
+    "sim_s": 5.011599999999514,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 0.0,
+    "pinch_events": [],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8111999999999759,
+        "phase": "press"
+      },
+      {
+        "t": 3.8107999999996456,
+        "phase": "close"
+      }
+    ],
+    "effective_depth_m": 0.029995234595900085,
+    "contact_height_m": 0.04999205765983348,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 0.830408584792167
+}

@@ -1,0 +1,65 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Module warp_mechanics a543b94 load on device 'cpu' took 12.86 ms  (error)
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/contents/segment/validate_acceleration.py", line 311, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/contents/segment/validate_acceleration.py", line 300, in main
+    passed = force_pilot(out)
+             ^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/contents/segment/validate_acceleration.py", line 255, in force_pilot
+    candidate.apply(sim.m, sim.d)
+  File "/home/ubuntu/Dev/Projects/random/contents/segment/warp_mechanics.py", line 147, in apply
+    wp.launch(face_forces, dim=1, device="cpu",
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 12041, in launch
+    module_exec = kernel.module.load(device, block_dim)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 5227, in load
+    raise e
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 5224, in load
+    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 4972, in _compile
+    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, is_cpu)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 1907, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 4833, in _run_codegen
+    builder = ModuleBuilder(
+              ^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 3501, in __init__
+    self.build_kernel(kernel)
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 3620, in build_kernel
+    kernel.adj.build(self)
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 1907, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 2415, in build
+    raise type(original_exc)(*new_args).with_traceback(original_exc.__traceback__) from None
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 2395, in build
+    adj.eval(adj.tree.body[0])
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 6693, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 3632, in emit_FunctionDef
+    adj.eval(f)
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 6693, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 4391, in emit_For
+    adj.eval(s)
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 6693, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/codegen.py", line 5664, in emit_Assign
+    raise WarpCodegenError(
+warp._src.codegen.WarpCodegenError: Error while parsing function "face_forces" at /home/ubuntu/Dev/Projects/random/contents/segment/warp_mechanics.py:88:
+        forces[env, i], torques_a[env, i], torques_b[env, i] = f, ta, tb
+;Multiple return functions can only assign to simple variables, e.g.: x, y = func()

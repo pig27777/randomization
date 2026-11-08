@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/package_grasp.py", line 414, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/package_grasp.py", line 395, in main
+    scene=PackageScene(scale=a.scale,mass_scale=a.mass_scale,self_contact=not a.no_self_contact,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/package_scene.py", line 175, in __init__
+    if cloth:color_seams(builder)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/package_scene.py", line 75, in color_seams
+    for a,b in combinations([int(i) for i in feature if i>=0],2):
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: 'int' object is not iterable

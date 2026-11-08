@@ -1,0 +1,152 @@
+{
+  "kind": "random",
+  "category": "bendable",
+  "kappa": {
+    "category": "bendable",
+    "size": [
+      0.30272290098615645,
+      0.1600311835642472,
+      0.02596717778750554
+    ],
+    "mass": 0.21311377754093627,
+    "com_offset": [
+      -0.11108091428243182,
+      0.13724668125893388,
+      -0.01818138904094657
+    ],
+    "segments": [
+      4,
+      3,
+      2
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.20537094977805753,
+    "squeeze_stiffness_z": 0.7791634463388681,
+    "lock_strain_y": 0.14535754970779052,
+    "lock_strain_z": 0.16284269059642534,
+    "droop_ratio": 0.4270168080813078,
+    "damping_ratio": 0.84682923270707,
+    "mobile": false,
+    "mobile_frac": 0.4727166039309467,
+    "mobile_range": 0.01002669335492723,
+    "mobile_freq": 2.823942563458067,
+    "surface_friction": 0.20676167337828494,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.19785594847820454
+  },
+  "seed": 20261261,
+  "grasp": {
+    "u": -0.4076801099852937,
+    "v": -0.2007931559842463,
+    "psi": 1.0082670252786035,
+    "w": 0.09298384828936958,
+    "d": 0.019695875271238807,
+    "F": 5.629212814433517,
+    "v_lift": 0.1365517237375365,
+    "a_max": 1.734986387789806
+  },
+  "index": 135,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 1.6034485563114873,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 1.0000000000072713,
+    "speed_median_mm_s": 0.00025013466184045066,
+    "speed_max_mm_s": 0.0012578506544227176,
+    "drift_mm": 6.239241064888398e-05,
+    "max_joint_strain": 0.03522380931559204
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "both contacts lost for >50 ms",
+    "cls": "bendable",
+    "max_grip_force_N": 5.629205829008443,
+    "lift_height_mm": null,
+    "slip_mm": 28.481456243487713,
+    "wall_s": 5.970333326142281,
+    "sim_s": 4.7599999999995415,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 2.836303795427297,
+    "pinch_events": [
+      {
+        "t": 4.453599999999575,
+        "event": "bind",
+        "segment": 1
+      },
+      {
+        "t": 4.701599999999548,
+        "event": "overload",
+        "segment": 1,
+        "overload_s": 0.02,
+        "force": 1.1740564740905126,
+        "limit": 1.1137732406159617
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8439999999999723,
+        "phase": "press"
+      },
+      {
+        "t": 1.5415999999998955,
+        "phase": "close"
+      },
+      {
+        "t": 4.453599999999575,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.01537870670735932,
+    "contact_height_m": 0.025631177845598867,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 1.5415999999998955,
+      "force_N": 22.577993734443847,
+      "depth_m": 0.006971999999999232
+    },
+    "press_peak_vertical_force_N": 22.577993734443847,
+    "actual_depth_m": 0.006971999999999232,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.8439999999999723,
+      "forces": {
+        "pA": [
+          -0.0004911052390370255,
+          -0.004884705427310104,
+          0.02327891401902237
+        ],
+        "pB": [
+          0.006054386874031482,
+          0.008288588187680534,
+          0.049337342744710716
+        ]
+      }
+    },
+    "max_real_grip_force_N": 5.1655547890534494,
+    "max_spring_force_N": 6.484870222460137,
+    "rest_grip_to_com_gap_mm": 6.052203587149828,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 7.282136998139322
+}

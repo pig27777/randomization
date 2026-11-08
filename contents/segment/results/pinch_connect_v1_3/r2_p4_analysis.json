@@ -1,0 +1,432 @@
+{
+ "monotonicity": {
+  "categories": {
+   "bendable": {
+    "success_counts": {
+     "0.25": 12,
+     "0.5": 33,
+     "1.0": 49
+    },
+    "success_region": true,
+    "success_count_nondecreasing": true,
+    "held_counts": {
+     "0.25": 30,
+     "0.5": 39,
+     "1.0": 54
+    },
+    "held_sets_nested": true,
+    "counterexample_actions": 2,
+    "paired_actions": 108
+   },
+   "compressible": {
+    "success_counts": {
+     "0.25": 0,
+     "0.5": 27,
+     "1.0": 52
+    },
+    "success_region": true,
+    "success_count_nondecreasing": true,
+    "held_counts": {
+     "0.25": 33,
+     "0.5": 66,
+     "1.0": 99
+    },
+    "held_sets_nested": true,
+    "counterexample_actions": 0,
+    "paired_actions": 108
+   }
+  },
+  "counterexamples": [
+   {
+    "category": "bendable",
+    "w": 0.06,
+    "d": 0.02,
+    "F": 5.0,
+    "seed": 20261118
+   },
+   {
+    "category": "bendable",
+    "w": 0.06,
+    "d": 0.03,
+    "F": 5.0,
+    "seed": 20261118
+   }
+  ],
+  "paired_actions": 216,
+  "counterexample_rate": 0.009259259259259259,
+  "hard_all_rejected": true,
+  "confirmed_failures": 0,
+  "passed": true
+ },
+ "groups": {
+  "hard": {
+   "1.0": {
+    "outcomes": {
+     "grasp_fail": 36
+    },
+    "capacity_releases": 0
+   }
+  },
+  "bendable": {
+   "0.25": {
+    "outcomes": {
+     "grasp_fail": 45,
+     "drop": 18,
+     "over_squeeze": 33,
+     "success": 12
+    },
+    "capacity_releases": 84
+   },
+   "0.5": {
+    "outcomes": {
+     "grasp_fail": 36,
+     "success": 33,
+     "drop": 6,
+     "over_squeeze": 33
+    },
+    "capacity_releases": 72
+   },
+   "1.0": {
+    "outcomes": {
+     "drop": 5,
+     "success": 49,
+     "over_squeeze": 33,
+     "grasp_fail": 21
+    },
+    "capacity_releases": 60
+   }
+  },
+  "compressible": {
+   "0.25": {
+    "outcomes": {
+     "grasp_fail": 75,
+     "over_squeeze": 33
+    },
+    "capacity_releases": 75
+   },
+   "0.5": {
+    "outcomes": {
+     "grasp_fail": 42,
+     "drop": 6,
+     "over_squeeze": 33,
+     "success": 27
+    },
+    "capacity_releases": 53
+   },
+   "1.0": {
+    "outcomes": {
+     "drop": 14,
+     "success": 52,
+     "over_squeeze": 33,
+     "grasp_fail": 9
+    },
+    "capacity_releases": 27
+   }
+  }
+ },
+ "static_following": {
+  "hard": {
+   "measured_cases": 0,
+   "max_error_mm": null,
+   "passed": true
+  },
+  "bendable": {
+   "measured_cases": 123,
+   "max_error_mm": 0.10075317017071024,
+   "passed": true
+  },
+  "compressible": {
+   "measured_cases": 198,
+   "max_error_mm": 0.04968812004261267,
+   "passed": true
+  }
+ },
+ "execution_errors": 0,
+ "bendable": {
+  "swing_v13": {
+   "n": 36,
+   "median": 4.384622565638348,
+   "p90": 9.194105188041075,
+   "max": 9.453756912259063
+  },
+  "swing_v12": {
+   "n": 48,
+   "median": 0.9907331247259884,
+   "p90": 1.2924165400935836,
+   "max": 1.3712290909529365
+  },
+  "swing_paired": {
+   "n": 36,
+   "median_ratio": 3.9626542091965673,
+   "v13_larger": 36
+  },
+  "lift_end_tilt_v13": {
+   "n": 69,
+   "median": 0.24695059578926679,
+   "p90": 0.41142478188292,
+   "max": 1.0899951596634558
+  },
+  "lift_end_tilt_v12": {
+   "n": 84,
+   "median": 11.53991635780351,
+   "p90": 12.548403622390897,
+   "max": 12.611095451624553
+  },
+  "default_outcomes_v13": {
+   "drop": 5,
+   "success": 49,
+   "over_squeeze": 33,
+   "grasp_fail": 21
+  },
+  "default_outcomes_v12": {
+   "success": 56,
+   "over_squeeze": 33,
+   "grasp_fail": 15,
+   "drop": 4
+  },
+  "w60_success_v13": "13/36",
+  "w60_success_v12": "8/36",
+  "w60_by_F_v13": {
+   "5.0": "4/12",
+   "15.0": "9/12",
+   "25.0": "0/12"
+  }
+ },
+ "compressible": {
+  "swing_v13": {
+   "n": 52,
+   "median": 25.48086132096364,
+   "p90": 30.199907481228767,
+   "max": 31.92986931252608
+  },
+  "swing_v12": {
+   "n": 67,
+   "median": 10.275845609462392,
+   "p90": 13.480845008431718,
+   "max": 18.991562470516268
+  },
+  "swing_paired": {
+   "n": 48,
+   "median_ratio": 2.0753808935895144,
+   "v13_larger": 48
+  },
+  "lift_end_tilt_v13": {
+   "n": 99,
+   "median": 0.15953559101072257,
+   "p90": 0.17288909861231924,
+   "max": 0.17788017004402834
+  },
+  "lift_end_tilt_v12": {
+   "n": 102,
+   "median": 30.018881057876094,
+   "p90": 33.398956858339496,
+   "max": 34.32986038211088
+  },
+  "default_outcomes_v13": {
+   "drop": 14,
+   "success": 52,
+   "over_squeeze": 33,
+   "grasp_fail": 9
+  },
+  "default_outcomes_v12": {
+   "success": 60,
+   "over_squeeze": 36,
+   "drop": 12
+  },
+  "w60_success_v13": "18/36",
+  "w60_success_v12": "20/36",
+  "w60_by_F_v13": {
+   "5.0": "6/12",
+   "10.0": "12/12",
+   "15.0": "0/12"
+  }
+ },
+ "all_seed_success_combos": [
+  {
+   "category": "bendable",
+   "w": 0.04,
+   "d": 0.005,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.04,
+   "d": 0.01,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.04,
+   "d": 0.02,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.04,
+   "d": 0.03,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.06,
+   "d": 0.01,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.06,
+   "d": 0.02,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.06,
+   "d": 0.03,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.005,
+   "F": 5.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.005,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.01,
+   "F": 5.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.01,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.02,
+   "F": 5.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.02,
+   "F": 15.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.03,
+   "F": 5.0
+  },
+  {
+   "category": "bendable",
+   "w": 0.08,
+   "d": 0.03,
+   "F": 15.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.04,
+   "d": 0.005,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.04,
+   "d": 0.01,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.04,
+   "d": 0.02,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.04,
+   "d": 0.03,
+   "F": 5.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.04,
+   "d": 0.03,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.06,
+   "d": 0.005,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.06,
+   "d": 0.01,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.06,
+   "d": 0.02,
+   "F": 5.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.06,
+   "d": 0.02,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.06,
+   "d": 0.03,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.08,
+   "d": 0.005,
+   "F": 5.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.08,
+   "d": 0.005,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.08,
+   "d": 0.01,
+   "F": 5.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.08,
+   "d": 0.01,
+   "F": 10.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.08,
+   "d": 0.02,
+   "F": 5.0
+  },
+  {
+   "category": "compressible",
+   "w": 0.08,
+   "d": 0.02,
+   "F": 10.0
+  }
+ ]
+}

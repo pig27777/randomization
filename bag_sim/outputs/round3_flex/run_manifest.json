@@ -1,0 +1,53 @@
+{
+  "started_at": "2026-11-06T21:14:17.743005+08:00",
+  "deadline": "2026-11-08T21:14:17.743005+08:00",
+  "f7_full_factorial": 216,
+  "content_release": "v1.3",
+  "timing_suite_pid": 3519571,
+  "gpu_queue_pid": 3527678,
+  "f7_queue_pid": 3526776,
+  "final_behavior_queue_pid": 3526780,
+  "f7_invalid_pilot": "f7_pilot_geom_index_invalid.jsonl",
+  "gpu_required_cases_per_world_count": 9,
+  "selected_cpu_config": "base + cache; c/d rejected",
+  "pending": [
+    "B1 and B4 soft GPU require accepted frozen v1.3 backend; do not repeat completed work",
+    "close effect results by effect_deadline, then stop continuation automation"
+  ],
+  "continuation_automation_id": "automation-2",
+  "formal_cpu_rates": {
+    "base": 0.08589016007854601,
+    "cache": 0.0947321560911549,
+    "precision": 0.0864858331249983,
+    "partition": 0.08031324055215024
+  },
+  "instrumentation_note": "GPU64 process began before overflow event counters were added; an accumulated zero bitmask proves zero events, but a nonzero batch must report counts as unknown/at least until replayed with the new counter. All overflow batches are invalid.",
+  "f7_total_with_controls": 219,
+  "f7_complete": true,
+  "f7_passed": false,
+  "count_correction": "Original plan 216 is correct. Earlier assistant multiplication 432 was wrong; execution used all 216 listed combinations plus 3 controls.",
+  "gpu_completed_environment_counts": [
+    64,
+    256,
+    1024
+  ],
+  "gpu_diagnostics_queue_pid": 3758225,
+  "gpu_diagnostics_state": "complete",
+  "gpu_diagnostics_nworld": 1024,
+  "gpu_diagnostics_rate_basis": 0.5935465145422997,
+  "f6_f7_complete_at": "2026-11-07T07:53:18.149253+08:00",
+  "f6_passed": false,
+  "next_step": "B1-B4 effect model per original REPORT plan",
+  "effect_deadline": "2026-11-13T00:00:00+08:00",
+  "effect_state": "waiting_for_accepted_frozen_v1_3_gpu_backend",
+  "effect_cpu_and_hard_gpu_complete_at": "2026-11-07T08:07:28.478698+08:00",
+  "effect_results": {
+    "B1": "CPU three anchors and hard GPU complete; two soft GPU blocked",
+    "B2": "failed",
+    "B3": "not fully passed; 18 top inputs complete after correction, nine side actions invalid",
+    "B4": "hard 256/1024 paired throughput complete; two soft contents blocked"
+  },
+  "content_gpu_gate_last_checked_at": "2026-11-08T20:21:35.633535+08:00",
+  "content_handoff_sha256": "99226c8d8b5245594375b1d8fe2b2024d1e652e1dc3f7093aea0b91ce50ca6fb",
+  "content_gpu_gate_note": "HANDOFF 2026-11-08 explicitly says soft-content GPU backend is not accepted for the bag line; stopped at hard R3 diagnosis, G3-G5 not run. No frozen GPU release found; bag standards unchanged."
+}

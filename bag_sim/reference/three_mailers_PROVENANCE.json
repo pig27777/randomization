@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "authored_date": "2026-10-20",
+  "units": "m_kg_s",
+  "up_axis": "Z",
+  "source_input": "../../../典型软包.pdf page 1 left plus online representative kraft mailer",
+  "reconstruction": "procedural empty folded mid-surfaces and original procedural textures; no model training",
+  "status": "first_version_behavioral_asset_not_calibrated",
+  "sources": [
+    {
+      "id": "kraft_dimensions",
+      "url": "https://www.paperbagco.co.uk/products/fsc-brown-kraft-paper-mailing-bags-250x50x350mm",
+      "facts": {
+        "nominal_size_mm": [
+          250,
+          50,
+          350
+        ],
+        "flap_mm": 90,
+        "grammage_gsm": 120
+      },
+      "usage": "geometry, nominal size, color and grammage; no mechanical measurements"
+    },
+    {
+      "id": "document_dimensions",
+      "url": "https://www.chinapost.com.cn/cn/report/2205/8843-1.htm",
+      "facts": {
+        "item": 12,
+        "nominal_size_mm": [
+          325,
+          230
+        ],
+        "flap_mm": 52,
+        "grammage_gsm": 250,
+        "paper": "white paperboard"
+      },
+      "usage": "representative document envelope specification, not identification of PDF paper grade"
+    },
+    {
+      "id": "paper_modulus_scale",
+      "url": "https://www.lth.se/fileadmin/byggnadsmekanik/publications/tvsm1000/web1008.pdf",
+      "usage": "paper and board modulus/thickness order of magnitude, different grades; not selected product measurements"
+    },
+    {
+      "id": "crease_recovery",
+      "url": "https://doi.org/10.1103/PhysRevApplied.13.014031",
+      "usage": "plastic fold and logarithmic slow relaxation; short-time SLS parameters are authored, not copied from paper"
+    },
+    {
+      "id": "residual_fold_model",
+      "url": "https://www.frontiersin.org/journals/materials/articles/10.3389/fmats.2019.00041/full",
+      "usage": "separate residual fold angle and rotational stiffness"
+    },
+    {
+      "id": "user_classification_article",
+      "url": "https://www.sohu.com/a/717628399_121613835",
+      "usage": "user-supplied paperboard document envelope material class background only"
+    },
+    {
+      "id": "kraft-product-1.jpg",
+      "url": "https://www.paperbagco.co.uk/cdn/shop/files/FSC-Brown-Kraft-Paper-Mailing-Bags-1.jpg",
+      "local_file": "references/kraft-product-1.jpg",
+      "sha256": "e93ae842c0d1bbabc3dd87292a6fdf801e4c56e4cabc830666a732a30c88c0c9",
+      "license": "third_party_rights_not_granted; local reference only",
+      "usage": "shape reference only, not rendered texture"
+    },
+    {
+      "id": "kraft-product-5.jpg",
+      "url": "https://www.paperbagco.co.uk/cdn/shop/files/FSC-Brown-Kraft-Paper-Mailing-Bags-5.jpg",
+      "local_file": "references/kraft-product-5.jpg",
+      "sha256": "7c911c5947b7c982abd4290ab1526d5b169ca93bfcf7b1dff433593feb641841",
+      "license": "third_party_rights_not_granted; local reference only",
+      "usage": "shape reference only, not rendered texture"
+    },
+    {
+      "id": "document-envelope-structure.jpg",
+      "url": "https://www.jhbarcode.com/upload/2015-04-15/20150415154613141.jpg",
+      "local_file": "references/document-envelope-structure.jpg",
+      "sha256": "d2819960be9ea4f463c70989ed0f3e973e57dfc71f6f95de765bf6b4a7ec2e8a",
+      "license": "third_party_rights_not_granted; local reference only",
+      "usage": "shape reference only, not rendered texture"
+    }
+  ],
+  "assumptions": [
+    "No exact material identification from PDF",
+    "No payload, sealed glue, tear propagation or delamination",
+    "Three-side joins and simplified bottom replace detailed glued overlap",
+    "Isotropic low-stretch approximation; directional paper stiffness not implemented",
+    "SLS recovery is a short-time approximation; permanent fold angle does not heal",
+    "Collision radius is numerical and distinct from physical wall thickness"
+  ],
+  "package_name": "flexible-mailer-assets",
+  "asset_classes": [
+    "kraft paper",
+    "white paperboard",
+    "gray PE film"
+  ],
+  "user_scope": "editable assets with qualitatively similar physics; randomized mesh count/size; vertical gravity tests; no model training",
+  "layout_note": "renamed shared shell package from paper-shell-assets; historical source paths retained in immutable evidence"
+}

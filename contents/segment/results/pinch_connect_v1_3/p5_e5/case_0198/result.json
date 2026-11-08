@@ -1,0 +1,155 @@
+{
+  "kind": "random",
+  "category": "bendable",
+  "kappa": {
+    "category": "bendable",
+    "size": [
+      0.2492750058098203,
+      0.18480992180845238,
+      0.03388377969741301
+    ],
+    "mass": 0.35379279759285837,
+    "com_offset": [
+      -0.12436874864440045,
+      -0.04762635195024474,
+      -0.13840782384410724
+    ],
+    "segments": [
+      4,
+      3,
+      2
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.21937099379855687,
+    "squeeze_stiffness_z": 0.3146776024802432,
+    "lock_strain_y": 0.26628664812819797,
+    "lock_strain_z": 0.12512139858169052,
+    "droop_ratio": 0.21424586397325848,
+    "damping_ratio": 0.8943875543241834,
+    "mobile": true,
+    "mobile_frac": 0.15493010566884513,
+    "mobile_range": 0.004648376674220764,
+    "mobile_freq": 3.5403646528647146,
+    "surface_friction": 0.38397715342629674,
+    "skin_compliance": 0.00018223120693682733,
+    "pinch_coeff": 1.3535961727885701
+  },
+  "seed": 20261399,
+  "grasp": {
+    "u": -0.06539299310019087,
+    "v": 0.17116104753217565,
+    "psi": 0.9745704845458245,
+    "w": 0.041785950742455225,
+    "d": 0.006934571388080841,
+    "F": 30.181995159164067,
+    "v_lift": 0.11195438693442357,
+    "a_max": 1.2420753805691536
+  },
+  "index": 198,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 1.5637212395431461,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 0.9999999994449346,
+    "speed_median_mm_s": 0.0005371063046160575,
+    "speed_max_mm_s": 0.008547591083190776,
+    "drift_mm": 0.0002453473606048313,
+    "max_joint_strain": 0.12512111008760124
+  },
+  "result": {
+    "outcome": "over_squeeze",
+    "reason": "25.057171 N in lift",
+    "cls": "bendable",
+    "max_grip_force_N": 25.05717126111507,
+    "lift_height_mm": null,
+    "slip_mm": 1.0046764027543202,
+    "wall_s": 1.730197210330516,
+    "sim_s": 1.6155999999998873,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 10.978258053386575,
+    "pinch_events": [
+      {
+        "t": 1.5967999999998894,
+        "event": "bind",
+        "segment": 11,
+        "segments": [
+          11,
+          9,
+          17
+        ]
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8983999999999663,
+        "phase": "press"
+      },
+      {
+        "t": 1.3787999999999134,
+        "phase": "close"
+      },
+      {
+        "t": 1.5967999999998894,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.006934571388080841,
+    "contact_height_m": 0.033003779737953744,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 1.3787999999999134,
+      "force_N": 20.04954407620857,
+      "depth_m": 0.004799999999999471
+    },
+    "press_peak_vertical_force_N": 20.04954407620857,
+    "actual_depth_m": 0.004799999999999471,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.8983999999999663,
+      "forces": {
+        "pA": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "pB": [
+          0.004124987882355543,
+          0.0015163460245862508,
+          0.0506754332311095
+        ]
+      }
+    },
+    "max_real_grip_force_N": 5.516910532915216,
+    "max_spring_force_N": 31.388956169619703,
+    "rest_grip_to_com_gap_mm": 22.557071242401783,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": null,
+    "hang_end": null,
+    "stop_swing_mm": null,
+    "stop_window_samples": 0
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 3.075008069165051
+}

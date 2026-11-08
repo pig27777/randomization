@@ -1,0 +1,77 @@
+{
+  "protocol": "v2.2",
+  "status": "frozen",
+  "checks": {
+    "E1": true,
+    "E2": true,
+    "E3": true,
+    "E4": true,
+    "E5": true,
+    "E6": true,
+    "static_following": true
+  },
+  "E1": {
+    "tests": 34,
+    "passed": true,
+    "evidence": "../v22/units_formal/summary.json"
+  },
+  "E2": {
+    "passed": true,
+    "basis": "Reviewed 12/12 bitwise regression retained; unchanged ordinary physical core"
+  },
+  "E3": {
+    "passed": true,
+    "repeats_per_anchor": 3,
+    "evidence": "../v22/r4_formal/summary.json"
+  },
+  "E4": {
+    "passed": true,
+    "basis": "Authorized revised E4 criteria",
+    "evidence": "e4_review.json",
+    "simulation_failures": 0,
+    "total": 684
+  },
+  "E5": {
+    "passed": true,
+    "seed": 20261126,
+    "total": 200,
+    "confirmed_failures": 0,
+    "execution_errors": 0,
+    "evidence": "e5_formal/summary.json"
+  },
+  "E6": {
+    "passed": true,
+    "total": 30,
+    "median_wall_s": {
+      "hard": 0.2812404604628682,
+      "bendable": 8.920370686566457,
+      "compressible": 11.707560193259269
+    },
+    "ratios_to_side": {
+      "hard": 0.4048623428006458,
+      "bendable": 1.313516359014229,
+      "compressible": 1.4857257097638827
+    },
+    "evidence": "e6_formal/summary.json"
+  },
+  "static_following": {
+    "hard": {
+      "measured_cases": 0,
+      "max_error_mm": null,
+      "passed": true
+    },
+    "bendable": {
+      "measured_cases": 180,
+      "max_error_mm": 0.5401722822168278,
+      "passed": true
+    },
+    "compressible": {
+      "measured_cases": 264,
+      "max_error_mm": 1.5686091387302785,
+      "passed": true
+    }
+  },
+  "source": "../v22/candidate_source.json",
+  "audit": "analysis/audit.json"
+}
+frozen /home/ubuntu/Dev/Projects/random/contents/segment/results/pinch_effect_v1_2/v22_review/release_v1_2/v1.2.tar.gz e75f2a8cc718bcde7d99b6ea34afa170e712784e8960482eec62937232e23919

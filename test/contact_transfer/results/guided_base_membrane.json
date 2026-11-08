@@ -1,0 +1,133 @@
+{
+  "config": {
+    "case": "membrane",
+    "dt": 0.001,
+    "iterations": 10,
+    "cells": [
+      12,
+      10,
+      4
+    ],
+    "ke": 3000.0,
+    "kd": 3.0,
+    "friction": 0.0,
+    "full_surface": true,
+    "tile": true,
+    "seconds": 2.0,
+    "ramp_s": 0.2,
+    "material_scale": 1.0,
+    "tag": "guided_base",
+    "k_start": 100.0,
+    "guided": true
+  },
+  "actual_dt_s": 0.001,
+  "load_N": 19.62,
+  "nodes": 858,
+  "tets": 2400,
+  "fixed_nodes": 143,
+  "environment": {
+    "python": "3.11.17",
+    "newton": "1.6.1",
+    "warp": "1.18.0",
+    "device": "cuda:0",
+    "newton_path": "/home/ubuntu/Dev/Projects/real2sim/bubble_mailer/.venv/lib/python3.11/site-packages/newton",
+    "executable": "/home/ubuntu/Dev/Projects/real2sim/bubble_mailer/.venv/bin/python",
+    "solver_sha256": "d8ff6c214a47779ce5629aee5186401f8ff2090d5c225e9fef6996905e93dfd9"
+  },
+  "seconds": 2.0,
+  "wall_s": 0.604,
+  "failure": "37 inverted tetrahedra at 0.15 s",
+  "summary": {
+    "t": 0.10000000000000002,
+    "support_N": 80.67260038542547,
+    "sink_mm": 13.072177391273044,
+    "slab_contact_N": 85.63624672320718,
+    "active_residual_L1_N": 87.23419847196311,
+    "active_residual_z_N": -4.963646337781717,
+    "energy_J": 0.8011860443754362,
+    "min_J": 0.29865720550664737,
+    "inverted_tets": 12.333333333333334,
+    "max_speed_mm_s": 1422.1746114095051,
+    "soft_contacts": 0.0,
+    "self_pair_force_imbalance_N": 0.1972397758184646,
+    "min_interface_clearance_mm": 7.6855158655594495,
+    "support_error_pct": 311.17533325904924,
+    "material_residual_pct": 444.6187485828904,
+    "sink_drift_last_half_second_mm": 23.78748861946613,
+    "min_J_all_samples": -0.42902901312705777,
+    "inverted_tets_all_samples": 37,
+    "minimum_interface_clearance_all_samples_mm": 7.41387850886681
+  },
+  "checks": {
+    "finished": false,
+    "support_balance": false,
+    "material_equilibrium": false,
+    "no_inversion": false,
+    "settled": false,
+    "no_geometric_penetration": true
+  },
+  "passed": false,
+  "trace": [
+    {
+      "t": 0.05,
+      "support_N": 15.000326307740691,
+      "sink_mm": 3.3875324397513618,
+      "slab_contact_N": 15.058289120896006,
+      "active_residual_L1_N": 6.615852144381421,
+      "active_residual_z_N": -0.057962813155318704,
+      "energy_J": 0.03142844433200409,
+      "min_J": 0.7974412658528087,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 381.8078918457031,
+      "soft_contacts": 0,
+      "contact_kinds": [
+        0,
+        0,
+        0
+      ],
+      "self_pair_force_imbalance_N": 1.2931688615935855e-05,
+      "min_interface_clearance_mm": 7.870264014691666
+    },
+    {
+      "t": 0.1,
+      "support_N": 38.94681789444392,
+      "sink_mm": 8.653978674850274,
+      "slab_contact_N": 44.18486692328588,
+      "active_residual_L1_N": 34.38079420982938,
+      "active_residual_z_N": -5.238049028841974,
+      "energy_J": 0.20294225989121273,
+      "min_J": 0.5275593637941911,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 1958.6883544921875,
+      "soft_contacts": 0,
+      "contact_kinds": [
+        0,
+        0,
+        0
+      ],
+      "self_pair_force_imbalance_N": 1.0550639672146644e-05,
+      "min_interface_clearance_mm": 7.772405073119875
+    },
+    {
+      "t": 0.15,
+      "support_N": 188.0706569540918,
+      "sink_mm": 27.175021059217492,
+      "slab_contact_N": 197.66558412543964,
+      "active_residual_L1_N": 220.70594906167852,
+      "active_residual_z_N": -9.594927171347859,
+      "energy_J": 2.1691874289030917,
+      "min_J": -0.42902901312705777,
+      "inverted_tets": 37,
+      "max_speed_mm_s": 1926.027587890625,
+      "soft_contacts": 0,
+      "contact_kinds": [
+        0,
+        0,
+        0
+      ],
+      "self_pair_force_imbalance_N": 0.5916958451271057,
+      "min_interface_clearance_mm": 7.41387850886681
+    }
+  ],
+  "checks_version": 2
+}

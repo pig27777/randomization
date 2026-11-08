@@ -1,0 +1,152 @@
+{
+  "kind": "random",
+  "category": "compressible",
+  "kappa": {
+    "category": "compressible",
+    "size": [
+      0.4130767318734359,
+      0.22451724261861328,
+      0.07327888448732327
+    ],
+    "mass": 0.3259140679251978,
+    "com_offset": [
+      -0.03454081982013214,
+      0.1012454198808784,
+      0.12142049229146942
+    ],
+    "segments": [
+      6,
+      4,
+      2
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.06501577744000422,
+    "squeeze_stiffness_z": 0.4996189414141987,
+    "lock_strain_y": 0.20613316605551174,
+    "lock_strain_z": 0.21336656397534848,
+    "droop_ratio": 0.2435052794607504,
+    "damping_ratio": 0.20644952201661979,
+    "mobile": false,
+    "mobile_frac": 0.46275893951411773,
+    "mobile_range": 0.015157687364751754,
+    "mobile_freq": 3.0139267128358593,
+    "surface_friction": 0.20520416911512745,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.10549413842733045
+  },
+  "seed": 20261306,
+  "grasp": {
+    "u": -0.2951354738625561,
+    "v": 0.11171727082564065,
+    "psi": 1.1883266875172758,
+    "w": 0.06316155653695202,
+    "d": 0.03246431709431651,
+    "F": 4.902362585815002,
+    "v_lift": 0.2778575044043263,
+    "a_max": 2.33266372446338
+  },
+  "index": 180,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 0.9566353659457018,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 0.9999992723880098,
+    "speed_median_mm_s": 0.00019536920300128633,
+    "speed_max_mm_s": 0.006371824325669224,
+    "drift_mm": 0.003336786562881537,
+    "max_joint_strain": 0.11794615592247894
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "both contacts lost for >50 ms",
+    "cls": "compressible",
+    "max_grip_force_N": 4.7191572959022565,
+    "lift_height_mm": null,
+    "slip_mm": 28.188381468314766,
+    "wall_s": 7.800627875607461,
+    "sim_s": 3.9999999999996247,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 9.69777749146154,
+    "pinch_events": [
+      {
+        "t": 3.8763999999996384,
+        "event": "bind",
+        "segment": 13
+      },
+      {
+        "t": 3.9191999999996336,
+        "event": "overload",
+        "segment": 13,
+        "overload_s": 0.02,
+        "force": 0.7181748526346974,
+        "limit": 0.5127967500596213
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 1.1167999999999423,
+        "phase": "press"
+      },
+      {
+        "t": 2.9583999999997395,
+        "phase": "close"
+      },
+      {
+        "t": 3.8763999999996384,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.03246431709431651,
+    "contact_height_m": 0.0702148845628259,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 2.9583999999997395,
+      "force_N": 20.10210028298244,
+      "depth_m": 0.01841199999999797
+    },
+    "press_peak_vertical_force_N": 20.10210028298244,
+    "actual_depth_m": 0.01841199999999797,
+    "lift_table": null,
+    "first_contact": {
+      "t": 1.1167999999999423,
+      "forces": {
+        "pA": [
+          0.004007136998746627,
+          -0.016878420341700902,
+          0.09437751922148935
+        ],
+        "pB": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "max_real_grip_force_N": 7.726350671603162,
+    "max_spring_force_N": 5.5178544000908385,
+    "rest_grip_to_com_gap_mm": 15.752091931447422,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 9.999821566976607
+}

@@ -1,0 +1,67 @@
+{
+  "checked_at": "2026-11-06T13:29:45.946500+08:00",
+  "environment": "/home/ubuntu/Dev/Envs/isaaclab",
+  "source_tag": "v3.0.0",
+  "source_commit": "e3f7d9ff1f5d7f8280de3ece9000b7117f66bcf4",
+  "source_unmodified": true,
+  "packages": 292,
+  "versions": {
+    "isaaclab": "28.0.0",
+    "isaaclab-newton": "9.1.4",
+    "isaacsim": "6.2.0.0",
+    "newton": "1.6.1",
+    "warp-lang": "1.17.0",
+    "torch": "2.11.0+cu130",
+    "numpy": "2.3.1",
+    "numba": "0.64.0",
+    "onnxruntime-gpu": "1.26.0",
+    "mujoco": "3.12.0",
+    "mujoco-warp": "3.12.0"
+  },
+  "disk_bytes_including_caches": 37979693056,
+  "compatibility_overlay_sha256": "0e31f8d029e9482d6f9c32a794c0e295752192d44eadec255e2a7e6b3a9298a3",
+  "dependency_check_exit": 1,
+  "dependency_metadata_conflicts": [
+    {
+      "package": "isaacsim-core",
+      "requires": "fsspec==2026.2.0",
+      "installed": "2026.6.0",
+      "reason": "official root override for torch 2.11"
+    },
+    {
+      "package": "isaacsim-kernel",
+      "requires": "urllib3==2.7.0",
+      "installed": "2.8.0",
+      "reason": "official root security override"
+    }
+  ],
+  "newton_smoke": {
+    "task": "Isaac-Lift-Cloth-Franka",
+    "preset": "newton_mjwarp_vbd_proxy",
+    "agent": "hold/zero",
+    "num_envs": 1,
+    "seed": 20261105,
+    "warmup_steps": 2,
+    "measured_steps": 5,
+    "initialization_s": 86.15515988506377,
+    "warmup_s": 57.98753100214526,
+    "wall_s": 0.07391990022733808,
+    "env_steps_per_s": 67.64078393805558,
+    "batch_steps_per_s": 67.64078393805558,
+    "physics_dt_s": 0.008333333333333333,
+    "decimation": 4,
+    "num_substeps": 2,
+    "process_memory_peak_sampled_mib": 662.0,
+    "process_memory_sampling_interval_s": 0.5,
+    "process_memory_sampling_errors": [],
+    "torch_peak_allocated_mib": 0.033203125,
+    "final_observation_reward_finite": true,
+    "note": "L1 task execution only; does not measure completed grasps or establish L5/L6"
+  },
+  "isaacsim_smoke": {
+    "headless": true,
+    "updates": 10,
+    "stage_exists": true,
+    "startup_s": 11.88086599111557
+  }
+}

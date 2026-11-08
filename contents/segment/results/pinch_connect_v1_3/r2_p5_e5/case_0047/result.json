@@ -1,0 +1,154 @@
+{
+  "kind": "random",
+  "category": "bendable",
+  "kappa": {
+    "category": "bendable",
+    "size": [
+      0.3763916538154565,
+      0.1321210783756157,
+      0.025571931199750195
+    ],
+    "mass": 0.42228552481104864,
+    "com_offset": [
+      0.05212330816067379,
+      -0.00835383971311418,
+      0.00713853006807913
+    ],
+    "segments": [
+      6,
+      3,
+      2
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.27531875785850385,
+    "squeeze_stiffness_z": 0.7339372017730221,
+    "lock_strain_y": 0.16350381808588269,
+    "lock_strain_z": 0.20510953218562572,
+    "droop_ratio": 0.4612219975175432,
+    "damping_ratio": 0.20284261450276211,
+    "mobile": false,
+    "mobile_frac": 0.3167069668578655,
+    "mobile_range": 0.010506240149871861,
+    "mobile_freq": 4.427878810435072,
+    "surface_friction": 0.43406279738814163,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.7220146977268116
+  },
+  "seed": 20261249,
+  "grasp": {
+    "u": 0.23483809811987422,
+    "v": -0.05146461122909496,
+    "psi": 0.9440369537729058,
+    "w": 0.030160456873900794,
+    "d": 0.01253341926525243,
+    "F": 34.52120206860525,
+    "v_lift": 0.23796513795945867,
+    "a_max": 3.4232139908968695
+  },
+  "index": 47,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 1.2093031940782548,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 0.9999999999887603,
+    "speed_median_mm_s": 4.034015952433638e-05,
+    "speed_max_mm_s": 0.0006980431170737968,
+    "drift_mm": 1.661065184147515e-06,
+    "max_joint_strain": 0.05558787654015995
+  },
+  "result": {
+    "outcome": "over_squeeze",
+    "reason": "25.013468 N in lift",
+    "cls": "bendable",
+    "max_grip_force_N": 25.013468274786465,
+    "lift_height_mm": null,
+    "slip_mm": 0.4580016543794684,
+    "wall_s": 1.9012151998467743,
+    "sim_s": 1.5767999999998916,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 9.490646998018383,
+    "pinch_events": [
+      {
+        "t": 1.5675999999998926,
+        "event": "bind",
+        "segment": 27,
+        "segments": [
+          27,
+          25
+        ]
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8859999999999677,
+        "phase": "press"
+      },
+      {
+        "t": 1.3475999999999169,
+        "phase": "close"
+      },
+      {
+        "t": 1.5675999999998926,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.01253341926525243,
+    "contact_height_m": 0.024815931278873975,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 1.3475999999999169,
+      "force_N": 20.21247846322126,
+      "depth_m": 0.0046119999999994915
+    },
+    "press_peak_vertical_force_N": 20.21247846322126,
+    "actual_depth_m": 0.0046119999999994915,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.8859999999999677,
+      "forces": {
+        "pA": [
+          -0.005494786148043817,
+          0.004677345963698386,
+          0.04804228284185602
+        ],
+        "pB": [
+          0.0023304045089508774,
+          -0.0019936381595659627,
+          0.05086198936314215
+        ]
+      }
+    },
+    "max_real_grip_force_N": 6.182154694990823,
+    "max_spring_force_N": 35.80958275114052,
+    "rest_grip_to_com_gap_mm": 12.260218329584188,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": null,
+    "hang_end": null,
+    "stop_swing_mm": null,
+    "stop_window_samples": 0
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 3.64321959996596
+}

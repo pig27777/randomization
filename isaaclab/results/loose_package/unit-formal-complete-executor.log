@@ -1,0 +1,23 @@
+.Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+E./home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:4085: UserWarning: SolverMuJoCo is converting 1 joint(s) outside articulations as standalone world roots: ['joint_4']. This fallback is specific to SolverMuJoCo.
+  self._convert_to_mjc(
+.......
+======================================================================
+ERROR: test_failure_is_latched_between_control_reads (test_package_pinch.PinchTests.test_failure_is_latched_between_control_reads)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/tests/test_package_pinch.py", line 135, in test_failure_is_latched_between_control_reads
+    wp.launch(content_failure,dim=2,inputs=inputs,device='cpu')
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 11333, in launch
+    pack_args(fwd_args, params, adjoint=False)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 11328, in pack_args
+    params.append(pack_arg(kernel, arg_type, arg_name, a, device, adjoint))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 10334, in pack_arg
+    raise RuntimeError(
+RuntimeError: Error launching kernel 'content_failure', argument 'compression' expects an array with dtype=<class 'warp._src.types.float32'> but passed array has dtype=<class 'warp._src.types.float64'>.
+
+----------------------------------------------------------------------
+Ran 10 tests in 8.120s
+
+FAILED (errors=1)

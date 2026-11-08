@@ -1,0 +1,132 @@
+{
+  "bag": {
+    "source": "/home/ubuntu/real2sim/previews/mujoco-elastic-bag",
+    "sha256": {
+      "model.py": "7529e8387fef6b5a45635753fca305201274f714d940fb21a1c59598f21815aa",
+      "shell.py": "104abd22213b19a0cb658b2624054edc85d714d92c84edbf1cccd866b551c358",
+      "rheology.py": "1579050a8d99f6da3df75af43141c1b66d7308674d2e01d7f5fc349c7100c150"
+    },
+    "changes": [
+      "Separate empty material reference from loaded initial positions; natural edge lengths and hinge angles are not overwritten by contents.",
+      "Use the same empty two-panel topology for configurable independent box, sphere, cylinder and convex OBJ contents.",
+      "Share vertex bodies across membrane, layer/self-contact surfaces and small rigid-contact patches without duplicating membrane elasticity.",
+      "Retain nonlinear SLS hinge forces and accepted-step material history updates; guard one active bag model per process."
+    ],
+    "sha256_scope": "Historical upstream source files before local modifications.",
+    "modified_sha256": {
+      "model.py": "50e070b75440401b1c8843240143a3167a161590afd6613a98e7ef0ea8fb8fe9",
+      "shell.py": "104abd22213b19a0cb658b2624054edc85d714d92c84edbf1cccd866b551c358",
+      "rheology.py": "1579050a8d99f6da3df75af43141c1b66d7308674d2e01d7f5fc349c7100c150"
+    }
+  },
+  "units": "SI (metres, kilograms, seconds); CLI thickness/radius in mm",
+  "calibrated": false,
+  "material_profile": {
+    "source_config": "source-material-config.json",
+    "source_version": "BAG-20261016-v1",
+    "young_pa": 20000000.0,
+    "bend": 0.0004,
+    "longitudinal_stiffness": 6.0,
+    "crease_memory": true,
+    "plasticity": false,
+    "original_geometry_unchanged": false,
+    "scene_adaptations": [
+      "180 x 240 mm empty two-panel bag, 14 x 18 cells per panel, three connected edges and one open mouth.",
+      "140 g configured bag mass, 2 mm equivalent wall and 1 mm contact radius; uncalibrated material parameters.",
+      "Contents are separate free rigid bodies. Loaded coordinates are prepared by distance/contact projections, followed by dynamics.",
+      "84 rigid-contact patches plus two full layer/self-contact surfaces share the 570 original material vertices."
+    ],
+    "thickness_mm": 2.0,
+    "radius_mm": 1.0,
+    "thickness_source": "User estimate of 2 mm per wall; not independently measured."
+  },
+  "contents": {
+    "default_api": "empty bag; load_bag()",
+    "config_example": [
+      "book"
+    ],
+    "supported_shapes": [
+      "box",
+      "sphere",
+      "cylinder",
+      "mesh"
+    ],
+    "mesh_collision": "MuJoCo convex hull; initialization uses the mesh bounding box.",
+    "multiple_contents": true,
+    "reference": "Empty two-panel material reference, shared across contents.",
+    "initialization": "1600 distance/contact projection iterations for loaded cases; no changes to natural reference geometry.",
+    "dynamics": "Independent free rigid bodies, gravity, membrane and hinge forces, frictional contacts; no attachment.",
+    "insertion_simulated": false,
+    "visibility": "Transparent and opaque previews use the same saved settled state.",
+    "validation": "examples/validation.json",
+    "calibrated": false
+  },
+  "geometry_source_sha256": "d36664cb092038ed708990c5d36e3b69228dc3d4df5b68d3c0de255bc82ee2aa",
+  "geometry_functions": [
+    "tabletop_mesh"
+  ],
+  "payload_and_support_included": true,
+  "robot_included": false,
+  "appearance": {
+    "texture": "textures/bag_film.png",
+    "source": "../parcel_assets_v1_2026101/parcel_assets_v1_20261017/textures/parcel_film_realistic_v1.png",
+    "sha256": "7be4256def0f123a9e4fe52bcb5c7e9832c846ed43c7089e6f763d9cb38b8f15",
+    "type": "synthetic film albedo with baked wrinkle shading",
+    "mapping": "per-vertex UVs on both deformable panels; shared by MuJoCo and OBJ/MTL",
+    "physics_changed": false
+  },
+  "history": {
+    "book_update_before_reusable_refactor": {
+      "date": "2026-10-18",
+      "previous_payload": "70 x 100 x 12 mm, 25 g ellipsoid",
+      "previous_asset_backup": "../.real2sim-archive/plastic-bag-filled-before-book-20261018",
+      "generation": "build_asset.py",
+      "rendering": "render_preview.py",
+      "render_backend": "MuJoCo EGL",
+      "insertion_simulated": false
+    }
+  },
+  "reusable_update": {
+    "date": "2026-10-18",
+    "generation": "build_asset.py / export_asset.py",
+    "rendering": "demo_contents.py, MuJoCo EGL",
+    "report": "PHYSICS_MODEL_REPORT.md",
+    "reference_fingerprint": "4254339862c7bb36ce13164c042f93d9203e7f5e5f9d5b281ba3cf15776958b8",
+    "insertion_simulated": false,
+    "calibrated": false,
+    "known_limits": [
+      "Frequent solver iteration-limit frames remain for the flat empty bag.",
+      "Reported maximum penetration is sampled every 10 ms, not every internal timestep.",
+      "No sealed air, thickness compression, tearing or seam failure model.",
+      "Material values other than the user-provided wall estimate remain configuration values."
+    ]
+  },
+  "external_mesh_and_yam_experiments": {
+    "date": "2026-10-18",
+    "report": "../mesh_grasp_experiments/README.md",
+    "evidence": "../mesh_grasp_experiments/summary.json",
+    "ycb_source": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+    "ycb_license": "CC-BY-4.0",
+    "yam_source_package": "../simulation-assets/external/i2rt-yam-menagerie",
+    "mesh_cases": 6,
+    "mesh_functional_checks_passed": 6,
+    "grasp_cases": 3,
+    "grasp_checks_passed": 0,
+    "bag_material_changed": false,
+    "calibrated": false,
+    "insertion_simulated": false,
+    "sealing_simulated": false
+  },
+  "sealed_conveyor_contact_sort_scene": {
+    "date": "2026-10-18",
+    "report": "../sealed_conveyor_scene/README.md",
+    "evidence": "../sealed_conveyor_scene/artifacts/validation.json",
+    "base_loader_default_changed": false,
+    "material_reference_changed": false,
+    "permanent_seal_pairs": 15,
+    "glue_calibrated": false,
+    "mode": "closed gripper contact push; no lift grasp",
+    "fully_received": true,
+    "calibrated": false
+  }
+}

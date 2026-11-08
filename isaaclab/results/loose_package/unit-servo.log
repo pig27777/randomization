@@ -1,0 +1,14 @@
+..Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+F...
+======================================================================
+FAIL: test_gripper_moves_in_native_solver_and_generates_contact (test_package_pinch.PinchTests.test_gripper_moves_in_native_solver_and_generates_contact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/isaaclab/tests/test_package_pinch.py", line 86, in test_gripper_moves_in_native_solver_and_generates_contact
+    self.assertGreater(np.abs(scene.pad_forces.numpy()[:,1]).mean(),.05)
+AssertionError: np.float32(0.0) not greater than 0.05
+
+----------------------------------------------------------------------
+Ran 6 tests in 6.416s
+
+FAILED (failures=1)

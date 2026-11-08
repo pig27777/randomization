@@ -1,0 +1,2678 @@
+{
+  "config": {
+    "case": "plate",
+    "dt": 0.001,
+    "iterations": 10,
+    "cells": [
+      12,
+      10,
+      4
+    ],
+    "ke": 3000.0,
+    "kd": 3.0,
+    "friction": 0.0,
+    "full_surface": true,
+    "tile": true,
+    "seconds": 2.0,
+    "ramp_s": 0.2,
+    "material_scale": 1.0,
+    "tag": "ctl_force",
+    "k_start": 100.0,
+    "guided": true,
+    "drag": 0.0,
+    "sdf_voxel": 0.0015,
+    "drive": "force",
+    "tool_z_mm": 0.0,
+    "dense_s": 0.1
+  },
+  "actual_dt_s": 0.001,
+  "load_N": 19.62,
+  "nodes": 715,
+  "tets": 2400,
+  "fixed_nodes": 143,
+  "environment": {
+    "python": "3.11.17",
+    "newton": "1.6.1",
+    "warp": "1.18.0",
+    "device": "cuda:0",
+    "newton_path": "/home/ubuntu/Dev/Projects/real2sim/bubble_mailer/.venv/lib/python3.11/site-packages/newton",
+    "executable": "/home/ubuntu/Dev/Projects/real2sim/bubble_mailer/.venv/bin/python",
+    "solver_sha256": "d8ff6c214a47779ce5629aee5186401f8ff2090d5c225e9fef6996905e93dfd9"
+  },
+  "seconds": 2.0,
+  "wall_s": 11.901,
+  "failure": null,
+  "summary": {
+    "t": 1.775,
+    "support_N": 16.280155319499507,
+    "sink_mm": 3.1912910079662016,
+    "slab_contact_N": 21.204511285360788,
+    "active_residual_L1_N": 6.342333350915416,
+    "active_residual_z_N": -4.924355965861279,
+    "energy_J": 0.026024429852333775,
+    "min_J": 0.8932676233217262,
+    "inverted_tets": 0.0,
+    "max_speed_mm_s": 36.590928077697754,
+    "median_active_speed_mm_s": 4.009143498539925,
+    "nodes_over_1mm_s": 459.4,
+    "soft_contacts": 669.0,
+    "self_pair_force_imbalance_N": 0.0,
+    "tool_reaction_N": 21.2045108795166,
+    "tool_z_mm": 60.79755648970604,
+    "tool_speed_mm_s": 9.421261367201804,
+    "min_interface_clearance_mm": 3.977939928359433,
+    "tool_shift_mm": 7.359748286903518e-06,
+    "tool_tilt_deg": 0.0,
+    "support_error_pct": 17.02265382518091,
+    "material_residual_pct": 32.32585805767286,
+    "sink_drift_last_half_second_mm": -0.23188488700932863,
+    "tool_force_error_pct": 8.075998366547399,
+    "min_J_all_samples": 0.8746182257186239,
+    "inverted_tets_all_samples": 0,
+    "minimum_interface_clearance_all_samples_mm": 3.9537358051644005,
+    "dense_support_N_peak_to_peak": 0.9965619639347736,
+    "dense_support_N_dominant_hz": 10.0,
+    "dense_tool_reaction_N_peak_to_peak": 7.3345232009887695,
+    "dense_tool_reaction_N_dominant_hz": 10.0,
+    "dense_sink_mm_peak_to_peak": 0.18937926504565494,
+    "dense_sink_mm_dominant_hz": 10.0,
+    "dense_contact_count_range": [
+      669,
+      669
+    ]
+  },
+  "checks": {
+    "finished": true,
+    "support_balance": false,
+    "material_equilibrium": false,
+    "no_inversion": true,
+    "settled": false,
+    "tool_force_balance": false,
+    "no_geometric_penetration": true
+  },
+  "passed": false,
+  "trace": [
+    {
+      "t": 0.05,
+      "support_N": -7.688998661805632e-06,
+      "sink_mm": -7.450580569168253e-07,
+      "slab_contact_N": -0.0,
+      "active_residual_L1_N": 4.952337843098008e-05,
+      "active_residual_z_N": -7.68899866180563e-06,
+      "energy_J": 7.105427357601002e-15,
+      "min_J": 0.999999821186045,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 0.0037252900656312704,
+      "median_active_speed_mm_s": 0.0,
+      "nodes_over_1mm_s": 0,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": -0.0,
+      "tool_z_mm": 64.47361409664154,
+      "tool_speed_mm_s": 35.017730712890625,
+      "min_interface_clearance_mm": 4.473613351583479,
+      "tool_shift_mm": 0.0,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.1,
+      "support_N": 11.666555578581436,
+      "sink_mm": 2.2682571992633456,
+      "slab_contact_N": 10.827677186069195,
+      "active_residual_L1_N": 2.1057969680752198,
+      "active_residual_z_N": 0.8388783925122492,
+      "energy_J": 0.013103180357886046,
+      "min_J": 0.9251936772545406,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 54.11973190307617,
+      "median_active_speed_mm_s": 15.211698532104492,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 10.827682495117188,
+      "tool_z_mm": 61.72429025173187,
+      "tool_speed_mm_s": 33.63936996459961,
+      "min_interface_clearance_mm": 3.9768700624970217,
+      "tool_shift_mm": 6.2438372450300745e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.15,
+      "support_N": 11.556218399714705,
+      "sink_mm": 2.2798696683495305,
+      "slab_contact_N": 11.507411703263642,
+      "active_residual_L1_N": 1.6387930644789055,
+      "active_residual_z_N": 0.04880669645106455,
+      "energy_J": 0.013235748484323295,
+      "min_J": 0.9236651840827287,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 25.087871551513672,
+      "median_active_speed_mm_s": 2.099817991256714,
+      "nodes_over_1mm_s": 479,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 11.507407188415527,
+      "tool_z_mm": 61.7126002907753,
+      "tool_speed_mm_s": 4.041939735412598,
+      "min_interface_clearance_mm": 3.976536902528631,
+      "tool_shift_mm": 3.719049986237898e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.2,
+      "support_N": 18.612989581667247,
+      "sink_mm": 3.6315902809483505,
+      "slab_contact_N": 17.73452937597176,
+      "active_residual_L1_N": 3.4873551685116855,
+      "active_residual_z_N": 0.8784602056954807,
+      "energy_J": 0.03362994089232885,
+      "min_J": 0.8786096975251777,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 47.98360824584961,
+      "median_active_speed_mm_s": 7.045493125915527,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 17.73454475402832,
+      "tool_z_mm": 60.355931520462036,
+      "tool_speed_mm_s": 14.822929382324219,
+      "min_interface_clearance_mm": 3.9638199268546,
+      "tool_shift_mm": 6.921165772537851e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.25,
+      "support_N": 11.606260674987755,
+      "sink_mm": 2.301260968850871,
+      "slab_contact_N": 15.865190419426654,
+      "active_residual_L1_N": 4.362524399281076,
+      "active_residual_z_N": -4.258929744438902,
+      "energy_J": 0.01348647163093375,
+      "min_J": 0.9226002471593234,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 23.778682708740234,
+      "median_active_speed_mm_s": 1.961092472076416,
+      "nodes_over_1mm_s": 484,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 15.86518669128418,
+      "tool_z_mm": 61.690617352724075,
+      "tool_speed_mm_s": 3.9450838565826416,
+      "min_interface_clearance_mm": 3.976203965330438,
+      "tool_shift_mm": 1.992673371490029e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.3,
+      "support_N": 18.4403438756399,
+      "sink_mm": 3.591433285736705,
+      "slab_contact_N": 18.431340439536143,
+      "active_residual_L1_N": 1.8375384827993075,
+      "active_residual_z_N": 0.00900343610376117,
+      "energy_J": 0.0328949961053997,
+      "min_J": 0.8802177887377386,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 31.25171661376953,
+      "median_active_speed_mm_s": 1.2481473684310913,
+      "nodes_over_1mm_s": 364,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 18.431352615356445,
+      "tool_z_mm": 60.39563938975334,
+      "tool_speed_mm_s": 1.0282748937606812,
+      "min_interface_clearance_mm": 3.9641534101294424,
+      "tool_shift_mm": 6.921925347834815e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.35,
+      "support_N": 12.031619972306602,
+      "sink_mm": 2.3805845295167667,
+      "slab_contact_N": 11.739875135594048,
+      "active_residual_L1_N": 2.008165697287494,
+      "active_residual_z_N": 0.2917448367125566,
+      "energy_J": 0.014432752936061277,
+      "min_J": 0.9199132007005443,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 29.54902458190918,
+      "median_active_speed_mm_s": 3.8954005241394043,
+      "nodes_over_1mm_s": 558,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 11.739870071411133,
+      "tool_z_mm": 61.61104515194893,
+      "tool_speed_mm_s": 8.836398124694824,
+      "min_interface_clearance_mm": 3.975351330742644,
+      "tool_shift_mm": 1.7902287059219828e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.4,
+      "support_N": 18.49106759601764,
+      "sink_mm": 3.601806194257852,
+      "slab_contact_N": 37.88930580456508,
+      "active_residual_L1_N": 19.831578697169327,
+      "active_residual_z_N": -19.398238208547458,
+      "energy_J": 0.03308421537049355,
+      "min_J": 0.879906997621364,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 48.39936447143555,
+      "median_active_speed_mm_s": 7.991496562957764,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 37.88931655883789,
+      "tool_z_mm": 60.38530915975571,
+      "tool_speed_mm_s": 18.28372573852539,
+      "min_interface_clearance_mm": 3.9642413189408323,
+      "tool_shift_mm": 6.897882562642383e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.45,
+      "support_N": 12.765934592082747,
+      "sink_mm": 2.5220891180491023,
+      "slab_contact_N": 12.376995857048314,
+      "active_residual_L1_N": 2.1204933856910317,
+      "active_residual_z_N": 0.3889387350344413,
+      "energy_J": 0.01620438716853201,
+      "min_J": 0.915191682515541,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 35.95287322998047,
+      "median_active_speed_mm_s": 5.832895755767822,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 12.376997947692871,
+      "tool_z_mm": 61.46903336048126,
+      "tool_speed_mm_s": 14.066699028015137,
+      "min_interface_clearance_mm": 3.9822231710228624,
+      "tool_shift_mm": 2.483881281336847e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.5,
+      "support_N": 17.44026833707767,
+      "sink_mm": 3.400143100982253,
+      "slab_contact_N": 55.51387353625614,
+      "active_residual_L1_N": 38.47356437971428,
+      "active_residual_z_N": -38.07360519917847,
+      "energy_J": 0.0294804405399276,
+      "min_J": 0.8867798140618172,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 59.34618377685547,
+      "median_active_speed_mm_s": 12.567461967468262,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 55.513885498046875,
+      "tool_z_mm": 60.58816984295845,
+      "tool_speed_mm_s": 30.80069923400879,
+      "min_interface_clearance_mm": 3.977446322730664,
+      "tool_shift_mm": 6.718099146330056e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.55,
+      "support_N": 12.734983655262923,
+      "sink_mm": 2.5151102879085974,
+      "slab_contact_N": 12.205327611853136,
+      "active_residual_L1_N": 2.316800080111957,
+      "active_residual_z_N": 0.5296560434097879,
+      "energy_J": 0.016114180307170045,
+      "min_J": 0.9152815814606002,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 58.61868667602539,
+      "median_active_speed_mm_s": 16.453210830688477,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 12.20533561706543,
+      "tool_z_mm": 61.476003378629684,
+      "tool_speed_mm_s": 35.63612747192383,
+      "min_interface_clearance_mm": 3.979577259415876,
+      "tool_shift_mm": 8.802013438908167e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.6,
+      "support_N": 15.927958653201829,
+      "sink_mm": 3.1108300215352975,
+      "slab_contact_N": 93.80933711025864,
+      "active_residual_L1_N": 78.20436590125897,
+      "active_residual_z_N": -77.8813784570568,
+      "energy_J": 0.024671827226971033,
+      "min_J": 0.8965553780813471,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 79.77579498291016,
+      "median_active_speed_mm_s": 23.4870662689209,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 93.80938720703125,
+      "tool_z_mm": 60.8782172203064,
+      "tool_speed_mm_s": 53.97572708129883,
+      "min_interface_clearance_mm": 3.9765743396974265,
+      "tool_shift_mm": 8.001856742072448e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.65,
+      "support_N": 14.670118812438506,
+      "sink_mm": 2.883377404297194,
+      "slab_contact_N": 13.867558173718862,
+      "active_residual_L1_N": 2.496560182146493,
+      "active_residual_z_N": 0.802560638719632,
+      "energy_J": 0.0211848992584045,
+      "min_J": 0.9031955111198499,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 69.5487060546875,
+      "median_active_speed_mm_s": 20.061166763305664,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 13.867568016052246,
+      "tool_z_mm": 61.10653653740883,
+      "tool_speed_mm_s": 43.354923248291016,
+      "min_interface_clearance_mm": 3.9767959236422303,
+      "tool_shift_mm": 1.145916930367226e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.7,
+      "support_N": 13.702797240819205,
+      "sink_mm": 2.706495256023229,
+      "slab_contact_N": 80.1036632496398,
+      "active_residual_L1_N": 66.44166969745231,
+      "active_residual_z_N": -66.40086600882057,
+      "energy_J": 0.018665830488696855,
+      "min_J": 0.9095382009731823,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 69.00076293945312,
+      "median_active_speed_mm_s": 20.864408493041992,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 80.10375213623047,
+      "tool_z_mm": 61.28386780619621,
+      "tool_speed_mm_s": 46.28300476074219,
+      "min_interface_clearance_mm": 3.972542843444296,
+      "tool_shift_mm": 2.479755980943534e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.75,
+      "support_N": 15.96575338956835,
+      "sink_mm": 3.1307892738433973,
+      "slab_contact_N": 15.048137236590264,
+      "active_residual_L1_N": 2.7520306167997237,
+      "active_residual_z_N": 0.9176161529780811,
+      "energy_J": 0.024981754186836014,
+      "min_J": 0.8950741370780875,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 72.95866394042969,
+      "median_active_speed_mm_s": 20.690210342407227,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 15.04813003540039,
+      "tool_z_mm": 60.85820123553276,
+      "tool_speed_mm_s": 44.53584289550781,
+      "min_interface_clearance_mm": 3.9744790992486125,
+      "tool_shift_mm": 1.2572256516159247e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.8,
+      "support_N": 12.617750428253636,
+      "sink_mm": 2.4946685276918314,
+      "slab_contact_N": 49.515556811355054,
+      "active_residual_L1_N": 36.91988890865243,
+      "active_residual_z_N": -36.89780638310141,
+      "energy_J": 0.015853795216742128,
+      "min_J": 0.9165042435143538,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 49.20097351074219,
+      "median_active_speed_mm_s": 12.10752010345459,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 49.515560150146484,
+      "tool_z_mm": 61.49658560752869,
+      "tool_speed_mm_s": 28.029083251953125,
+      "min_interface_clearance_mm": 3.9798923895307814,
+      "tool_shift_mm": 1.8976148478916336e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.85,
+      "support_N": 17.988099795874007,
+      "sink_mm": 3.499563045634791,
+      "slab_contact_N": 17.005692213511793,
+      "active_residual_L1_N": 3.329413773532967,
+      "active_residual_z_N": 0.9824075823622217,
+      "energy_J": 0.031229864324458845,
+      "min_J": 0.883375965191849,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 52.69213104248047,
+      "median_active_speed_mm_s": 10.499022483825684,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 17.00568962097168,
+      "tool_z_mm": 60.48781797289848,
+      "tool_speed_mm_s": 20.40713882446289,
+      "min_interface_clearance_mm": 3.9668646409308574,
+      "tool_shift_mm": 3.2462277335253634e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.9,
+      "support_N": 10.897207369862343,
+      "sink_mm": 2.164422587115111,
+      "slab_contact_N": 13.099338246218394,
+      "active_residual_L1_N": 2.3831710707511133,
+      "active_residual_z_N": -2.2021308763560525,
+      "energy_J": 0.011930039916020263,
+      "min_J": 0.9271100191961013,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 20.51212501525879,
+      "median_active_speed_mm_s": 1.2971299886703491,
+      "nodes_over_1mm_s": 359,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 13.099339485168457,
+      "tool_z_mm": 61.82809919118881,
+      "tool_speed_mm_s": 1.7695404291152954,
+      "min_interface_clearance_mm": 3.984180767908421,
+      "tool_shift_mm": 1.562099105941125e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 0.95,
+      "support_N": 17.996914826421236,
+      "sink_mm": 3.506832996760857,
+      "slab_contact_N": 31.43047218269203,
+      "active_residual_L1_N": 13.85858392635873,
+      "active_residual_z_N": -13.433557356270796,
+      "energy_J": 0.03135888779867102,
+      "min_J": 0.8831066025851525,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 369.80889892578125,
+      "median_active_speed_mm_s": 5.389404296875,
+      "nodes_over_1mm_s": 569,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 31.430492401123047,
+      "tool_z_mm": 60.480449348688126,
+      "tool_speed_mm_s": 13.142824172973633,
+      "min_interface_clearance_mm": 3.9537358051644005,
+      "tool_shift_mm": 3.4630313153804956e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.0,
+      "support_N": 12.648125407819924,
+      "sink_mm": 2.499141282074946,
+      "slab_contact_N": 12.18692408388597,
+      "active_residual_L1_N": 2.1402520039230635,
+      "active_residual_z_N": 0.46120132393395147,
+      "energy_J": 0.015910003712395593,
+      "min_J": 0.915911415516902,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 39.68555450439453,
+      "median_active_speed_mm_s": 7.3163909912109375,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 12.186942100524902,
+      "tool_z_mm": 61.492107808589935,
+      "tool_speed_mm_s": 18.00060272216797,
+      "min_interface_clearance_mm": 3.9819951412446013,
+      "tool_shift_mm": 1.3163549005345562e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.05,
+      "support_N": 17.42550282524082,
+      "sink_mm": 3.40113980547453,
+      "slab_contact_N": 61.17311036097817,
+      "active_residual_L1_N": 44.07674086095932,
+      "active_residual_z_N": -43.74760753573735,
+      "energy_J": 0.0294954484680634,
+      "min_J": 0.8866181380071244,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 63.20304489135742,
+      "median_active_speed_mm_s": 15.105741500854492,
+      "nodes_over_1mm_s": 571,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 61.173118591308594,
+      "tool_z_mm": 60.586754232645035,
+      "tool_speed_mm_s": 34.86126708984375,
+      "min_interface_clearance_mm": 3.9662051087942034,
+      "tool_shift_mm": 3.745156605693875e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.1,
+      "support_N": 13.06997651430847,
+      "sink_mm": 2.5784094465119534,
+      "slab_contact_N": 12.574280315864598,
+      "active_residual_L1_N": 2.2402826599230483,
+      "active_residual_z_N": 0.4956961984438798,
+      "energy_J": 0.016936446870341015,
+      "min_J": 0.9131796240779533,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 58.8372917175293,
+      "median_active_speed_mm_s": 16.900617599487305,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 12.574283599853516,
+      "tool_z_mm": 61.4125169813633,
+      "tool_speed_mm_s": 36.53764724731445,
+      "min_interface_clearance_mm": 3.981938104355237,
+      "tool_shift_mm": 4.662034497621338e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.15,
+      "support_N": 16.36928072907866,
+      "sink_mm": 3.1928396867256152,
+      "slab_contact_N": 89.88260778901167,
+      "active_residual_L1_N": 73.87768205862085,
+      "active_residual_z_N": -73.513327059933,
+      "energy_J": 0.025988617016871274,
+      "min_J": 0.8938894751710833,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 78.33631896972656,
+      "median_active_speed_mm_s": 23.992563247680664,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 89.88260650634766,
+      "tool_z_mm": 60.79587712883949,
+      "tool_speed_mm_s": 51.87093734741211,
+      "min_interface_clearance_mm": 3.9683621902968644,
+      "tool_shift_mm": 0.0001372057236945607,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.2,
+      "support_N": 12.46369179894714,
+      "sink_mm": 2.462148123520051,
+      "slab_contact_N": 11.962798971333541,
+      "active_residual_L1_N": 2.146421040226588,
+      "active_residual_z_N": 0.5008928276136083,
+      "energy_J": 0.015441314266528394,
+      "min_J": 0.9168598327167404,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 84.98504638671875,
+      "median_active_speed_mm_s": 29.72011947631836,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 11.962798118591309,
+      "tool_z_mm": 61.529312282800674,
+      "tool_speed_mm_s": 63.66893768310547,
+      "min_interface_clearance_mm": 3.9826357303815034,
+      "tool_shift_mm": 3.0618098600907736e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.25,
+      "support_N": 18.755325783414918,
+      "sink_mm": 3.66102083761408,
+      "slab_contact_N": 104.44267881847918,
+      "active_residual_L1_N": 86.04641202447583,
+      "active_residual_z_N": -85.68735303506426,
+      "energy_J": 0.03418904060460548,
+      "min_J": 0.8778178791692355,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 90.44023132324219,
+      "median_active_speed_mm_s": 27.238384246826172,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 104.44266510009766,
+      "tool_z_mm": 60.325730592012405,
+      "tool_speed_mm_s": 60.20441436767578,
+      "min_interface_clearance_mm": 3.975202580801952,
+      "tool_shift_mm": 7.876704646830584e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.3,
+      "support_N": 12.271869897248422,
+      "sink_mm": 2.426367002540364,
+      "slab_contact_N": 11.810341449367115,
+      "active_residual_L1_N": 2.15146165219249,
+      "active_residual_z_N": 0.4615284478813021,
+      "energy_J": 0.014995369918484158,
+      "min_J": 0.9181323506054868,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 58.55411148071289,
+      "median_active_speed_mm_s": 17.480810165405273,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 11.810338973999023,
+      "tool_z_mm": 61.56521663069725,
+      "tool_speed_mm_s": 37.4913215637207,
+      "min_interface_clearance_mm": 3.982877408169695,
+      "tool_shift_mm": 1.075546719483896e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.35,
+      "support_N": 19.20548567115743,
+      "sink_mm": 3.7488430137570443,
+      "slab_contact_N": 46.22328717564233,
+      "active_residual_L1_N": 27.30332645410472,
+      "active_residual_z_N": -27.017801504484893,
+      "energy_J": 0.035847242191684,
+      "min_J": 0.8746182257186239,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 54.91071701049805,
+      "median_active_speed_mm_s": 9.875518798828125,
+      "nodes_over_1mm_s": 572,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 46.22331619262695,
+      "tool_z_mm": 60.23764982819557,
+      "tool_speed_mm_s": 23.633241653442383,
+      "min_interface_clearance_mm": 3.974524131672194,
+      "tool_shift_mm": 4.433117075028387e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.4,
+      "support_N": 13.04042929689526,
+      "sink_mm": 2.574317811171715,
+      "slab_contact_N": 12.708413888467476,
+      "active_residual_L1_N": 1.8548388541941498,
+      "active_residual_z_N": 0.33201540842778254,
+      "energy_J": 0.016882692083928674,
+      "min_J": 0.9135308843162863,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 30.372314453125,
+      "median_active_speed_mm_s": 3.6043548583984375,
+      "nodes_over_1mm_s": 567,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 12.70842170715332,
+      "tool_z_mm": 61.41677498817444,
+      "tool_speed_mm_s": 8.05408000946045,
+      "min_interface_clearance_mm": 3.9818677707153456,
+      "tool_shift_mm": 2.650970425843107e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.45,
+      "support_N": 18.854786393040012,
+      "sink_mm": 3.6826385237438277,
+      "slab_contact_N": 18.420494828547817,
+      "active_residual_L1_N": 1.8446259871865376,
+      "active_residual_z_N": 0.43429156449220174,
+      "energy_J": 0.03458751045028663,
+      "min_J": 0.876813248773425,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 34.712257385253906,
+      "median_active_speed_mm_s": 1.4248677492141724,
+      "nodes_over_1mm_s": 353,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 18.420516967773438,
+      "tool_z_mm": 60.30428037047386,
+      "tool_speed_mm_s": 3.337860584259033,
+      "min_interface_clearance_mm": 3.974543609037727,
+      "tool_shift_mm": 8.615292879985555e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.5,
+      "support_N": 13.690148443967102,
+      "sink_mm": 2.698928311175134,
+      "slab_contact_N": 22.76036782731535,
+      "active_residual_L1_N": 9.099648985455262,
+      "active_residual_z_N": -9.07021938334825,
+      "energy_J": 0.018559578150783906,
+      "min_J": 0.909564175645065,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 31.591705322265625,
+      "median_active_speed_mm_s": 3.488837718963623,
+      "nodes_over_1mm_s": 565,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 22.7603816986084,
+      "tool_z_mm": 61.29171699285507,
+      "tool_speed_mm_s": 8.586793899536133,
+      "min_interface_clearance_mm": 3.981025065749391,
+      "tool_shift_mm": 1.5748275987606896e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.55,
+      "support_N": 17.92630050252889,
+      "sink_mm": 3.503776373927109,
+      "slab_contact_N": 16.965382177993888,
+      "active_residual_L1_N": 2.401518708588209,
+      "active_residual_z_N": 0.9609183245350037,
+      "energy_J": 0.03130384534733821,
+      "min_J": 0.8828271625316296,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 42.278316497802734,
+      "median_active_speed_mm_s": 5.342465400695801,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 16.965381622314453,
+      "tool_z_mm": 60.48392504453659,
+      "tool_speed_mm_s": 12.382863998413086,
+      "min_interface_clearance_mm": 3.9760241777904577,
+      "tool_shift_mm": 4.830582751250886e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.6,
+      "support_N": 14.904817431150379,
+      "sink_mm": 2.9299172753025213,
+      "slab_contact_N": 33.278971741965506,
+      "active_residual_L1_N": 18.39141412827625,
+      "active_residual_z_N": -18.374154310815126,
+      "energy_J": 0.021878152465149014,
+      "min_J": 0.9020451330546372,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 40.94658660888672,
+      "median_active_speed_mm_s": 6.898195266723633,
+      "nodes_over_1mm_s": 570,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 33.27894973754883,
+      "tool_z_mm": 61.05983629822731,
+      "tool_speed_mm_s": 16.167760848999023,
+      "min_interface_clearance_mm": 3.979595062249687,
+      "tool_shift_mm": 2.8801214077020357e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.65,
+      "support_N": 16.87764616115089,
+      "sink_mm": 3.30415461371651,
+      "slab_contact_N": 15.937913695408497,
+      "active_residual_L1_N": 2.4168805123051884,
+      "active_residual_z_N": 0.9397324657423907,
+      "energy_J": 0.02783270383214287,
+      "min_J": 0.889455094432806,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 43.336299896240234,
+      "median_active_speed_mm_s": 6.408892631530762,
+      "nodes_over_1mm_s": 556,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 15.937912940979004,
+      "tool_z_mm": 60.68428233265877,
+      "tool_speed_mm_s": 15.061347961425781,
+      "min_interface_clearance_mm": 3.9772620740150533,
+      "tool_shift_mm": 1.1681890518557699e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.7,
+      "support_N": 15.95779844673977,
+      "sink_mm": 3.1305471862507432,
+      "slab_contact_N": 33.02726423734566,
+      "active_residual_L1_N": 17.09619828577927,
+      "active_residual_z_N": -17.069465790605896,
+      "energy_J": 0.02498180243052417,
+      "min_J": 0.8953863861567845,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 41.910614013671875,
+      "median_active_speed_mm_s": 6.346407413482666,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 33.027259826660156,
+      "tool_z_mm": 60.858532786369324,
+      "tool_speed_mm_s": 15.512107849121094,
+      "min_interface_clearance_mm": 3.978294950934061,
+      "tool_shift_mm": 1.3263751346977629e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.75,
+      "support_N": 15.983695284829658,
+      "sink_mm": 3.1348123948932987,
+      "slab_contact_N": 15.23293749341974,
+      "active_residual_L1_N": 2.226368694733911,
+      "active_residual_z_N": 0.7507577914099176,
+      "energy_J": 0.025048784151685766,
+      "min_J": 0.8950668516831268,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 38.93673324584961,
+      "median_active_speed_mm_s": 5.072508811950684,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 15.232932090759277,
+      "tool_z_mm": 60.854267328977585,
+      "tool_speed_mm_s": 12.04013729095459,
+      "min_interface_clearance_mm": 3.9782596033919315,
+      "tool_shift_mm": 4.869999810393546e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.8,
+      "support_N": 16.5493841964849,
+      "sink_mm": 3.2429843972060284,
+      "slab_contact_N": 27.85058909491636,
+      "active_residual_L1_N": 11.352530969598472,
+      "active_residual_z_N": -11.301204898431447,
+      "energy_J": 0.026810920471378452,
+      "min_J": 0.8916165251149203,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 38.25188064575195,
+      "median_active_speed_mm_s": 4.376358509063721,
+      "nodes_over_1mm_s": 568,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 27.85059928894043,
+      "tool_z_mm": 60.74570119380951,
+      "tool_speed_mm_s": 10.900198936462402,
+      "min_interface_clearance_mm": 3.9775870220110225,
+      "tool_shift_mm": 3.857024787099032e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.85,
+      "support_N": 15.564530755476952,
+      "sink_mm": 3.0551228723054966,
+      "slab_contact_N": 15.174021319107851,
+      "active_residual_L1_N": 2.0382393919143125,
+      "active_residual_z_N": 0.3905094363691022,
+      "energy_J": 0.02379001094129407,
+      "min_J": 0.8977359857267303,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 32.793731689453125,
+      "median_active_speed_mm_s": 3.049722909927368,
+      "nodes_over_1mm_s": 560,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 15.174013137817383,
+      "tool_z_mm": 60.93422323465347,
+      "tool_speed_mm_s": 6.541609287261963,
+      "min_interface_clearance_mm": 3.9787870025331378,
+      "tool_shift_mm": 4.102164817261198e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.9,
+      "support_N": 16.81964046748795,
+      "sink_mm": 3.2942225424898526,
+      "slab_contact_N": 21.56905250181444,
+      "active_residual_L1_N": 4.952427880215924,
+      "active_residual_z_N": -4.749412034326488,
+      "energy_J": 0.027666356300400707,
+      "min_J": 0.8898663278559987,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 32.71195983886719,
+      "median_active_speed_mm_s": 1.8756545782089233,
+      "nodes_over_1mm_s": 454,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 21.569067001342773,
+      "tool_z_mm": 60.69423630833626,
+      "tool_speed_mm_s": 4.906207084655762,
+      "min_interface_clearance_mm": 3.977288775368473,
+      "tool_shift_mm": 1.4899055168777306e-05,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 1.95,
+      "support_N": 15.513677070437016,
+      "sink_mm": 3.045480936652677,
+      "slab_contact_N": 15.758782352058915,
+      "active_residual_L1_N": 1.1662408095377979,
+      "active_residual_z_N": -0.24510528162190168,
+      "energy_J": 0.023639579436624203,
+      "min_J": 0.8980790310310267,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 26.784852981567383,
+      "median_active_speed_mm_s": 0.45203980803489685,
+      "nodes_over_1mm_s": 94,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 15.758783340454102,
+      "tool_z_mm": 60.943931341171265,
+      "tool_speed_mm_s": 0.6109482049942017,
+      "min_interface_clearance_mm": 3.978818193943176,
+      "tool_shift_mm": 4.793250696759567e-06,
+      "tool_tilt_deg": 0.0
+    },
+    {
+      "t": 2.0,
+      "support_N": 16.704062878708648,
+      "sink_mm": 3.2718914869177804,
+      "slab_contact_N": 17.250198239577003,
+      "active_residual_L1_N": 1.381514128204824,
+      "active_residual_z_N": -0.5461353608683543,
+      "energy_J": 0.027292143146800285,
+      "min_J": 0.8905977356296005,
+      "inverted_tets": 0,
+      "max_speed_mm_s": 27.95830535888672,
+      "median_active_speed_mm_s": 0.26918965578079224,
+      "nodes_over_1mm_s": 88,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "self_pair_force_imbalance_N": 0.0,
+      "tool_reaction_N": 17.25020980834961,
+      "tool_z_mm": 60.71662902832031,
+      "tool_speed_mm_s": 0.08943220973014832,
+      "min_interface_clearance_mm": 3.9774824213573283,
+      "tool_shift_mm": 8.419641564256287e-06,
+      "tool_tilt_deg": 0.0
+    }
+  ],
+  "dense_trace": [
+    {
+      "t": 2.001,
+      "support_N": 16.708270803805036,
+      "slab_contact_N": 16.209827081940603,
+      "sink_mm": 3.272395733841604,
+      "max_speed_mm_s": 28.96798324584961,
+      "active_residual_L1_N": 1.098516376365025,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.209840774536133
+    },
+    {
+      "t": 2.002,
+      "support_N": 16.708052469866598,
+      "slab_contact_N": 17.358891764102736,
+      "sink_mm": 3.2726788230237505,
+      "max_speed_mm_s": 28.27901840209961,
+      "active_residual_L1_N": 1.279253953330663,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 17.358882904052734
+    },
+    {
+      "t": 2.003,
+      "support_N": 16.708598727342793,
+      "slab_contact_N": 16.328989711328177,
+      "sink_mm": 3.27246185811922,
+      "max_speed_mm_s": 28.506088256835938,
+      "active_residual_L1_N": 1.0075712798353922,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.328996658325195
+    },
+    {
+      "t": 2.004,
+      "support_N": 16.704614397914888,
+      "slab_contact_N": 18.067353843711317,
+      "sink_mm": 3.2720206150523135,
+      "max_speed_mm_s": 29.072410583496094,
+      "active_residual_L1_N": 1.796309125126625,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.06736946105957
+    },
+    {
+      "t": 2.005,
+      "support_N": 16.701410930483405,
+      "slab_contact_N": 16.63768930346123,
+      "sink_mm": 3.271163586699959,
+      "max_speed_mm_s": 28.029083251953125,
+      "active_residual_L1_N": 0.7079546028114598,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.637693405151367
+    },
+    {
+      "t": 2.006,
+      "support_N": 16.694020277277968,
+      "slab_contact_N": 18.46028319085599,
+      "sink_mm": 3.270163978882538,
+      "max_speed_mm_s": 29.545494079589844,
+      "active_residual_L1_N": 2.0994112027174543,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.46027374267578
+    },
+    {
+      "t": 2.007,
+      "support_N": 16.68762703042099,
+      "slab_contact_N": 16.907916742988164,
+      "sink_mm": 3.268695363267201,
+      "max_speed_mm_s": 28.464942932128906,
+      "active_residual_L1_N": 0.8717796193987475,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.907915115356445
+    },
+    {
+      "t": 2.008,
+      "support_N": 16.67699711886379,
+      "slab_contact_N": 19.206567467044806,
+      "sink_mm": 3.2669905188052235,
+      "max_speed_mm_s": 30.26814079284668,
+      "active_residual_L1_N": 2.7989047870798363,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.20658302307129
+    },
+    {
+      "t": 2.009,
+      "support_N": 16.667412667982855,
+      "slab_contact_N": 17.537404989270726,
+      "sink_mm": 3.264902152787582,
+      "max_speed_mm_s": 29.20255470275879,
+      "active_residual_L1_N": 1.390176754473197,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 17.537403106689453
+    },
+    {
+      "t": 2.01,
+      "support_N": 16.653921738305534,
+      "slab_contact_N": 19.605713793454925,
+      "sink_mm": 3.2627236853914425,
+      "max_speed_mm_s": 30.659284591674805,
+      "active_residual_L1_N": 3.1839903319078164,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.605701446533203
+    },
+    {
+      "t": 2.011,
+      "support_N": 16.641658955431037,
+      "slab_contact_N": 17.621216439118143,
+      "sink_mm": 3.2600815369714367,
+      "max_speed_mm_s": 29.537832260131836,
+      "active_residual_L1_N": 1.4687897942256682,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 17.6212215423584
+    },
+    {
+      "t": 2.012,
+      "support_N": 16.62535431614801,
+      "slab_contact_N": 20.267516367544886,
+      "sink_mm": 3.2572607023793974,
+      "max_speed_mm_s": 31.314905166625977,
+      "active_residual_L1_N": 3.8579500517044156,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 20.267520904541016
+    },
+    {
+      "t": 2.013,
+      "support_N": 16.61026952343849,
+      "slab_contact_N": 18.47476071678102,
+      "sink_mm": 3.2541031995244953,
+      "max_speed_mm_s": 30.20838737487793,
+      "active_residual_L1_N": 2.281311976840265,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.474769592285156
+    },
+    {
+      "t": 2.014,
+      "support_N": 16.59118327299812,
+      "slab_contact_N": 20.753655573586002,
+      "sink_mm": 3.2506806024848998,
+      "max_speed_mm_s": 31.750757217407227,
+      "active_residual_L1_N": 4.3652445286284,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 20.75366973876953
+    },
+    {
+      "t": 2.015,
+      "support_N": 16.573357134978114,
+      "slab_contact_N": 18.598615518189035,
+      "sink_mm": 3.2469037399578444,
+      "max_speed_mm_s": 30.59581756591797,
+      "active_residual_L1_N": 2.402852628139992,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.59861183166504
+    },
+    {
+      "t": 2.016,
+      "support_N": 16.5515426359335,
+      "slab_contact_N": 21.307811295439024,
+      "sink_mm": 3.242971121967346,
+      "max_speed_mm_s": 32.28346252441406,
+      "active_residual_L1_N": 4.945043782126879,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.30781364440918
+    },
+    {
+      "t": 2.017,
+      "support_N": 16.530964369556557,
+      "slab_contact_N": 19.24154233408626,
+      "sink_mm": 3.2387359873081105,
+      "max_speed_mm_s": 31.12853240966797,
+      "active_residual_L1_N": 3.062815989582778,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.241558074951172
+    },
+    {
+      "t": 2.018,
+      "support_N": 16.5067531276701,
+      "slab_contact_N": 21.533494758070447,
+      "sink_mm": 3.2344955532338773,
+      "max_speed_mm_s": 32.469730377197266,
+      "active_residual_L1_N": 5.20565299193154,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.533506393432617
+    },
+    {
+      "t": 2.019,
+      "support_N": 16.484073835400654,
+      "slab_contact_N": 19.21264918652014,
+      "sink_mm": 3.2299061115017924,
+      "max_speed_mm_s": 31.262643814086914,
+      "active_residual_L1_N": 3.0671597215549213,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.212648391723633
+    },
+    {
+      "t": 2.02,
+      "support_N": 16.457926402384796,
+      "slab_contact_N": 21.939978676091414,
+      "sink_mm": 3.2252561172035157,
+      "max_speed_mm_s": 32.853458404541016,
+      "active_residual_L1_N": 5.648290441924466,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.939983367919922
+    },
+    {
+      "t": 2.021,
+      "support_N": 16.433499851703388,
+      "slab_contact_N": 19.729517038096674,
+      "sink_mm": 3.22036313327212,
+      "max_speed_mm_s": 31.63889503479004,
+      "active_residual_L1_N": 3.6143973311881155,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.72952651977539
+    },
+    {
+      "t": 2.022,
+      "support_N": 16.40597117135559,
+      "slab_contact_N": 22.042893912061118,
+      "sink_mm": 3.215518479617585,
+      "max_speed_mm_s": 32.91679763793945,
+      "active_residual_L1_N": 5.795922872088621,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 22.042909622192383
+    },
+    {
+      "t": 2.023,
+      "support_N": 16.380468750872225,
+      "slab_contact_N": 19.579243796906667,
+      "sink_mm": 3.2103882042495746,
+      "max_speed_mm_s": 31.642620086669922,
+      "active_residual_L1_N": 3.5083099708247074,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.579238891601562
+    },
+    {
+      "t": 2.024,
+      "support_N": 16.351943989317604,
+      "slab_contact_N": 22.32987255981425,
+      "sink_mm": 3.2052496627047575,
+      "max_speed_mm_s": 33.177608489990234,
+      "active_residual_L1_N": 6.127727470208424,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 22.329849243164062
+    },
+    {
+      "t": 2.025,
+      "support_N": 16.32552901772426,
+      "slab_contact_N": 20.043076151341666,
+      "sink_mm": 3.1999266200085503,
+      "max_speed_mm_s": 31.90338897705078,
+      "active_residual_L1_N": 4.011865413297713,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 20.0430908203125
+    },
+    {
+      "t": 2.026,
+      "support_N": 16.296333527801497,
+      "slab_contact_N": 22.317353083344642,
+      "sink_mm": 3.1947044184003803,
+      "max_speed_mm_s": 33.12172317504883,
+      "active_residual_L1_N": 6.1664460194198,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 22.317352294921875
+    },
+    {
+      "t": 2.027,
+      "support_N": 16.269467265246366,
+      "slab_contact_N": 19.86083423724631,
+      "sink_mm": 3.1892938554282773,
+      "max_speed_mm_s": 31.79535675048828,
+      "active_residual_L1_N": 3.8820117719557823,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.860824584960938
+    },
+    {
+      "t": 2.028,
+      "support_N": 16.239979787472503,
+      "slab_contact_N": 22.430914125812706,
+      "sink_mm": 3.1839343458303095,
+      "max_speed_mm_s": 33.19628143310547,
+      "active_residual_L1_N": 6.330983028348878,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 22.430904388427734
+    },
+    {
+      "t": 2.029,
+      "support_N": 16.21289311533322,
+      "slab_contact_N": 20.08351958572166,
+      "sink_mm": 3.1784695233705307,
+      "max_speed_mm_s": 31.862415313720703,
+      "active_residual_L1_N": 4.153899075363503,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 20.083528518676758
+    },
+    {
+      "t": 2.03,
+      "support_N": 16.183405373848057,
+      "slab_contact_N": 22.24836211366346,
+      "sink_mm": 3.173206585970345,
+      "max_speed_mm_s": 32.98391342163086,
+      "active_residual_L1_N": 6.204565345753191,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 22.24838638305664
+    },
+    {
+      "t": 2.031,
+      "support_N": 16.15658528229158,
+      "slab_contact_N": 19.738560796540696,
+      "sink_mm": 3.1678236453792903,
+      "max_speed_mm_s": 31.597923278808594,
+      "active_residual_L1_N": 3.8683161525965493,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.73857307434082
+    },
+    {
+      "t": 2.032,
+      "support_N": 16.1275370334554,
+      "slab_contact_N": 22.229637109383475,
+      "sink_mm": 3.1625590680774653,
+      "max_speed_mm_s": 32.92431640625,
+      "active_residual_L1_N": 6.2393752421767585,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 22.229642868041992
+    },
+    {
+      "t": 2.033,
+      "support_N": 16.101252202183037,
+      "slab_contact_N": 19.850412376457825,
+      "sink_mm": 3.1572468811098022,
+      "max_speed_mm_s": 31.542043685913086,
+      "active_residual_L1_N": 4.033492447095446,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.850419998168945
+    },
+    {
+      "t": 2.034,
+      "support_N": 16.072951298277648,
+      "slab_contact_N": 21.922725437267218,
+      "sink_mm": 3.152202849915951,
+      "max_speed_mm_s": 32.585289001464844,
+      "active_residual_L1_N": 5.989882163242566,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.922725677490234
+    },
+    {
+      "t": 2.035,
+      "support_N": 16.04765645521475,
+      "slab_contact_N": 19.388936445320724,
+      "sink_mm": 3.1470954990583415,
+      "max_speed_mm_s": 31.165788650512695,
+      "active_residual_L1_N": 3.6341066642288755,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.388940811157227
+    },
+    {
+      "t": 2.036,
+      "support_N": 16.020487220112976,
+      "slab_contact_N": 21.781906964082737,
+      "sink_mm": 3.142173467890149,
+      "max_speed_mm_s": 32.4139404296875,
+      "active_residual_L1_N": 5.902479813551549,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.78192710876465
+    },
+    {
+      "t": 2.037,
+      "support_N": 15.996381237018255,
+      "slab_contact_N": 19.387307837227127,
+      "sink_mm": 3.137258482240126,
+      "max_speed_mm_s": 30.98697280883789,
+      "active_residual_L1_N": 3.6867236995556953,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.387327194213867
+    },
+    {
+      "t": 2.038,
+      "support_N": 15.970557382827524,
+      "slab_contact_N": 21.371869867725763,
+      "sink_mm": 3.1326651828440037,
+      "max_speed_mm_s": 31.9780330657959,
+      "active_residual_L1_N": 5.548077603100504,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.371875762939453
+    },
+    {
+      "t": 2.039,
+      "support_N": 15.947989784309751,
+      "slab_contact_N": 18.85108552145539,
+      "sink_mm": 3.128061553841013,
+      "max_speed_mm_s": 30.513858795166016,
+      "active_residual_L1_N": 3.2121814381559943,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.85109519958496
+    },
+    {
+      "t": 2.04,
+      "support_N": 15.923798311492705,
+      "slab_contact_N": 21.133007173775695,
+      "sink_mm": 3.123691172714186,
+      "max_speed_mm_s": 31.70978355407715,
+      "active_residual_L1_N": 5.359749806997325,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 21.133024215698242
+    },
+    {
+      "t": 2.041,
+      "support_N": 15.902890368806034,
+      "slab_contact_N": 18.765735101158498,
+      "sink_mm": 3.119384380804263,
+      "max_speed_mm_s": 30.245635986328125,
+      "active_residual_L1_N": 3.1793535781197666,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.765735626220703
+    },
+    {
+      "t": 2.042,
+      "support_N": 15.880497885652142,
+      "slab_contact_N": 20.62899904610822,
+      "sink_mm": 3.115440794930686,
+      "max_speed_mm_s": 31.18450355529785,
+      "active_residual_L1_N": 4.907591689820416,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 20.628992080688477
+    },
+    {
+      "t": 2.043,
+      "support_N": 15.861577557091564,
+      "slab_contact_N": 18.21111545705935,
+      "sink_mm": 3.111555391292994,
+      "max_speed_mm_s": 29.67939567565918,
+      "active_residual_L1_N": 2.6839263110845946,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.21112060546875
+    },
+    {
+      "t": 2.044,
+      "support_N": 15.841314644036004,
+      "slab_contact_N": 20.29543939587893,
+      "sink_mm": 3.1079364689979943,
+      "max_speed_mm_s": 30.82317352294922,
+      "active_residual_L1_N": 4.6197431212199405,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 20.295455932617188
+    },
+    {
+      "t": 2.045,
+      "support_N": 15.824557491693175,
+      "slab_contact_N": 18.003084124764428,
+      "sink_mm": 3.1044299456314537,
+      "max_speed_mm_s": 29.329219818115234,
+      "active_residual_L1_N": 2.5246780363739045,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.003087997436523
+    },
+    {
+      "t": 2.046,
+      "support_N": 15.80655468122499,
+      "slab_contact_N": 19.696494277828606,
+      "sink_mm": 3.1013441505339054,
+      "max_speed_mm_s": 30.215953826904297,
+      "active_residual_L1_N": 4.066794815656154,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.69647979736328
+    },
+    {
+      "t": 2.047,
+      "support_N": 15.79223842523981,
+      "slab_contact_N": 17.356643989216536,
+      "sink_mm": 3.0983431834585398,
+      "max_speed_mm_s": 28.69219970703125,
+      "active_residual_L1_N": 1.9565107524510235,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 17.35663604736328
+    },
+    {
+      "t": 2.048,
+      "support_N": 15.77676247183904,
+      "slab_contact_N": 19.27159719762858,
+      "sink_mm": 3.0956792355796976,
+      "max_speed_mm_s": 29.776391983032227,
+      "active_residual_L1_N": 3.680860418272791,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 19.271604537963867
+    },
+    {
+      "t": 2.049,
+      "support_N": 15.7650246550646,
+      "slab_contact_N": 17.141251498367637,
+      "sink_mm": 3.0931690285592914,
+      "max_speed_mm_s": 28.263792037963867,
+      "active_residual_L1_N": 1.8015566905304217,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 17.14125633239746
+    },
+    {
+      "t": 2.05,
+      "support_N": 15.752310128313528,
+      "slab_contact_N": 18.635530188388657,
+      "sink_mm": 3.091086833652463,
+      "max_speed_mm_s": 29.128215789794922,
+      "active_residual_L1_N": 3.0825912072822863,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.63552474975586
+    },
+    {
+      "t": 2.051,
+      "support_N": 15.743473518089056,
+      "slab_contact_N": 16.46993639486027,
+      "sink_mm": 3.089088384361614,
+      "max_speed_mm_s": 27.582063674926758,
+      "active_residual_L1_N": 1.2125761991191912,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.469947814941406
+    },
+    {
+      "t": 2.052,
+      "support_N": 15.733589237266022,
+      "slab_contact_N": 18.19219899305608,
+      "sink_mm": 3.087480954810991,
+      "max_speed_mm_s": 28.673744201660156,
+      "active_residual_L1_N": 2.6898831975804964,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 18.19218635559082
+    },
+    {
+      "t": 2.053,
+      "support_N": 15.72755261355615,
+      "slab_contact_N": 16.18199697835371,
+      "sink_mm": 3.0860171441917754,
+      "max_speed_mm_s": 27.15737533569336,
+      "active_residual_L1_N": 1.0020588302228193,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.181995391845703
+    },
+    {
+      "t": 2.054,
+      "support_N": 15.720541238525007,
+      "slab_contact_N": 17.612881990266033,
+      "sink_mm": 3.084931004600344,
+      "max_speed_mm_s": 28.1001033782959,
+      "active_residual_L1_N": 2.1675347528172217,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 17.612882614135742
+    },
+    {
+      "t": 2.055,
+      "support_N": 15.717351438765496,
+      "slab_contact_N": 15.77958382977522,
+      "sink_mm": 3.0840355621697446,
+      "max_speed_mm_s": 26.56877326965332,
+      "active_residual_L1_N": 0.7264945632390005,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.779592514038086
+    },
+    {
+      "t": 2.056,
+      "support_N": 15.713283267108004,
+      "slab_contact_N": 16.93059395151795,
+      "sink_mm": 3.0836189375698786,
+      "max_speed_mm_s": 27.4072322845459,
+      "active_residual_L1_N": 1.60709626850352,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.930601119995117
+    },
+    {
+      "t": 2.057,
+      "support_N": 15.71315928951832,
+      "slab_contact_N": 15.463391573401168,
+      "sink_mm": 3.0832995579780955,
+      "max_speed_mm_s": 26.79241371154785,
+      "active_residual_L1_N": 0.9465038741946158,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.463400840759277
+    },
+    {
+      "t": 2.058,
+      "support_N": 15.712036763408019,
+      "slab_contact_N": 16.68132656326634,
+      "sink_mm": 3.083368200690098,
+      "max_speed_mm_s": 26.971437454223633,
+      "active_residual_L1_N": 1.4746121692706828,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.681339263916016
+    },
+    {
+      "t": 2.059,
+      "support_N": 15.714792304333136,
+      "slab_contact_N": 15.356831971235806,
+      "sink_mm": 3.0835484741167676,
+      "max_speed_mm_s": 27.172367095947266,
+      "active_residual_L1_N": 1.0433335751292088,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.356823921203613
+    },
+    {
+      "t": 2.06,
+      "support_N": 15.716501493718162,
+      "slab_contact_N": 16.302710795833264,
+      "sink_mm": 3.0841202672123096,
+      "max_speed_mm_s": 26.464824676513672,
+      "active_residual_L1_N": 1.2164074761874817,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.302724838256836
+    },
+    {
+      "t": 2.061,
+      "support_N": 15.721991130068716,
+      "slab_contact_N": 15.288385130144889,
+      "sink_mm": 3.084871755962894,
+      "max_speed_mm_s": 27.719974517822266,
+      "active_residual_L1_N": 1.1117385011620238,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.288384437561035
+    },
+    {
+      "t": 2.062,
+      "support_N": 15.726493924167613,
+      "slab_contact_N": 16.00731636249111,
+      "sink_mm": 3.086051168998037,
+      "max_speed_mm_s": 26.863067626953125,
+      "active_residual_L1_N": 1.15389195867355,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.007326126098633
+    },
+    {
+      "t": 2.063,
+      "support_N": 15.734806726922814,
+      "slab_contact_N": 15.207756175863324,
+      "sink_mm": 3.0873191685886856,
+      "max_speed_mm_s": 28.401702880859375,
+      "active_residual_L1_N": 1.2215986459317119,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.207767486572266
+    },
+    {
+      "t": 2.064,
+      "support_N": 15.741969294384306,
+      "slab_contact_N": 16.021503842959646,
+      "sink_mm": 3.088989506460998,
+      "max_speed_mm_s": 27.317554473876953,
+      "active_residual_L1_N": 1.3990094788331962,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.021503448486328
+    },
+    {
+      "t": 2.065,
+      "support_N": 15.75286202126875,
+      "slab_contact_N": 15.182782968011452,
+      "sink_mm": 3.090712232450367,
+      "max_speed_mm_s": 28.83012580871582,
+      "active_residual_L1_N": 1.2614422268118546,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.18278694152832
+    },
+    {
+      "t": 2.066,
+      "support_N": 15.762436364076686,
+      "slab_contact_N": 15.977818022831343,
+      "sink_mm": 3.092756810659011,
+      "max_speed_mm_s": 27.716157913208008,
+      "active_residual_L1_N": 1.4808006344318474,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.977825164794922
+    },
+    {
+      "t": 2.067,
+      "support_N": 15.775548052827348,
+      "slab_contact_N": 15.220212204643758,
+      "sink_mm": 3.094943641605331,
+      "max_speed_mm_s": 29.206398010253906,
+      "active_residual_L1_N": 1.2258814985039956,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.220215797424316
+    },
+    {
+      "t": 2.068,
+      "support_N": 15.787443160118732,
+      "slab_contact_N": 15.845859137596563,
+      "sink_mm": 3.097546751162226,
+      "max_speed_mm_s": 28.379261016845703,
+      "active_residual_L1_N": 1.3361358586582857,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.84585952758789
+    },
+    {
+      "t": 2.069,
+      "support_N": 15.80289766297204,
+      "slab_contact_N": 15.116137313918443,
+      "sink_mm": 3.100204615299889,
+      "max_speed_mm_s": 29.90302276611328,
+      "active_residual_L1_N": 1.3790215874855172,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.11613655090332
+    },
+    {
+      "t": 2.07,
+      "support_N": 15.816936200285257,
+      "slab_contact_N": 15.889563584001735,
+      "sink_mm": 3.1032074266481784,
+      "max_speed_mm_s": 28.766691207885742,
+      "active_residual_L1_N": 1.6030377838499894,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.88958740234375
+    },
+    {
+      "t": 2.071,
+      "support_N": 15.834464116804432,
+      "slab_contact_N": 15.114993703202344,
+      "sink_mm": 3.1062131158401556,
+      "max_speed_mm_s": 30.245763778686523,
+      "active_residual_L1_N": 1.4087623200050325,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.115005493164062
+    },
+    {
+      "t": 2.072,
+      "support_N": 15.850402058612518,
+      "slab_contact_N": 15.892291495751124,
+      "sink_mm": 3.109483282090699,
+      "max_speed_mm_s": 29.07589340209961,
+      "active_residual_L1_N": 1.6508175542106378,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.892294883728027
+    },
+    {
+      "t": 2.073,
+      "support_N": 15.869610782954979,
+      "slab_contact_N": 15.206248270929791,
+      "sink_mm": 3.112839193209878,
+      "max_speed_mm_s": 30.525177001953125,
+      "active_residual_L1_N": 1.3302472357564041,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.206243515014648
+    },
+    {
+      "t": 2.074,
+      "support_N": 15.887295489491411,
+      "slab_contact_N": 15.79517487011617,
+      "sink_mm": 3.1165484215249584,
+      "max_speed_mm_s": 29.634689331054688,
+      "active_residual_L1_N": 1.4836134489966302,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.795187950134277
+    },
+    {
+      "t": 2.075,
+      "support_N": 15.908233936024056,
+      "slab_contact_N": 15.096367846534122,
+      "sink_mm": 3.1202501815940735,
+      "max_speed_mm_s": 31.117504119873047,
+      "active_residual_L1_N": 1.4988512042968658,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.096381187438965
+    },
+    {
+      "t": 2.076,
+      "support_N": 15.927393161736987,
+      "slab_contact_N": 15.866273083724082,
+      "sink_mm": 3.1242316814197166,
+      "max_speed_mm_s": 29.917816162109375,
+      "active_residual_L1_N": 1.7364155609131255,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.866271018981934
+    },
+    {
+      "t": 2.077,
+      "support_N": 15.949698438337384,
+      "slab_contact_N": 15.121004882559646,
+      "sink_mm": 3.128147357102859,
+      "max_speed_mm_s": 31.33732795715332,
+      "active_residual_L1_N": 1.511679236973316,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.121009826660156
+    },
+    {
+      "t": 2.078,
+      "support_N": 15.970025535604146,
+      "slab_contact_N": 15.895224007050274,
+      "sink_mm": 3.132254965638139,
+      "max_speed_mm_s": 30.09663200378418,
+      "active_residual_L1_N": 1.7658832810142182,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.895227432250977
+    },
+    {
+      "t": 2.079,
+      "support_N": 15.99326324702417,
+      "slab_contact_N": 15.249175625271164,
+      "sink_mm": 3.136374779870227,
+      "max_speed_mm_s": 31.486358642578125,
+      "active_residual_L1_N": 1.4019484642324482,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.249183654785156
+    },
+    {
+      "t": 2.08,
+      "support_N": 16.014559103709885,
+      "slab_contact_N": 15.825316750298953,
+      "sink_mm": 3.1407713931899957,
+      "max_speed_mm_s": 30.521312713623047,
+      "active_residual_L1_N": 1.5750690409900598,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.825311660766602
+    },
+    {
+      "t": 2.081,
+      "support_N": 16.038721140487944,
+      "slab_contact_N": 15.158290965831839,
+      "sink_mm": 3.1450816023353725,
+      "max_speed_mm_s": 31.94086265563965,
+      "active_residual_L1_N": 1.558910606375983,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.158285140991211
+    },
+    {
+      "t": 2.082,
+      "support_N": 16.06069559215814,
+      "slab_contact_N": 15.921788773208391,
+      "sink_mm": 3.14960599919434,
+      "max_speed_mm_s": 30.655418395996094,
+      "active_residual_L1_N": 1.8131349891700967,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.921797752380371
+    },
+    {
+      "t": 2.083,
+      "support_N": 16.085419033621598,
+      "slab_contact_N": 15.202349370345473,
+      "sink_mm": 3.1539848389261347,
+      "max_speed_mm_s": 32.01907730102539,
+      "active_residual_L1_N": 1.5570934803550893,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.202352523803711
+    },
+    {
+      "t": 2.084,
+      "support_N": 16.107743801481146,
+      "slab_contact_N": 15.97533737035701,
+      "sink_mm": 3.1584860642223447,
+      "max_speed_mm_s": 30.69266700744629,
+      "active_residual_L1_N": 1.8242971724672756,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.975345611572266
+    },
+    {
+      "t": 2.085,
+      "support_N": 16.13257486317058,
+      "slab_contact_N": 15.329694682441186,
+      "sink_mm": 3.162902290227281,
+      "max_speed_mm_s": 32.03398895263672,
+      "active_residual_L1_N": 1.4584071894882749,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.329699516296387
+    },
+    {
+      "t": 2.086,
+      "support_N": 16.154977493940404,
+      "slab_contact_N": 15.951178167480975,
+      "sink_mm": 3.1674451334817326,
+      "max_speed_mm_s": 30.86030387878418,
+      "active_residual_L1_N": 1.646702814262116,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.951180458068848
+    },
+    {
+      "t": 2.087,
+      "support_N": 16.17974997105465,
+      "slab_contact_N": 15.298007700330345,
+      "sink_mm": 3.171863031974789,
+      "max_speed_mm_s": 32.197906494140625,
+      "active_residual_L1_N": 1.545679145366356,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.298019409179688
+    },
+    {
+      "t": 2.088,
+      "support_N": 16.201827497667516,
+      "slab_contact_N": 16.01483492157422,
+      "sink_mm": 3.1763494285455596,
+      "max_speed_mm_s": 30.84912872314453,
+      "active_residual_L1_N": 1.7568080226904006,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.01483917236328
+    },
+    {
+      "t": 2.089,
+      "support_N": 16.226124840262017,
+      "slab_contact_N": 15.410841349890688,
+      "sink_mm": 3.1807040197501832,
+      "max_speed_mm_s": 32.14201736450195,
+      "active_residual_L1_N": 1.4653144298301053,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.410842895507812
+    },
+    {
+      "t": 2.09,
+      "support_N": 16.247713962692274,
+      "slab_contact_N": 16.049648364947643,
+      "sink_mm": 3.185139102515661,
+      "max_speed_mm_s": 30.901283264160156,
+      "active_residual_L1_N": 1.6287007860272493,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.049654006958008
+    },
+    {
+      "t": 2.091,
+      "support_N": 16.271446328439538,
+      "slab_contact_N": 15.34645787187037,
+      "sink_mm": 3.1893237710549927,
+      "max_speed_mm_s": 32.19411087036133,
+      "active_residual_L1_N": 1.5883198720350706,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.34646224975586
+    },
+    {
+      "t": 2.092,
+      "support_N": 16.291978758714773,
+      "slab_contact_N": 16.19629131286638,
+      "sink_mm": 3.193497373756806,
+      "max_speed_mm_s": 30.625612258911133,
+      "active_residual_L1_N": 1.8449077890715668,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.1962947845459
+    },
+    {
+      "t": 2.093,
+      "support_N": 16.314438848030353,
+      "slab_contact_N": 15.52665462103323,
+      "sink_mm": 3.1974707600165124,
+      "max_speed_mm_s": 31.86627197265625,
+      "active_residual_L1_N": 1.4279876893757721,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.526660919189453
+    },
+    {
+      "t": 2.094,
+      "support_N": 16.333766632097735,
+      "slab_contact_N": 16.195668878994184,
+      "sink_mm": 3.201409626871729,
+      "max_speed_mm_s": 30.521303176879883,
+      "active_residual_L1_N": 1.5751704227181071,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.195674896240234
+    },
+    {
+      "t": 2.095,
+      "support_N": 16.354883853237634,
+      "slab_contact_N": 15.509790737822186,
+      "sink_mm": 3.205121392707469,
+      "max_speed_mm_s": 31.769397735595703,
+      "active_residual_L1_N": 1.4927390092126331,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.509798049926758
+    },
+    {
+      "t": 2.096,
+      "support_N": 16.372704619096435,
+      "slab_contact_N": 16.282242073881207,
+      "sink_mm": 3.2088151322284526,
+      "max_speed_mm_s": 30.308961868286133,
+      "active_residual_L1_N": 1.6612700619283691,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.28223991394043
+    },
+    {
+      "t": 2.097,
+      "support_N": 16.39222230101842,
+      "slab_contact_N": 15.635286373697454,
+      "sink_mm": 3.2122853428787237,
+      "max_speed_mm_s": 31.523517608642578,
+      "active_residual_L1_N": 1.3906668100803543,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.635278701782227
+    },
+    {
+      "t": 2.098,
+      "support_N": 16.408516415775914,
+      "slab_contact_N": 16.32908063576906,
+      "sink_mm": 3.2157513820486523,
+      "max_speed_mm_s": 30.16739845275879,
+      "active_residual_L1_N": 1.507028929765058,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.329082489013672
+    },
+    {
+      "t": 2.099,
+      "support_N": 16.426529708435655,
+      "slab_contact_N": 15.590927172481315,
+      "sink_mm": 3.218881628640104,
+      "max_speed_mm_s": 31.385671615600586,
+      "active_residual_L1_N": 1.4844626643968881,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 15.590921401977539
+    },
+    {
+      "t": 2.1,
+      "support_N": 16.440948961404537,
+      "slab_contact_N": 16.48366554119275,
+      "sink_mm": 3.2219380156181696,
+      "max_speed_mm_s": 29.738990783691406,
+      "active_residual_L1_N": 1.7068156901657061,
+      "soft_contacts": 669,
+      "contact_kinds": [
+        99,
+        334,
+        236
+      ],
+      "tool_reaction_N": 16.483673095703125
+    }
+  ]
+}

@@ -1,0 +1,156 @@
+{
+  "kind": "random",
+  "category": "compressible",
+  "kappa": {
+    "category": "compressible",
+    "size": [
+      0.17791545236930215,
+      0.17791545236930215,
+      0.08125983041530026
+    ],
+    "mass": 0.18182744405459164,
+    "com_offset": [
+      -0.06426463762936685,
+      -0.1271037440280627,
+      -0.06478204723334215
+    ],
+    "segments": [
+      4,
+      4,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.0968761761296008,
+    "squeeze_stiffness_z": 0.46369435273235743,
+    "lock_strain_y": 0.28175282144355573,
+    "lock_strain_z": 0.2731360806060452,
+    "droop_ratio": 0.16486376558416094,
+    "damping_ratio": 0.9739319837423724,
+    "mobile": false,
+    "mobile_frac": 0.49596130130334204,
+    "mobile_range": 0.02362118475899665,
+    "mobile_freq": 1.9021137666526964,
+    "surface_friction": 0.2059531171476032,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.10572861299881628
+  },
+  "seed": 20261277,
+  "grasp": {
+    "u": 0.07078643990386924,
+    "v": 0.03178851575920294,
+    "psi": 0.7656098553386471,
+    "w": 0.029500247456638408,
+    "d": 0.011683360003059615,
+    "F": 19.149393885609946,
+    "v_lift": 0.24094389269253647,
+    "a_max": 2.2507602891178924
+  },
+  "index": 76,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 0.9650440409222232,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 1.000000000010553,
+    "speed_median_mm_s": 0.0001584932081462986,
+    "speed_max_mm_s": 0.0011492971840516126,
+    "drift_mm": 1.8639403856722108e-05,
+    "max_joint_strain": 0.020750221231445376
+  },
+  "result": {
+    "outcome": "over_squeeze",
+    "reason": "15.033333 N in lift",
+    "cls": "compressible",
+    "max_grip_force_N": 15.033332505130504,
+    "lift_height_mm": null,
+    "slip_mm": 2.2974105703971857,
+    "wall_s": 3.15024240501225,
+    "sim_s": 2.2499999999998175,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 2.343524910590973,
+    "pinch_events": [
+      {
+        "t": 2.234799999999819,
+        "event": "bind",
+        "segment": 32,
+        "segments": [
+          32,
+          29,
+          20,
+          17
+        ]
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8515999999999715,
+        "phase": "press"
+      },
+      {
+        "t": 2.019999999999843,
+        "phase": "close"
+      },
+      {
+        "t": 2.234799999999819,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.011683360003059615,
+    "contact_height_m": 0.08084783045596786,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "depth",
+      "t": 2.019999999999843,
+      "force_N": 3.9158543500526197,
+      "depth_m": 0.011679999999998716
+    },
+    "press_peak_vertical_force_N": 3.9158543500526197,
+    "actual_depth_m": 0.011679999999998716,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.8515999999999715,
+      "forces": {
+        "pA": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "pB": [
+          -0.001958839054374814,
+          -0.0007313701503982402,
+          0.050834084709315094
+        ]
+      }
+    },
+    "max_real_grip_force_N": 0.2267349433805601,
+    "max_spring_force_N": 24.006654244805443,
+    "rest_grip_to_com_gap_mm": 48.43504522411011,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": null,
+    "hang_end": null,
+    "stop_swing_mm": null,
+    "stop_window_samples": 0
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 5.322456690017134
+}

@@ -1,0 +1,49 @@
+{
+  "title_zh": "牛皮纸邮寄袋",
+  "geometry": "geometry/kraft.npz",
+  "texture": "textures/kraft.png",
+  "notes_zh": "参数与 02_kraft_paper/material.json 相同；Newton 膜 E·t = 6e5 N/m（4 GPa × 0.15 mm，估计值），按子步下限自动软化",
+  "params": {
+    "memory_ratio": 0.6,
+    "recovery_tau_s": 2.0,
+    "bending_damping_nms": 3e-07,
+    "frame_dt_s": 0.01,
+    "friction": 0.45,
+    "table_friction": 0.45,
+    "velocity_damping_per_s": 3.0,
+    "self_contact": true,
+    "gravity": true,
+    "edge_solref_s": 0.0002,
+    "edge_solimp": [
+      0.99,
+      0.999,
+      0.0001
+    ],
+    "iterations": 200,
+    "solver": "CG",
+    "tolerance": 1e-08,
+    "contact_timeconst_s": 0.0002,
+    "membrane_model": "inextensible",
+    "plasticity": true,
+    "plastic_hardening_ratio": 0.08,
+    "collision_radius_m": 0.00035,
+    "collision_patch_faces": 32,
+    "bending_rigidity_nm": 0.00135,
+    "plastic_yield_angle_deg": 25.0,
+    "timestep_s": 0.0001,
+    "precreased_stiffness_ratio": 0.01,
+    "precreased_panel_ids": [
+      6
+    ],
+    "precreased_panel_boundaries": true,
+    "self_contact_front_panel_ids": [
+      0
+    ],
+    "self_contact_back_panel_ids": [
+      3,
+      7
+    ],
+    "young_pa": 4000000000.0,
+    "membrane_thickness_m": 0.00015
+  }
+}

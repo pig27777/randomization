@@ -1,0 +1,58 @@
+{
+  "passed": false,
+  "rows": [
+    {
+      "job": {
+        "category": "hard",
+        "test": "r1y"
+      },
+      "passed": false,
+      "metrics": [
+        {
+          "metric": "stiffness",
+          "reference": 161.96591339936433,
+          "candidate": 186.6877670586538,
+          "relative_error": 0.15263615127667046,
+          "abs_diff": 24.72185365928948,
+          "nominal_absolute_tolerance": 3.2393182679872865,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 3.2393182679872865,
+          "resolution_used": false,
+          "passed": false
+        },
+        {
+          "metric": "lock_strain",
+          "reference": null,
+          "candidate": null,
+          "relative_error": null,
+          "abs_diff": null,
+          "nominal_absolute_tolerance": null,
+          "grid_step": 0.0025,
+          "effective_absolute_tolerance": null,
+          "resolution_used": false,
+          "passed": true
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        },
+        "lower_bound": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    }
+  ],
+  "planned": 12,
+  "completed": 1
+}

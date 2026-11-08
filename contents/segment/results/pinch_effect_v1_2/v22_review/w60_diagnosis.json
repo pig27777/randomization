@@ -1,0 +1,165 @@
+{
+  "same_segment_required": false,
+  "all_four_cases_bound": true,
+  "conclusion": "w60 is not rejected for different contact segments. Native lateral force reaches the target before the 10 mm virtual-spring gathering travel; subsequent force loss overloads the attachment. No eligibility change or E4 resimulation required.",
+  "rows": [
+    {
+      "name": "w60_d5_formal",
+      "grasp": {
+        "w": 0.06,
+        "d": 0.005,
+        "F": 5.0
+      },
+      "outcome": "grasp_fail",
+      "first_close_top_contacts": [
+        [
+          13,
+          19
+        ],
+        [
+          17,
+          23
+        ]
+      ],
+      "first_close_candidate": 15,
+      "first_lift_gap_mm": 53.05930742567376,
+      "first_lift_force_N": 0.21012662746144545,
+      "max_real_grip_force_N": 91.55996546148765,
+      "max_spring_force_N": 0.0,
+      "events": [
+        {
+          "t": 1.7311999999998746,
+          "event": "bind",
+          "segment": 15
+        },
+        {
+          "t": 1.7863999999998685,
+          "event": "overload",
+          "segment": 15,
+          "overload_s": 0.02,
+          "force": 0.45579635400170515,
+          "limit": 0.023740240047747718
+        }
+      ],
+      "evidence": "w60_d5_formal/result.json"
+    },
+    {
+      "name": "w60_d10_formal",
+      "grasp": {
+        "w": 0.06,
+        "d": 0.01,
+        "F": 5.0
+      },
+      "outcome": "grasp_fail",
+      "first_close_top_contacts": [
+        [
+          13,
+          19
+        ],
+        [
+          17,
+          23
+        ]
+      ],
+      "first_close_candidate": 15,
+      "first_lift_gap_mm": 53.32820178998905,
+      "first_lift_force_N": 1.3939970652234814,
+      "max_real_grip_force_N": 65.69741271406583,
+      "max_spring_force_N": 0.0,
+      "events": [
+        {
+          "t": 2.207999999999822,
+          "event": "bind",
+          "segment": 21
+        },
+        {
+          "t": 3.242399999999708,
+          "event": "overload",
+          "segment": 21,
+          "overload_s": 0.02,
+          "force": 4.96613516779224,
+          "limit": 4.9263095437221445
+        }
+      ],
+      "evidence": "w60_d10_formal/result.json"
+    },
+    {
+      "name": "w40_d5_formal",
+      "grasp": {
+        "w": 0.04,
+        "d": 0.005,
+        "F": 5.0
+      },
+      "outcome": "success",
+      "first_close_top_contacts": [
+        [
+          15,
+          21
+        ],
+        [
+          15,
+          21
+        ]
+      ],
+      "first_close_candidate": 15,
+      "first_lift_gap_mm": 29.859855640558234,
+      "first_lift_force_N": 5.605774377670375,
+      "max_real_grip_force_N": 4.9726390632193365,
+      "max_spring_force_N": 5.898596213569501,
+      "events": [
+        {
+          "t": 1.9143999999998544,
+          "event": "bind",
+          "segment": 21
+        },
+        {
+          "t": 6.189999999999384,
+          "event": "overload",
+          "segment": 21,
+          "overload_s": 0.02,
+          "force": 32.933758822622266,
+          "limit": 4.983979142759922
+        }
+      ],
+      "evidence": "w40_d5_formal/result.json"
+    },
+    {
+      "name": "w80_d5_formal",
+      "grasp": {
+        "w": 0.08,
+        "d": 0.005,
+        "F": 5.0
+      },
+      "outcome": "success",
+      "first_close_top_contacts": [
+        [
+          13,
+          19
+        ],
+        [
+          17,
+          23
+        ]
+      ],
+      "first_close_candidate": 15,
+      "first_lift_gap_mm": 69.85250605410998,
+      "first_lift_force_N": 5.8997333025717635,
+      "max_real_grip_force_N": 0.5886433811189231,
+      "max_spring_force_N": 5.930714510578583,
+      "events": [
+        {
+          "t": 1.8675999999998596,
+          "event": "bind",
+          "segment": 21
+        },
+        {
+          "t": 7.063999999999288,
+          "event": "open",
+          "segment": 21,
+          "overload_s": 0.0
+        }
+      ],
+      "evidence": "w80_d5_formal/result.json"
+    }
+  ]
+}

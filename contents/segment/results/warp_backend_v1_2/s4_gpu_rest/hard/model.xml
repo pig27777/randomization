@@ -1,0 +1,45 @@
+<mujoco model="segment_content">
+<option timestep="0.0004" integrator="implicitfast" solver="Newton" iterations="100" ls_iterations="20" tolerance="1e-8" cone="elliptic" gravity="0 0 -9.81"><flag energy="enable"/></option>
+<size memory="512M"/>
+<visual><global offwidth="1280" offheight="800"/></visual>
+<worldbody>
+<light pos="0 0 2" dir="0 0 -1"/>
+<geom name="table" type="box" pos="0.15 0 -0.025" size="0.75 0.5 0.025" contype="1" conaffinity="0" condim="3" friction="0.5 0.005 0.0001" solref="0.01 1" solmix="0" rgba=".8 .8 .75 1"/>
+
+<body name="obj" pos="0 0 0.0251"><freejoint name="obj_free"/>
+<inertial pos="-1.0842022e-18 -4.3368087e-18 1.6263033e-18" mass="0.8" fullinertia="0.0020933333 0.0040066667 0.0057666667 0 0 0"/>
+<geom name="s0" type="box" pos="-0.09 -0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s1" type="box" pos="-0.09 -0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s2" type="box" pos="-0.09 0 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s3" type="box" pos="-0.09 0 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s4" type="box" pos="-0.09 0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s5" type="box" pos="-0.09 0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s6" type="box" pos="-0.03 -0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s7" type="box" pos="-0.03 -0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s8" type="box" pos="-0.03 0 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s9" type="box" pos="-0.03 0 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s10" type="box" pos="-0.03 0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s11" type="box" pos="-0.03 0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s12" type="box" pos="0.03 -0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s13" type="box" pos="0.03 -0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s14" type="box" pos="0.03 0 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s15" type="box" pos="0.03 0 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s16" type="box" pos="0.03 0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s17" type="box" pos="0.03 0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s18" type="box" pos="0.09 -0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s19" type="box" pos="0.09 -0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s20" type="box" pos="0.09 0 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s21" type="box" pos="0.09 0 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s22" type="box" pos="0.09 0.056666667 -0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+<geom name="s23" type="box" pos="0.09 0.056666667 0.0125" size="0.03 0.028333333 0.0125" mass="0" rgba=".45 .45 .55 1" contype="2" conaffinity="3" condim="3" friction="0.5 0.005 0.0001" solref="-3787.88 -123.091" solimp="0.99 0.99 0.001" solmix="1"/>
+</body>
+
+</worldbody>
+<contact>
+
+</contact>
+<tendon>
+</tendon>
+<equality>
+</equality>
+</mujoco>

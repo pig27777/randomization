@@ -1,0 +1,124 @@
+{
+  "kind": "scan",
+  "category": "bendable",
+  "seed": 20261117,
+  "coefficient_scale": 0.5,
+  "grasp": {
+    "w": 0.06,
+    "d": 0.01,
+    "F": 15.0
+  },
+  "index": 121,
+  "kappa": {
+    "category": "bendable",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "mass": 0.29,
+    "com_offset": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "segments": [
+      6,
+      3,
+      2
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.5,
+    "squeeze_stiffness_z": 0.3,
+    "lock_strain_y": 0.2,
+    "lock_strain_z": 0.2,
+    "droop_ratio": 0.32,
+    "damping_ratio": 0.5,
+    "mobile": false,
+    "mobile_frac": 0.3,
+    "mobile_range": 0.02,
+    "mobile_freq": 2.0,
+    "surface_friction": 0.8,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.5
+  },
+  "result": {
+    "outcome": "success",
+    "reason": null,
+    "cls": "bendable",
+    "max_grip_force_N": 15.000003654058048,
+    "lift_height_mm": 69.41212289634028,
+    "slip_mm": 35.6910551826844,
+    "wall_s": 6.135085663758218,
+    "sim_s": 6.0411999999994,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 18.664705105091752,
+    "pinch_events": [
+      {
+        "t": 2.1591999999998275,
+        "event": "bind",
+        "segment": 21
+      },
+      {
+        "t": 4.940799999999522,
+        "event": "open",
+        "segment": 21,
+        "overload_s": 0.0
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.9455999999999611,
+        "phase": "press"
+      },
+      {
+        "t": 1.945999999999851,
+        "phase": "close"
+      },
+      {
+        "t": 2.1591999999998275,
+        "phase": "lift"
+      },
+      {
+        "t": 3.3595999999996953,
+        "phase": "carry"
+      },
+      {
+        "t": 4.913199999999525,
+        "phase": "lower"
+      },
+      {
+        "t": 4.940799999999522,
+        "phase": "open"
+      }
+    ],
+    "effective_depth_m": 0.01,
+    "contact_height_m": 0.048648000080227974,
+    "trace": [],
+    "diagnostics": [
+      {
+        "t": 3.869999999999639,
+        "phase": "carry",
+        "pad_relative_m_s": 1.0159646484160998,
+        "com_relative_m_s": 0.31655299583755975,
+        "confirmed_failure": null
+      },
+      {
+        "t": 5.0499999999995095,
+        "phase": "open",
+        "pad_relative_m_s": 1.1189962894046483,
+        "com_relative_m_s": 0.6096462820171452,
+        "confirmed_failure": null
+      }
+    ],
+    "failure_state": null
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 6.135460924822837
+}

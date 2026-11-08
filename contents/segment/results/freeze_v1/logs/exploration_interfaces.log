@@ -1,0 +1,25 @@
+test_invalid_boundary_inputs (test_freeze_interfaces.FreezeInterfacesTest.test_invalid_boundary_inputs) ... ok
+test_outside_new_mapping_is_rejected (test_freeze_interfaces.FreezeInterfacesTest.test_outside_new_mapping_is_rejected) ... ok
+test_rj_geometry_mass_pairing_and_log_ranges (test_freeze_interfaces.FreezeInterfacesTest.test_rj_geometry_mass_pairing_and_log_ranges) ... ok
+test_specified_category_and_constraints (test_freeze_interfaces.FreezeInterfacesTest.test_specified_category_and_constraints) ... FAIL
+test_speed_only_is_diagnostic_but_overlap_fails (test_freeze_interfaces.FreezeInterfacesTest.test_speed_only_is_diagnostic_but_overlap_fails) ... ok
+
+======================================================================
+FAIL: test_specified_category_and_constraints (test_freeze_interfaces.FreezeInterfacesTest.test_specified_category_and_constraints)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/contents/segment/tests/test_freeze_interfaces.py", line 20, in test_specified_category_and_constraints
+    self.assertEqual(check_kappa(k, category), [])
+AssertionError: Lists differ: ['droop target outside the calibrated range'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'droop target outside the calibrated range'
+
+- ['droop target outside the calibrated range']
++ []
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.419s
+
+FAILED (failures=1)

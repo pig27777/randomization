@@ -1,0 +1,528 @@
+{
+  "hard_lower_bound_review": {
+    "simulation_runs": 0,
+    "source": "/home/ubuntu/Dev/Projects/random/contents/segment/results/warp_backend_v1_2/s4_gpu_responses/hard_r1y",
+    "reference_sha256": "8060e6ae3852c6281ca33f4b2a54fe1f31091a94b4813719316d3c2cca3b87e6",
+    "candidate_sha256": "ef80b94cae63fc1302b40cd11247a87754f45318214fdb93ffe9907d5d1bc752",
+    "hard_task_layer_not_yet_validated": true,
+    "passed": true,
+    "metrics": [
+      {
+        "metric": "stiffness",
+        "reference": 161.96591339936433,
+        "candidate": 186.6877670586538,
+        "relative_error": 0.15263615127667046,
+        "abs_diff": 24.72185365928948,
+        "nominal_absolute_tolerance": 3.2393182679872865,
+        "grid_step": 0.0,
+        "effective_absolute_tolerance": 3.2393182679872865,
+        "resolution_used": false,
+        "record_only": true,
+        "exclusion_reason": "reviewed hard-object capped stiffness lower bound",
+        "passed": true
+      },
+      {
+        "metric": "lock_strain",
+        "reference": null,
+        "candidate": null,
+        "relative_error": null,
+        "abs_diff": null,
+        "nominal_absolute_tolerance": null,
+        "grid_step": 0.0025,
+        "effective_absolute_tolerance": null,
+        "resolution_used": false,
+        "record_only": false,
+        "exclusion_reason": null,
+        "passed": true
+      }
+    ],
+    "flags": {
+      "fail": {
+        "reference": null,
+        "candidate": null,
+        "passed": true
+      },
+      "capped": {
+        "reference": true,
+        "candidate": true,
+        "passed": true
+      },
+      "lower_bound": {
+        "reference": true,
+        "candidate": true,
+        "passed": true
+      }
+    }
+  },
+  "valid_soft_responses": [
+    {
+      "stage": "s5_soft_responses",
+      "job": {
+        "category": "bendable",
+        "test": "r1y"
+      },
+      "passed": true,
+      "metrics": [
+        {
+          "metric": "stiffness",
+          "reference": 0.5011508539825948,
+          "candidate": 0.4983083256052679,
+          "relative_error": 0.005672001463706336,
+          "abs_diff": 0.0028425283773269583,
+          "nominal_absolute_tolerance": 0.010023017079651897,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.010023017079651897,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        },
+        {
+          "metric": "lock_strain",
+          "reference": 0.1900000000000001,
+          "candidate": 0.1900000000000001,
+          "relative_error": 0.0,
+          "abs_diff": 0.0,
+          "nominal_absolute_tolerance": 0.003800000000000002,
+          "grid_step": 0.0025,
+          "effective_absolute_tolerance": 0.003800000000000002,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        },
+        "lower_bound": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    },
+    {
+      "stage": "s5_soft_responses",
+      "job": {
+        "category": "bendable",
+        "test": "r1z"
+      },
+      "passed": true,
+      "metrics": [
+        {
+          "metric": "stiffness",
+          "reference": 0.3019819639643874,
+          "candidate": 0.30223135613431346,
+          "relative_error": 0.0008258512086352394,
+          "abs_diff": 0.00024939216992603264,
+          "nominal_absolute_tolerance": 0.006039639279287749,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.006039639279287749,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        },
+        {
+          "metric": "lock_strain",
+          "reference": 0.15250000000000008,
+          "candidate": 0.15250000000000008,
+          "relative_error": 0.0,
+          "abs_diff": 0.0,
+          "nominal_absolute_tolerance": 0.0030500000000000015,
+          "grid_step": 0.0025,
+          "effective_absolute_tolerance": 0.0030500000000000015,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        },
+        "lower_bound": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    },
+    {
+      "stage": "s5_bendable_readback_fixed",
+      "job": {
+        "category": "bendable",
+        "test": "r2"
+      },
+      "passed": true,
+      "metrics": [
+        {
+          "metric": "droop",
+          "reference": 0.3199022748330566,
+          "candidate": 0.32043053762713314,
+          "relative_error": 0.0016513255316868447,
+          "abs_diff": 0.0005282627940765283,
+          "nominal_absolute_tolerance": 0.006398045496661132,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.006398045496661132,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        },
+        "slipped": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        },
+        "dropped": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        },
+        "suspended": {
+          "reference": true,
+          "candidate": true,
+          "passed": true
+        },
+        "table_touch": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    },
+    {
+      "stage": "s5_bendable_readback_fixed",
+      "job": {
+        "category": "bendable",
+        "test": "r3"
+      },
+      "passed": false,
+      "metrics": [
+        {
+          "metric": "slip_mm",
+          "reference": 0.7380576331795597,
+          "candidate": 0.6670631902727143,
+          "relative_error": 0.09619092021445622,
+          "abs_diff": 0.07099444290684542,
+          "nominal_absolute_tolerance": 0.014761152663591195,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.014761152663591195,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": false
+        },
+        {
+          "metric": "com_swing_mm",
+          "reference": 0.14313620294966223,
+          "candidate": 0.1464505487898342,
+          "relative_error": 0.02315518905680043,
+          "abs_diff": 0.003314345840171984,
+          "nominal_absolute_tolerance": 0.0028627240589932444,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.0028627240589932444,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": false
+        },
+        {
+          "metric": "com_decay_s",
+          "reference": 0.9919999999996376,
+          "candidate": 0.9907999999996377,
+          "relative_error": 0.0012096774193551473,
+          "abs_diff": 0.0011999999999998678,
+          "nominal_absolute_tolerance": 0.019839999999992752,
+          "grid_step": 0.01,
+          "effective_absolute_tolerance": 0.019839999999992752,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        },
+        {
+          "metric": "force_p2p",
+          "reference": 0.16232302353351713,
+          "candidate": 0.12480347437730188,
+          "relative_error": 0.2311412659736963,
+          "abs_diff": 0.03751954915621525,
+          "nominal_absolute_tolerance": 0.0032464604706703426,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.0032464604706703426,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": false
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        },
+        "dropped": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        },
+        "table_touch": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    }
+  ],
+  "invalid_original_r2": {
+    "reason": "stale legacy contact IDs after native MJWarp readback",
+    "comparison": {
+      "job": {
+        "category": "bendable",
+        "test": "r2"
+      },
+      "passed": false,
+      "metrics": [
+        {
+          "metric": "droop",
+          "reference": 0.3199022748330566,
+          "candidate": 0.3204662288032478,
+          "relative_error": 0.0017628945292293237,
+          "abs_diff": 0.0005639539701912111,
+          "nominal_absolute_tolerance": 0.006398045496661132,
+          "grid_step": 0.0,
+          "effective_absolute_tolerance": 0.006398045496661132,
+          "resolution_used": false,
+          "record_only": false,
+          "exclusion_reason": null,
+          "passed": true
+        }
+      ],
+      "flags": {
+        "fail": {
+          "reference": null,
+          "candidate": null,
+          "passed": true
+        },
+        "capped": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        },
+        "slipped": {
+          "reference": false,
+          "candidate": null,
+          "passed": false
+        },
+        "dropped": {
+          "reference": false,
+          "candidate": true,
+          "passed": false
+        },
+        "suspended": {
+          "reference": true,
+          "candidate": false,
+          "passed": false
+        },
+        "table_touch": {
+          "reference": false,
+          "candidate": false,
+          "passed": true
+        }
+      },
+      "scope": "closed-loop GPU R1--R3 using frozen host controller; not batched grasp throughput"
+    }
+  },
+  "native_readback_reproduction": {
+    "passed": true,
+    "ncon": 1,
+    "modern": [
+      [
+        0,
+        1
+      ]
+    ],
+    "legacy_before": [
+      [
+        0,
+        0
+      ]
+    ],
+    "legacy_after": [
+      [
+        0,
+        1
+      ]
+    ],
+    "reproduced_stale_aliases": true
+  },
+  "only_contact_readback_repaired": true,
+  "earlier_r1_reusable_reason": "R1 uses modern contact.geom; readback alias repair does not affect integration or its force measurement",
+  "physics_sources_unchanged": {
+    "warp_mechanics.py": true,
+    "warp_effects.py": true,
+    "warp_cpu.py": true
+  },
+  "provenance": {
+    "hard_lower_bound_review": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:24:40.672142+08:00",
+        "end": "2026-11-06T18:24:40.680975+08:00",
+        "loadavg_before": [
+          0.2490234375,
+          0.2958984375,
+          0.587890625
+        ],
+        "loadavg_after": [
+          0.2490234375,
+          0.2958984375,
+          0.587890625
+        ],
+        "busy_percent": null,
+        "average_busy_logical_cpus": null,
+        "note": "subsecond read-only audit; CPU tick resolution is insufficient"
+      }
+    },
+    "s5_soft_responses": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:26:01.040481+08:00",
+        "end": "2026-11-06T18:32:26.173552+08:00",
+        "loadavg_before": [
+          0.111328125,
+          0.234375,
+          0.53662109375
+        ],
+        "loadavg_after": [
+          1.2724609375,
+          1.0,
+          0.80419921875
+        ],
+        "busy_percent": 3.760405632850927,
+        "average_busy_logical_cpus": 1.2033298025122967
+      }
+    },
+    "s5_readback_repair": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:38:10.621525+08:00",
+        "end": "2026-11-06T18:38:13.699567+08:00",
+        "loadavg_before": [
+          0.240234375,
+          0.470703125,
+          0.62158203125
+        ],
+        "loadavg_after": [
+          0.30126953125,
+          0.4794921875,
+          0.6240234375
+        ],
+        "busy_percent": 3.731570920183025,
+        "average_busy_logical_cpus": 1.194102694458568
+      }
+    },
+    "s5_bendable_readback_fixed": {
+      "source_snapshot_matches": {
+        "validate_warp.py": true,
+        "warp_mechanics.py": true,
+        "warp_effects.py": true,
+        "warp_cpu.py": true,
+        "mjwarp_backend.py": true
+      },
+      "load": {
+        "start": "2026-11-06T18:38:54.445252+08:00",
+        "end": "2026-11-06T18:44:13.967507+08:00",
+        "loadavg_before": [
+          0.15283203125,
+          0.41748046875,
+          0.5966796875
+        ],
+        "loadavg_after": [
+          1.27734375,
+          1.025390625,
+          0.82568359375
+        ],
+        "busy_percent": 3.6853487732310675,
+        "average_busy_logical_cpus": 1.1793116074339416
+      }
+    }
+  },
+  "original_files_checked": 31,
+  "original_files_changed": [
+    "test/policy/README.md"
+  ],
+  "frozen_runtime_files_changed": [],
+  "original_content_files_changed": [],
+  "frozen_archive_unchanged": true,
+  "source_syntax_passed": true,
+  "latest_sources_match": {
+    "validate_warp.py": true,
+    "warp_mechanics.py": true,
+    "warp_effects.py": true,
+    "warp_cpu.py": true,
+    "mjwarp_backend.py": true
+  },
+  "S5_complete": false,
+  "S6_evaluate_per_second": null,
+  "S6_peak_vram": null,
+  "candidate_training_ready": false
+}

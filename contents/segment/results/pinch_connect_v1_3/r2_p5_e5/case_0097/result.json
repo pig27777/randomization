@@ -1,0 +1,166 @@
+{
+  "kind": "random",
+  "category": "bendable",
+  "kappa": {
+    "category": "bendable",
+    "size": [
+      0.3200896767425674,
+      0.19356690359810796,
+      0.0258886973140227
+    ],
+    "mass": 0.4458509354285084,
+    "com_offset": [
+      0.07520195318899545,
+      0.03798967702835149,
+      -0.006052776442663277
+    ],
+    "segments": [
+      6,
+      3,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.1868991686091603,
+    "squeeze_stiffness_z": 0.7706938759728712,
+    "lock_strain_y": 0.2373119670127823,
+    "lock_strain_z": 0.28078866543659997,
+    "droop_ratio": 0.5749666465344156,
+    "damping_ratio": 0.712512647725702,
+    "mobile": false,
+    "mobile_frac": 0.4721277231665618,
+    "mobile_range": 0.008757981172046177,
+    "mobile_freq": 3.99598197320048,
+    "surface_friction": 0.3802903905926518,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 0.8297052989582773
+  },
+  "seed": 20261299,
+  "grasp": {
+    "u": 0.19186664945108234,
+    "v": 0.31817809758940185,
+    "psi": 2.568129964279455,
+    "w": 0.02454761139640818,
+    "d": 0.007249859462115667,
+    "F": 6.76875203871144,
+    "v_lift": 0.27818724519783034,
+    "a_max": 1.7155904813100196
+  },
+  "index": 97,
+  "rest": {
+    "test": "T1",
+    "fail": null,
+    "fail_t": null,
+    "rtf": 0.9093534101321483,
+    "sim_t": 1.999999999999845,
+    "diagnostics": [],
+    "failure_state": null,
+    "support_ratio": 0.9999999999988444,
+    "speed_median_mm_s": 6.32774367543179e-05,
+    "speed_max_mm_s": 0.000811264942288921,
+    "drift_mm": 4.952363283786009e-06,
+    "max_joint_strain": 0.059001222166527714
+  },
+  "result": {
+    "outcome": "grasp_fail",
+    "reason": "both contacts lost for >50 ms",
+    "cls": "bendable",
+    "max_grip_force_N": 6.768752630828585,
+    "lift_height_mm": null,
+    "slip_mm": 40.14455570735805,
+    "wall_s": 3.8191228453069925,
+    "sim_s": 2.479999999999792,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 6.774778094522479,
+    "pinch_events": [
+      {
+        "t": 2.055599999999839,
+        "event": "bind",
+        "segment": 44,
+        "segments": [
+          44,
+          35
+        ]
+      },
+      {
+        "t": 2.4211999999997986,
+        "event": "overload",
+        "segment": 44,
+        "segments": [
+          44,
+          35
+        ],
+        "force": 6.503341719428713,
+        "filtered_force": 5.669316652665288,
+        "limit": 5.616084944787263
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 0.8903999999999672,
+        "phase": "press"
+      },
+      {
+        "t": 1.5775999999998915,
+        "phase": "close"
+      },
+      {
+        "t": 2.055599999999839,
+        "phase": "lift"
+      }
+    ],
+    "effective_depth_m": 0.007249859462115667,
+    "contact_height_m": 0.025088697392746856,
+    "trace": [],
+    "diagnostics": [],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "force_limit",
+      "t": 1.5775999999998915,
+      "force_N": 20.098368516787303,
+      "depth_m": 0.006867999999999243
+    },
+    "press_peak_vertical_force_N": 20.098368516787303,
+    "actual_depth_m": 0.006867999999999243,
+    "lift_table": null,
+    "first_contact": {
+      "t": 0.8903999999999672,
+      "forces": {
+        "pA": [
+          -0.004208168652715339,
+          0.006859679328895112,
+          0.04895733212302711
+        ],
+        "pB": [
+          0.006625295364030191,
+          -0.00955290932553802,
+          0.049447404475437905
+        ]
+      }
+    },
+    "max_real_grip_force_N": 3.94347926983942,
+    "max_spring_force_N": 6.825611241690691,
+    "rest_grip_to_com_gap_mm": 13.28753218024623,
+    "hold_samples": [],
+    "static_hold_sample_count": 0,
+    "static_attachment_error_max_mm": null,
+    "suspension_extension_mean_mm": null,
+    "suspension_extension_max_mm": null,
+    "suspension_extension_final_mm": null,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": null,
+    "hang_end": null,
+    "stop_swing_mm": null,
+    "stop_window_samples": 0
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 6.129291059914976
+}

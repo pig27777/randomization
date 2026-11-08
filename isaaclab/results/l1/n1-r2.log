@@ -1,0 +1,118 @@
+[INFO]: Parsing configuration from: isaaclab_tasks.core.lift.config.franka_soft.franka_cloth_env_cfg:FrankaClothEnvCfg
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 20261106
+	Physics step-size     : 0.008333333333333333
+	Rendering step-size   : 0.03333333333333333
+	Environment step-size : 0.03333333333333333
+I: Initializing Version 2.74.0-release.7316+gl.ec99a64b
+I: Client ID: Y6FYXSB3
+I: ThreadId(02) hub_client::client::Client::new Launching client mode=Shared with_cleaner=false cache_path=None cache_size=None
+I: ThreadId(03) launch self=Launcher { discovery_lock: RwLock { lock: RwLock { inner: File { fd: 49, path: "/home/ubuntu/Dev/Envs/isaaclab/cache/tmp/hub-ubuntu.lock", read: false, write: true } } }, mode: Shared, with_cleaner: false, config_file: "/home/ubuntu/Dev/Envs/isaaclab/cache/tmp/hub-ubuntu-47C2E5A2.config.json" } cmd="hub" "--mode=shared" "--write-config" "/home/ubuntu/Dev/Envs/isaaclab/cache/tmp/hub-ubuntu-47C2E5A2.config.json" "--"
+I: Not using Hub: Hub not found
+I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
+I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
+Serving remote assets from the local cache under '/home/ubuntu/Dev/Envs/isaaclab/cache/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+/home/ubuntu/Dev/Envs/isaaclab/src/IsaacLab/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:165: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+[INFO]: Time taken for scene creation Last: 5.162587 s, Mean: 5.162587 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 2.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+Finalize builder took: Last: 0.018363 s, Mean: 0.018363 s, Std: 0.000000 s, N: 1
+Failed to get root com velocity. If the articulation is fixed, this is expected. Setting root com velocity to zeros.
+Initialize solver took: Last: 1.015528 s, Mean: 1.015528 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for simulation start Last: 1.214397 s, Mean: 1.214397 s, Std: 0.000000 s, N: 1
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++--------------------------------------------------------+
+|                  Active Command Terms                  |
++-------+-----------------+------------------------------+
+| Index | Name            |             Type             |
++-------+-----------------+------------------------------+
+|   0   | deformable_pose | DeformableUniformPoseCommand |
++-------+-----------------+------------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | reset_robot_arm_joints      |
+|   1   | reset_robot_gripper_joints  |
+|   2   | reset_deformable            |
+|   3   | variable_gravity            |
++-------+-----------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++-----------------------+
+| Active Recorder Terms |
++------------+----------+
+|   Index    | Name     |
++------------+----------+
++------------+----------+
+
+[INFO] Action Manager:  <ActionManager> contains 2 active terms.
++------------------------------------+
+|   Active Action Terms (shape: 8)   |
++-------+----------------+-----------+
+| Index | Name           | Dimension |
++-------+----------------+-----------+
+|   0   | arm_action     |         7 |
+|   1   | gripper_action |         1 |
++-------+----------------+-----------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (93,)) |
++---------+---------------------------------------+----------+
+|  Index  | Name                                  |  Shape   |
++---------+---------------------------------------+----------+
+|    0    | joint_pos                             |   (9,)   |
+|    1    | joint_vel                             |   (9,)   |
+|    2    | deformable_sampled_points             |  (60,)   |
+|    3    | target_position                       |   (7,)   |
+|    4    | actions                               |   (8,)   |
++---------+---------------------------------------+----------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 4 active terms.
++---------------------------------------------+
+|           Active Termination Terms          |
++-------+--------------------------+----------+
+| Index | Name                     | Time Out |
++-------+--------------------------+----------+
+|   0   | time_out                 |   True   |
+|   1   | deformable_out_of_bounds |  False   |
+|   2   | ee_below_table           |  False   |
+|   3   | joint_vel_out_of_limit   |  False   |
++-------+--------------------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 5 active terms.
++-------------------------------------------+
+|            Active Reward Terms            |
++-------+--------------------------+--------+
+| Index | Name                     | Weight |
++-------+--------------------------+--------+
+|   0   | reaching_deformable      |    5.0 |
+|   1   | lifting_deformable       |    5.0 |
+|   2   | deformable_goal_tracking |    2.0 |
+|   3   | success_bonus            |   20.0 |
+|   4   | action_rate              | -0.001 |
++-------+--------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 2 active terms.
++-------------------------+
+| Active Curriculum Terms |
++--------+----------------+
+| Index  | Name           |
++--------+----------------+
+|   0    | action_rate    |
+|   1    | gravity        |
++--------+----------------+
+
+[INFO]: Completed setting up the environment...
+CUDA graph took: Last: 0.280826 s, Mean: 0.280826 s, Std: 0.000000 s, N: 1
+{"task": "Isaac-Lift-Cloth-Franka", "preset": "newton_mjwarp_vbd_proxy", "agent": "hold/zero", "num_envs": 1, "seed": 20261106, "warmup_steps": 100, "measured_steps": 1000, "initialization_s": 9.220659890212119, "warmup_s": 4.151380973868072, "wall_s": 27.73231681389734, "env_steps_per_s": 36.05901399117421, "batch_steps_per_s": 36.05901399117421, "physics_dt_s": 0.008333333333333333, "decimation": 4, "num_substeps": 2, "process_memory_peak_sampled_mib": 662.0, "process_memory_sampling_interval_s": 0.5, "process_memory_sampling_errors": [], "torch_peak_allocated_mib": 0.03515625, "final_observation_reward_finite": true, "note": "L1 task execution only; does not measure completed grasps or establish L5/L6"}

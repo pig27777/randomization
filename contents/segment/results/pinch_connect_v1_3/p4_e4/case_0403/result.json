@@ -1,0 +1,371 @@
+{
+  "kind": "scan",
+  "category": "compressible",
+  "seed": 20261117,
+  "coefficient_scale": 1.0,
+  "grasp": {
+    "w": 0.04,
+    "d": 0.01,
+    "F": 10.0
+  },
+  "index": 403,
+  "kappa": {
+    "category": "compressible",
+    "size": [
+      0.35,
+      0.25,
+      0.12
+    ],
+    "mass": 0.5,
+    "com_offset": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "segments": [
+      4,
+      4,
+      3
+    ],
+    "rigid": false,
+    "squeeze_stiffness_y": 0.1,
+    "squeeze_stiffness_z": 0.2,
+    "lock_strain_y": 0.25,
+    "lock_strain_z": 0.25,
+    "droop_ratio": 0.15,
+    "damping_ratio": 0.5,
+    "mobile": false,
+    "mobile_frac": 0.3,
+    "mobile_range": 0.02,
+    "mobile_freq": 2.0,
+    "surface_friction": 0.8,
+    "skin_compliance": 0.0,
+    "pinch_coeff": 2.0
+  },
+  "result": {
+    "outcome": "success",
+    "reason": null,
+    "cls": "compressible",
+    "max_grip_force_N": 10.107039550393065,
+    "lift_height_mm": 208.64181411557064,
+    "slip_mm": 8.001310088400977,
+    "wall_s": 10.871662489138544,
+    "sim_s": 8.878400000001038,
+    "measured_pinch_coeff": null,
+    "pull_force_N": 0.0,
+    "peak_weld_force_N": 12.291536385031756,
+    "pinch_events": [
+      {
+        "t": 2.555199999999784,
+        "event": "bind",
+        "segment": 29,
+        "segments": [
+          29,
+          32,
+          17,
+          20
+        ]
+      },
+      {
+        "t": 7.778399999999209,
+        "event": "open",
+        "segment": 29,
+        "segments": [
+          29,
+          32,
+          17,
+          20
+        ],
+        "overload_s": 0.0
+      }
+    ],
+    "phases": [
+      {
+        "t": 0.3000000000000045,
+        "phase": "approach"
+      },
+      {
+        "t": 1.3427999999999174,
+        "phase": "press"
+      },
+      {
+        "t": 2.343199999999807,
+        "phase": "close"
+      },
+      {
+        "t": 2.555199999999784,
+        "phase": "lift"
+      },
+      {
+        "t": 5.255599999999487,
+        "phase": "carry"
+      },
+      {
+        "t": 6.809199999999316,
+        "phase": "lower"
+      },
+      {
+        "t": 7.778399999999209,
+        "phase": "open"
+      }
+    ],
+    "effective_depth_m": 0.01,
+    "contact_height_m": 0.1146760000757238,
+    "trace": [],
+    "diagnostics": [
+      {
+        "t": 5.879999999999418,
+        "phase": "carry",
+        "pad_relative_m_s": 1.0081733444183525,
+        "com_relative_m_s": 0.1316404665161551,
+        "confirmed_failure": null
+      }
+    ],
+    "failure_state": null,
+    "protocol": "v2.2",
+    "press_stop": {
+      "reason": "depth",
+      "t": 2.343199999999807,
+      "force_N": 1.946357028274794,
+      "depth_m": 0.009999999999998897
+    },
+    "press_peak_vertical_force_N": 1.946357028274794,
+    "actual_depth_m": 0.009999999999998897,
+    "lift_table": {
+      "contact": false,
+      "count": 0,
+      "force_N": 0.0
+    },
+    "first_contact": {
+      "t": 1.3427999999999174,
+      "forces": {
+        "pA": [
+          -0.00013553213332445808,
+          0.016035126999759373,
+          0.047314215455938224
+        ],
+        "pB": [
+          -0.00014209345870761642,
+          -0.016170112779106023,
+          0.047339474934296556
+        ]
+      }
+    },
+    "max_real_grip_force_N": 1.8512663438368093,
+    "max_spring_force_N": 12.973144495112138,
+    "rest_grip_to_com_gap_mm": 60.79029915452972,
+    "hold_samples": [
+      {
+        "t": 5.0599999999995084,
+        "gap_mm": 89.01906452758746,
+        "extension_mm": 28.228765373057733,
+        "material_extension_mm": 27.604524466712125,
+        "attachment_lag_mm": 0.6242409063456078,
+        "attachment_error_mm": 0.6253090408113172,
+        "static_bound": false
+      },
+      {
+        "t": 5.069999999999507,
+        "gap_mm": 88.05009974135703,
+        "extension_mm": 27.259800586827303,
+        "material_extension_mm": 27.117245119063654,
+        "attachment_lag_mm": 0.1425554677636498,
+        "attachment_error_mm": 0.1490321248130774,
+        "static_bound": false
+      },
+      {
+        "t": 5.079999999999506,
+        "gap_mm": 87.15099435359852,
+        "extension_mm": 26.3606951990688,
+        "material_extension_mm": 26.317866806123074,
+        "attachment_lag_mm": 0.04282839294572627,
+        "attachment_error_mm": 0.05562981020917879,
+        "static_bound": false
+      },
+      {
+        "t": 5.089999999999505,
+        "gap_mm": 86.33814713237842,
+        "extension_mm": 25.547847977848697,
+        "material_extension_mm": 25.51544605980998,
+        "attachment_lag_mm": 0.03240191803871584,
+        "attachment_error_mm": 0.043975833009645235,
+        "static_bound": false
+      },
+      {
+        "t": 5.099999999999504,
+        "gap_mm": 85.62619830442469,
+        "extension_mm": 24.835899149894974,
+        "material_extension_mm": 24.803995535752627,
+        "attachment_lag_mm": 0.03190361414234788,
+        "attachment_error_mm": 0.04251051899386428,
+        "static_bound": false
+      },
+      {
+        "t": 5.109999999999503,
+        "gap_mm": 85.02755723765604,
+        "extension_mm": 24.237258083126317,
+        "material_extension_mm": 24.206202439040528,
+        "attachment_lag_mm": 0.03105564408578676,
+        "attachment_error_mm": 0.0417716935885171,
+        "static_bound": false
+      },
+      {
+        "t": 5.119999999999502,
+        "gap_mm": 84.5513437751565,
+        "extension_mm": 23.761044620626773,
+        "material_extension_mm": 23.73101122961662,
+        "attachment_lag_mm": 0.030033391010153565,
+        "attachment_error_mm": 0.04110112212597236,
+        "static_bound": false
+      },
+      {
+        "t": 5.129999999999501,
+        "gap_mm": 84.20349398672522,
+        "extension_mm": 23.413194832195497,
+        "material_extension_mm": 23.383889501560944,
+        "attachment_lag_mm": 0.02930533063455476,
+        "attachment_error_mm": 0.040636086510721814,
+        "static_bound": false
+      },
+      {
+        "t": 5.1399999999995,
+        "gap_mm": 83.98695582285987,
+        "extension_mm": 23.196656668330146,
+        "material_extension_mm": 23.16769321226885,
+        "attachment_lag_mm": 0.028963456061292803,
+        "attachment_error_mm": 0.04041082064403355,
+        "static_bound": false
+      },
+      {
+        "t": 5.1499999999994985,
+        "gap_mm": 83.90168746850945,
+        "extension_mm": 23.111388313979734,
+        "material_extension_mm": 23.082456405807353,
+        "attachment_lag_mm": 0.02893190817238045,
+        "attachment_error_mm": 0.04040835337085619,
+        "static_bound": false
+      },
+      {
+        "t": 5.159999999999497,
+        "gap_mm": 83.94456007894297,
+        "extension_mm": 23.154260924413244,
+        "material_extension_mm": 23.12515921795654,
+        "attachment_lag_mm": 0.029101706456702292,
+        "attachment_error_mm": 0.04060515112761438,
+        "static_bound": true
+      },
+      {
+        "t": 5.169999999999496,
+        "gap_mm": 84.1093088635937,
+        "extension_mm": 23.31900970906397,
+        "material_extension_mm": 23.28962159294861,
+        "attachment_lag_mm": 0.02938811611535863,
+        "attachment_error_mm": 0.04098019773875631,
+        "static_bound": true
+      },
+      {
+        "t": 5.179999999999495,
+        "gap_mm": 84.3866218050931,
+        "extension_mm": 23.596322650563376,
+        "material_extension_mm": 23.566579650545474,
+        "attachment_lag_mm": 0.02974300001790109,
+        "attachment_error_mm": 0.0415150969136653,
+        "static_bound": true
+      },
+      {
+        "t": 5.189999999999494,
+        "gap_mm": 84.76439148343029,
+        "extension_mm": 23.974092328900568,
+        "material_extension_mm": 23.94394638871699,
+        "attachment_lag_mm": 0.03014594018357908,
+        "attachment_error_mm": 0.042191869284879155,
+        "static_bound": true
+      },
+      {
+        "t": 5.199999999999493,
+        "gap_mm": 85.22810917425794,
+        "extension_mm": 24.437810019728218,
+        "material_extension_mm": 24.40721989159777,
+        "attachment_lag_mm": 0.030590128130447702,
+        "attachment_error_mm": 0.04299009485392803,
+        "static_bound": true
+      },
+      {
+        "t": 5.209999999999492,
+        "gap_mm": 85.76135801823554,
+        "extension_mm": 24.971058863705814,
+        "material_extension_mm": 24.93998767060845,
+        "attachment_lag_mm": 0.031071193097365057,
+        "attachment_error_mm": 0.04388518742928416,
+        "static_bound": true
+      },
+      {
+        "t": 5.219999999999491,
+        "gap_mm": 86.34635990266976,
+        "extension_mm": 25.556060748140034,
+        "material_extension_mm": 25.524479364601053,
+        "attachment_lag_mm": 0.0315813835389811,
+        "attachment_error_mm": 0.044848604908825834,
+        "static_bound": true
+      },
+      {
+        "t": 5.22999999999949,
+        "gap_mm": 86.9645403390269,
+        "extension_mm": 26.174241184497177,
+        "material_extension_mm": 26.142132840167523,
+        "attachment_lag_mm": 0.03210834432965104,
+        "attachment_error_mm": 0.04584942669506521,
+        "static_bound": true
+      },
+      {
+        "t": 5.239999999999489,
+        "gap_mm": 87.59708841177932,
+        "extension_mm": 26.8067892572496,
+        "material_extension_mm": 26.77415268186644,
+        "attachment_lag_mm": 0.03263657538316034,
+        "attachment_error_mm": 0.04685623822704298,
+        "static_bound": true
+      },
+      {
+        "t": 5.2499999999994875,
+        "gap_mm": 88.22549879767422,
+        "extension_mm": 27.435199643144497,
+        "material_extension_mm": 27.402049904122975,
+        "attachment_lag_mm": 0.03314973902152074,
+        "attachment_error_mm": 0.04783861308705406,
+        "static_bound": true
+      }
+    ],
+    "static_hold_sample_count": 10,
+    "static_attachment_error_max_mm": 0.04783861308705406,
+    "suspension_extension_mean_mm": 24.968869806718125,
+    "suspension_extension_max_mm": 28.228765373057733,
+    "suspension_extension_final_mm": 27.435199643144497,
+    "suspension_over_half_thickness": false
+  },
+  "metrics": {
+    "lift_end": {
+      "com": [
+        -2.1295930277856954e-05,
+        6.368183158409714e-05,
+        0.2664505012023277
+      ],
+      "pinch": [
+        0.0,
+        0.0,
+        0.35467600000000193
+      ],
+      "com_pinch_horizontal_mm": 0.06714828605634442,
+      "tilt_deg": 0.17288909861231924,
+      "lowest_point_mm": 199.20068936615883,
+      "com_speed_mm_s": 62.08614723570104,
+      "attached": true
+    },
+    "hang_end": null,
+    "stop_swing_mm": 23.51959781628512,
+    "stop_window_samples": 29
+  },
+  "confirmed_failure": false,
+  "execution_error": false,
+  "total_wall_s": 10.872335100080818
+}

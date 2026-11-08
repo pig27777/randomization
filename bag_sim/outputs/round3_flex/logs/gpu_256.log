@@ -1,0 +1,120 @@
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Module __main__ acbd149 load on device 'cuda:0' took 1095.62 ms  (compiled)
+Module mujoco_warp._src.smooth 6774445 load on device 'cuda:0' took 0.51 ms  (cached)
+Module _subtree_com_acc__locals__kernel_3896ce10 3896ce1 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _crb_accumulate__locals__kernel_90ab7522 90ab752 load on device 'cuda:0' took 0.25 ms  (cached)
+Module _nxn_broadphase__locals__kernel_0dcff9d2 0dcff9d load on device 'cuda:0' took 0.25 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_31f64391 31f6439 load on device 'cuda:0' took 0.27 ms  (cached)
+Module mujoco_warp._src.collision_flex 742b16f load on device 'cuda:0' took 0.34 ms  (cached)
+Module _flex_narrowphase_elem_detect__locals__kernel_da189f4b da189f4 load on device 'cuda:0' took 2.04 ms  (cached)
+Module _write_filtered_contacts__locals__kernel_2c001468 2c00146 load on device 'cuda:0' took 0.29 ms  (cached)
+Module mujoco_warp._src.constraint 9feb269 load on device 'cuda:0' took 0.23 ms  (cached)
+Module _friction_dof__locals__kernel_1de789ae 1de789a load on device 'cuda:0' took 0.28 ms  (cached)
+Module _efc_contact_init_flex__locals__kernel_db4e5b62 db4e5b6 load on device 'cuda:0' took 0.35 ms  (cached)
+Module _efc_contact_jac_sparse_flex__locals__kernel_0faca6c5 0faca6c load on device 'cuda:0' took 0.38 ms  (cached)
+Module _efc_contact_update_flex__locals__kernel_3f82e89d 3f82e89 load on device 'cuda:0' took 0.32 ms  (cached)
+Module mujoco_warp._src.passive a541019 load on device 'cuda:0' took 0.32 ms  (cached)
+Module _flex_hessian_elem__locals__kernel_a54fcf23 a54fcf2 load on device 'cuda:0' took 0.28 ms  (cached)
+Module _flex_hessian_diag__locals__kernel_d8e346bb d8e346b load on device 'cuda:0' took 0.28 ms  (cached)
+Module _eff_flex_stretch_stiff_vert__locals__kernel_b73e9904 b73e990 load on device 'cuda:0' took 0.29 ms  (cached)
+Module _eff_flex_stretch_stiff_edge__locals__kernel_8ce0256d 8ce0256 load on device 'cuda:0' took 0.29 ms  (cached)
+Module _eff_flex_bend_stiff__locals__kernel_1bc1869f 1bc1869 load on device 'cuda:0' took 0.28 ms  (cached)
+Module mujoco_warp._src.derivative 82b7ef7 load on device 'cuda:0' took 0.41 ms  (cached)
+Module mujoco_warp._src.sensor 5f5ff21 load on device 'cuda:0' took 0.43 ms  (cached)
+Module _energy_pos_gravity__locals__kernel_712d6ed0 712d6ed load on device 'cuda:0' took 0.30 ms  (cached)
+Module _energy_pos_passive_joint__locals__kernel_db408c39 db408c3 load on device 'cuda:0' took 0.25 ms  (cached)
+Module _energy_pos_passive_flex__locals__kernel_62ed2564 62ed256 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _spring_damper_flexedge_passive__locals__kernel_95e79495 95e7949 load on device 'cuda:0' took 0.25 ms  (cached)
+Module _flex_elasticity__locals__kernel_568213c2 568213c load on device 'cuda:0' took 0.26 ms  (cached)
+Module _flex_bending__locals__kernel_f5196b9a f5196b9 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _gravity_force__locals__kernel_ae06eb60 ae06eb6 load on device 'cuda:0' took 0.24 ms  (cached)
+Module mujoco_warp._src.support d4bd46c load on device 'cuda:0' took 0.23 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_887f05a4 887f05a load on device 'cuda:0' took 0.25 ms  (cached)
+Module _cfrc_backward__locals__kernel_a834cc03 a834cc0 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _flex_bend_mul__locals__kernel_175771c6 175771c load on device 'cuda:0' took 0.27 ms  (cached)
+Module _flex_gather_kernel__locals__kernel_e2095fee e2095fe load on device 'cuda:0' took 0.24 ms  (cached)
+Module _flex_hessian_mul_vert__locals__kernel_50fe5083 50fe508 load on device 'cuda:0' took 0.25 ms  (cached)
+Module _flex_hessian_mul_edge__locals__kernel_bb27e07c bb27e07 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _flex_scatter_kernel__locals__kernel_ba6d6639 ba6d663 load on device 'cuda:0' took 0.24 ms  (cached)
+Module mul_m_kernel__locals___mul_m_8d81580e 8d81580 load on device 'cuda:0' took 0.26 ms  (cached)
+Module _energy_vel_kinetic__locals__energy_vel_kinetic_0cba73dd 842b540 load on device 'cuda:0' took 0.28 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_ca86cb1a 831f0d6 load on device 'cuda:0' took 0.25 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_76d25309 797032f load on device 'cuda:0' took 0.26 ms  (cached)
+Module _regularize_constraint__locals__kernel_72459ca3 72459ca load on device 'cuda:0' took 0.25 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5d93552d 5d93552 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_ebc933cb c6bbdda load on device 'cuda:0' took 0.25 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_b7425cff b9bad6a load on device 'cuda:0' took 0.26 ms  (cached)
+Module _pcg_init_tiled_b4d5fa74 90f5018 load on device 'cuda:0' took 0.27 ms  (cached)
+Module mul_m_kernel__locals___mul_m_2eb0ef19 2eb0ef1 load on device 'cuda:0' took 0.26 ms  (cached)
+Module _eff_mul_diag_and_csr__locals__kernel_0b34287f 0b34287 load on device 'cuda:0' took 0.24 ms  (cached)
+Module _pcg_pAp_step_and_check_tiled_83413ed8 27201e4 load on device 'cuda:0' took 0.29 ms  (cached)
+Module _pcg_beta_and_p_update_tiled_af3156cc a929a82 load on device 'cuda:0' took 0.27 ms  (cached)
+Module mujoco_warp._src.solver cd4ec3c load on device 'cuda:0' took 0.35 ms  (cached)
+Module _solve_init_dof__locals__kernel_a80c928f a80c928 load on device 'cuda:0' took 0.29 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_5bd16df7 5bd16df load on device 'cuda:0' took 0.27 ms  (cached)
+Module _update_constraint_efc__locals__kernel_c81c55ec c81c55e load on device 'cuda:0' took 0.25 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_6aed0c06 6aed0c0 load on device 'cuda:0' took 0.26 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_eeeb13da eeeb13d load on device 'cuda:0' took 0.25 ms  (cached)
+Module _update_gradient_grad__locals__kernel_6b3af6f7 6b3af6f load on device 'cuda:0' took 0.26 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_d97c8041 d97c804 load on device 'cuda:0' took 0.26 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_ac180d6e ac180d6 load on device 'cuda:0' took 0.29 ms  (cached)
+Module _add_efmK_metric_dense__locals__kernel_b6ba76b0 b6ba76b load on device 'cuda:0' took 0.25 ms  (cached)
+Module _update_gradient_cholesky_blocked__locals__kernel_85933fa6 8370047 load on device 'cuda:0' took 39.28 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_e31ac712 e31ac71 load on device 'cuda:0' took 0.33 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_f91a1c4c f91a1c4 load on device 'cuda:0' took 0.35 ms  (cached)
+Module _solve_done__locals__kernel_f10f2c47 f10f2c4 load on device 'cuda:0' took 7.96 ms  (cached)
+Module _discrete_free_gyro_kernel__locals___discrete_free_gyro_1ca1e63e 1ca1e63 load on device 'cuda:0' took 0.42 ms  (cached)
+Module mujoco_warp._src.forward 8778b9a load on device 'cuda:0' took 0.44 ms  (cached)
+Module _next_time_builder__locals___next_time_1cb22d2e 1cb22d2 load on device 'cuda:0' took 0.27 ms  (cached)
+Module flex_geometry 2e80e60 load on device 'cuda:0' took 0.27 ms  (cached)
+{"config": "base", "case": "centre", "params": [0.0, 0.0, 1.570796, 20.0, 0.1, 2.0], "seed": 0, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 1176.0797531027347, "completed": 256, "valid": true, "evals_per_s": 0.2176723128891732, "env_steps_per_s": 2403.102334296472, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 246, "grasp_fail": 1, "drop": 9, "sim_fail": 0}, "majority": "success", "content_z_mm": [24.933807373046875, 29.034541130065918, 69.57391357421875], "completion_sim_s": [5.539220333099365, 8.550119400024414, 8.818964004516602], "end_checks": [{"world": 0, "outcome": "success", "outside": [0.0, 0.0], "penetration_mm": 0.0}, {"world": 34, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}, {"world": 2, "outcome": "drop", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [54.308258056640625, 91.94743347167969, 100.15494537353516], "completion_content_z_mm": [24.940780639648438, 30.81114673614502, 72.78889465332031], "max_penetration_mm": 1.2643449306488037, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2227}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "centre", "params": [0.0, 0.0, 1.570796, 20.0, 0.1, 2.0], "seed": 1, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 1179.6581115350127, "completed": 256, "valid": true, "evals_per_s": 0.21701202873677, "env_steps_per_s": 2401.0210859436233, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 249, "grasp_fail": 3, "drop": 4, "sim_fail": 0}, "majority": "success", "content_z_mm": [24.918766021728516, 28.09170436859131, 68.9031982421875], "completion_sim_s": [5.46240758895874, 8.550119400024414, 8.847768783569336], "end_checks": [{"world": 0, "outcome": "success", "outside": [0.0, 0.0], "penetration_mm": 0.0}, {"world": 10, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}, {"world": 28, "outcome": "drop", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [53.009578704833984, 91.36970520019531, 101.2900161743164], "completion_content_z_mm": [24.9193172454834, 30.313429832458496, 68.94084930419922], "max_penetration_mm": 15.252023696899414, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2230}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "centre", "params": [0.0, 0.0, 1.570796, 20.0, 0.1, 2.0], "seed": 2, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 1179.1261672200635, "completed": 256, "valid": true, "evals_per_s": 0.2171099303169158, "env_steps_per_s": 2396.8936306987503, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 250, "grasp_fail": 0, "drop": 6, "sim_fail": 0}, "majority": "success", "content_z_mm": [24.928613662719727, 27.98240566253662, 74.04761505126953], "completion_sim_s": [5.8752760887146, 8.550119400024414, 8.82856559753418], "end_checks": [{"world": 0, "outcome": "success", "outside": [0.0, 0.0], "penetration_mm": 0.0}, {"world": 26, "outcome": "drop", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [57.67750549316406, 91.72828674316406, 102.0154800415039], "completion_content_z_mm": [24.943050384521484, 29.667949676513672, 74.03011322021484], "max_penetration_mm": 1.7173364162445068, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2230}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "empty_end", "params": [0.42, 0.0, 1.570796, 20.0, 0.1, 2.0], "seed": 0, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 939.5415329546668, "completed": 256, "valid": true, "evals_per_s": 0.2724733191889156, "env_steps_per_s": 2805.3852943690754, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 0, "grasp_fail": 256, "drop": 0, "sim_fail": 0}, "majority": "grasp_fail", "content_z_mm": [25.09049415588379, 46.84690284729004, 53.53847122192383], "completion_sim_s": [7.593961238861084, 7.789593696594238, 8.234867095947266], "end_checks": [{"world": 0, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [0.844409704208374, 24.13900375366211, 36.420494079589844], "completion_content_z_mm": [25.731962203979492, 49.0446834564209, 61.31190490722656], "max_penetration_mm": 0.0, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2227}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "empty_end", "params": [0.42, 0.0, 1.570796, 20.0, 0.1, 2.0], "seed": 1, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 939.5554716126062, "completed": 256, "valid": true, "evals_per_s": 0.2724692769449944, "env_steps_per_s": 2805.3436754256622, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 0, "grasp_fail": 256, "drop": 0, "sim_fail": 0}, "majority": "grasp_fail", "content_z_mm": [26.01404571533203, 46.726667404174805, 54.74125289916992], "completion_sim_s": [7.571557521820068, 7.786793231964111, 8.226865768432617], "end_checks": [{"world": 0, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [1.0583996772766113, 23.653590202331543, 32.082157135009766], "completion_content_z_mm": [25.94933319091797, 48.552602767944336, 56.983280181884766], "max_penetration_mm": 0.0, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2228}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "empty_end", "params": [0.42, 0.0, 1.570796, 20.0, 0.1, 2.0], "seed": 2, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 941.6405293219723, "completed": 256, "valid": true, "evals_per_s": 0.2718659531194273, "env_steps_per_s": 2799.131853317623, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 0, "grasp_fail": 256, "drop": 0, "sim_fail": 0}, "majority": "grasp_fail", "content_z_mm": [24.98789405822754, 47.44990539550781, 59.5271110534668], "completion_sim_s": [7.520349025726318, 7.793994426727295, 8.23726749420166], "end_checks": [{"world": 0, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [0.32779574394226074, 24.052346229553223, 35.67193603515625], "completion_content_z_mm": [25.248788833618164, 48.92155838012695, 60.56412124633789], "max_penetration_mm": 0.0, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2227}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "corner", "params": [0.42, 0.42, 0.785398, 20.0, 0.1, 2.0], "seed": 0, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 518.4981321678497, "completed": 256, "valid": true, "evals_per_s": 0.49373369761171476, "env_steps_per_s": 3246.7927954946363, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 0, "grasp_fail": 256, "drop": 0, "sim_fail": 0}, "majority": "grasp_fail", "content_z_mm": [24.95213508605957, 25.52694797515869, 51.9771842956543], "completion_sim_s": [4.732686519622803, 4.751889705657959, 5.253572940826416], "end_checks": [{"world": 0, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [19.500324249267578, 25.016332626342773, 26.99435806274414], "completion_content_z_mm": [25.079544067382812, 26.460790634155273, 51.89188766479492], "max_penetration_mm": 0.0, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2228}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "corner", "params": [0.42, 0.42, 0.785398, 20.0, 0.1, 2.0], "seed": 1, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 515.3296978347935, "completed": 256, "valid": true, "evals_per_s": 0.49676935188406224, "env_steps_per_s": 3266.7552579895932, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 0, "grasp_fail": 256, "drop": 0, "sim_fail": 0}, "majority": "grasp_fail", "content_z_mm": [24.967710494995117, 25.550376892089844, 51.96526336669922], "completion_sim_s": [4.732686519622803, 4.751889705657959, 5.255173206329346], "end_checks": [{"world": 0, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [18.22843360900879, 25.122641563415527, 27.098848342895508], "completion_content_z_mm": [25.216976165771484, 26.413532257080078, 51.99867630004883], "max_penetration_mm": 0.0, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2228}
+WARNING: Flex stiffness is too ill-conditioned for the effective-metric block preconditioner: the M+K solve ran out of iterations at a relative residual of 5.66e-06 and qacc_smooth is under-converged. Reported as a singular inertia below, because M+K is the effective inertia.
+
+WARNING: Inertia matrix is too close to singular, or the effective-metric solve failed to converge, at DOF 567. Check model. Time = 0.0000.
+
+{"config": "base", "case": "corner", "params": [0.42, 0.42, 0.785398, 20.0, 0.1, 2.0], "seed": 2, "nworld": 256, "njmax": 1566, "ncon_per_world": 522, "wall_s": 517.4333036090247, "completed": 256, "valid": true, "evals_per_s": 0.49474975463395165, "env_steps_per_s": 3253.474386472866, "overflow_worlds": 0, "overflow_bits": [0], "finite_worlds": 256, "outcomes": {"unfinished": 0, "success": 0, "grasp_fail": 256, "drop": 0, "sim_fail": 0}, "majority": "grasp_fail", "content_z_mm": [25.00589942932129, 25.608744621276855, 52.40663528442383], "completion_sim_s": [4.732686519622803, 4.751889705657959, 5.252772808074951], "end_checks": [{"world": 0, "outcome": "grasp_fail", "outside": [0.0, 0.0], "penetration_mm": 0.0}], "content_lift_mm": [19.230070114135742, 24.99534034729004, 27.56557273864746], "completion_content_z_mm": [25.151939392089844, 26.435246467590332, 52.44919204711914], "max_penetration_mm": 0.0, "escaped_worlds": 0, "overflow_world_steps": 0, "peak_total_gpu_mib": 2226}

@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/types.py", line 8755, in get_signature
+    type_codes.append(get_type_code(arg_type))
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/types.py", line 8706, in get_type_code
+    raise TypeError(f"Unrecognized type '{arg_type}'")
+TypeError: Unrecognized type '<class 'mujoco_warp._src.types.Data'>'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/bag_sim/flex_batch.py", line 73, in <module>
+    @wp.func
+     ^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 1608, in func
+    return wrapper(f)
+           ^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 1588, in wrapper
+    Function(
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 401, in __init__
+    self.add_overload(self)
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/context.py", line 596, in add_overload
+    sig = warp._src.types.get_signature(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/mjwarp/lib/python3.12/site-packages/warp/_src/types.py", line 8765, in get_signature
+    raise RuntimeError(f"Failed to determine type code for argument {arg_str}{func_str}: {e}") from e
+RuntimeError: Failed to determine type code for argument 'd' of function pkg_com: Unrecognized type '<class 'mujoco_warp._src.types.Data'>'

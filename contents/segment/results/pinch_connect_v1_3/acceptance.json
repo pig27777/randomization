@@ -1,0 +1,235 @@
+{
+  "version": "v1.3",
+  "rule": "point connections; release when the 5 ms low-passed load exceeds pinch_coeff x current grip force",
+  "stages": {
+    "r2_p1_units": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    },
+    "r2_p2_r4": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    },
+    "r2_p3_hang": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    },
+    "r2_p4_e4": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    },
+    "r2_p5_e5": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    },
+    "r2_p6_e6": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    },
+    "r2_p7_positions": {
+      "passed": true,
+      "execution_errors": 0,
+      "source_matches": true,
+      "protocol_matches": true
+    }
+  },
+  "p7_trend": {
+    "criteria": "centre has the smallest hang tilt and the most successes; success count does not increase with the horizontal pinch offset; tilts are lift-end medians (unset when the grasp failed before the lift end)",
+    "categories": {
+      "bendable": {
+        "positions": [
+          {
+            "u": 0.0,
+            "v": 0.0,
+            "offset_mm": 0.0,
+            "successes": 3,
+            "outcomes": {
+              "success": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": 0.2941970304455415,
+            "lowest_mm": 212.83887119502583,
+            "swing_mm": 3.0073782443662394
+          },
+          {
+            "u": 0.0,
+            "v": 0.3,
+            "offset_mm": 48.0,
+            "successes": 3,
+            "outcomes": {
+              "success": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": 33.02678504441107,
+            "lowest_mm": 153.34833765919475,
+            "swing_mm": 3.644112017258386
+          },
+          {
+            "u": 0.25,
+            "v": 0.0,
+            "offset_mm": 60.0,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": null,
+            "lowest_mm": null,
+            "swing_mm": null
+          },
+          {
+            "u": 0.25,
+            "v": 0.3,
+            "offset_mm": 76.8,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": 48.40354103438585,
+            "lowest_mm": 50.49060573601968,
+            "swing_mm": null
+          },
+          {
+            "u": 0.45,
+            "v": 0.0,
+            "offset_mm": 108.0,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": null,
+            "lowest_mm": null,
+            "swing_mm": null
+          },
+          {
+            "u": 0.45,
+            "v": 0.3,
+            "offset_mm": 118.2,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": null,
+            "lowest_mm": null,
+            "swing_mm": null
+          }
+        ],
+        "success_nonincreasing": true,
+        "centre_smallest_tilt": true
+      },
+      "compressible": {
+        "positions": [
+          {
+            "u": 0.0,
+            "v": 0.0,
+            "offset_mm": 0.0,
+            "successes": 3,
+            "outcomes": {
+              "success": 3
+            },
+            "overload": 0,
+            "bound": 3,
+            "tilt_deg": 0.17288909861231924,
+            "lowest_mm": 199.20068936615883,
+            "swing_mm": 23.51959781628512
+          },
+          {
+            "u": 0.0,
+            "v": 0.3,
+            "offset_mm": 75.0,
+            "successes": 0,
+            "outcomes": {
+              "drop": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": 37.41319395889373,
+            "lowest_mm": 93.57865929152767,
+            "swing_mm": null
+          },
+          {
+            "u": 0.25,
+            "v": 0.0,
+            "offset_mm": 87.5,
+            "successes": 0,
+            "outcomes": {
+              "drop": 3
+            },
+            "overload": 1,
+            "bound": 3,
+            "tilt_deg": 48.56383305484587,
+            "lowest_mm": 40.47473081241692,
+            "swing_mm": 29.149048575827603
+          },
+          {
+            "u": 0.25,
+            "v": 0.3,
+            "offset_mm": 115.2,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 0,
+            "bound": 3,
+            "tilt_deg": 47.33711143064639,
+            "lowest_mm": -0.0016183100099223524,
+            "swing_mm": null
+          },
+          {
+            "u": 0.45,
+            "v": 0.0,
+            "offset_mm": 157.5,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": 43.962956507998214,
+            "lowest_mm": -0.05191699105146913,
+            "swing_mm": null
+          },
+          {
+            "u": 0.45,
+            "v": 0.3,
+            "offset_mm": 174.4,
+            "successes": 0,
+            "outcomes": {
+              "grasp_fail": 3
+            },
+            "overload": 3,
+            "bound": 3,
+            "tilt_deg": null,
+            "lowest_mm": null,
+            "swing_mm": null
+          }
+        ],
+        "success_nonincreasing": true,
+        "centre_smallest_tilt": true
+      }
+    },
+    "trend_reasonable": true
+  },
+  "passed": true
+}

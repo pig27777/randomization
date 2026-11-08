@@ -1,0 +1,171 @@
+{
+  "checked_at": "2026-11-05T19:58:00.625597+08:00",
+  "checks": {
+    "m3": true,
+    "random": true,
+    "i22": true,
+    "speed": true,
+    "interfaces_and_units": true
+  },
+  "m3_hits": 15,
+  "random": {
+    "seed": 20261107,
+    "total": 200,
+    "confirmed_failures": 1,
+    "execution_errors": 0,
+    "categories": {
+      "hard": 68,
+      "bendable": 72,
+      "compressible": 60
+    },
+    "rest_failures": 0,
+    "r3_failures": 1,
+    "physical_drops": 5,
+    "table_touch": 45,
+    "failure_evidence": [
+      {
+        "index": 57,
+        "stage": "r3",
+        "phase": "close",
+        "fail_t": 2.2599999999998164,
+        "failure": "compression 1.20 x limit",
+        "kappa": {
+          "category": "bendable",
+          "size": [
+            0.18101665145615634,
+            0.15109988455309167,
+            0.02079745670343519
+          ],
+          "mass": 0.1889420267963848,
+          "com_offset": [
+            -0.0983820338535869,
+            -0.02073519548984104,
+            -0.1412471557085905
+          ],
+          "segments": [
+            6,
+            4,
+            2
+          ],
+          "rigid": false,
+          "squeeze_stiffness_y": 0.22524761831230974,
+          "squeeze_stiffness_z": 0.20510038511703116,
+          "lock_strain_y": 0.29295810048769033,
+          "lock_strain_z": 0.14429528250673118,
+          "droop_ratio": 0.35965321736790246,
+          "damping_ratio": 0.6231213429761993,
+          "mobile": false,
+          "mobile_frac": 0.20465067055009345,
+          "mobile_range": 0.00614070835551616,
+          "mobile_freq": 3.076082704138438,
+          "surface_friction": 0.2825926484538444,
+          "skin_compliance": 0.0
+        },
+        "warning_counts": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "saved_state_forward_only": {
+          "max_compression_ratio": 1.20352843807164,
+          "strain": 0.47011120680051266,
+          "limit": 0.3906108006502538,
+          "segment_pair": [
+            [
+              3,
+              2,
+              0
+            ],
+            [
+              3,
+              3,
+              0
+            ]
+          ],
+          "axis": 1,
+          "max_bending_rad": 1.0641927236535444
+        },
+        "state_note": "mj_forward reconstructs the post-step qpos; failure check uses the engine kinematic cache (up to one timestep earlier)"
+      }
+    ]
+  },
+  "median_wall_s": {
+    "hard": 0.6946572628803551,
+    "bendable": 6.791214152472094,
+    "compressible": 7.880027521867305
+  },
+  "i22": {
+    "successes": 10,
+    "max_outer_roll_deg": 0.13193283792963417,
+    "both_contacts_throughout": true,
+    "max_outer_z_from_grip_mm": 12.867904552896311
+  },
+  "runtime_hash_match": {
+    "m3_final": {
+      "model.py": true,
+      "mj_adapter.py": true,
+      "bushing.py": true,
+      "metrics.py": true,
+      "protocols.py": true,
+      "sampling.py": true,
+      "policy_protocol.py": true
+    },
+    "random200_seed20261107": {
+      "model.py": true,
+      "mj_adapter.py": true,
+      "bushing.py": true,
+      "metrics.py": true,
+      "protocols.py": true,
+      "sampling.py": true,
+      "policy_protocol.py": true
+    },
+    "evaluate10": {
+      "model.py": true,
+      "mj_adapter.py": true,
+      "bushing.py": true,
+      "metrics.py": true,
+      "protocols.py": true,
+      "sampling.py": true,
+      "policy_protocol.py": true
+    }
+  },
+  "source_sha256": {
+    "bushing.py": "b6283564922010ee82f900e9402f367a386fd344014648e5ef825d58b1471c6b",
+    "calibrate.py": "fb447fce7eae145f016748f4cb346b7f2caabc043306c0c9690ca3ed1231c5b4",
+    "freeze_v1.py": "0741ebf3beb88c22f8fdfe57bd87759813bda465478e2e92427b0aa3d72e0ea6",
+    "metrics.py": "cb9b0755c888913615d1f8e9999d9c07349e8279e76f3ea30bcd248bc1606891",
+    "mj_adapter.py": "904e545b12105587b046ef5541fe74c3c9d4b424f0607d25730eb160b5052be6",
+    "mjwarp_speed.py": "24ea169c338c9a96fb75113b85cb15127a5f65e982d0f6f57a93411ba29148c6",
+    "mjwarp_validate.py": "e41204c774cf7258633f9dd32b0db010af492da1be5e5ae9b9d96b29986092f6",
+    "model.py": "abcc6f68f2c0e1af373e8292678d65a09bac657273dbc108295648400d9172f0",
+    "newton_check.py": "2c86a48cbf0fa5eb3ecd13fb551ad93e7cec36bbc61d3826bdb99b36424de6d8",
+    "policy_protocol.py": "e61788679a8e366c206367e4ebd449bff321ea3727e26653a53936c3d2d35f17",
+    "protocols.py": "fbcffe01adc218de73412fdfe3fac00008269bbe0b651a33e2c51af4e3fe7cfe",
+    "run_round1.py": "b7871b589ca70d4457639d155619137a4ca6f05beebbbe76f96a712fc06f3d8e",
+    "run_round2.py": "1321350e7f4c1a15a3f0c9de0ded118d52be8900f28e3899502ed7515549c6f2",
+    "sampling.py": "873ebb2177424891ab452a06058afea7a116946a6da59c6f4609f322ef7fa40e",
+    "stability_estimate.py": "d731f5bb3c71ddcba022364afca01aa97ed0ac6c1d7c6a24d49de3a12ee386d1",
+    "validate_model.py": "8d57d9bd8cc1ae010077a5641815a9787ed8031654582fec4c3e8ddc741ef6f1",
+    "view_m2.py": "6ede9fbf43d7a67c31a11f4ff70d119bb013eb64985aeec22800e5db28d9019b",
+    "tests/test_acceptance_entry.py": "c4fe4dc257c3b066e841ea32f6923d4aaefcb68028ec7b4a8cace8d99522c83f",
+    "tests/test_bushing.py": "7e7d24f1628bf97df4a5f6fd69ce78479c724dbe7fd4414f381ec94fdce72c3b",
+    "tests/test_freeze_interfaces.py": "eab223b1c5eefc28102e8b1ba2b6ad31d2d40d81f770f50af979fd1c3660b46c",
+    "tests/test_sampling.py": "db2a2bc6de62a0aea94953f9693316ef079e6c0648240f587dc63698539957d0",
+    "tests/test_scene_extensions.py": "fdcee6c613a275d1af3a256719ac10396d42b445ba5536c27fdd9030fdb36ff2"
+  },
+  "table": {
+    "path": "results/freeze_v1_newton/mapping_pass1/table.json",
+    "version": "Newton mapping_pass1",
+    "sha256": "e65abc104e0e8e3dc9e3f11437d41fe22318a32188fd17232e4d6819407009d9"
+  },
+  "limits": [
+    "I-29: hard task filtered force peaks exceed 50 N; policy executor returns success, requires policy-line review",
+    "compressible 10 N center task is grasp_fail 10/10; timing includes early termination",
+    "M3 aggregate passes 15/18; two compressible droop targets miss and one bendable target is outside the table",
+    "v1 is content-model freeze only; shape and YAM top grasp are not implemented or accepted"
+  ]
+}

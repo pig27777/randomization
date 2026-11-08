@@ -1,0 +1,21 @@
+start 2026-11-06 19:25:54 CST
+ 19:25:54 up 26 days, 19:41,  1 user,  load average: 1.78, 1.18, 0.85
+=== units --run-id p1_units --workers 1 2026-11-06 19:25:54
+exit 0 19:26:05
+=== r4 --run-id p2_r4 --count 3 --workers 3 2026-11-06 19:26:05
+exit 2 19:26:46
+=== hang --run-id p3_hang --workers 6 2026-11-06 19:26:46
+exit 0 19:26:55
+=== hang --run-id p3_hang_v12 --v12 --workers 6 2026-11-06 19:26:55
+exit 0 19:27:07
+=== scan --run-id p4_e4 --workers 8 2026-11-06 19:27:07
+exit 0 19:36:50
+=== scan --run-id p4_e4_v12_default --v12 --scales 1 --categories bendable compressible --workers 8 2026-11-06 19:36:50
+exit 0 19:41:11
+=== random --run-id p5_e5 --count 200 --seed 20261201 --workers 8 2026-11-06 19:41:11
+exit 2 19:42:56
+ 19:42:56 up 26 days, 19:58,  1 user,  load average: 8.02, 7.98, 5.76
+=== speed --run-id p6_e6 --count 10 --workers 1 2026-11-06 19:42:56
+exit 0 19:46:07
+ 19:46:07 up 26 days, 20:01,  1 user,  load average: 1.36, 4.74, 4.89
+end 2026-11-06 19:46:07 CST

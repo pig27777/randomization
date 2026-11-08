@@ -1,0 +1,201 @@
+{
+ "config": {
+  "nworld": 1024,
+  "dt": 0.0005,
+  "mode": "truss",
+  "groups": "center,bend,shear",
+  "solver": "solver=\"CG\" iterations=\"100\" ls_iterations=\"20\" tolerance=\"1e-8\"",
+  "out": "s3_mjwarp",
+  "skip_compare": false
+ },
+ "compare": [
+  {
+   "anchor": "hard",
+   "test": "R1y",
+   "cpu_protocol": {
+    "stiffness": 141.12325356134258,
+    "lock_strain": null,
+    "droop": null,
+    "fail": null
+   },
+   "cpu_replay": {
+    "finite": true,
+    "stiffness": 77.06191690962103,
+    "lock_strain": null
+   },
+   "mjwarp_replay": {
+    "finite": true,
+    "stiffness": 110.08215343359848,
+    "lock_strain": null
+   },
+   "stiffness_rel_diff": 0.4284896852838984
+  },
+  {
+   "anchor": "hard",
+   "test": "R2",
+   "cpu_protocol": {
+    "stiffness": null,
+    "lock_strain": null,
+    "droop": 0.003072804907683612,
+    "fail": null
+   },
+   "cpu_replay": {
+    "finite": true,
+    "droop": 0.003074024907363492,
+    "pad_force": 25.077265999494614
+   },
+   "mjwarp_replay": {
+    "finite": true,
+    "droop": 0.0030799176235031937,
+    "pad_force": 24.836188783832625
+   },
+   "droop_rel_diff": 0.0019169383193955447
+  },
+  {
+   "anchor": "bendable",
+   "test": "R1y",
+   "cpu_protocol": {
+    "stiffness": 0.2613076916500666,
+    "lock_strain": 0.1850000000000001,
+    "droop": null,
+    "fail": null
+   },
+   "cpu_replay": {
+    "finite": true,
+    "stiffness": 0.2675278603804155,
+    "lock_strain": 0.1850000000000001
+   },
+   "mjwarp_replay": {
+    "finite": true,
+    "stiffness": 0.0,
+    "lock_strain": null
+   },
+   "stiffness_rel_diff": -1.0
+  },
+  {
+   "anchor": "bendable",
+   "test": "R2",
+   "cpu_protocol": {
+    "stiffness": null,
+    "lock_strain": null,
+    "droop": null,
+    "fail": "flung: segment speed 1.01 m/s relative to the pads"
+   },
+   "cpu_replay": {
+    "finite": true,
+    "droop": 0.5126533043911696,
+    "pad_force": 6.370909163976302
+   },
+   "mjwarp_replay": {
+    "finite": true,
+    "droop": 72675051.31761046,
+    "pad_force": 0.0
+   },
+   "droop_rel_diff": 141762571.66871578
+  },
+  {
+   "anchor": "compressible",
+   "test": "R1y",
+   "cpu_protocol": {
+    "stiffness": 0.10025274299863696,
+    "lock_strain": 0.23000000000000015,
+    "droop": null,
+    "fail": null
+   },
+   "cpu_replay": {
+    "finite": true,
+    "stiffness": 0.22603644531139297,
+    "lock_strain": null
+   },
+   "mjwarp_replay": {
+    "finite": false,
+    "stiffness": 0.0,
+    "lock_strain": null
+   },
+   "stiffness_rel_diff": -1.0
+  },
+  {
+   "anchor": "compressible",
+   "test": "R2",
+   "cpu_protocol": {
+    "stiffness": null,
+    "lock_strain": null,
+    "droop": 0.2356301703479907,
+    "fail": null
+   },
+   "cpu_replay": {
+    "finite": true,
+    "droop": 0.23329782831680576,
+    "pad_force": 24.680972211003702
+   },
+   "mjwarp_replay": {
+    "finite": true,
+    "droop": -655041102837.3041,
+    "pad_force": 0.0
+   },
+   "droop_rel_diff": -2807746251062.5137
+  }
+ ],
+ "batch": [
+  {
+   "anchor": "hard",
+   "segments": [
+    4,
+    3,
+    2
+   ],
+   "nworld": 1024,
+   "dt": 0.0005,
+   "ntendon": 0,
+   "neq": 0,
+   "bad_worlds": 0,
+   "env_steps_per_s": 3348778.560407697,
+   "sim_s_per_s": 1674.3892802038488
+  },
+  {
+   "anchor": "bendable",
+   "segments": [
+    6,
+    3,
+    2
+   ],
+   "nworld": 1024,
+   "dt": 0.0005,
+   "ntendon": 816,
+   "neq": 0,
+   "bad_worlds": 0,
+   "env_steps_per_s": 108131.57300725365,
+   "sim_s_per_s": 54.065786503626825
+  },
+  {
+   "anchor": "compressible",
+   "segments": [
+    4,
+    4,
+    3
+   ],
+   "nworld": 1024,
+   "dt": 0.0005,
+   "ntendon": 1184,
+   "neq": 0,
+   "bad_worlds": 22,
+   "env_steps_per_s": 63629.989829690654,
+   "sim_s_per_s": 31.814994914845325
+  },
+  {
+   "anchor": "bendable",
+   "segments": [
+    6,
+    4,
+    3
+   ],
+   "nworld": 1024,
+   "dt": 0.0005,
+   "ntendon": 1836,
+   "neq": 0,
+   "bad_worlds": 0,
+   "env_steps_per_s": 30503.773622397395,
+   "sim_s_per_s": 15.251886811198698
+  }
+ ]
+}

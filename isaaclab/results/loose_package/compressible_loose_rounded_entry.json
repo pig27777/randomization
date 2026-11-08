@@ -1,0 +1,116 @@
+{
+  "arguments": {
+    "output": "isaaclab/results/loose_package/compressible_loose_rounded_entry.json",
+    "scale": 1.7320508075688772,
+    "category": "compressible",
+    "grasp": "top",
+    "seed": 20261105,
+    "u": 0.0,
+    "v": 0.0,
+    "psi": 1.5707963267948966,
+    "w": 0.04,
+    "d": 0.015,
+    "force": 10.0,
+    "mass_scale": 1.0,
+    "no_self_contact": false,
+    "coarse": null,
+    "no_cloth": false,
+    "cache": "isaaclab/results/loose_package/compressible_loose_rounded_baseline_cache.npz",
+    "device": "cuda:0",
+    "limit": 0.005,
+    "no_capture": false
+  },
+  "initialization_s": 46.23689982434735,
+  "result": {
+    "outcome": "sim_fail",
+    "reason": "adjacent overlap 2.55314 of segment size",
+    "simulation_s": 0.0,
+    "wall_s": 2.2966880351305008e-05,
+    "phase": "approach",
+    "completed_attempt": false,
+    "success": false,
+    "bag_content_relative_motion_mm": 0.0,
+    "peak_connection_force_N": 0.0,
+    "material_contact_sliding_mm": 0.0,
+    "sliding_evidence": null,
+    "sliding_measurements": 0,
+    "max_penetration_mm": 0.0,
+    "max_centres_outside": 0.0,
+    "max_corners_outside": 0.0,
+    "preparation_failure": "adjacent overlap 2.55314 of segment size",
+    "preparation_trace": [],
+    "simulation_failure_metrics": [
+      2.5531375408172607,
+      7.659412384033203,
+      1.8135900497436523,
+      0.0
+    ],
+    "rest_state_report": {
+      "finite": true,
+      "content_position": [
+        0.0008316010353155429,
+        0.019180150954828907,
+        0.06379545945674181
+      ],
+      "max_particle_speed": 5.287675857543945,
+      "particle_bounds": [
+        [
+          -0.4548198878765106,
+          -0.22008563578128815,
+          0.0002794428146444261
+        ],
+        [
+          0.3127681016921997,
+          0.2383446842432022,
+          0.13088910281658173
+        ]
+      ]
+    },
+    "table_contact_after_lift_hold": null,
+    "phases": [
+      {
+        "phase": "approach",
+        "t": 0.0
+      }
+    ],
+    "pinch_events": [],
+    "trace": [],
+    "cache_used": false,
+    "settle_wall_s": 43.72836898313835,
+    "capture_warmup_s": 0.0,
+    "wrap_relaxation_s": 1.7,
+    "protocol_rest_s": 0.3,
+    "membrane_scale": 0.19109999999999983,
+    "dt": 5e-05,
+    "substeps": 100,
+    "category": "compressible",
+    "grasp": "top",
+    "required_opening_m": null,
+    "object_frame": null,
+    "limitations": [
+      "VBD elastic cloth; material plasticity/memory not migrated",
+      "relative COM motion is diagnostic only; contact-material tangential motion is measured separately"
+    ]
+  },
+  "source_sha256": {
+    "package_assets.py": "8fd1e50e5167c1589de82f95eace781dec3fd996367688e41b6288a01b302ec5",
+    "package_metrics.py": "dc4f1b4ffad6b3d08bff0f19fd47061b1e712548ca4f1d33b4ef4d9b4963b16e",
+    "package_rest.py": "3b730e1e18ca2a46cd4ab25342ab2d161085e49fc746bdd420fff0b5121b99f4",
+    "package_scene.py": "9c5b8f36dd73fe211983885ed2e8cda87b7574386977043b37a1a68970388805",
+    "package_grasp.py": "4e0af42c5cb7afc9df1c7c816d12904f555b9fe7786bd8e3922f764ea05bdf57",
+    "package_batch.py": "e810ff26bdf2e57a6193766920e113a5898f390c305eb4506e339ee5e9f7819c",
+    "pinch_effect.py": "e6e94445230d47f4584fc2f6ae7549e9a9bf723aead016d21c73fbdac5fec923",
+    "segment_adapter.py": "cdcc8e13a37a25d0e9eb94f02ab2b4ba47a41157d217e38d37cbdeeb143192d0"
+  },
+  "input_manifest": {
+    "bag_sim/bag_model.py": "baf174e77d2e79ee16a869cebcf32b0e8387953f6c8e0ffd4c18724ccd9dcb4c",
+    "bag_sim/wrap.py": "93958be7481f59338b7db5444f2f6e16f90469f030c165e30688400955822d0e",
+    "bag_sim/legacy/contents.py": "d69dd219433a8e17885926c1d223137a75bbef596857a21e220087a797fa431d",
+    "bag_sim/legacy/initialization.py": "354e6fe7319ef1b6956676a28dd5fb33423a830bf6e33678c496a6eac5f49fb5",
+    "bag_sim/reference/runtime.py": "874811c1fc17990d5b9d8815b923ab7c4ed8d14940cd416059afb299cfc72bbb",
+    "bag_sim/profiles/kraft.json": "2666250a21b59fdc3630c06a1186daca74945edae46009c398f786c250996a70",
+    "bag_sim/geometry/kraft.npz": "bdeff4a8a8f531ab3a135ead1e4a76c9eb192344e21045bbacef4fdf06390d5b",
+    "isaaclab/results/descriptions/compressible-describe-1.json": "baba9bae33497b3f3adb2fd74a7ba1009e5986f1cea4d40d8cdacdfacb58f609"
+  },
+  "failure_state": "isaaclab/results/loose_package/compressible_loose_rounded_entry.state.npz"
+}

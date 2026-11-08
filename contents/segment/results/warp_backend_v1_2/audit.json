@@ -1,0 +1,177 @@
+{
+  "operator_gate": {
+    "passed": true,
+    "cases": 436,
+    "max_abs_diff": 1.7763568394002505e-15,
+    "groups": {
+      "bushing": {
+        "count": 62,
+        "max_abs_diff": 8.326672684688674e-17,
+        "passed": true
+      },
+      "compaction_native_state": {
+        "count": 62,
+        "max_abs_diff": 1.7763568394002505e-15,
+        "passed": true
+      },
+      "compaction_threshold_pose": {
+        "count": 16,
+        "max_abs_diff": 1.3877787807814457e-17,
+        "passed": true
+      },
+      "pinch_contacts": {
+        "count": 12,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "pinch_candidate": {
+        "count": 12,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "pinch_depth_threshold": {
+        "count": 9,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "pinch_contact_threshold": {
+        "count": 9,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "pinch_bind_pose": {
+        "count": 2,
+        "max_abs_diff": 1.3877787807814457e-17,
+        "passed": true
+      },
+      "pinch_reaction": {
+        "count": 2,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "pinch_capacity_continuity": {
+        "count": 212,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "pinch_release": {
+        "count": 2,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "spring": {
+        "count": 30,
+        "max_abs_diff": 0.0,
+        "passed": true
+      },
+      "spring_release": {
+        "count": 6,
+        "max_abs_diff": 0.0,
+        "passed": true
+      }
+    }
+  },
+  "response_gate": {
+    "passed": false,
+    "completed": 7,
+    "planned": 15,
+    "failed": [
+      {
+        "index": 6,
+        "job": {
+          "category": "bendable",
+          "test": "r1z"
+        },
+        "passed": false,
+        "metrics": [
+          {
+            "metric": "stiffness",
+            "reference": 0.3019819639643874,
+            "candidate": 0.3021774564496529,
+            "relative_error": 0.0006473647720514613,
+            "passed": true
+          },
+          {
+            "metric": "lock_strain",
+            "reference": 0.15250000000000008,
+            "candidate": 0.15500000000000008,
+            "relative_error": 0.016393442622950824,
+            "passed": false
+          }
+        ],
+        "flags": {
+          "fail": {
+            "reference": null,
+            "candidate": null,
+            "passed": true
+          },
+          "capped": {
+            "reference": true,
+            "candidate": true,
+            "passed": true
+          },
+          "lower_bound": {
+            "reference": false,
+            "candidate": false,
+            "passed": true
+          }
+        }
+      }
+    ]
+  },
+  "E4_E5": "not run: response gate failed",
+  "S4_S6": "not run: S2 incomplete",
+  "CPU_speed_target": "cancelled by review",
+  "released_v1_2_1": false,
+  "quantization": {
+    "lock_strain_step": 0.0025,
+    "reference": 0.15250000000000008,
+    "candidate": 0.15500000000000008,
+    "relative_diff": 0.016393442622950824,
+    "source": "contents/segment/metrics.py:r1_metrics np.arange step"
+  },
+  "load": {
+    "s2_operators_boundaries": {
+      "start": "2026-11-06T17:32:11.244995+08:00",
+      "end": "2026-11-06T17:32:12.719014+08:00",
+      "loadavg_before": [
+        0.32470703125,
+        0.2392578125,
+        0.18310546875
+      ],
+      "loadavg_after": [
+        0.32470703125,
+        0.2392578125,
+        0.18310546875
+      ],
+      "busy_percent": 6.4290260980267355,
+      "average_busy_logical_cpus": 2.0572883513685554
+    },
+    "s2_responses": {
+      "start": "2026-11-06T17:32:44.251973+08:00",
+      "end": "2026-11-06T17:33:05.763862+08:00",
+      "loadavg_before": [
+        0.19580078125,
+        0.21533203125,
+        0.1767578125
+      ],
+      "loadavg_after": [
+        0.69287109375,
+        0.328125,
+        0.2158203125
+      ],
+      "busy_percent": 3.9460670235047735,
+      "average_busy_logical_cpus": 1.2627414475215275
+    }
+  },
+  "frozen_archive_unchanged": true,
+  "original_files_changed": [],
+  "candidate_sources_match_run": {
+    "validate_warp.py": true,
+    "warp_mechanics.py": true,
+    "warp_effects.py": true,
+    "warp_cpu.py": true
+  },
+  "source_syntax_passed": true,
+  "dependency_installations": 0
+}
