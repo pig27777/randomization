@@ -11,8 +11,9 @@
 <meta property="og:description" content="One template. Interpretable responses. Many soft parcels.">
 <meta property="og:url" content="https://pig27777.github.io/randomization/">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/page.css?v=kappapack-3">
+<link rel="stylesheet" href="assets/page.css?v=kappapack-4">
 <script defer src="assets/page.js?v=kappapack-1"></script>
+<script defer src="assets/kappa-demo.js?v=1"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -86,6 +87,15 @@
       <p>Following the structure used for cross-embodiment robot randomization, a fixed template <i>B</i> holds the physics, a parameter vector <i>κ</i> holds only physical quantities, and a reparameterization keeps every random sample valid. Each response coordinate is defined by a fixed gripper-level measurement. The aim is to keep the coordinates interpretable as discretization changes; matching responses still requires calibration and validation.</p>
     </div>
 
+<div class="kappa-workbench" id="kappa-demo">
+<div class="kappa-heading"><div><p class="eyebrow">Interactive schematic</p><h3>Move κ. Watch the parcel change.</h3></div><span class="kappa-slice">A 3D slice: size · shape · compliance</span></div>
+<div class="kappa-views">
+<div class="kappa-view"><div class="kappa-view-label"><b>κ distribution</b><output id="kappa-mean">μ = (0.50, 1.00, 0.50)</output></div><canvas id="kappa-space" width="500" height="290" tabindex="0" aria-label="Interactive 3D response distribution" aria-describedby="kappa-help">Drag the mean with the mouse, or use arrow keys and Page Up / Page Down.</canvas><p id="kappa-help">Drag the center or an axis handle. Click a sample to preview it; drag the background to rotate. Arrow keys move the mean; Page Up / Down changes compliance.</p></div>
+<div class="kappa-view"><div class="kappa-view-label"><b id="kappa-preview-title">Mean parcel</b><span>Same illustrative load</span></div><canvas id="kappa-preview" width="500" height="290" aria-label="Soft parcel illustration responding to the selected parameters"></canvas><div class="kappa-readouts"><span>Size <b id="kappa-size">0.50</b></span><span>Shape <b id="kappa-shape">Pillow</b></span><span>Compliance <b id="kappa-compliance">0.50</b></span></div></div>
+</div>
+<div class="kappa-shapes" aria-label="Shape presets"><span>Shape</span><button type="button" data-kappa-shape="0">Cube</button><button type="button" data-kappa-shape="0.25">Cuboid</button><button type="button" data-kappa-shape="0.5">Cylinder</button><button type="button" data-kappa-shape="0.75">Sphere</button><button type="button" data-kappa-shape="1" aria-pressed="true">Pillow</button></div><div class="kappa-controls"><label for="kappa-spread">Distribution spread <input id="kappa-spread" type="range" min="0.03" max="0.30" step="0.01" value="0.14"><output id="kappa-spread-value">0.14</output></label><button id="kappa-reset" type="button">Reset view</button></div>
+</div>
+<details class="parameter-details model-details"><summary>How the model is constructed</summary>
 <div class="model-explorer" data-model-explorer>
 <div class="model-tabs" role="tablist" aria-label="Understand the model">
 <button type="button" role="tab" id="template-tab" aria-controls="template-panel" aria-selected="true" tabindex="0"><span>01 / B</span> Fix the template</button>
@@ -119,6 +129,8 @@
 </div>
 <div class="mapping"><div><span class="eyebrow">MEASURE</span><b>R1 · R2 · R4</b><p>Squeeze, droop, pull-off</p></div><span aria-hidden="true">→</span><div><span class="eyebrow">MAP</span><b>Calibration table</b><p>Supported range, no extrapolation</p></div><span aria-hidden="true">→</span><div><span class="eyebrow">INSTANTIATE</span><b>A = g<sub>B</sub>(κ)</b><p>Geometry, connections and limits</p></div></div>
 <p class="note">Model diagrams are schematic. A top-pinch attachment is a reduced-model effect, not evidence of native frictional grasping. The bag-contact trials below use a separate full-arm setup.</p>
+
+</details>
 <details class="parameter-details"><summary>Response coordinates &amp; illustrative sampling ranges</summary><p class="note">Draft sampling ranges, not calibrated material bounds or a guarantee of batch stability.</p>
 <div class="tablewrap">
       <table class="data">

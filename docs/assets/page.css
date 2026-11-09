@@ -325,3 +325,37 @@ h3{font-size:1.15rem}
 .evidence-links a{padding:15px 0}
 @media(max-width:860px){.wrap{gap:42px}.hero{padding-top:25px;gap:26px}.hero h1{font-size:clamp(3rem,8vw,5.6rem)}.hero .sub{font-size:clamp(1.15rem,2.2vw,1.45rem)}.model-panel{padding:20px;gap:20px}.responses-panel{grid-template-columns:1fr}.response-card{grid-template-columns:145px minmax(0,1fr);gap:0 18px}.slide{grid-template-columns:1fr;gap:18px}.slide-media{max-height:300px}.slide-media video{max-height:300px}}
 @media(max-width:520px){.hero h1{font-size:3rem}.hero .eyebrow{font-size:9px}.hero .sub{font-size:1.15rem}.hero .lede{font-size:14px}.wrap{gap:36px}h2{font-size:1.6rem}.col>p:not(.eyebrow):not(.eq){font-size:14px}.model-tabs button{padding:12px 9px;font-size:11px}.model-panel{padding:16px}.model-copy h3{font-size:19px}.response-card{display:block}.response-card svg{height:110px}.mapping{gap:12px}.slide{padding:12px;gap:15px}.slide-copy h3{font-size:19px}.slide-copy p{font-size:12px}.slide-media{max-height:270px}.slide-media video{max-height:270px}.carousel-controls button{height:36px}.pending h2{font-size:24px}}
+
+/* Small, illustrative response-space explorer. */
+.kappa-workbench{border:1px solid var(--rule);background:var(--panel)}
+.kappa-heading{display:flex;justify-content:space-between;gap:20px;align-items:end;padding:19px 22px;border-bottom:1px solid var(--rule)}
+.kappa-heading .eyebrow{font-size:9px;color:var(--signal);margin-bottom:6px}
+.kappa-heading h3{font-size:21px;font-stretch:85%;font-weight:700}
+.kappa-slice{font:9px/1.6 var(--mono);color:var(--muted);text-align:right}
+.kappa-views{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.kappa-view{min-width:0;padding:16px 18px 12px}
+.kappa-view:first-child{border-right:1px solid var(--rule)}
+.kappa-view-label{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font:10px/1.6 var(--mono)}
+.kappa-view-label b{font-weight:500}
+.kappa-view-label output,.kappa-view-label span{font-size:9px;color:var(--muted)}
+.kappa-view canvas{width:100%;height:260px;display:block}
+#kappa-space{cursor:grab;touch-action:none}
+#kappa-space:active{cursor:grabbing}
+#kappa-help{font:9px/1.7 var(--mono);color:var(--muted);margin:1px 0 0}
+.kappa-readouts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font:9px/1.6 var(--mono);color:var(--muted);padding-top:8px;border-top:1px solid var(--rule)}
+.kappa-readouts b{display:block;font:500 13px/1.6 var(--mono);color:var(--ink)}
+.kappa-controls{border-top:1px solid var(--rule);padding:12px 18px;display:flex;justify-content:space-between;gap:20px;align-items:center}
+.kappa-controls label{display:flex;gap:14px;align-items:center;font:10px/1.6 var(--mono);color:var(--muted)}
+.kappa-controls input{width:145px;accent-color:var(--signal)}
+.kappa-controls output{color:var(--ink);min-width:28px}
+.kappa-controls button{border:1px solid var(--rule);background:var(--panel);color:var(--ink);font:10px/1.6 var(--mono);padding:6px 11px}
+.kappa-controls button:hover{border-color:var(--signal);color:var(--signal)}
+.model-details>.model-explorer{margin-top:20px}
+@media(max-width:720px){.kappa-views{grid-template-columns:1fr}.kappa-view:first-child{border-right:0;border-bottom:1px solid var(--rule)}.kappa-heading{align-items:start;padding:16px;gap:12px}.kappa-heading h3{font-size:19px}.kappa-slice{max-width:120px}.kappa-view{padding:13px 15px}.kappa-view canvas{height:240px}.kappa-controls{padding:12px 15px}.kappa-controls label{gap:9px;font-size:9px}.kappa-controls input{width:105px}}
+@media(max-width:400px){.kappa-controls{flex-wrap:wrap;gap:12px}.kappa-controls label{flex:1}.kappa-controls input{width:120px}}
+
+.kappa-shapes{display:flex;align-items:center;flex-wrap:wrap;gap:7px 9px;padding:11px 18px;border-top:1px solid var(--rule);font:9px/1.6 var(--mono)}
+.kappa-shapes>span{color:var(--muted);margin-right:8px}
+.kappa-shapes button{border:1px solid var(--rule);background:var(--panel);padding:5px 10px;font:10px/1.5 var(--mono)}
+.kappa-shapes button[aria-pressed=true]{background:var(--signal);border-color:var(--signal);color:white}
+.kappa-readouts b{font-size:12px;overflow-wrap:anywhere}
