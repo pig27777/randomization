@@ -1,0 +1,105 @@
+{
+  "hostname": "ubun",
+  "started_at": "2026-11-09T17:57:36.708393+08:00",
+  "lock": "/tmp/claude-gpu.lock",
+  "throughput": false,
+  "variants": [
+    {
+      "id": "small",
+      "trial": "trial_000",
+      "size_mm": [
+        180.0,
+        120.0,
+        37.5
+      ],
+      "mass_kg": 0.12234375,
+      "label": "小包 · 0.75 倍 · 同密度"
+    },
+    {
+      "id": "medium",
+      "trial": "trial_001",
+      "size_mm": [
+        240.0,
+        160.0,
+        50.0
+      ],
+      "mass_kg": 0.29,
+      "label": "中包 · 1.00 倍 · 同密度"
+    },
+    {
+      "id": "large",
+      "trial": "trial_002",
+      "size_mm": [
+        288.0,
+        192.0,
+        60.0
+      ],
+      "mass_kg": 0.50112,
+      "label": "大包 · 1.20 倍 · 同密度"
+    },
+    {
+      "id": "long",
+      "trial": "trial_003",
+      "size_mm": [
+        320.0,
+        120.0,
+        50.0
+      ],
+      "mass_kg": 0.29,
+      "label": "长条 · 等体积 / 等质量"
+    },
+    {
+      "id": "flat",
+      "trial": "trial_004",
+      "size_mm": [
+        200.0,
+        240.0,
+        40.0
+      ],
+      "mass_kg": 0.29,
+      "label": "扁平 · 等体积 / 等质量"
+    },
+    {
+      "id": "thick",
+      "trial": "trial_005",
+      "size_mm": [
+        160.0,
+        150.0,
+        80.0
+      ],
+      "mass_kg": 0.29,
+      "label": "厚块 · 等体积 / 等质量"
+    }
+  ],
+  "method": "Frozen v1.3 rectangular envelope; size/shape ratios are actual model geometry. Bendable calibration family fixed.",
+  "comparisons": {
+    "size": [
+      "small",
+      "medium",
+      "large"
+    ],
+    "shape": [
+      "long",
+      "flat",
+      "thick"
+    ]
+  },
+  "completed_at": "2026-11-09T18:02:00.217875+08:00",
+  "outcomes": {
+    "success": 5,
+    "grasp_fail": 1
+  },
+  "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 flock /tmp/claude-gpu.lock .venv/bin/python -u -B test/flex3d/run_suite.py behavior --backend segmented --cases test/runs/2026-11-09/contents/segmented-size-shape-r1/cases.json --workers 2 --output test/runs/2026-11-09/contents/segmented-size-shape-r1/matrix",
+  "render_command": ".venv/bin/python -B test/flex3d/render_comparison.py test/runs/2026-11-09/contents/segmented-size-shape-r1 --workers 2 --fps 12",
+  "video_completed_at": "2026-11-09T18:04:37.631443+08:00",
+  "video_sha256": {
+    "long.mp4": "62b0c37ccd42b345c8a6d40f824f44ea81b7a41e942cb560b0021759a2269e51",
+    "thick.mp4": "71e60db2ba4e344e648c9c1ac0592a84cfc4f0394fbafdb4020d3b718ee6ca3e",
+    "flat.mp4": "c8fca23732a44af7074db30e93e3354c52d035d40ff0b45e926d06286ffd963c",
+    "medium.mp4": "3af8d02097e293505b840d496946b2a34e74765f25b8d8bbb6183a4aaae9077a",
+    "shape-comparison.mp4": "5887fd863dbda8a58d0a7263edd20fec50ce8ebbaac03a73218d733d32da50c0",
+    "large.mp4": "38723c6bb89a76015635402986d7a32dce0cb5d524134043e75847173cd2548b",
+    "small.mp4": "ec1b21352aa9c63f58a2603ca507dfb05c6adbcc6923e7c51310480a2d7bf2f3",
+    "size-comparison.mp4": "562dfd3485ab1e0f1e0d928fa6dea689d137d6ffb0821ca23eef73e90667a341"
+  }
+}

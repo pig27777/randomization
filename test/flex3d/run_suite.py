@@ -22,11 +22,17 @@ def main():
     parser.add_argument('--backend',default='native_flex')
     parser.add_argument('--workers',type=int,default=1)
     parser.add_argument('--trials',type=int,default=28)
+    parser.add_argument('--cases',type=Path,help='Behavior configurations as a JSON list of model/shared options')
     parser.add_argument('--locked',action='store_true',help='Launch speed via flock /tmp/claude-gpu.lock')
     args=parser.parse_args()
+    if args.cases and args.mode!='behavior':parser.error('--cases is only for behavior runs')
     if args.mode=='speed' and not args.locked:parser.error('speed requires --locked and external flock')
     args.output.mkdir(parents=True,exist_ok=False)
-    if args.mode=='behavior':
+    if args.cases:
+        conditions=json.loads(args.cases.read_text())
+        if not isinstance(conditions,list) or not conditions or not all(isinstance(x,dict) for x in conditions):
+            raise ValueError('cases must be a nonempty list of configuration objects')
+    elif args.mode=='behavior':
         conditions=[dict(category=c,yaw=y,tilt=t) for c in ('bendable','compressible')
                     for y,t in ((0,0),(45,0),(90,0),(135,0),(0,-30),(0,30))]
         conditions += [dict(category=c,pinch_coeff=0.) for c in ('bendable','compressible')]

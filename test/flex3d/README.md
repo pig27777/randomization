@@ -10,6 +10,8 @@
 
 `segmented.py`只读接入冻结v1.3分段内容物，保留发布版bushing/阻尼/限位，使用其0.4ms步长；首轮14次原任务结果为4 success、5 grasp_fail、5 setup_fail，成功样本的机械臂跟踪峰值约42–43mm，不能称整套平台物理验收通过。完整结果见报告末节。
 
+分段模型可通过`--model-options '{"size":[0.32,0.12,0.05],"mass":0.29}'`指定实际长宽高（米）和质量（kg），沿用本类别映射表；不设置时保持原锚点。冻结模板仅支持长方体包络，此处形状变化指长宽高比例，换几何后的响应/稳定性需另验。
+
 ## 运行
 
 在仓库根目录，使用已有`.venv`，不安装包。每次输出目录必须不存在。
@@ -22,12 +24,15 @@
 flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex3d/run_suite.py speed --locked --workers 1 --trials 1 --output test/flex3d/results/NEW_RUN/speed1
 flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex3d/run_suite.py speed --locked --workers 28 --trials 28 --output test/flex3d/results/NEW_RUN/speed28
 .venv/bin/python -B test/flex3d/render_video.py test/flex3d/results/NEW_RUN/one test/flex3d/results/NEW_RUN/one/grasp.mp4
+.venv/bin/python -B test/flex3d/render_video.py test/runs/YYYY-MM-DD/contents/NEW_RUN/one test/runs/YYYY-MM-DD/contents/NEW_RUN/detail.mp4 --view detail --fps 12
 .venv/bin/python -B test/flex3d/angles.py --yaw 45 --model-options '{"shape":"pillow","surface_refinement":2}' --output test/flex3d/results/NEW_RUN/pillow
 .venv/bin/python -B test/flex3d/render_video.py test/flex3d/results/NEW_RUN/pillow test/flex3d/results/NEW_RUN/pillow/closeup.mp4 --tetra --focus
 .venv/bin/python -B test/flex3d/export_tetra.py test/flex3d/results/NEW_RUN/pillow test/flex3d/results/NEW_RUN/pillow/playback.html
 ```
 
 行为矩阵为两类×6姿态+两类纯接触对照，共14次。角度是0/45/90/135°水平朝向，另加±30°倾斜。`--smoke-seconds .02`只检查入口，不产生抓取结论。当前安装高度270 mm、抓取位置x=-250 mm、搬运终点x=250 mm；不可达姿态记`setup_fail`，不混入内容物物理失败。
+
+`run_suite.py behavior --cases PATH`可运行JSON配置列表（各项为共享/模型选项，默认矩阵不变）；大小/比例展示的六项列表见`test/runs/2026-11-09/contents/segmented-size-shape-r1/cases.json`。保存所有试次后，用`render_comparison.py RUN_DIRECTORY`按该轮`manifest.json`的`variants`和`comparisons`导出单段及并排视频。近景使用相同距离/角度；短视频尾部保持末帧并标记STOPPED，不补造轨迹。新参数只影响回放排版与帧率，不改变动作或物理积分。
 
 速度输出同时给出evaluate完成数/秒、成功抓取数/秒、仿真时间/墙钟时间与每类结果数。早停失败和完整成功的成本不同，比较模型时必须使用同协议、同机器、同日志配置并列出组成；尚未接入的分段模型不能拿历史速度作正式同机对照。行为运行耗时不作为吞吐数据。28进程采用spawn，限制进程内数值库线程的环境变量应由测速命令统一设置。
 

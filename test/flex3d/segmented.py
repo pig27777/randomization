@@ -14,6 +14,17 @@ from pinch import PinchAttachment, fragments
 class Config(TrialConfig):
     # The released bushing model requires its validated CPU timestep.
     dt: float = .0004
+    size: tuple | None = None
+    mass: float | None = None
+
+    def __post_init__(self):
+        if self.size is not None:
+            value = np.asarray(self.size, dtype=float)
+            if value.shape != (3,) or not np.isfinite(value).all() or np.any(value <= 0):
+                raise ValueError('size requires three finite positive lengths in metres')
+            self.size = tuple(float(v) for v in value)
+        if self.mass is not None and (not np.isfinite(self.mass) or self.mass <= 0):
+            raise ValueError('mass must be finite and positive')
 
 
 class SegmentSim(A.Sim):
@@ -60,8 +71,12 @@ class SegmentPinch(PinchAttachment):
 
 
 def scene(cfg):
-    kappa = replace(ANCHORS[cfg.category], pinch_coeff=cfg.pinch_coeff)
-    desc = build(kappa, omega_max=.8 / cfg.dt)
+    anchor = ANCHORS[cfg.category]
+    kappa = replace(anchor, pinch_coeff=cfg.pinch_coeff,
+                    size=cfg.size if cfg.size is not None else anchor.size,
+                    mass=cfg.mass if cfg.mass is not None else anchor.mass)
+    desc = build(kappa, omega_max=.8 / cfg.dt,
+                 geometry=cfg.category if cfg.size is not None else None)
     center = np.array([-.25, .04])
     top = kappa.size[2] + .002
     _, equality = fragments(desc)
@@ -99,4 +114,6 @@ def summarize(trace):
 
 def dimensions(sim):
     return dict(nv=sim.m.nv, segments=len(sim.desc.segments),
-                elastic_connections=len(sim.built.bushings))
+                elastic_connections=len(sim.built.bushings),
+                size_mm=(np.array(sim.desc.kappa.size) * 1000).tolist(),
+                mass_kg=sim.mass)

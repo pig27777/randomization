@@ -36,6 +36,7 @@
 | --- | --- | --- | --- |
 | 分段内容物，冻结v1.3 | `segmented-v13-yam-r1`：统一平台两类×六姿态＋纯接触对照 | ubun，CPU，14次结束：4任务success/5抓取失败/5初始化失败；跟踪未验收 | [主题报告](../../flex3d/REPORT.md#分段内容物-v13-接入本轮计划2026-11-09ubun) · [数据](contents/segmented-v13-yam-r1/) · [检查](../../../reports/segmented-v13-platform-test.md) |
 | 分段内容物，冻结v1.3 | `segmented-v13-parameter-ui-r1`：κ拖动、真实材料响应与本地服务 | ubun，CPU；3项物理检查、HTTP/JS契约通过，浏览器未验 | [说明与命令](../../content_model/TOOLS.md) · [数据](contents/segmented-v13-parameter-ui-r1/) · [检查](../../../reports/segmented-parameter-ui-test.md) |
+| 分段内容物，冻结v1.3本构＋可变尺寸适配 | `segmented-size-shape-r1`：三种尺度＋三种等体积形状比例，各1次45°抓取 | ubun，CPU；5任务success/1抓取失败，无模型失效/警告，接触与跟踪未验收 | [计划/命令/结果](../../flex3d/REPORT.md#分段内容物尺寸与形状比例视频本轮计划2026-11-09ubun) · [数据](contents/segmented-size-shape-r1/) · [检查](../../../reports/segmented-size-shape-test.md) |
 
 ## 仓库维护检查
 

@@ -163,3 +163,44 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 flock /tmp/claude-gpu
 验证范围：两类初态与三个模式入口、参数边界拒绝、真实载荷下软硬设置产生不同位移、HTTP输入/暂停/重建、JS语法及滑块/绘图契约。CPU物理检查持共享锁；界面日常运行是探索预览，不产生正式吞吐/验收。当前CUA浏览器清单为空，若仍无浏览器则明确保留浏览器视觉/真实拖动验证限制。
 
 κ界面结果：3项CPU物理检查通过，两类×三模式均进入有限、无警告的0.1s入口；同5N下ky=0.12与1.0N/mm的1.2s真实计算，前者压缩率比后者多于2个百分点。页面与元数据HTTP200，5种非法请求400，配置重建与暂停生效；900/360px JS交互/绘图契约通过。没有浏览器可作实际布局/拖动验收。启动方式见[测试入口](../content_model/TOOLS.md)，[任务检查](../../reports/segmented-parameter-ui-test.md)。
+
+## 分段内容物尺寸与形状比例视频：本轮计划（2026-11-09，ubun）
+
+用户要求查看换形、换大小的视频。冻结v1.3当前只有长方体包络，本轮“换形”明确指长宽高比例，不添加圆柱/圆枕轮廓，不通过渲染缩放伪造几何变化。只在统一平台适配器开放size/mass，保留冻结本构、36段、同一易弯响应κ、0.4ms步长、45°抓取、系数1、平台原动作与判定。指定沿用易弯映射家族，避免尺寸改变时隐式切到另一锚点表；改变几何后的响应命中与稳定性未经全面验收。
+
+每配置1次，共6次，先核对实际碰撞包络/质量并做20ms入口，再持共享锁运行完整动作：
+
+| 配置 | 长×宽×厚mm | 质量kg | 比较约定 |
+| --- | --- | --- | --- |
+| 小 | 180×120×37.5 | 0.12234375 | 与中/大同密度，尺度0.75 |
+| 中 | 240×160×50 | 0.29 | 原锚点，尺度1 |
+| 大 | 288×192×60 | 0.50112 | 同密度，尺度1.2 |
+| 长条 | 320×120×50 | 0.29 | 与扁平/厚块同体积、同质量 |
+| 扁平 | 200×240×40 | 0.29 | 仅改变长宽高比例 |
+| 厚块 | 160×150×80 | 0.29 | 仅改变长宽高比例 |
+
+输出：`test/runs/2026-11-09/contents/segmented-size-shape-r1/`。沿用原模型失效/任务判定，初始化失败、抓取失败和求解警告原样保留，不调参挑成功。视频取实际保存状态，CPU llvmpipe回放，固定近景距离/角度，字幕标尺寸、质量和任务结局；每段12fps/1倍速。并排视频同一仿真时刻开始，较早结束者保持末帧并明确标记，不能把保持帧冒充额外仿真。报告原始结局与跟踪/穿透，不作成功率、吞吐或实物效果结论。
+
+### 六配置结果
+
+全部6次已结束，**5次原任务success、1次grasp_fail，无初始化/模型失效或MuJoCo警告**。四项集成检查和六个20ms入口通过；各试次的实际包络、XML质量、冻结指纹与适配器源码一致。冻结XML质量使用8位有效数字，0.29kg的实际总和为0.2900000016kg；早期审计将其错误地与请求值按1e-12精度比较，已改为核对实际归档XML的质量总和，最大序列化差1.6e-9kg，未改模型/参数或正式标准。
+
+| 配置 | 任务结局 | 峰值穿透mm | 跟踪峰值mm | 原因或限制 |
+| --- | --- | ---: | ---: | --- |
+| 小 | success | 0.489 | 41.40 | 仅一次任务完成 |
+| 中 | success | 0.542 | 42.05 | 与首轮同锚点45°任务一致 |
+| 大 | success | 1.065 | 43.30 | 穿透已超过1mm量级，不据任务完成宣称接触可靠 |
+| 长条 | success | 0.599 | 42.23 | 新比例未做响应标定 |
+| 扁平 | grasp_fail | 0.180 | 30.45 | 合拢末不满足v1.3捏取资格，未进入提起 |
+| 厚块 | success | 0.364 | 48.18 | 跟踪误差仍明显偏大 |
+
+六次非指尖接触穿透均为0，五个任务success均使用系数1的效果连接；本轮没有额外纯接触对照，不能证明上述形状可原生摩擦抓取。保留所有配置、状态、事件、原始结果与源快照；见[结构化摘要](../runs/2026-11-09/contents/segmented-size-shape-r1/behavior-summary.json)及[命令/清单](../runs/2026-11-09/contents/segmented-size-shape-r1/manifest.json)。下一步仍按前文核查平台跟踪与接触，不因本轮视频而放行训练或扩大形状域。
+
+正式命令：
+
+```sh
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex3d/run_suite.py behavior --backend segmented --cases test/runs/2026-11-09/contents/segmented-size-shape-r1/cases.json --workers 2 --output test/runs/2026-11-09/contents/segmented-size-shape-r1/matrix
+.venv/bin/python -B test/flex3d/render_comparison.py test/runs/2026-11-09/contents/segmented-size-shape-r1 --workers 2 --fps 12
+```
+
+[任务检查](../../reports/segmented-size-shape-test.md)。视频已完成：[大小并排](../runs/2026-11-09/contents/segmented-size-shape-r1/videos/size-comparison.mp4)、[形状比例并排](../runs/2026-11-09/contents/segmented-size-shape-r1/videos/shape-comparison.mp4)。六段单视频640×480，两段并排1920×480，均12fps/1倍速；6个实际renderer均为llvmpipe，近景距离0.67m、方位−45°、仰角−30°一致，未为小包单独放大。六段帧数与渲染记录一致，两段并排帧数/时长等于该组最长原片；八个MP4完整解码通过。已查看尺寸组首帧和形状组13.5s，中文尺寸/质量标签及扁平包STOPPED保持末帧提示清楚可见。[视频检查](../runs/2026-11-09/contents/segmented-size-shape-r1/videos/video-checks.json)。

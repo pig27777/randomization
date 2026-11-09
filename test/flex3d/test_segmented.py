@@ -9,6 +9,20 @@ import test_platform
 
 
 class SegmentedAdapterTest(unittest.TestCase):
+    def test_resized_geometry_and_mass_reach_the_physics_model(self):
+        for size, mass in (((.18,.12,.0375),.12234375), ((.32,.12,.05),.29),
+                           ((.20,.24,.04),.29), ((.16,.15,.08),.29)):
+            with self.subTest(size=size):
+                sim = scene(Config(size=size, mass=mass, yaw=45)).sim
+                centers = sim.seg_pos()
+                half = np.array([s.half for s in sim.desc.segments])
+                np.testing.assert_allclose((centers+half).max(0)-(centers-half).min(0), size, atol=1e-12)
+                self.assertAlmostEqual(sim.mass, mass)
+                self.assertEqual(sim.bushings.n, 72)
+        for size in ((0,.1,.1), (.1,.1), (float('nan'),.1,.1)):
+            with self.assertRaises(ValueError):
+                Config(size=size)
+
     def test_released_models_keep_mass_and_connections(self):
         for category, count, connections, mass in (
             ('bendable', 36, 72, .29), ('compressible', 48, 104, .5)

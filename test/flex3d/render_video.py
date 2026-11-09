@@ -50,8 +50,9 @@ class SoftwareContext:
             self.context=None
 
 
-def render(run,output,tetra=False,focus=False):
+def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     if output.exists():raise FileExistsError(output)
+    if not 1<=fps<=60 or view not in ('both','detail'):raise ValueError('invalid fps or view')
     from mujoco.rendering.classic import gl_context
     gl_context.GLContext=SoftwareContext
     result=json.loads((run/"result.json").read_text())
@@ -89,19 +90,27 @@ def render(run,output,tetra=False,focus=False):
             t=p[tets];return np.linalg.det(np.stack([t[:,i]-t[:,0] for i in (1,2,3)],axis=2))
         min_tet=int(np.argmin(dets(final_vertices)/dets(rest_vertices)))
         focus_reference=rest_vertices[tets[min_tet]].mean(0)
-    fps=20
     cfg=result["config"]
     model_label='Segmented v1.3' if result.get('backend')=='segmented' else '3D flex'
     title=f'{model_label} | {"TETRAHEDRA | " if tetra else ""}{cfg["category"]} | yaw {cfg["yaw"]:g} deg | pinch {cfg["pinch_coeff"]:g} | {result["outcome"]}'
+    if view=='detail':title=f'{model_label} | {cfg["category"]} | {result["outcome"]}'
     if focus:title=f'{cfg.get("shape","box").upper()} tetrahedra | 10x slow | RED = inverted | final frame held 3s'
-    label=f"drawtext=text='{title}':fontcolor=white:fontsize=20:x=16:y=12:box=1:boxcolor=black@0.65"
+    font_size=20 if view=='both' else 16
+    label=f"drawtext=text='{title}':fontcolor=white:fontsize={font_size}:x=16:y=12:box=1:boxcolor=black@0.65"
+    dimensions=result.get('dimensions',{})
+    if dimensions.get('size_mm'):
+        size_text=' x '.join(f'{v:g}' for v in dimensions['size_mm'])
+        caption=f'{size_text} mm | {dimensions["mass_kg"]:.3f} kg | yaw {cfg["yaw"]:g} deg'
+        label+=f",drawtext=text='{caption}':fontcolor=white:fontsize={font_size}:x=16:y=40:box=1:boxcolor=black@0.65"
     if focus:label+=",tpad=stop_mode=clone:stop_duration=3"
+    width=1280 if view=='both' else 640
     process=subprocess.Popen(["ffmpeg","-hide_banner","-loglevel","error","-f","rawvideo","-pixel_format","rgb24",
-                              "-video_size","1280x480","-framerate",str(fps),"-i","pipe:0","-vf",label,
+                              "-video_size",f"{width}x480","-framerate",str(fps),"-i","pipe:0","-vf",label,
                               "-c:v","libx264","-preset","fast","-crf","22","-pix_fmt","yuv420p","-movflags","+faststart",str(output)],stdin=subprocess.PIPE)
     begin=max(0.,result['sim_time_s']-.8) if focus else 0.
     slow=10 if focus else 1
     frames=max(1,round((result["sim_time_s"]-begin)*slow*fps)+1)
+    content_geoms=[g for g in range(model.ngeom) if model.geom(g).name.startswith('s') and model.geom(g).name[1:].isdigit()]
     for i in range(frames):
         t=result["sim_time_s"] if i==frames-1 else begin+i/fps/slow
         j=max(0,min(len(times)-2,int(np.searchsorted(times,t)-1)))
@@ -111,7 +120,6 @@ def render(run,output,tetra=False,focus=False):
         if model.nflex:
             detail.lookat[:]=data.flexvert_xpos.mean(0)
         elif result.get('backend')=='segmented':
-            content_geoms=[g for g in range(model.ngeom) if model.geom(g).name.startswith('s') and model.geom(g).name[1:].isdigit()]
             detail.lookat[:]=data.geom_xpos[content_geoms].mean(0)
         else:
             detail.lookat[:]=[0,0,.15]
@@ -145,18 +153,21 @@ def render(run,output,tetra=False,focus=False):
                     geom=renderer.scene.geoms[renderer.scene.ngeom]
                     mujoco.mjv_initGeom(geom,mujoco.mjtGeom.mjGEOM_SPHERE,np.array([.0012]*3),data.flexvert_xpos[node],np.eye(3).ravel(),np.array([1.,.05,.03,1.]))
                     renderer.scene.ngeom+=1
-        renderer.update_scene(data,camera=full,scene_option=option);edges(False);left=renderer.render().copy()
+        if view=='both':
+            renderer.update_scene(data,camera=full,scene_option=option);edges(False);left=renderer.render().copy()
         renderer.update_scene(data,camera=detail,scene_option=detail_option);edges(True);right=renderer.render().copy()
-        frame=np.concatenate([left,right],axis=1)
+        frame=np.concatenate([left,right],axis=1) if view=='both' else right
         process.stdin.write(frame.tobytes())
         if i==0:
-            (output.parent/(output.stem+"_first.ppm")).write_bytes(b"P6\n1280 480\n255\n"+frame.tobytes())
+            (output.parent/(output.stem+"_first.ppm")).write_bytes(f"P6\n{width} 480\n255\n".encode()+frame.tobytes())
     process.stdin.close()
     if process.wait()!=0:raise RuntimeError("ffmpeg failed")
     renderer.close()
     (output.parent/(output.stem+"_render.json")).write_text(json.dumps(dict(renderer=renderer_name,fps=fps,frames=frames,
         source=str(run),state_interval_s=float(np.median(np.diff(times))) if len(times)>1 else None,
-        interpolated=True,physics_recomputed=False,tetrahedra=tetra,focus=focus,slow_factor=slow),indent=2))
+        interpolated=True,physics_recomputed=False,tetrahedra=tetra,focus=focus,slow_factor=slow,
+        view=view,detail_camera_distance=detail.distance,detail_camera_azimuth=detail.azimuth,
+        detail_camera_elevation=detail.elevation),indent=2))
     print(output,renderer_name,flush=True)
 
 
@@ -164,4 +175,6 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument("run",type=Path);parser.add_argument("output",type=Path)
     parser.add_argument('--tetra',action='store_true')
     parser.add_argument('--focus',action='store_true')
-    args=parser.parse_args();render(args.run,args.output,args.tetra,args.focus)
+    parser.add_argument('--fps',type=int,default=20)
+    parser.add_argument('--view',choices=('both','detail'),default='both')
+    args=parser.parse_args();render(args.run,args.output,args.tetra,args.focus,fps=args.fps,view=args.view)

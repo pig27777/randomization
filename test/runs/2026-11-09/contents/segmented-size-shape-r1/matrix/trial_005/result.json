@@ -1,0 +1,188 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 45,
+    "tilt": 0.0,
+    "dt": 0.0004,
+    "pinch_coeff": 1.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "size": [
+      0.16,
+      0.15,
+      0.08
+    ],
+    "mass": 0.29
+  },
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv/bin/python",
+  "frozen_v13_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "platform": "69d4e8636b7ce1adbb52e10c638ba7b96b36678d31434d03499e1b75d3c06e26",
+    "backend": "c0c2de1302d98f4dd878e150ba4935ed5045d1223ce227c480223d530b0f2a93"
+  },
+  "backend": "segmented",
+  "robot_source_sha256": "63d03be809bc8767fa4638330202e387a905bcb158ab078c1067125c18ec84bd",
+  "outcome": "success",
+  "reason": "",
+  "phase": "open",
+  "sim_time_s": 18.020000000011358,
+  "wall_s": 34.101578464964405,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.3642305185721903,
+    "nonfinger_mm": 0.0,
+    "grip_N": 10.355669626562312,
+    "down_N": 19.64667879220788,
+    "tracking_mm": 48.17763587720687
+  },
+  "model_metrics": {
+    "max_strain": 0.34912304100048697,
+    "max_relative_angle_deg": 21.398502771791815,
+    "confinement_N": 18.73972927017193
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3004000000000045
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.3004000000000045,
+      "end_s": 7.118399999999282
+    },
+    {
+      "phase": "close",
+      "start_s": 7.118399999999282,
+      "end_s": 11.83120000000727
+    },
+    {
+      "phase": "lift",
+      "start_s": 11.83120000000727,
+      "end_s": 14.331600000012546
+    },
+    {
+      "phase": "lift_hold",
+      "start_s": 14.331600000012546,
+      "end_s": 14.53200000001297
+    },
+    {
+      "phase": "carry",
+      "start_s": 14.53200000001297,
+      "end_s": 16.305200000015354
+    },
+    {
+      "phase": "carry_hold",
+      "start_s": 16.305200000015354,
+      "end_s": 16.606000000014653
+    },
+    {
+      "phase": "lower",
+      "start_s": 16.606000000014653,
+      "end_s": 17.519200000012525
+    },
+    {
+      "phase": "open",
+      "start_s": 17.519200000012525,
+      "end_s": 18.020000000011358
+    }
+  ],
+  "initial_com": [
+    -0.2500000221236798,
+    0.03999983489021403,
+    0.03940823114133547
+  ],
+  "final_com": [
+    0.2538402518571725,
+    0.03822571005738952,
+    0.03940926064045431
+  ],
+  "pinch_events": [
+    {
+      "t": 11.830800000007269,
+      "event": "bind",
+      "segment": 15,
+      "segments": [
+        15,
+        21,
+        9,
+        17,
+        23
+      ]
+    },
+    {
+      "t": 17.519200000012525,
+      "event": "open",
+      "segment": 15,
+      "segments": [
+        15,
+        21,
+        9,
+        17,
+        23
+      ]
+    }
+  ],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.08000651993084014,
+    "ik_max_rotation_deg": 51.324591603517625,
+    "tracking_max_mm": 48.17763587720687,
+    "tracking_p95_mm": 47.21066368030116,
+    "actuator_peak_Nm": [
+      1.717282255000157,
+      6.0841440432895695,
+      1.8174420264185756,
+      1.6725249038764467,
+      0.252459891499413,
+      0.1888741985588993
+    ],
+    "control_clip_steps": 6178,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 224,
+    "segments": 36,
+    "elastic_connections": 72,
+    "size_mm": [
+      160.0,
+      150.0,
+      80.0
+    ],
+    "mass_kg": 0.2900000015999997
+  },
+  "warnings": {}
+}

@@ -498,3 +498,8 @@
 成功样本跟踪峰值42–43mm，系数0两例均失夹；任务完成不等于整套物理验收。[报告](../test/flex3d/REPORT.md#分段内容物-v13-接入本轮计划2026-11-09ubun)。
 已导出易弯/易压45°抓取视频；新增整体响应κ的真实CPU调参界面，3项物理检查及HTTP/JS契约通过，浏览器未验。
 [视频](../video/README.md) · [κ界面](../test/content_model/TOOLS.md) · [界面检查](../reports/segmented-parameter-ui-test.md)。
+
+
+2026-11-09 分段内容物大小/比例展示：三种同密度尺度、三种等体积等质量比例，各1次45°统一YAM任务，5 success/1扁平包grasp_fail，无模型失效/警告。
+六段单片＋两段固定镜头并排视频已完成并全解码检查；大包穿透1.065mm、跟踪峰30.45–48.18mm，仍非完整物理验收。
+形状仅为长方体比例，不宣称圆柱/圆枕支持；[视频](../video/README.md#改变大小与形状比例) · [实验报告](../test/flex3d/REPORT.md#分段内容物尺寸与形状比例视频本轮计划2026-11-09ubun) · [检查](../reports/segmented-size-shape-test.md)。

@@ -20,6 +20,13 @@ YAM 快递堆视频为归档试次按原配置重放后的连续积分状态，3
 
 14次矩阵为4任务success、5抓取失败、5初始化失败；成功样本跟踪峰值约42–43mm，未宣称完整物理验收。[实验报告](../test/flex3d/REPORT.md#分段内容物-v13-接入本轮计划2026-11-09ubun) · [帧数、CPU渲染与完整解码检查](../test/runs/2026-11-09/contents/segmented-v13-yam-r1/video-checks.json)。
 
+### 改变大小与形状比例
+
+- [小 / 中 / 大并排](../test/runs/2026-11-09/contents/segmented-size-shape-r1/videos/size-comparison.mp4)：180×120×37.5、240×160×50、288×192×60mm，同密度，质量随体积变化。
+- [长条 / 扁平 / 厚块并排](../test/runs/2026-11-09/contents/segmented-size-shape-r1/videos/shape-comparison.mp4)：320×120×50、200×240×40、160×150×80mm，同体积、同质量约0.29kg。
+
+实际重建几何并运行同一45°抓取，镜头距离/角度固定，12fps/1倍速；短的一侧结束后明确标注保持末帧。扁平包在合拢结束未满足捏取资格，其余五次为任务success；跟踪仍偏大，大包穿透峰1.065mm，未宣称物理验收通过。形状仅指长方体比例，未实现圆柱/圆枕。[实验/命令](../test/flex3d/REPORT.md#分段内容物尺寸与形状比例视频本轮计划2026-11-09ubun) · [八个MP4检查](../test/runs/2026-11-09/contents/segmented-size-shape-r1/videos/video-checks.json)。
+
 ## 薄膜与自由颗粒
 
 [GPU 连续 5 秒落袋与重排](flex_granular_gpu5s.mp4)：64 个直径 16 mm 的自由球粒、98 个 2D flex 膜顶点，单环境 GPU 连续 10000 步，100 Hz 记录、25 fps/1 倍速回放。左为半透明袋膜，右为线框内视；无机械臂动作。
