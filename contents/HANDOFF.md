@@ -52,18 +52,20 @@
 
 ## 4. 文件地图
 
-所有内容物代码都在 `/home/ubuntu/Dev/Projects/random/contents/` 下，按方案线分成三个子文件夹。各脚本的默认结果目录相对于脚本自身，从任何目录启动都写回原处。
+模型代码按方案和实际版本放在 `contents/`，版本索引见 [README.md](README.md)。独立测试、验收、分析、测速与查看器在 [test/content_model/](../test/content_model/TOOLS.md)，Newton 接触诊断在 `test/contact_transfer/`；新结果按 [日期与对象](../test/runs/README.md)管理。历史冻结包与旧结果保留原路径。
 
 ```
 contents/
 ├── HANDOFF.md
 ├── package_params.md   参数向量 κ 规格（设计）
 ├── segment_model.md    分段刚体内容物模型（设计，当前主线）
-├── segment/      当前主线（模型、采样器、MuJoCo 适配、换算表、逐轮测试；第 2 轮结果在 segment/results/round2/）
-├── particle/   粒子键模型（已停止，MuJoCo / MJWarp）
+├── segment/      当前主线（模型、采样器、MuJoCo 适配、换算表；第 2 轮结果在 segment/results/round2/）
+├── legacy/particle/   粒子键模型（已停止，MuJoCo / MJWarp）
 ├── newton/     旧 Newton 实验、接触诊断和暂停的压密本构；四面体生成器供代理测试线参考
-└── rigid/      硬物模型和最早的统一结构原型
+└── legacy/rigid/      硬物模型和最早的统一结构原型
 ```
+
+独立脚本的当前路径与运行说明统一见 [测试入口表](../test/content_model/TOOLS.md)；下表的历史文件名用于对应既有轮次。
 
 ### `segment/`：当前实现与接入约定
 
@@ -100,7 +102,7 @@ sim.step()  # 必须由该入口计算连接力；直接 mj_step 不包含 bushi
 
 I-27：`scene(..., worldbody="", contact="", equality="", tendon="", pad_contact=True, table_contact=True, solver=None)`，外加片段不带外层节标签；`solver="Newton"`（默认）或 `"CG"`。开关只禁内容物直触，外来 tendon 按名称与内容物分开，不再补零 `TendonInfo`。袋子线请删旧 `bag_rope` 补丁；装袋组合仍由袋子线验收。CPU 构建必须保留 `omega_max=adapter.OMEGA_MAX`，否则不是验收配置。
 
-### `particle/`：粒子键模型（已停止）
+### `legacy/particle/`：粒子键模型（已停止）
 
 | 文件 | 作用 | 状态 |
 |---|---|---|
@@ -124,7 +126,7 @@ I-27：`scene(..., worldbody="", contact="", equality="", tendon="", pad_contact
 | `i11_finger_off.py`、`ef_*.py` | 边/面接触抖动的诊断脚本，调用 `../test/contact_transfer/benchmark.py`；说明见 `../test/contact_transfer/REPORT_diagnosis.md` |
 | `results_newton/`、`results_unified/` | 结果 |
 
-### `rigid/`：硬物与早期原型
+### `legacy/rigid/`：硬物与早期原型
 
 | 文件 | 作用 | 状态 |
 |---|---|---|
@@ -203,11 +205,11 @@ I-27：`scene(..., worldbody="", contact="", equality="", tendon="", pad_contact
 
 ## 9. 常用命令
 
-本轮已执行入口（工作目录 `contents/segment/`；列出用于定位与复现，不是仍待执行的任务。直接重跑会覆盖本轮结果，须先规划下一轮输出目录）：
+历史轮次的入口现已迁至 `test/content_model/`（工作目录为仓库根目录；列出用于定位与复现，不是仍待执行的任务。直接重跑会覆盖本轮结果，须先规划下一轮输出目录）：
 
 ```bash
-flock /tmp/claude-gpu.lock /home/ubuntu/Dev/Envs/mjwarp/bin/python -B run_round2.py s1 s5 s6 --workers 30
-flock /tmp/claude-gpu.lock /home/ubuntu/Dev/Envs/mjwarp/bin/python -B mjwarp_validate.py --nworld 1024
+flock /tmp/claude-gpu.lock /home/ubuntu/Dev/Envs/mjwarp/bin/python -B test/content_model/run_round2.py s1 s5 s6 --workers 30
+flock /tmp/claude-gpu.lock /home/ubuntu/Dev/Envs/mjwarp/bin/python -B test/content_model/mjwarp_validate.py --nworld 1024
 ```
 
 以下为旧路线命令，保留用于查看历史模型，不是当前分段模型的验收入口：
@@ -217,23 +219,23 @@ C=/home/ubuntu/Dev/Projects/random/contents
 PY=/home/ubuntu/Dev/Envs/mjwarp/bin/python
 
 # 交互查看（flat | blob | pillow）
-DISPLAY=:1 $PY -B $C/particle/view_soft.py pillow
+DISPLAY=:1 $PY -B $C/legacy/particle/view_soft.py pillow
 
 # 单项测试（shape: flat | blob | pillow；test: settle | cantilever | squeeze | finger | edge_lift | top_pinch）
-$PY -B $C/particle/particle_tests.py pillow squeeze
+$PY -B $C/legacy/particle/particle_tests.py pillow squeeze
 
 # 闭环标定
-$PY -B $C/particle/calibrate.py pillow --rounds 4
+$PY -B $C/legacy/particle/calibrate.py pillow --rounds 4
 
 # MJWarp：验证 GPU 与 CPU 一致，测批量速度
-$PY -B $C/particle/mjwarp_soft.py check
-$PY -B $C/particle/mjwarp_soft.py speed --worlds 1 64 256 512
+$PY -B $C/legacy/particle/mjwarp_soft.py check
+$PY -B $C/legacy/particle/mjwarp_soft.py speed --worlds 1 64 256 512
 
 # Newton 实验（用 Newton 1.6.1 环境；1.7.0 不接受标量重力，需改成向量）
-/home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/bin/python -B $C/newton/unified_tests.py folded_clothing speed
+/home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/bin/python -B $C/../test/contact_transfer/unified_tests.py folded_clothing speed
 
 # 硬物（用 MuJoCo 3.14 环境）
-/home/ubuntu/Dev/Envs/mujoco_env/bin/python -B $C/rigid/run_tests.py
+/home/ubuntu/Dev/Envs/mujoco_env/bin/python -B $C/legacy/rigid/run_tests.py
 ```
 
 ## 10. 尚未确认的假设

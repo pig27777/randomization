@@ -1,0 +1,213 @@
+COMMAND: ['/home/ubuntu/workspace/gzl/randomization/.venv/bin/python', '-B', '-m', 'unittest', 'discover', '-s', 'test/content_model/tests', '-t', 'test/content_model', '-v']
+STARTED: 2026-11-09T17:00:43.063752+08:00
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Module warp_v13 18fd9cb load on device 'cpu' took 0.66 ms  (cached)
+Module warp_effects 64dc750 load on device 'cpu' took 0.14 ms  (cached)
+E4 agreement 1.0000 hard None gpu sim_fail 0 cpu sim_fail 0 buckets [1]
+E5 agreement 0.9400 hard None gpu sim_fail 0 cpu sim_fail 0 buckets [1]
+G3 passed False
+E4 agreement 0.9444 hard None gpu sim_fail 0 cpu sim_fail 0 buckets [1]
+G3 passed False
+E4 agreement 0.9500 hard None gpu sim_fail 0 cpu sim_fail 0 buckets [1]
+E5 agreement 0.9600 hard None gpu sim_fail 0 cpu sim_fail 0 buckets [1]
+G3 passed True
+
+test_random_entry_preserves_required_auto_locks (tests.test_acceptance_entry.AcceptanceEntryTest.test_random_entry_preserves_required_auto_locks) ... ok
+test_biaxial_pad_release_without_reset (tests.test_bushing.BushingTest.test_biaxial_pad_release_without_reset)
+Four pads physically squeeze a free block from rest, then leave; no pose/velocity reset. ... ok
+test_compaction_recovers_after_real_unloading (tests.test_bushing.BushingTest.test_compaction_recovers_after_real_unloading)
+Remove the balancing loads, without resetting position/velocity: uniaxial and biaxial blocks ... ok
+test_compaction_welds_switch_across_the_squeeze (tests.test_bushing.BushingTest.test_compaction_welds_switch_across_the_squeeze)
+Squeezing a 2x2x2 block along z to 0.95 x lock welds its x and y connections at their current ... ok
+test_declared_stiffness_and_force (tests.test_bushing.BushingTest.test_declared_stiffness_and_force) ... ok
+test_energy_gradient_across_a_closed_block (tests.test_bushing.BushingTest.test_energy_gradient_across_a_closed_block) ... ok
+test_energy_gradient_momentum_and_damping (tests.test_bushing.BushingTest.test_energy_gradient_momentum_and_damping) ... ok
+test_export_cannot_silently_omit_pair_forces (tests.test_bushing.BushingTest.test_export_cannot_silently_omit_pair_forces) ... ok
+test_native_damping_matches_declared_coefficients (tests.test_bushing.BushingTest.test_native_damping_matches_declared_coefficients)
+At the rest pose the tendon dampers give the face-frame damping diag(c_trans, c_rot). ... ok
+test_native_step_receives_the_elastic_impulse (tests.test_bushing.BushingTest.test_native_step_receives_the_elastic_impulse) ... ok
+test_native_stops_engage_at_the_declared_locks (tests.test_bushing.BushingTest.test_native_stops_engage_at_the_declared_locks)
+Inner fibres reach their lower limit at straight compression to the lock and at lock_bend unloaded; ... ok
+test_invalid_boundary_inputs (tests.test_freeze_interfaces.FreezeInterfacesTest.test_invalid_boundary_inputs) ... ok
+test_outside_new_mapping_is_rejected (tests.test_freeze_interfaces.FreezeInterfacesTest.test_outside_new_mapping_is_rejected) ... ok
+test_rj_geometry_mass_pairing_and_log_ranges (tests.test_freeze_interfaces.FreezeInterfacesTest.test_rj_geometry_mass_pairing_and_log_ranges) ... ok
+test_specified_category_and_constraints (tests.test_freeze_interfaces.FreezeInterfacesTest.test_specified_category_and_constraints) ... ok
+test_speed_only_is_diagnostic_but_overlap_fails (tests.test_freeze_interfaces.FreezeInterfacesTest.test_speed_only_is_diagnostic_but_overlap_fails) ... ok
+test_changed_archive_is_rejected (tests.test_frozen_release.FrozenReleaseTest.test_changed_archive_is_rejected) ... ok
+test_changed_or_missing_model_is_rejected (tests.test_frozen_release.FrozenReleaseTest.test_changed_or_missing_model_is_rejected) ... ok
+test_relocated_driver_keeps_original_release_verifiable (tests.test_frozen_release.FrozenReleaseTest.test_relocated_driver_keeps_original_release_verifiable) ... ok
+test_two_sided_contact_becomes_one_sided_support (tests.test_gpu_contact_buffer.ContactBufferTest.test_two_sided_contact_becomes_one_sided_support) ... ok
+test_e5_failure_cannot_be_hidden_by_e4 (tests.test_gpu_continuation.ContinuationTest.test_e5_failure_cannot_be_hidden_by_e4) ... ok
+test_failed_e4_stops_before_e5_and_saves_partial_summary (tests.test_gpu_continuation.ContinuationTest.test_failed_e4_stops_before_e5_and_saves_partial_summary) ... ok
+test_g4_requires_complete_passing_g3_and_source_audit (tests.test_gpu_continuation.ContinuationTest.test_g4_requires_complete_passing_g3_and_source_audit) ... ok
+test_hard_force_gate_is_preserved (tests.test_gpu_continuation.ContinuationTest.test_hard_force_gate_is_preserved) ... ok
+test_nonfinite_json_is_rejected (tests.test_gpu_continuation.ContinuationTest.test_nonfinite_json_is_rejected) ... ok
+test_passing_sets_complete_the_stage (tests.test_gpu_continuation.ContinuationTest.test_passing_sets_complete_the_stage) ... ok
+test_saved_e4_is_below_gate_and_not_formal_completion (tests.test_gpu_continuation.ContinuationTest.test_saved_e4_is_below_gate_and_not_formal_completion) ... ok
+test_truncated_gpu_output_is_rejected (tests.test_gpu_continuation.ContinuationTest.test_truncated_gpu_output_is_rejected) ... ok
+test_wrong_result_order_or_protocol_is_rejected (tests.test_gpu_continuation.ContinuationTest.test_wrong_result_order_or_protocol_is_rejected) ... ok
+test_active_shared_field_splits_and_constructor_rejects_it (tests.test_gpu_model_batching.ModelBatchingTest.test_active_shared_field_splits_and_constructor_rejects_it) ... ok
+test_batched_mass_really_uploads_each_model (tests.test_gpu_model_batching.ModelBatchingTest.test_batched_mass_really_uploads_each_model) ... ok
+test_cpu_only_derived_arrays_do_not_fragment_buckets (tests.test_gpu_model_batching.ModelBatchingTest.test_cpu_only_derived_arrays_do_not_fragment_buckets) ... ok
+test_mixed_sleep_flags_are_rejected (tests.test_gpu_model_batching.ModelBatchingTest.test_mixed_sleep_flags_are_rejected) ... ok
+test_sleep_only_array_can_differ_only_with_sleep_disabled (tests.test_gpu_model_batching.ModelBatchingTest.test_sleep_only_array_can_differ_only_with_sleep_disabled) ... ok
+test_actual_current_force_and_low_passed_release (tests.test_pinch.PinchTest.test_actual_current_force_and_low_passed_release) ... ok
+test_band_keeps_both_sides_of_an_opened_seam (tests.test_pinch.PinchTest.test_band_keeps_both_sides_of_an_opened_seam) ... ok
+test_connection_carries_native_load_and_detaches (tests.test_pinch.PinchTest.test_connection_carries_native_load_and_detaches) ... ok
+test_connection_fixes_the_point_but_not_rotation (tests.test_pinch.PinchTest.test_connection_fixes_the_point_but_not_rotation) ... ok
+test_connections_span_a_seam_and_share_the_weight (tests.test_pinch.PinchTest.test_connections_span_a_seam_and_share_the_weight) ... ok
+test_eligibility_depth_and_both_contacts (tests.test_pinch.PinchTest.test_eligibility_depth_and_both_contacts) ... ok
+test_first_contact_starts_press_with_only_one_finger (tests.test_pinch.PinchTest.test_first_contact_starts_press_with_only_one_finger) ... ok
+test_multi_segment_release_and_tips_outside (tests.test_pinch.PinchTest.test_multi_segment_release_and_tips_outside) ... ok
+test_native_table_contact_and_clearance (tests.test_pinch.PinchTest.test_native_table_contact_and_clearance) ... ok
+test_native_top_contacts_and_yam_dimensions (tests.test_pinch.PinchTest.test_native_top_contacts_and_yam_dimensions) ... ok
+test_parameter_boundary_and_sampling_pair (tests.test_pinch.PinchTest.test_parameter_boundary_and_sampling_pair) ... ok
+test_real_contact_and_spring_force_add (tests.test_pinch.PinchTest.test_real_contact_and_spring_force_add) ... ok
+test_rigid_never_binds (tests.test_pinch.PinchTest.test_rigid_never_binds) ... ok
+test_spring_requires_eligibility_and_10mm_gathering (tests.test_pinch.PinchTest.test_spring_requires_eligibility_and_10mm_gathering) ... ok
+test_capacity_is_observed_before_binding (tests.test_pinch_v14.PinchCandidateTest.test_capacity_is_observed_before_binding) ... ok
+test_compression_is_not_pull_off_but_shear_and_tension_are (tests.test_pinch_v14.PinchCandidateTest.test_compression_is_not_pull_off_but_shear_and_tension_are) ... ok
+test_default_spring_curve_stays_equal_to_reference (tests.test_pinch_v14.PinchCandidateTest.test_default_spring_curve_stays_equal_to_reference) ... ok
+test_depth_is_configurable_without_changing_geometry (tests.test_pinch_v14.PinchCandidateTest.test_depth_is_configurable_without_changing_geometry) ... ok
+test_force_decomposition_rotates_with_tool (tests.test_pinch_v14.PinchCandidateTest.test_force_decomposition_rotates_with_tool) ... ok
+test_measured_claim_requires_real_hashed_evidence (tests.test_pinch_v14.PinchCandidateTest.test_measured_claim_requires_real_hashed_evidence) ... ok
+test_short_grip_dip_is_rejected_but_sustained_weak_grip_releases (tests.test_pinch_v14.PinchCandidateTest.test_short_grip_dip_is_rejected_but_sustained_weak_grip_releases) ... ok
+test_sustained_loss_of_grip_cannot_hold_indefinitely (tests.test_pinch_v14.PinchCandidateTest.test_sustained_loss_of_grip_cannot_hold_indefinitely) ... ok
+test_all_constraints_hold (tests.test_sampling.SamplingTest.test_all_constraints_hold) ... ok
+test_categories (tests.test_sampling.SamplingTest.test_categories) ... ok
+test_reproducible_and_buildable (tests.test_sampling.SamplingTest.test_reproducible_and_buildable) ... ok
+test_speed (tests.test_sampling.SamplingTest.test_speed) ... ok
+test_all_fragments_with_external_tendon_and_mobile_mass (tests.test_scene_extensions.SceneExtensionsTest.test_all_fragments_with_external_tendon_and_mobile_mass) ... ok
+test_default_and_explicit_solver (tests.test_scene_extensions.SceneExtensionsTest.test_default_and_explicit_solver) ... ok
+test_pad_switch_and_caller_contact (tests.test_scene_extensions.SceneExtensionsTest.test_pad_switch_and_caller_contact) ... ok
+test_table_contact_switch_preserves_table_and_self_contact (tests.test_scene_extensions.SceneExtensionsTest.test_table_contact_switch_preserves_table_and_self_contact) ... ok
+
+----------------------------------------------------------------------
+Ran 64 tests in 11.339s
+
+OK
+
+EXIT: 0
+
+COMMAND: ['/home/ubuntu/workspace/gzl/randomization/.venv/bin/python', '-B', '-m', 'unittest', 'discover', '-s', 'test/bag_model', '-p', 'test_*.py', '-v']
+STARTED: 2026-11-09T17:00:55.354945+08:00
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Module effect_control 5cca322 load on device 'cpu' took 0.64 ms  (cached)
+Module effect_control aa356ed load on device 'cuda:0' took 0.40 ms  (cached)
+Module mujoco_warp._src.smooth f9b8e80 load on device 'cpu' took 0.21 ms  (cached)
+Module _subtree_com_acc__locals__kernel_3896ce10 22555fd load on device 'cpu' took 0.10 ms  (cached)
+Module _crb_accumulate__locals__kernel_90ab7522 3e755b4 load on device 'cpu' took 0.09 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_ca86cb1a 0e3575a load on device 'cpu' took 0.10 ms  (cached)
+Module _nxn_broadphase__locals__kernel_0dcff9d2 8df3760 load on device 'cpu' took 0.10 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_25442a3d 4c5e2e6 load on device 'cpu' took 0.13 ms  (cached)
+Module mujoco_warp._src.constraint 3c4bce4 load on device 'cpu' took 0.10 ms  (cached)
+Module _friction_dof__locals__kernel_f927ceb8 10edc0c load on device 'cpu' took 0.11 ms  (cached)
+Module _efc_contact_init__locals__kernel_e6485be6 3e3b28a load on device 'cpu' took 0.10 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_8249addb 4283e7e load on device 'cpu' took 0.10 ms  (cached)
+Module _efc_contact_update__locals__kernel_9ca739ea c6d4e47 load on device 'cpu' took 0.10 ms  (cached)
+Module mujoco_warp._src.passive 15475de load on device 'cpu' took 0.11 ms  (cached)
+Module _gravity_force__locals__kernel_ae06eb60 30949ff load on device 'cpu' took 0.10 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_887f05a4 232356d load on device 'cpu' took 0.09 ms  (cached)
+Module _cfrc_backward__locals__kernel_a834cc03 18f0bfb load on device 'cpu' took 0.10 ms  (cached)
+Module mujoco_warp._src.derivative 5f8a9df load on device 'cpu' took 0.13 ms  (cached)
+Module _regularize_constraint__locals__kernel_a3ad15cb 2193c0c load on device 'cpu' took 0.10 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5d93552d 256e532 load on device 'cpu' took 0.09 ms  (cached)
+Module mujoco_warp._src.support 795a51f load on device 'cpu' took 0.09 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_ebc933cb ae4d594 load on device 'cpu' took 0.09 ms  (cached)
+Module mujoco_warp._src.solver 202ae48 load on device 'cpu' took 0.17 ms  (cached)
+Module _solve_init_dof__locals__kernel_08db194e b859e27 load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_2e9bf76d 4037495 load on device 'cpu' took 0.10 ms  (cached)
+Module mul_m_kernel__locals___mul_m_2eb0ef19 2c35d76 load on device 'cpu' took 0.09 ms  (cached)
+Module _eff_mul_diag__locals__kernel_3662596d 3691b94 load on device 'cpu' took 0.09 ms  (cached)
+Module _update_constraint_efc__locals__kernel_c81c55ec 26287bc load on device 'cpu' took 0.10 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1f63a94a ae6ee6f load on device 'cpu' took 0.09 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_eeeb13da abe3e46 load on device 'cpu' took 0.09 ms  (cached)
+Module _update_gradient_grad__locals__kernel_6b3af6f7 687b0e3 load on device 'cpu' took 0.09 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_44636bb8 14a4457 load on device 'cpu' took 0.10 ms  (cached)
+Module _update_gradient_JTCJ_dense__locals__kernel_d7996384 13cc319 load on device 'cpu' took 0.10 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_3593b5eb 9a536f9 load on device 'cpu' took 0.10 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_4e0377b2 7a3c6e2 load on device 'cpu' took 0.11 ms  (cached)
+Module _solve_done__locals__kernel_f10f2c47 ac1afe1 load on device 'cpu' took 0.09 ms  (cached)
+Module mul_m_kernel__locals___mul_m_8d81580e c6cba9a load on device 'cpu' took 0.10 ms  (cached)
+Module _eff_mul_diag__locals__kernel_53dab588 6481674 load on device 'cpu' took 0.09 ms  (cached)
+Module flex_constraint_residual 88dcc8b load on device 'cpu' took 0.10 ms  (cached)
+Module _update_gradient_grad_tiled_4f62362e 787e055 load on device 'cpu' took 0.17 ms  (cached)
+Module _solve_init_search_cg_tiled_240cd537 2b67ad9 load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_beta_finalize_tiled__locals__kernel_bf0a8476 da8d6dd load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_search_update_cg_tiled_864994a7 5a92448 load on device 'cpu' took 0.09 ms  (cached)
+Module _friction_dof__locals__kernel_1de789ae e9ab4b7 load on device 'cpu' took 0.17 ms  (cached)
+Module _efc_contact_init__locals__kernel_b89af1bd c158158 load on device 'cpu' took 0.10 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_d224b831 62d3bf3 load on device 'cpu' took 0.10 ms  (cached)
+Module _regularize_constraint__locals__kernel_72459ca3 da53045 load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_init_dof__locals__kernel_a80c928f 4d44bca load on device 'cpu' took 0.10 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_04e70926 dce3d97 load on device 'cpu' took 0.09 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_6aed0c06 2768d8e load on device 'cpu' took 0.10 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_d97c8041 c4ca830 load on device 'cpu' took 0.09 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_764940cd 764940c load on device 'cpu' took 0.11 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_60089891 5cda376 load on device 'cpu' took 0.10 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_779beb91 9f32099 load on device 'cpu' took 0.11 ms  (cached)
+Module _friction_dof__locals__kernel_5f08210a 0858778 load on device 'cpu' took 0.18 ms  (cached)
+Module _efc_contact_init__locals__kernel_0d374f6d 9e8df2c load on device 'cpu' took 0.11 ms  (cached)
+Module _pcg_init_tiled_b4d5fa74 2c6c2d4 load on device 'cpu' took 0.14 ms  (cached)
+Module _eff_mul_diag_and_csr__locals__kernel_0b34287f 2c10c13 load on device 'cpu' took 0.09 ms  (cached)
+Module _pcg_pAp_step_and_check_tiled_83413ed8 e1d9139 load on device 'cpu' took 0.09 ms  (cached)
+Module _pcg_beta_and_p_update_tiled_af3156cc 945c98b load on device 'cpu' took 0.09 ms  (cached)
+Module _eff_mul_diag_and_csr__locals__kernel_0ed7f8a8 56814ec load on device 'cpu' took 0.09 ms  (cached)
+Module flex_residual 6800894 load on device 'cpu' took 0.11 ms  (cached)
+Module soft_flex_adapter a6d7a1e load on device 'cpu' took 0.17 ms  (cached)
+Module warp_effects 64dc750 load on device 'cpu' took 0.11 ms  (cached)
+
+test_all_phases_and_events (test_effect_control.DeviceControlTest.test_all_phases_and_events) ... ok
+test_anchor_uses_local_frame_and_only_bound_world (test_effect_control.DeviceControlTest.test_anchor_uses_local_frame_and_only_bound_world) ... ok
+test_diagnostics_latch_nonfinite_overflow_and_escape (test_effect_control.DeviceControlTest.test_diagnostics_latch_nonfinite_overflow_and_escape) ... ok
+test_graph_stops_before_post_completion_overload (test_effect_control.DeviceControlTest.test_graph_stops_before_post_completion_overload) ... ok
+test_lost_contact_over_squeeze_and_timeout (test_effect_control.DeviceControlTest.test_lost_contact_over_squeeze_and_timeout) ... ok
+test_native_contact_newton_cg_dense_sparse_read_only (test_flex_constraint_residual.ConstraintResidualTest.test_native_contact_newton_cg_dense_sparse_read_only) ... ok
+test_zero_rows_nonfinite_and_reset (test_flex_constraint_residual.ConstraintResidualTest.test_zero_rows_nonfinite_and_reset) ... ok
+test_curved_rest_normal_force_and_unchanged_other_coefficients (test_flex_curvature.CurvedReferenceTest.test_curved_rest_normal_force_and_unchanged_other_coefficients) ... ok
+test_force_scales_with_area_when_lengths_and_thickness_scale (test_flex_curvature.CurvedReferenceTest.test_force_scales_with_area_when_lengths_and_thickness_scale) ... ok
+test_wrong_material_input_is_rejected_without_partial_mutation (test_flex_curvature.CurvedReferenceTest.test_wrong_material_input_is_rejected_without_partial_mutation) ... ok
+test_discrete_adapter_keeps_native_passive_on_physical_model (test_flex_metric.ConvexMetricTest.test_discrete_adapter_keeps_native_passive_on_physical_model) ... ok
+test_other_state_is_shared_and_rebuild_only_calls_metric_stages (test_flex_metric.ConvexMetricTest.test_other_state_is_shared_and_rebuild_only_calls_metric_stages) ... ok
+test_selection_preserves_physical_coefficients_and_curved_term (test_flex_metric.ConvexMetricTest.test_selection_preserves_physical_coefficients_and_curved_term) ... ok
+test_native_flex_pcg_refines_same_equation_and_keeps_other_state (test_flex_residual.ResidualTest.test_native_flex_pcg_refines_same_equation_and_keeps_other_state) ... ok
+test_native_metric_and_rhs_are_read_only (test_flex_residual.ResidualTest.test_native_metric_and_rhs_are_read_only) ... ok
+test_normalization_zero_rhs_nonfinite_and_first_failure (test_flex_residual.ResidualTest.test_normalization_zero_rhs_nonfinite_and_first_failure) ... ok
+test_refinement_rejects_worse_or_nonfinite_candidates (test_flex_residual.ResidualTest.test_refinement_rejects_worse_or_nonfinite_candidates) ... ok
+test_point_force_and_virtual_work_use_the_same_material_point (test_interpolated_bag.InterpolatedBagTest.test_point_force_and_virtual_work_use_the_same_material_point) ... ok
+test_same_fine_geometry_material_contact_and_total_mass (test_interpolated_bag.InterpolatedBagTest.test_same_fine_geometry_material_contact_and_total_mass) ... ok
+test_cpu_classifies_flex_content_and_excludes_other_contacts (test_soft_flex_adapter.FlexContactTest.test_cpu_classifies_flex_content_and_excludes_other_contacts) ... ok
+test_packed_flex_contacts_match_cpu_compaction (test_soft_flex_adapter.FlexContactTest.test_packed_flex_contacts_match_cpu_compaction) ... ok
+test_packing_reports_overflow_without_invalid_write (test_soft_flex_adapter.FlexContactTest.test_packing_reports_overflow_without_invalid_write) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 1.152s
+
+OK
+
+EXIT: 0
+
+COMMAND: ['/home/ubuntu/workspace/gzl/randomization/.venv/bin/python', '-B', '-m', 'unittest', 'discover', '-s', 'test/flex3d', '-p', 'test_platform.py', '-v']
+STARTED: 2026-11-09T17:00:57.548050+08:00
+
+test_actual_connect_pull_releases_and_press_does_not (test_platform.LoadProjectionTest.test_actual_connect_pull_releases_and_press_does_not) ... ok
+test_horizontal_component_counts_toward_capacity (test_platform.LoadProjectionTest.test_horizontal_component_counts_toward_capacity) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.014s
+
+OK
+
+EXIT: 0

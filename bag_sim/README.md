@@ -18,23 +18,31 @@ bag_sim/
 ├── geometry/               四个袋子的参考网格（npz）
 ├── textures/               对应纹理
 ├── make_bubble_geometry.py 用旧袋拓扑生成气泡袋网格（结果与 geometry/bubble_180x240.npz 逐位一致）
-├── demo_newton.py          空袋掉到台阶上（录制）
-├── demo_contents.py        袋内装刚体网格、桌面静置（录制+检查）
 ├── wrap.py                 把袋网格包到内容物外的初始化 wrap_generic（纯 numpy，Newton 与 MuJoCo 共用）和包含判定 winding_number
 ├── mj_loose.py             MuJoCo 3.17 松装袋表示（薄板片 plates / flex 薄膜），装 contents/segment 的分段内容物（第 1 轮 C2）
-├── loose_protocols.py      松装袋的任务协议 evaluate()（照 policy/env.py 流程）和 R2、R3
-├── loose_speed.py          C3：单环境实时率与 28 进程 evaluate/s
-├── c1_newton.py            C1：Newton 牛皮纸袋装硬盒的 R2、R3（复用 proxy_eval 的指垫驱动）
-├── render_demo.py          用 MuJoCo 离屏渲染录制结果并拼 GIF
-├── check_newton.py         Newton 检查：悬臂、压板、参数文件运行
-├── check_unified.py        MuJoCo 检查：与原 runtime.py 的回归、缓冲压板
 ├── self_clearance.py       诊断：VBD 会评估的点-三角形对的最小距离
 ├── legacy/                 旧袋的初始化与内容物工具（asset_mesh / contents / initialization），原样复制
 ├── reference/              原 runtime.py 与三类资产（仅供 MuJoCo 回归），LICENSES 与 PROVENANCE
 └── outputs/                GIF/PNG、录制 npz（recordings/）、内容物 OBJ（meshes/）；第 1 轮结果在 outputs/round1/
 ```
 
+独立检查、演示、行为验证、分析和测速已移至 [test/bag_model/](../test/bag_model/README.md)。本目录维护建模、材料、几何与共享后端；新测试结果按 [日期与对象](../test/runs/README.md)管理。
+
 来源：`soft-deformable-four-assets-only-20261022`（与 `real2sim/soft-package-assets` 相同）。原资产未改动；旧工作目录 `assets/unified/` 已并入本目录。
+
+## 建模方案与版本入口
+
+| 版本或方案 | 模型文件与参数 |
+| --- | --- |
+| 原始四资产 / MuJoCo 3.14 对照 | `reference/`、原资产包，保持原始来源和内容 |
+| 统一材料模型 / Newton VBD | `bag_model.py`、`newton_bag.py`、`bending_history.py`、`profiles/` |
+| 薄板片与 2D flex 袋 | `mj_loose.py`、`flex_geometry.py`、`wrap.py`、`loose_setup.py` |
+| Round 3 效果袋 | `effect_model.py`、`film_pinch.py`，冻结内容物通过 `frozen_content.py` 接入 |
+| 完整 flex 与软内容物联合求解 | `soft_flex_adapter.py`、`soft_content_backend.py`、`flex_*` 辅助模块 |
+| 静态插值袋候选 | `interpolated_bag.py` |
+| 原生 3D flex 内容物 / 整包候选 | `native_flex_contents.py`、`native_flex_gpu.py` |
+
+以上使用已有方案名称，不代表都已验收或冻结；具体边界以本文最新状态和 [实验报告](../test/bag_model/REPORT.md) 为准。`outputs/` 中的旧证据和被显式引用的后端快照保留原位；独立测试代码统一在 `test/`。
 
 ## 2 环境与运行
 
@@ -45,17 +53,17 @@ bag_sim/
 | MuJoCo 后端、渲染 | `/home/ubuntu/Dev/Envs/mujoco_env/bin/python` | MuJoCo 3.14.0（代码强制） |
 | Newton 后端 | `/home/ubuntu/Dev/Projects/real2sim/bubble_mailer/.venv/bin/python` | Newton 1.6.1、Warp 1.18、Python 3.11、RTX 5090 |
 
-在本目录下运行：
+从仓库根目录运行：
 
 ```bash
 NP=/home/ubuntu/Dev/Projects/real2sim/bubble_mailer/.venv/bin/python
 MP=/home/ubuntu/Dev/Envs/mujoco_env/bin/python
-$NP -B demo_contents.py book --profile bubble --seconds 1.5          # 装内容物静置；--set '{"key": value}' 临时覆盖参数
-$NP -B demo_newton.py pe --seconds 2                                  # 空袋掉落
-$MP -B render_demo.py frames outputs/bubble_book.npz                  # 渲染帧（写 *_frames.npy，约 35 MB/段）
-$NP -B render_demo.py gif outputs/x.gif --seconds 1.5 outputs/bubble_book_frames.npy
-$NP -B check_newton.py cantilever grid 20 | press 20 120 2 | profile pe 0.3
-$MP -B check_unified.py regression pe                                 # 应输出 max_position_difference_m: 0.0
+$NP -B test/bag_model/demo_contents.py book --profile bubble --seconds 1.5          # 装内容物静置；--set '{"key": value}' 临时覆盖参数
+$NP -B test/bag_model/demo_newton.py pe --seconds 2                                  # 空袋掉落
+$MP -B test/bag_model/render_demo.py frames bag_sim/outputs/bubble_book.npz                  # 渲染帧（写 *_frames.npy，约 35 MB/段）
+$NP -B test/bag_model/render_demo.py gif bag_sim/outputs/x.gif --seconds 1.5 bag_sim/outputs/bubble_book_frames.npy
+$NP -B test/bag_model/check_newton.py cantilever grid 20 | press 20 120 2 | profile pe 0.3
+$MP -B test/bag_model/check_unified.py regression pe                                 # 应输出 max_position_difference_m: 0.0
 ```
 
 代码调用：

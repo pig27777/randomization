@@ -6,10 +6,10 @@
 
 | 想了解什么 | 入口 |
 | --- | --- |
-| 项目目标、内容物现状和下一步 | [内容物交接](contents/HANDOFF.md) |
+| 内容物版本、现状和下一步 | [建模版本](contents/README.md) · [内容物交接](contents/HANDOFF.md) |
 | 外袋模型、接口与环境 | [袋子说明](bag_sim/README.md) |
 | 最近发生了什么 | [进度流水](log/progress.md) |
-| 实验计划、结果与复现证据 | [实验导航](test/README.md) |
+| 实验计划、结果与复现证据 | [按对象查](test/README.md) · [按日期查](test/runs/README.md) |
 | 机械臂抓取、模型对比、轨迹与测速 | [统一抓取平台](test/flex3d/README.md) |
 | 已讨论的方向与待办 | [决策](log/decisions.md) · [想法池](log/ideas.md) |
 | 展示视频及其限制 | [视频说明](video/README.md) |
@@ -21,12 +21,12 @@
 
 ```text
 randomization/
-├── contents/        内容物模型、参数设计与交接；segment/ 为当前分段模型主线
-├── bag_sim/         外层袋子模型、几何、材料与运行输出
+├── contents/        各版内容物模型、参数与交接；旧方案归入 legacy/
+├── bag_sim/         各版袋子/整包建模、几何、材料与共享运行模块
 ├── policy/          策略、YAM 场景、冻结的内容物副本与结果
 ├── proxy_eval/      代理真实测试集与评估入口
 ├── isaaclab/        Isaac Lab 可行性验证及独立环境入口
-├── test/            各主题的协议、实验报告、试验脚本和结果
+├── test/            按对象维护公共测试；runs/YYYY-MM-DD/ 管理轮次与新结果
 ├── reports/         开发任务的测试/检查报告
 ├── log/             进度、决策、想法与文献清单
 ├── paper/           论文计划、稿件、参考文献与模板
@@ -37,7 +37,7 @@ randomization/
                     原始四资产包，保留包结构、来源、许可与校验信息
 ```
 
-`contents/particle/`、`contents/newton/`、`contents/rigid/` 的定位见[内容物文件地图](contents/HANDOFF.md#4-文件地图)。它们承载历史模型、对照或诊断，不能仅凭目录名判断可删除。原始四资产包的使用方式见[包说明](soft-deformable-four-assets-only-20261022/README.md)。
+`contents/legacy/particle/`、`contents/newton/`、`contents/legacy/rigid/` 的定位见[内容物文件地图](contents/HANDOFF.md#4-文件地图)。它们承载历史模型、对照或诊断，不能仅凭目录名判断可删除。原始四资产包的使用方式见[包说明](soft-deformable-four-assets-only-20261022/README.md)。
 
 ## 环境与运行
 
@@ -59,7 +59,7 @@ randomization/
 | 实验协议、计划与结论 | `test/<主题>/`，同主题在原报告追加轮次；完整列表见[实验导航](test/README.md) |
 | 任务测试/检查报告 | `reports/<任务名>-test.md`，见[报告约定](reports/README.md) |
 | 进度与想法 | `log/`；流水只写关键结论与报告链接 |
-| 运行数据、日志、轨迹、源码快照 | 沿用该线的 `results/`、`results_*` 或 `outputs/`，按有意义的运行标识分组 |
+| 新运行的数据、日志、轨迹、源码快照 | `test/runs/YYYY-MM-DD/<对象>/<run-id>/`，见[管理约定](test/runs/README.md)；历史证据原位保留 |
 | 展示视频 | `video/`，在说明里关联原始试次与实验报告 |
 | 导入的聊天记录及压缩包 | `archive/conversations/<日期>/`，仅在本机保留，见[归档说明](archive/README.md) |
 | 虚拟环境和可再生缓存 | 使用现有忽略规则；不要混入源码或提交结果 |

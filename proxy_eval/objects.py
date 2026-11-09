@@ -4,7 +4,7 @@ Never used for training. Sizes and masses were chosen without reference to the r
 (contents/segment/model.py ANCHORS). Reused code is imported, not copied:
   tetrahedral items   contents/newton/unified_soft.py (generator, layered presets)
   pads                test/gripper_grasp/grasp.py rounded_box (4 mm fillet)
-  bags                bag_sim/newton_bag.py NewtonBag and the wrapping in bag_sim/demo_contents.py,
+  bags                bag_sim/newton_bag.py NewtonBag and bag_sim/wrap.py wrap_generic,
                       scenes as in the bag line's round 1 C1 (test/bag_model/REPORT.md)
 """
 from __future__ import annotations
@@ -123,7 +123,7 @@ class Scene:
     def _build_bag(self, spec):
         from bag_model import parameters
         from contents import normalize_contents, place_contents
-        from demo_contents import wrap_generic
+        from wrap import wrap_generic
         from newton_bag import content_shape_config, load_profile_newton
         profile = json.loads((BAG / 'profiles' / f"{spec['profile']}.json").read_text())
         p = profile['params']
