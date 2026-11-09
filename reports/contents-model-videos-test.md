@@ -1,5 +1,23 @@
 # 内容物模型视频检查
 
+## 追加计划：实验性SNH大软枕头全程四面体片
+
+复用 `continuum-pillow-grasp-r1/soft-5k-snh` 的实际grasp_fail记录，统一CPU Mesa回放优先读取该试次权威 `model.mjb`。`--tetra --fps 20`，不focus、不慢放、不截半，隐藏外表面，保留机械臂。实际240×160×50 mm、0.29 kg、E5 kPa、ν0.3、屈服应变0.2，576四面体，GPU Newton源动力学、纯接触/辅助捏取=0；7.938893 s提起失夹，不改标成功。新片置原观看页首段，并将本片、首例四面体片与首例有表面失败片复制docs/assets；不改docs/index正文。按用户要求不额外QA。
+
+结果：`continuum-pillow-snh-tetra.mp4` 已生成并置原观看页首段，渲染与编码正常结束。已复制docs/assets同名SNH片，以及 `continuum-pillow-soft5k-tetra.mp4`、`continuum-pillow-soft5k-failed.mp4`；未改docs/index正文。原成功与失败全部保留。本例GPU源记录无翻转/overflow/warnings、Jmin0.432761、穿透峰0.353943 mm、末塑性范数约0.00261083，结果仍为7.938893 s提起失夹。没有额外ffprobe、解码或目检QA。命令/来源见 [soft-5k-snh-video/README.md](../test/runs/2026-11-09/contents/continuum-pillow-grasp-r1/soft-5k-snh-video/README.md)。
+
+## 追加计划：隐藏外表面的完整四面体版本
+
+按用户要求，复用soft-5k的完整安全轨迹，使用负责人更新后的统一 `render_video.py --tetra --fps 20`：全景/局部均关闭FLEXFACE/FLEXSKIN，完整四面体网格不截半，保留机械臂。原速、无慢放、只到最后安全几何。新文件 `continuum-pillow-soft5k-tetra.mp4` 放原观看目录，保留大枕头240×160×50 mm、0.29 kg、E5 kPa、576四面体和4.37 s翻转失败标签。不改模型/网页，不占GPU；按用户要求不额外QA。
+
+结果：四面体版已生成，统一渲染与标签编码进程正常结束。原8768观看目录可直接访问 `continuum-pillow-soft5k-tetra.mp4`，未改任何网页或复制docs。没有额外ffprobe、解码或目检QA；命令见 [soft-5k-video/README.md](../test/runs/2026-11-09/contents/continuum-pillow-grasp-r1/soft-5k-video/README.md)。
+
+## 追加计划：240×160×50 mm、0.29 kg软枕头失败片
+
+复用负责人已完成的 `continuum-pillow-grasp-r1/soft-5k`：E=5 kPa、ν=0.3、yield_strain=0.2，189节点/576四面体，纯接触/辅助捏取=0，close阶段单元247翻转。仅建立回放复制记录并追加源最后安全qpos（不取失败后几何、不推进动力学），用统一CPU Mesa全景+局部回放并标真实失败。新视频为 `contents-model-videos-r1/continuum-pillow-soft5k-failed.mp4`，不覆盖旧片、不改网页或复制docs；按用户要求不额外执行视频QA。
+
+结果：新片已生成，仅显示至4.370951 s的安全几何，并明确标记4.371451 s、单元ID247翻转的原sim_fail结果。渲染/编码进程正常结束，无额外ffprobe、解码、目检QA；未复制docs或改网页。来源/命令见 [soft-5k-video/README.md](../test/runs/2026-11-09/contents/continuum-pillow-grasp-r1/soft-5k-video/README.md)。
+
 ## 追加结果：真实原生接触成功录像
 
 复用负责人已完成的 `continuum-grasp-success-r1/narrow-100k` 实际success，按用户要求立即CPU Mesa回放，不新跑动力学。120×45×50 mm、40.5 g、E100 kPa、ν0.1、屈服应变0.2、damping0.02、friction0.8、yaw/tilt0°/0°，辅助捏取=0、无辅助绑定。原公共完整任务15.025556564 s完成提起、搬运、放下与松开。

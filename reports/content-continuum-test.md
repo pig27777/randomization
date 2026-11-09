@@ -46,3 +46,15 @@ flock /tmp/claude-gpu.lock .venv-continuum/bin/python -B test/content_model/benc
 沿用原统一平台、同B、GPU Newton、pinch_coeff=0，仅调整X。首例120×50×50mm/E10kPa在3.665326s单元#43翻转（J=-.000772392），已保留失败片与标红慢放。第二例120×45×50mm/40.5g/E100kPa/ν.1/yield.2，在15.02556s完成原生接触完整success。runtime无失效、overflow或warning，Jmin.75958，残差峰9.99988e-6，穿透峰.88285mm；提起保持/搬运采样桌面反力0，最终质心x=.25366m。跟踪峰40.60mm单列。本次plastic=0，不将该成功例说成软塑性大物体成功或成功率验证。
 
 数据：`test/runs/2026-11-09/contents/continuum-grasp-success-r1/`。新片分别为`continuum-native-success.mp4`、`continuum-failed-narrow.mp4`、`continuum-tet-inversion.mp4`，放于原视频目录和`docs/assets/`。取得成功后停止剩余参数探索，全部失败保留；按用户要求未额外检查/重跑，录像进程正常结束。
+
+## 大软枕头与四面体显示（2026-11-09，ubun）
+
+用户明确恢复240×160×50mm/实际0.29kg大软枕头，并要求不渲染外表面。本轮统一E5kPa、189节点/576四面体、GPU Newton、原YAM动作、pinch0，每配置一次，共三次；命令、源码及完整状态在`test/runs/2026-11-09/contents/continuum-pillow-grasp-r1/`。
+
+| 配置 | 真实结果 |
+| --- | --- |
+| StVK/ν=.3 | 4.371451s合拢时单元247翻转，J=-.0002525；失败保留 |
+| StVK/ν=.45 | 3.312351s接近阶段6个塑性分量非有限；位置速度仍有限 |
+| 实验性SNH/ν=.3 | 7.938893s提起失夹；无数值/几何失效、overflow或warning，Jmin.43276、残差峰9.999868e-6、穿透峰.35394mm；夹持峰1.568N、跟踪峰25.99mm，未提起 |
+
+适配器增加显式网格与原生SNH选择；SNH通过mjSpec编译、完整MJB归档，回放优先读取；公共动作与门槛不变。四面体视图两相机均隐藏FLEXFACE/FLEXSKIN，显示全体积边线，物理体积/接触未删除。已按计划停止扫参；当前没有大软枕头成功抓取。按用户要求未增加独立回归或视频/页面QA；仅执行实际任务与内置有效性门槛，不能沿用旧StVK验收宣称SNH已验收。[主题报告](../test/content_model/CONTINUUM_REPORT.md#大软枕头抓取本轮计划2026-11-09ubun运行前)。

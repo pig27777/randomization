@@ -19,7 +19,28 @@
 <p>统一完整 YAM 机械臂，20 fps，全景与近景同步显示。画面来自真实保存的仿真状态。原失夹时刻明确标注；新增加长片将失夹后的真实观察段单独标黄。</p>
 
 <section>
-  <h2>最新成功片 · 连续体原生接触完整搬运</h2>
+  <h2>最新大软枕头 · 实验性SNH · 全程四面体版</h2>
+  <p>240×160×50 mm，实际0.29 kg，E=5 kPa，ν=0.3，屈服应变0.2。189节点、576四面体，隐藏外表面，完整线框不截半，保留机械臂；原速20 fps。GPU Newton源轨迹，原生接触、辅助捏取=0。</p>
+  <video controls preload="metadata" src="continuum-pillow-snh-tetra.mp4"></video>
+  <p class="event">完整7.938893 s后在提起阶段失夹，原结果grasp_fail。源记录无翻转、overflow或warning，Jmin=0.432761，穿透峰0.354 mm，末塑性范数约0.00261；没有把失夹改标成功。</p>
+  <p>回放读取该次权威model.mjb，保留实验性SNH本构；本构未经实物材料标定。<a href="continuum-pillow-snh-tetra.json">实际参数与源数据</a>。按用户要求未额外做视频QA。</p>
+</section>
+
+<section>
+  <h2>大软枕头 · 原StVK四面体失败片</h2>
+  <p>相同240×160×50 mm、实际0.29 kg、E=5 kPa、ν=0.3。外表面隐藏，完整576四面体线框、原生接触、辅助捏取=0；原速。</p>
+  <video controls preload="metadata" src="continuum-pillow-soft5k-tetra.mp4"></video>
+  <p class="event">约4.37 s闭合阶段单元ID247翻转失败，只播放至4.370951 s的最后安全几何。</p>
+</section>
+
+<section>
+  <h2>大软枕头 · 同一StVK失败过程的外表面版</h2>
+  <video controls preload="metadata" src="continuum-pillow-soft5k-failed.mp4"></video>
+  <p class="event">这是上条相同轨迹的外表面显示版，原结果仍为四面体翻转失败；没有追加失效后的动作。</p>
+</section>
+
+<section>
+  <h2>此前小尺寸成功片 · 连续体原生接触完整搬运</h2>
   <p>120×45×50 mm，40.5 g，E=100 kPa，ν=0.1，屈服应变0.2，摩擦0.8，yaw/tilt=0°/0°。GPU Newton；原生接触、辅助捏取=0，没有辅助绑定。</p>
   <video controls preload="metadata" src="continuum-native-success.mp4"></video>
   <p class="event">15.026 s 完成提起、搬运、放下与松开，原任务结果success。该配置没有发生屈服（塑性范数=0），是弹塑性框架中的弹性响应演示；它是单个小尺寸参数配置的成功结果。</p>

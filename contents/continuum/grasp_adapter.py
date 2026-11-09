@@ -8,7 +8,7 @@ import numpy as np
 
 from grasp_platform import MuJoCoSim, TrialConfig, attach_robot, measure_contacts
 from .gpu import Simulation
-from .model import Template, flex_xml, geometry, option_xml, preset, shape_parameters, topology_signature
+from .model import Template, compile_model, flex_xml, geometry, option_xml, preset, shape_parameters, topology_signature
 
 
 @dataclass
@@ -27,6 +27,8 @@ class Config(TrialConfig):
     roundness: float | None = None
     bulge: float | None = None
     taper: float | None = None
+    mesh_count: tuple = (5, 4, 3)
+    elastic3d: int = 0
     simulation_seconds: float = 30.
 
     def parameters(self):
@@ -84,7 +86,7 @@ class NoPinch:
 
 def scene(cfg):
     p = cfg.parameters()
-    b = Template(timestep=cfg.dt, contact_time=cfg.contact_time)
+    b = Template(count=cfg.mesh_count, timestep=cfg.dt, contact_time=cfg.contact_time, elastic3d=cfg.elastic3d)
     g = geometry(p, b)
     center = np.array([-.25, .04])
     top = p.size[2] + .002
@@ -94,7 +96,8 @@ def scene(cfg):
         friction=".8 .005 .0001" solref="{cfg.contact_time} 1" solimp=".99 .99 .001"/>
       {flex_xml(p,b,[*center,.002+p.size[2]/2])}
       </worldbody><contact/><equality/></mujoco>'''
-    built = SimpleNamespace(xml=xml, desc=SimpleNamespace(), cfg=cfg, parameters=p, template=b)
+    built = SimpleNamespace(xml=xml, desc=SimpleNamespace(), cfg=cfg, parameters=p, template=b,
+                            compile_model=lambda xml: compile_model(xml, b))
     return attach_robot(cfg, built, GpuSim, center, top, p.size, g.mass)
 
 
@@ -116,6 +119,12 @@ STATE_SPEC = int(mujoco.mjtState.mjSTATE_INTEGRATION)
 def record_state(sim):
     sim.prepare()
     return sim.gpu.state()[0]
+
+
+def save_model(sim, output):
+    if sim.built.template.elastic3d:
+        # MJCF cannot represent elastic3d=1; the compiled model is authoritative.
+        mujoco.mj_saveModel(sim.m, str(output / "model.mjb"))
 
 
 def check_state(sim):
@@ -143,6 +152,8 @@ def dimensions(sim):
     b, p = sim.built.template, sim.built.parameters
     return dict(nv=sim.m.nv, vertices=sim.m.nflexvert, tetrahedra=sim.m.nflexelem,
                 nplastic=sim.m.nplastic, representation="full_3d_elastoplastic_continuum",
+                material_law="experimental_SNH" if b.elastic3d else "StVK",
+                authoritative_model="model.mjb" if b.elastic3d else "model.xml",
                 parameters_X=asdict(p), template_B=asdict(b), template_sha256=b.signature,
                 topology_sha256=topology_signature(sim.m), mass_kg=float(sim.mass.sum()),
                 size_mm=(np.asarray(p.size)*1000).tolist(), native_contact_only=True,

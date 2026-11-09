@@ -73,7 +73,7 @@ class MuJoCoSim:
         link = root.find(".//body[@name='link_6']")
         ET.SubElement(link, "body", name="pinch_frame", pos="0 0 .1347")
         built.xml = ET.tostring(root, encoding="unicode")
-        self.m = mujoco.MjModel.from_xml_string(built.xml)
+        self.m = getattr(built, "compile_model", mujoco.MjModel.from_xml_string)(built.xml)
         self.d = mujoco.MjData(self.m)
         self.desc = built.desc
         self.obj_geoms = set()
@@ -162,6 +162,8 @@ def run(backend, cfg, output, *, on_sample=None):
     sim = robot.sim
     m,d = sim.m,sim.d
     (output/"model.xml").write_text(sim.built.xml)
+    if hasattr(backend, "save_model"):
+        backend.save_model(sim, output)
     (output/"robot_assets.json").write_text(json.dumps(asset_fingerprint(),indent=2))
     pinch = backend.attachment(robot,cfg)
     spring = PinchSpring()

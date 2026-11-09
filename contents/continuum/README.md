@@ -70,3 +70,7 @@ flock /tmp/claude-gpu.lock .venv-continuum/bin/python -B test/content_model/benc
 公共平台的旧袋子依赖会导入一个同名`contents.py`，因此统一使用`PYTHONPATH=contents`和`continuum.grasp_adapter`，不修改历史包的导入规则。
 
 `--model-options`还可直接指定`roundness/bulge/taper`覆盖命名形状的参数，连续改变实体参考几何；`size/density/young/poisson/damping/yield_strain/friction`也可指定。
+
+统一抓取适配器可显式指定`mesh_count`（三个方向的节点数），默认仍为`[5,4,3]`。大枕头局部捏取采用`[9,7,3]`候选来增加表面分辨率；它改变数值模板B及自由度，不是物理参数X，不能与旧模板混称同B结果。实际模板、连接拓扑指纹与质量随`result.json`保存。枕形质量应按实际网格体积×密度计算；需要固定0.29kg时，应按该网格体积反算密度。
+
+`elastic3d=0`保持原StVK；`elastic3d=1`显式选择MuJoCo4实验性Stable Neo-Hookean，仍用discrete/GPU Newton及原有效性门槛，不保证防翻转。后者只能通过mjSpec编译，没有MJCF属性，因此试次的`model.mjb`是完整模型，`model.xml`仅为编译输入；回放优先读MJB。本构改变属于模板B改变，不能直接沿用StVK验证或成本。说明见[官方API](https://mujoco.readthedocs.io/en/4.0.0/APIreference/APItypes.html#mjsflex)。

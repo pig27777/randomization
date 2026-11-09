@@ -66,7 +66,8 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     trajectory=np.load(run/"trajectory.npz")
     states=trajectory["qpos"]
     times=trajectory["time"] if "time" in trajectory else np.arange(len(states))*.2+.001
-    model=mujoco.MjModel.from_xml_path(str(run/"model.xml"))
+    model=(mujoco.MjModel.from_binary_path(str(run/"model.mjb")) if (run/"model.mjb").exists()
+           else mujoco.MjModel.from_xml_path(str(run/"model.xml")))
     model.vis.global_.offwidth=640;model.vis.global_.offheight=480
     data=mujoco.MjData(model)
     mujoco.mj_kinematics(model,data)
@@ -84,7 +85,10 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     detail_option.flags[mujoco.mjtVisFlag.mjVIS_FLEXFACE]=not tetra
     detail_option.flags[mujoco.mjtVisFlag.mjVIS_FLEXSKIN]=not tetra
     tets=model.flex_elem.reshape(-1,4) if tetra else None
-    if tetra:model.flex_rgba[:,3]=.12
+    if tetra:
+        # The wire view exposes the volume mesh, with no exterior face/skin.
+        option.flags[mujoco.mjtVisFlag.mjVIS_FLEXFACE]=False
+        option.flags[mujoco.mjtVisFlag.mjVIS_FLEXSKIN]=False
     full=mujoco.MjvCamera();full.lookat[:]=[0,-.02,.20];full.distance=1.35;full.azimuth=-45;full.elevation=-25
     detail=mujoco.MjvCamera();detail.distance=.67;detail.azimuth=-45;detail.elevation=-30
     if focus:
@@ -162,7 +166,7 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
                     renderer.scene.ngeom+=1
         if view=='both':
             renderer.update_scene(data,camera=full,scene_option=option);edges(False);left=renderer.render().copy()
-        renderer.update_scene(data,camera=detail,scene_option=detail_option);edges(True);right=renderer.render().copy()
+        renderer.update_scene(data,camera=detail,scene_option=detail_option);edges(focus);right=renderer.render().copy()
         frame=np.concatenate([left,right],axis=1) if view=='both' else right
         process.stdin.write(frame.tobytes())
         if i==0:
@@ -172,7 +176,8 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     renderer.close()
     (output.parent/(output.stem+"_render.json")).write_text(json.dumps(dict(renderer=renderer_name,fps=fps,frames=frames,
         source=str(run),state_interval_s=float(np.median(np.diff(times))) if len(times)>1 else None,
-        interpolated=True,physics_recomputed=False,tetrahedra=tetra,focus=focus,slow_factor=slow,
+        interpolated=True,physics_recomputed=False,tetrahedra=tetra,exterior_faces_visible=not tetra,
+        detail_cutaway=bool(tetra and focus),focus=focus,slow_factor=slow,
         view=view,detail_camera_distance=detail.distance,detail_camera_azimuth=detail.azimuth,
         detail_camera_elevation=detail.elevation),indent=2))
     print(output,renderer_name,flush=True)

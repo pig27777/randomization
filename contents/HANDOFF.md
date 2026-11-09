@@ -20,6 +20,8 @@
 
 ## 2. 一句话现状
 
+**2026-11-09 大软枕头与四面体视图**：用户明确240×160×50mm/0.29kg，恢复大尺寸并降到E5kPa，采用189节点/576四面体新模板。三例保持原YAM/GPU Newton/pinch0：StVK/ν.3在4.371s翻转，ν.45在3.312s塑性非有限；实验性原生SNH/ν.3跑到7.939s，无数值几何失效、overflow或warning，Jmin.4328、穿透峰.354mm，但提起失夹，尚无大软枕头成功。SNH只能mjSpec编译，完整模型存model.mjb，回放优先读MJB；网格/本构变化不能沿用旧B验收。用户要求四面体视图，已隐藏两相机外表面、保留体积网格和机械臂。按计划停止三例探索，不加硬/缩小兜底，不额外QA。结果见[连续体报告](../test/content_model/CONTINUUM_REPORT.md#大软枕头抓取本轮计划2026-11-09ubun运行前)，数据`continuum-pillow-grasp-r1/`。
+
 **2026-11-09 连续体首个原生接触成功例**：同B/GPU Newton、辅助捏取0，120×45×50mm、40.5g、E100kPa/ν.1/yield.2的窄实体15.026s完整提起搬运放下松开。无倒置/overflow/warning，Jmin.7596、穿透峰.8828mm，跟踪峰40.60mm；本次plastic=0，是弹性响应实例，不能外推到大软物或随机κ成功率。前一120×50mm/E10kPa样本翻转失败保留，网页有标红慢放；[本轮结果](../test/content_model/CONTINUUM_REPORT.md#成功例及停止探索)。
 
 **2026-11-09 分段/连续体GPU成本与视频补充**：同YAM、尺寸/质量的单world推进1s仿真，当前分段/连续体hard为0.900/4.998s、易弯8.651/3.335s、易压13.005/3.052s；分段六个1/32world组均有线搜索上限警告，完整诊断保留valid=false，不作有效吞吐或等响应加速结论。用户指定agent完成4单片+1原生接触并排，均为旧轨迹CPU回放、事件醒目标注；[对照与视频记录](../test/content_model/CONTINUUM_REPORT.md#分段物gpu速度对照本轮计划2026-11-09ubun运行前) · [视频检查](../reports/contents-model-videos-test.md)。

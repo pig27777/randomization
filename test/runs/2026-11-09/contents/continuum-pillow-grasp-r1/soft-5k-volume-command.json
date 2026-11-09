@@ -1,0 +1,21 @@
+[
+  "flock",
+  "/tmp/claude-gpu.lock",
+  "/home/ubuntu/workspace/gzl/randomization/.venv-continuum/bin/python",
+  "-B",
+  "test/flex3d/angles.py",
+  "--backend",
+  "continuum.grasp_adapter",
+  "--dt",
+  ".0005",
+  "--pinch-coeff",
+  "0",
+  "--yaw",
+  "0",
+  "--wall-limit",
+  "1200",
+  "--model-options",
+  "{\"material\": \"bendable\", \"shape\": \"pillow\", \"size\": [0.24, 0.16, 0.05], \"density\": 251.3860204553869, \"young\": 5000.0, \"poisson\": 0.45, \"damping\": 0.02, \"yield_strain\": 0.2, \"friction\": 0.8, \"mesh_count\": [9, 7, 3], \"simulation_seconds\": 30.0}",
+  "--output",
+  "test/runs/2026-11-09/contents/continuum-pillow-grasp-r1/soft-5k-volume"
+]

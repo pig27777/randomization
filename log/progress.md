@@ -523,3 +523,8 @@
 runtime无倒置/overflow/warning，Jmin.7596、穿透峰.8828mm；跟踪峰40.60mm，本次plastic0，不作为大软物/随机κ可靠性证明。
 前一E10k/width50样本3.665s四面体翻转，失败与标红慢放均保留；成功即停止后备探索，按用户要求不额外QA。
 [结果](../test/content_model/CONTINUUM_REPORT.md#成功例及停止探索) · [视频记录](../reports/contents-model-videos-test.md)。
+
+2026-11-09 大软枕头与四面体：240×160×50mm/0.29kg/E5kPa、576四面体，GPU Newton/pinch0，原YAM动作不变。
+StVK首例4.371s翻转、提高ν后3.312s塑性非有限；原生SNH7.939s无数值几何失效/overflow/warning，但提起失夹，尚无大软枕头成功。
+SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧验收。四面体回放两相机均隐藏外表面，保留机械臂与物理体积。
+三例后停止扫参，未缩小/加硬或加辅助连接，按用户要求无额外QA。[报告](../test/content_model/CONTINUUM_REPORT.md#大软枕头抓取本轮计划2026-11-09ubun运行前)。

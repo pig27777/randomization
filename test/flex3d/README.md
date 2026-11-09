@@ -57,6 +57,8 @@ flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex3d/run_suite.py speed --
 | 可选 `refresh(sim)` | GPU等后端自行刷新采样状态；未提供时仍用原CPU forward |
 | 可选 `record_state(sim)` / `STATE_SPEC` | 保存含塑性等历史的完整integration state，额外写入NPZ，不改变原qpos记录 |
 | 可选 `source_files()` | 补充依赖源码快照与指纹 |
+| 可选 `built.compile_model(xml)` | `MuJoCoSim`调用模型提供的编译器；用于mjSpec专有材料等，默认仍直接编译XML |
+| 可选 `save_model(sim,output)` | 保存XML不能表达的模型设置；SNH适配器写`model.mjb`，公共回放优先读该完整模型 |
 
 直接调用`run(..., on_sample=callback)`可观察已记录样本并渲染UI画面，不参与控制或判定。适配器配置可提供`simulation_seconds`限制时长；没有此字段仍为原30秒。连续体UI显式使用10秒，失败事件提前停止。后端逐步有效性检查若抛出且`check_state`给出模型失效原因，平台保存最后安全导出的几何、完整后端失败状态与`sim_fail`结果；未知运行异常仍交原异常处理。
 

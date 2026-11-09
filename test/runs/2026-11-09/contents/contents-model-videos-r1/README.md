@@ -1,5 +1,19 @@
 # 分段与连续体内容物视频
 
+## 最新大软枕头：实验性SNH完整四面体片
+
+[continuum-pillow-snh-tetra.mp4](continuum-pillow-snh-tetra.mp4) 已置观看页首段。实际240×160×50 mm、0.29 kg、E5 kPa、ν0.3、屈服应变0.2，189节点/576四面体，实验性SNH、GPU Newton、原生接触/辅助捏取=0。直接使用试次权威 `model.mjb` 回放，完整7.938893 s至提起失夹grasp_fail；外表面隐藏、完整线框不截半、保留机械臂、原速20 fps，无focus或慢放。
+
+原记录无翻转/overflow/warnings，Jmin0.432761，接触穿透峰0.353943 mm，末塑性范数约0.00261083；没有改判成功，也不据单次无模型失效宣称可靠抓取。完整结果及MJB来源见 [continuum-pillow-snh-tetra.json](continuum-pillow-snh-tetra.json)，命令见 [soft-5k-snh-video/README.md](../continuum-pillow-grasp-r1/soft-5k-snh-video/README.md)。本片与首例四面体片、首例外表面失败片均已复制至 `docs/assets/` 同名文件，原观看页保留全部旧成功/失败；未改docs/index正文。统一渲染与合成正常结束，按用户要求没有额外视频QA。
+
+## 追加素材：大软枕头完整四面体版，外表面隐藏
+
+[continuum-pillow-soft5k-tetra.mp4](continuum-pillow-soft5k-tetra.mp4) 使用相同soft-5k安全轨迹，保留机械臂、全景和完整近景；隐藏外表面，只画576四面体线框，不截半，原速20 fps无慢放。字幕标240×160×50 mm、实际0.29 kg、E5 kPa、原生接触/辅助捏取=0、4.37 s四面体翻转失败。统一CPU回放/编码正常结束，没有新GPU运行或额外视频QA，未改任何网页或复制docs；来源及命令见 [soft-5k-video/README.md](../continuum-pillow-grasp-r1/soft-5k-video/README.md)。
+
+## 追加素材：240×160×50 mm、0.29 kg大软枕头失败
+
+[continuum-pillow-soft5k-failed.mp4](continuum-pillow-soft5k-failed.mp4) 已单独生成，E=5 kPa、ν=0.3、yield_strain=0.2、189节点/576四面体、原生接触/辅助捏取=0。源试次close阶段单元ID247在4.371451 s翻转，最后安全导出4.370951 s；视频仅显示安全几何并醒目标sim_fail，不补造后续夹取。来源与命令见 [soft-5k-video/README.md](../continuum-pillow-grasp-r1/soft-5k-video/README.md)。本素材暂未复制docs或加入任何网页；渲染/编码正常结束，按用户要求没有额外QA。
+
 ## 最新追加：连续体原生接触成功片
 
 [continuum-native-success.mp4](continuum-native-success.mp4) 来自 [narrow-100k](../continuum-grasp-success-r1/narrow-100k/) 的实际success，原公共YAM协议完整运行15.025556564 s并完成提起、搬运、放下与松开。原生接触，辅助捏取=0，无辅助绑定。120×45×50 mm、0.0405 kg、E=100000 Pa、ν=0.1、yield_strain=0.2、damping=0.02、density=150 kg/m³、friction=0.8、box，yaw/tilt=0°/0°。60顶点/144四面体，MuJoCo/MJWarp4 GPU Newton，0.5 ms步长。

@@ -1,4 +1,4 @@
-"""Fixed full-3D StVK/J2 template with physical parameters separated from numerics.
+"""Full-3D continuum templates with physical parameters separated from numerics.
 
 Positive yield thresholds retain the same plastic-state layout across X. A very
 large threshold provides an effectively elastic control. The presets are
@@ -57,8 +57,12 @@ class Template:
     tolerance: float = 1e-8
     contact_time: float = .005
     radius: float = .001
+    elastic3d: int = 0
 
     def __post_init__(self):
+        if isinstance(self.elastic3d, bool) or self.elastic3d not in (0, 1):
+            raise ValueError("elastic3d must be 0 (StVK) or 1 (experimental SNH)")
+        object.__setattr__(self, "elastic3d", int(self.elastic3d))
         count = tuple(self.count)
         if len(count) != 3 or any(isinstance(x, bool) or int(x) != x or x < 2 for x in count):
             raise ValueError("count must contain three integer vertex counts >= 2")
@@ -73,7 +77,10 @@ class Template:
 
     @property
     def signature(self):
-        payload = dict(law="MuJoCo4/full3D/StVK/J2", **asdict(self))
+        values = asdict(self)
+        values.pop("elastic3d")
+        law = "MuJoCo4/full3D/SNH/native-plasticity" if self.elastic3d else "MuJoCo4/full3D/StVK/J2"
+        payload = dict(law=law, **values)
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 
@@ -164,6 +171,16 @@ def require_mujoco4():
         raise RuntimeError("continuum requires the isolated MuJoCo 4 environment (.venv-continuum)")
 
 
+def compile_model(xml, b):
+    """SNH is a native mjSpec-only setting and must be archived as MJB."""
+    require_mujoco4()
+    if not b.elastic3d:
+        return mujoco.MjModel.from_xml_string(xml)
+    spec = mujoco.MjSpec.from_string(xml)
+    spec.flex("contents").elastic3d = b.elastic3d
+    return spec.compile()
+
+
 def flex_xml(p, b, position, name="contents"):
     require_mujoco4()
     g = geometry(p, b)
@@ -192,7 +209,7 @@ def build(p=Parameters(), b=Template(), *, gravity=(0, 0, -9.81), table=True):
     position = (0, 0, p.size[2] / 2 + .002)
     xml = f'''<mujoco model="continuum"><compiler angle="radian"/>{option_xml(b, gravity)}
       <size memory="128M"/><worldbody>{floor}{flex_xml(p, b, position)}</worldbody></mujoco>'''
-    model = mujoco.MjModel.from_xml_string(xml)
+    model = compile_model(xml, b)
     data = mujoco.MjData(model)
     # Geometry only. Do not invoke CPU dynamics as an initialization fallback.
     mujoco.mj_kinematics(model, data)
