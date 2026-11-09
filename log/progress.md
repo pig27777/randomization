@@ -481,3 +481,8 @@
 ### 读文档时注意到的
 - `contents/HANDOFF.md` §3 说 `bubble_mailer/.venv` 是“Warp 1.18（无 MuJoCo）”，实际该环境现在也装了 **Newton 1.6.1**（`bag_sim` 的 Newton 后端就用它）
 - `contents/HANDOFF.md` §7.4 “袋子加内容物”说要先解决 MuJoCo 3.14 版本问题；`bag_sim` 的 Newton 后端已经绕开了这个限制，但内容物线在 MuJoCo 上，两边平台不一致（见 ideas.md）
+
+2026-11-09 统一抓取平台：完整YAM、多角度、模型适配、轨迹/四面体视频与CPU测速已搭建；后续模型按[平台说明](../test/flex3d/README.md)共用，项目AGENTS已登记。
+14次角度试验为4翻转、5抓取失败、5初始化失败；当前3D flex未通过可靠抓取，κ覆盖/GPU大批量未做。
+同机持锁CPU单环境实时率0.1495，28进程0.18119次失败evaluate/s、成功抓取0/s；后台有其他CPU行为作业，不当作独占上限。
+枕头形468顶点/1728四面体在下压约5.20s翻转，已提供局部10倍慢放/标红；细网格半步长仍翻转。[本轮报告](../test/flex3d/REPORT.md) · [检查报告](../reports/flex3d-test.md)。

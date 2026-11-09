@@ -1,0 +1,113 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 45.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 1.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 6.0,
+    "arm_height": 0.27,
+    "young": 10000.0,
+    "poisson": 0.2,
+    "damping": 0.02,
+    "surface_refinement": 2
+  },
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv/bin/python",
+  "frozen_v13_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "platform": "5cbc279ed7e65b2dd413d87147ddb3ad14c7fb2311c54c8234daa4e325a932b1",
+    "backend": "14001b70b845e4326d900f0527c04c75f053d817959a8fa3716d7b189198767f"
+  },
+  "backend": "native_flex",
+  "robot_source_sha256": "63d03be809bc8767fa4638330202e387a905bcb158ab078c1067125c18ec84bd",
+  "outcome": "sim_fail",
+  "reason": "tetrahedron inversion",
+  "phase": "approach",
+  "sim_time_s": 5.040499999999926,
+  "wall_s": 96.00451846397482,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.35690603329773934,
+    "nonfinger_mm": 0.0,
+    "grip_N": 0.3249277115621845,
+    "down_N": 8.655323349305219,
+    "tracking_mm": 25.624948666382213
+  },
+  "model_metrics": {
+    "min_determinant": -0.033765413046440554
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3005000000000002
+    }
+  ],
+  "initial_com": [
+    -0.24999722120946474,
+    0.0399942077148073,
+    0.025909855706401252
+  ],
+  "final_com": [
+    -0.25073758705756594,
+    0.041172839099528354,
+    0.02535162943900827
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.013592059631278495,
+    "ik_max_rotation_deg": 0.00024330691806888856,
+    "tracking_max_mm": 25.624948666382213,
+    "tracking_p95_mm": 24.44492214545623,
+    "actuator_peak_Nm": [
+      0.058587509336192056,
+      2.863895964525426,
+      0.7271708724897508,
+      0.4541721305613855,
+      0.0789428069572237,
+      0.011366818212710683
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 1412,
+    "vertices": 468,
+    "tetrahedra": 1728
+  },
+  "warnings": {}
+}
