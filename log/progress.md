@@ -513,3 +513,8 @@
 分段6个1/32world组均线搜索警告，诊断跑满3次但保留valid=false；不当作有效吞吐、等响应或普遍加速结论。[对照报告](../test/content_model/CONTINUUM_REPORT.md#对照结果)。
 用户指定agent录制4单片+1原生接触并排，ffprobe/全解码/关键帧及主视频HTTP通过；只做CPU回放，无新GPU动力学。
 [观看文件](../test/runs/2026-11-09/contents/contents-model-videos-r1/index.html) · [视频检查](../reports/contents-model-videos-test.md)。
+
+2026-11-09 连续体视频从含PLASTIC终止态新增9173步，真实达到10.0003185s，原5.414s失夹后标为保持姿态观察，运行时无失效。
+简单GitHub报告已上线：https://pig27777.github.io/randomization/ ，涵盖两种建模、实验、问题与视频；官方Pages状态built，源main:/docs。
+用户要求跳过额外检查，本轮不追加页面/视频QA；Git push超时后由专门agent经官方API完整发布同一提交f908943。
+[发布记录](../reports/content-report-page-test.md) · [实验报告](../test/content_model/CONTINUUM_REPORT.md)。

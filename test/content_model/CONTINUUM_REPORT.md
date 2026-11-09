@@ -173,3 +173,9 @@ API四形状预览、同拓扑不同实际质量、7个非法输入、同源校�
 五条片ffprobe/全解码、源几何有限性、关键帧及HTML本地引用检查通过。父会话另外核对并排关键帧，并验证只读`http://127.0.0.1:8768/`观看页及三条主视频HTTP可用，未声称浏览器布局验收。原生并排尺寸质量角度一致，但材料/积分器未匹配，视频只作动作展示；用户自调compressible标签未实物标定。
 
 数据与观看入口：`test/runs/2026-11-09/contents/contents-model-videos-r1/index.html`；[独立视频检查报告](../../reports/contents-model-videos-test.md)。来源、完整X、命令与全部SHA在该运行README/manifest中。
+
+## 视频加长与GitHub报告网页（2026-11-09）
+
+用户要求连续体多录几秒。视频agent从用户软参数原5.4138727s终止态恢复含PLASTIC的完整integration state，保持已保存的终止控制目标，GPU Newton新增9173步，真实续算到10.0003185s；原失夹判定保留，后段标为“失夹后保持姿态观察”。没有慢放或重复帧替代续算，旧片未覆盖。运行时健康检查failure_bits=0、minJ约0.2195、残差峰9.9982e-6；该观察段不代表重新抓取成功。原始续算在`continuum-video-long-r1/`，新片为`contents-model-videos-r1/continuum-user-rounded-10s-observe.mp4`。
+
+用户随后要求简单GitHub网页，说明建模、已做实验与问题，并明确“不用检查”。已用`docs/index.html`及本地打包视频/形状图制作静态报告，未追加页面或视频QA。现有GitHub仓库授权可用，无需重新登录；HTTPS push超时后由专门agent通过官方API发布，原提交f908943完整保留。GitHub Pages官方状态built，源main:/docs，地址<https://pig27777.github.io/randomization/>。本轮发布记录见[网页发布记录](../../reports/content-report-page-test.md)。

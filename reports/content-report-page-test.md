@@ -5,6 +5,6 @@
 - 实现：`docs/index.html`，独立静态HTML/CSS；`docs/assets/`打包真实形状图及三条视频，含新的连续体10秒片。
 - 内容：分段v1.3与MuJoCo4连续体、构建/材料/24κGPU与抓取实验、线搜索警告/塑性非有限/残差/失夹问题，以及原始资料链接。
 - 测试：按用户要求，未增加HTML、浏览器、视频或模型测试。既有实验结论和失败标记保留，没有将警告或失夹改算通过。
-- 发布：现有仓库授权已确认账号pig27777具有仓库管理员权限；新页面使用GitHub Pages的`main:/docs`源，目标网址为`https://pig27777.github.io/randomization/`。发布结果待平台返回后补记。
+- 发布：现有仓库授权已确认账号pig27777具有仓库管理员权限；GitHub Pages源为`main:/docs`。HTTPS推送遇HTTP408后，专门的登录agent通过官方Git Data API完整发布32个文件，保留原提交SHA `f908943138322796d66aa0f39b66d73260acbc68`；Pages官方构建状态为`built`，耗时36046ms，无错误。正式网址：<https://pig27777.github.io/randomization/>。
 
 视频加长是从含PLASTIC完整状态恢复，原5.414秒失夹后继续GPU保持终止控制目标观察到10.0003185秒；不表示任务成功，未用重复帧或慢放替代新增仿真。本轮按用户要求跳过额外视频检查。
