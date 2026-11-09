@@ -224,3 +224,6 @@
 ## 2026-11-09 · MuJoCo 3D flex 测试计划
 - 改动：新建 `test/flex3d/REPORT.md`（第 1 轮计划 T1–T5）；decisions 加 2026-11-09 条。核对：锚点尺寸/质量取自 contents/segment/model.py ANCHORS；T1 阈值沿用 test/contact_transfer/README.md 的 5%/0.05 mm/1 mm/s；κ 范围取自 sampling.BOUNDS。
 - 2026-11-09 同步：远端已有另一会话写的 `test/flex3d/REPORT.md`（据原任务重建计划并按用户要求改为机械臂多角度抓取）；本机未提交的计划稿不覆盖它，已移到会话草稿区备份。
+
+## 2026-11-10 · 加速轮计划
+- 改动：内容物报告追加“加速轮计划”（A0–A6）；袋子报告追加“加速与底板修改”（B2″–B4″）；decisions 加 2026-11-10 条。核对：速度数字引自 CONTINUUM_REPORT“分段物GPU速度对照”；G3 报错原文见 resume_20261108/g3.log；绳数与 frictionloss 公式见 bag_sim/effect_model.py。
