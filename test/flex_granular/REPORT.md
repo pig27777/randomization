@@ -59,3 +59,27 @@ flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex_granular/benchmark.py -
 原始结果见 [results/20261109_ubun](results/20261109_ubun/)，汇总见 [summary.json](results/20261109_ubun/summary.json)，每组保存 XML、结果 JSON，CPU 另存终态 NPZ，批量运行保留日志。六份 Newton 结果内 SHA 与交付 `benchmark.py`、`gpu_checks.py`、只读 `bag_sim/wrap.py` 一致；初期 CG 历史 SHA/模型及失败数据保留。
 
 限制：仅 0.3 s 落袋与重排，理想拉伸膜、预设鼓形、16 mm 球形粗颗粒，未实物标定；GPU 为同参数复制，不是异参数随机批量。未测机械臂抓取、长期稳定、独立线性残差、CPU/GPU响应等价、CPU 多进程吞吐和峰值显存；CPU 未逐步记录线搜索次数。因此不能把本轮局部通过当作完整训练模型验收，也不能据此认定任意褶皱/真实颗粒尺度下速度相同。没有修改现有袋子、内容物或策略线实现。
+
+## 第 2 轮计划：GPU 连续 5 s 与录像（2026-11-09，ubun，运行前）
+
+用户要求“生成视频”，补充“仿真跑5秒用gpu”。沿用已通过短测的 64 粒、98 膜顶点、Newton 单环境、0.5 ms 步长、1 ms 接触、100/20 次求解/线搜索上限，连续 10000 步，1 次。该轮只记录模型落袋和自然重排，不新增机械臂动作或抓取执行器，不是统一抓取平台的端到端试验。复用 `test/flex3d/render_video.py` 的 CPU Mesa 软件渲染上下文回放状态。
+
+GPU 持共享锁；每 20 步保存真实 GPU qpos（100 Hz）并沿用逐步有限性、原始标志和接触深度统计及采样包含检查。不把旧 0.3 s 轨迹拉长冒充 5 s。为交付连续展示，若只有求解/线搜索预算标志（512/1024），保留累计标志并继续记录，结果 `valid=false`，字幕/报告明确警告，不把它当成正式通过；非有限、容量溢出、穿透>1 mm 或出袋仍提前停止，视频标明实际时长。此处只改变展示运行遇预算标志后的停止方式，不放宽上一轮或本轮有效性门槛。
+
+输出原始轨迹、配置/XML、结果、源码指纹与 MP4。视频按原始采样状态回放，不重新计算物理；半透明袋膜/线框只影响显示。完整 5 s、轨迹有限、帧数/视频解码和起止时间检查通过才交付为完整录像，否则报告实际失败证据。上一轮速度证据及源码以 Git `014e77a` 为准，本轮新增记录选项，不补认旧数据的新验收。
+
+### 第 2 轮结果
+
+GPU 完成 10000 步，实际仿真区间 0–5 s，保存 501 份 100 Hz 状态（每份 qpos 742 维），所有状态有限。原始 overflow 累计为 0，未使用预算警告续跑分支；接触峰值穿透 0.8654 mm、外层求解峰值 14 次、终态出袋环境数 0。每 10 ms 的颗粒中心包含及球面越膜检查均通过本轮门槛。步进/逐步诊断墙钟 287.564 s，含读回/几何检查 289.364 s，准备 0.572 s；本次仅一次展示运行，不替代上一轮三次中位测速。
+
+使用共享 `test/flex3d/render_video.py::SoftwareContext`，实际 renderer 为 Mesa llvmpipe（LLVM 20.1.2），仅回放保存状态，不重新积分、不插值、不把 0.3 s 拉长。视频 1280×600、H.264、25 fps、126 帧、1 倍速；包含真实 t=0 和 t=5 s 两端，因此文件时长 5.04 s。左为半透明袋膜、右为线框内视，天空背景与透明度仅为显示设置。已检查首、中、末帧，ffprobe 元数据符合，完整 ffmpeg 解码无错误。
+
+- [观看视频](../../video/flex_granular_gpu5s.mp4) · [渲染来源](../../video/flex_granular_gpu5s.render.json)
+- [GPU 结果](results/20261109_ubun_gpu5s/gpu64_5s.json) · [100 Hz 轨迹](results/20261109_ubun_gpu5s/gpu64_5s.trajectory.npz) · [视频检查](results/20261109_ubun_gpu5s/video_checks.json)
+
+```sh
+flock /tmp/claude-gpu.lock .venv/bin/python -u -B test/flex_granular/benchmark.py --backend gpu --solver Newton --grains 64 --worlds 1 --steps 10000 --nconmax 256 --njmax 512 --record --continue-solver-warnings --output <新目录>/gpu64_5s.json
+.venv/bin/python -B test/flex_granular/render_recording.py <新目录>/gpu64_5s.json <新路径>/gpu5s.mp4
+```
+
+本轮只证实该配置的 5 s 运行和录像完整性；预设矩形鼓壳、理想拉伸膜与粗球粒仍未标定，不能把录像当作真实柔软快递袋或机械臂抓取通过证据。

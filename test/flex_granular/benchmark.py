@@ -147,7 +147,8 @@ def run_cpu(m, rest, faces, grain_q, film_q, steps):
                 peak_penetration_mm=peak_penetration*1000, samples=samples), d
 
 
-def run_gpu(m, rest, faces, grain_q, film_q, steps, worlds, ncon, njmax):
+def run_gpu(m, rest, faces, grain_q, film_q, steps, worlds, ncon, njmax,
+            record_path=None, continue_solver_warnings=False):
     import mujoco_warp as mjw
     import warp as wp
     from gpu_checks import state_check, contact_check, counters
@@ -183,6 +184,8 @@ def run_gpu(m, rest, faces, grain_q, film_q, steps, worlds, ncon, njmax):
     wp.synchronize()
     setup_wall = time.perf_counter()-started_setup
     samples = []
+    recorded_qpos = [data.qpos.numpy()[0].copy()] if record_path else []
+    recorded_time = [0.] if record_path else []
     failure = None
     executed = 0
     wall = 0.
@@ -196,16 +199,31 @@ def run_gpu(m, rest, faces, grain_q, film_q, steps, worlds, ncon, njmax):
         status = flags.numpy()
         depth = float(penetration.numpy()[0])
         q = data.qpos.numpy()
+        if record_path:
+            recorded_qpos.append(q[0].copy())
+            recorded_time.append(executed*DT)
         g = geometry(q[0], rest, faces, grain_q, film_q)
+        raw_flags = int(peak.numpy()[3])
         samples.append(dict(step=executed,time=executed*DT,geometry=g,flags_or=int(np.bitwise_or.reduce(status)),
                             peak_penetration_mm=depth*1000))
-        if np.any(status) or depth > .001 or not g["valid"]:
+        allowed = 1536 if continue_solver_warnings else 0
+        hard_status = np.any(status & 1) or (raw_flags & ~allowed) != 0
+        if hard_status or depth > .001 or not g["valid"]:
             failure = samples[-1]
             break
+        if record_path and executed % 500 == 0:
+            print(json.dumps(dict(recorded_sim_time_s=executed*DT,wall_s=wall,
+                                  raw_flags=raw_flags)),flush=True)
     final_geometry = [geometry(row,rest,faces,grain_q,film_q) for row in data.qpos.numpy()]
     if not all(g["valid"] for g in final_geometry):
         failure = dict(reason="final geometry failed",bad_worlds=[i for i,g in enumerate(final_geometry) if not g["valid"]])
     stats = peak.numpy().tolist()
+    if failure is None and stats[3]:
+        failure = dict(reason="recorded solver budget warnings",raw_flags=stats[3])
+    if record_path:
+        with record_path.open("xb") as stream:
+            np.savez_compressed(stream,time=np.asarray(recorded_time),qpos=np.asarray(recorded_qpos),
+                                rest=rest,faces=faces,grain_q=grain_q,film_q=film_q)
     summary = dict(valid=failure is None and executed==steps,failure=failure,steps=executed,nworld=worlds,
         wall_s=wall,instrumented_wall_s=time.perf_counter()-started,setup_wall_s=setup_wall,
         env_steps_per_s=worlds*executed/wall,realtime_factor=executed*DT/wall,
@@ -227,10 +245,17 @@ def main():
     p.add_argument("--repeats",type=int,default=1)
     p.add_argument("--nconmax",type=int,default=4096)
     p.add_argument("--njmax",type=int,default=12288)
+    p.add_argument("--record",action="store_true",help="save 100 Hz GPU states for video")
+    p.add_argument("--continue-solver-warnings",action="store_true",
+                   help="record-only: retain warnings and continue; result still invalid")
     p.add_argument("--output",type=Path,required=True)
     a=p.parse_args()
     if a.steps<=0 or a.steps%20 or a.repeats<=0 or a.worlds<=0:
         p.error("positive steps divisible by 20; positive repeats and worlds required")
+    if a.record and (a.backend!="gpu" or a.worlds!=1 or a.repeats!=1):
+        p.error("recording requires one GPU world and one repeat")
+    if a.continue_solver_warnings and not a.record:
+        p.error("continuing solver warnings is only for recorded diagnostic runs")
     if a.output.exists():
         p.error("refusing to overwrite result")
     m,d,rest,faces,grain_q,film_q,metadata,xml=make_model(a.grains,a.divisions,a.solver)
@@ -247,7 +272,8 @@ def main():
         if a.backend=="cpu":
             trial,last=run_cpu(m,rest,faces,grain_q,film_q,a.steps)
         else:
-            trial,last=run_gpu(m,rest,faces,grain_q,film_q,a.steps,a.worlds,a.nconmax,a.njmax)
+            trial,last=run_gpu(m,rest,faces,grain_q,film_q,a.steps,a.worlds,a.nconmax,a.njmax,
+                a.output.with_suffix(".trajectory.npz") if a.record else None,a.continue_solver_warnings)
         trials.append(trial)
         print(json.dumps({k:v for k,v in trial.items() if k not in ("samples",)},ensure_ascii=False),flush=True)
         if not trial["valid"]: break
@@ -258,6 +284,7 @@ def main():
         median_env_steps_per_s=float(np.median([t["env_steps_per_s"] for t in trials])) if valid else None,
         median_realtime_factor=float(np.median([t["realtime_factor"] for t in trials])) if valid else None,
         source_sha256=source_sha,sources_unchanged=unchanged,
+        recorded=a.record,continue_solver_warnings=a.continue_solver_warnings,
         software=dict(mujoco=mujoco.__version__,numpy=np.__version__,
             mujoco_warp=importlib.metadata.version("mujoco-warp"),warp=importlib.metadata.version("warp-lang")),
         timing="step+per-step numerical/contact counters; CPU geometry/readback separately in instrumented_wall_s",
