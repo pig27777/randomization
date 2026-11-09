@@ -1,114 +1,246 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unboxed · 柔性包裹的物理与抓取</title>
-<meta name="description" content="外袋、内容物与接触的物理建模，通过仿真轨迹与对照实验探索柔性包裹的形变和机器人抓取。">
-<meta name="theme-color" content="#080808">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Unboxed · Response-Space Randomization for Soft Parcels</title>
+<meta name="description" content="Response-space randomization for grasping soft parcels: a reduced model, interpretable response coordinates, and recorded simulation studies.">
+<meta name="theme-color" content="#f5f6f3">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Unboxed · 柔性包裹的物理与抓取">
-<meta property="og:description" content="从外袋到内容物，从形变到抓取。柔性包裹物理建模与机器人抓取实验记录。">
+<meta property="og:title" content="Unboxed · Response-Space Randomization for Soft Parcels">
+<meta property="og:description" content="One template. Interpretable responses. Many soft parcels.">
 <meta property="og:url" content="https://pig27777.github.io/randomization/">
 <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="assets/page.css?v=20261109">
+<link rel="stylesheet" href="assets/page.css?v=kappapack-3">
+<script defer src="assets/page.js?v=kappapack-1"></script>
 </head>
 <body>
-<a class="skip-link" href="#main">跳到主要内容</a>
-<div class="site-bar">
-<div class="bar-inner">
-<a class="brand" href="#top" aria-label="Unboxed，返回顶部"><img src="assets/mark.svg" width="28" height="28" alt=""><span>UNBOXED</span></a>
-<nav class="site-nav" aria-label="页面导航"><a href="#bagged-videos">抓取演示</a><a href="#model">建模方法</a><a href="#videos">模型视频</a><a href="#experiments">实验数据</a><a href="#issues">问题记录</a><a class="source-link" href="https://github.com/pig27777/randomization">GitHub ↗</a></nav>
-</div>
-</div>
-<header class="hero" id="top">
-<p class="eyebrow"><span class="signal-dot" aria-hidden="true"></span>PHYSICS × DEFORMABLE MANIPULATION</p>
-<div class="hero-grid">
-<div><h1>Un<span>boxed</span></h1><p class="hero-en">柔性包裹的物理与抓取</p></div>
-<div class="hero-copy"><p class="lead">从外袋到内容物，<br>从形变到抓取。</p><p class="hero-description">探索柔性包裹的物理建模与机器人操作。用仿真轨迹、对照实验和失效记录，理解看不见的内容物如何影响每一次夹取。</p><div class="hero-actions"><a class="button primary" href="#bagged-videos">观看抓取演示 <span aria-hidden="true">↗</span></a><a class="button secondary" href="https://github.com/pig27777/randomization">查看源码 <span aria-hidden="true">↗</span></a></div></div>
-</div>
-<div class="hero-meta"><span>外袋 / 内容物 / 接触</span><span>MuJoCo · MJWarp · YAM</span><span>RESEARCH NOTES / 2026</span></div>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="bar">
+  <div class="bar-in">
+    <a class="brand" href="#top"><img src="assets/mark.svg" width="26" height="26" alt="">Un<span>boxed</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#method">Method</a>
+      <a href="#simulation">Simulation</a><a href="#bagged-videos">Bag grasping</a>
+      <a href="#experiments">Experiments</a>
+      <a href="#lab-notes">Lab notes</a><a href="https://github.com/pig27777/randomization">Code ↗</a>
+    </nav>
+  </div>
 </header>
-<main id="main" tabindex="-1">
-<div class="notice"><strong>当前结论：</strong>目标已明确为240×160×50 mm、0.29 kg的大软枕头。E=5 kPa的SNH候选跑到7.94秒，无翻转或数值失效，但提起时失夹。原窄小、较硬实体的成功片保留作历史对照，不能代表大枕头成功。材料尚未实物标定，所有失败保留。</div>
-<section id="bagged-videos" aria-labelledby="bagged-title">
-<div class="section-heading"><div><p class="section-index">01 / BAGGED OBJECTS</p><h2 id="bagged-title">同一外袋，不同的抓取</h2></div><p class="section-intro">完整 YAM 机械臂从快递堆中夹取外袋与内部物体。整机与近景同时展示，0.5 倍速播放，末帧停留 2 秒。</p></div>
 
-<div class="video-grid bagged-videos">
-<article class="video-card wide"><video controls playsinline aria-label="书本与衣物同外袋抓取并排对比" src="assets/book_clothes_comparison.mp4" preload="metadata" poster="assets/posters/book_clothes_comparison.jpg" width="1920" height="1080" style="--video-ratio:1920 / 1080">请<a href="assets/book_clothes_comparison.mp4">下载书本与衣物对比视频</a>观看。</video><div class="body"><h3>先看对比 · 同外袋，书本 / 衣物</h3><p>同一外袋、相同堆形和抓点。书本单次成功，衣物完整运行但抬升不足；当前结果仍受接触步长影响。</p></div></article>
-<article class="video-card"><video controls playsinline aria-label="袋装书本抓取视频" src="assets/book.mp4" preload="none" poster="assets/posters/book.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/book.mp4">下载袋装书本视频</a>观看。</video><div class="body"><h3>袋装书本 · 单次成功</h3><p>低堆顶上方夹取，抬升约 103 mm、搬运约 99 mm。0.2 ms 步长下完成；0.1 ms 对照穿透超限，尚未通过步长稳定性验证。</p></div></article>
-<article class="video-card"><video controls playsinline aria-label="袋装衣物抓取视频" src="assets/clothes.mp4" preload="none" poster="assets/posters/clothes.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/clothes.mp4">下载袋装衣物视频</a>观看。</video><div class="body"><h3>袋装衣物 · 夹袋滑移</h3><p>原双指夹袋接触丢失，后期主要挂持、夹住局部折膜。搬运约 100 mm，抬升约 55 mm，未达到 100 mm 标准。</p></div></article>
-<article class="video-card"><video controls playsinline aria-label="装纸信封上方试抓视频" src="assets/paper_envelope.mp4" preload="none" poster="assets/posters/paper_envelope.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/paper_envelope.mp4">下载装纸信封视频</a>观看。</video><div class="body"><h3>装纸信封 · 上方试抓中止</h3><p>低堆顶上方接近。合拢时纸张与外壳穿透达到 0.15077 mm，超过本轮门槛，仿真停止。</p></div></article>
-<article class="video-card"><video controls playsinline aria-label="装薄硬片信封侧夹视频" src="assets/card_envelope_side.mp4" preload="none" poster="assets/posters/card_envelope_side.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/card_envelope_side.mp4">下载薄硬片信封视频</a>观看。</video><div class="body"><h3>装薄硬片信封 · 侧夹未夹稳</h3><p>高堆空隙侧向接近，合拢 3 秒后仍未建立稳定双指夹持，未进入抬升。与上方试抓的支撑条件不同。</p></div></article>
+<main class="wrap" id="main" tabindex="-1">
+
+  <div class="hero" id="top">
+    <div>
+      <p class="eyebrow">Response-space randomization · Research in progress</p>
+      <h1>Un<span class="k">boxed</span></h1>
+      <p class="sub">Response-Space Randomization for Grasping Soft Parcels</p>
+      <p class="lede">A sorting robot has to pick up parcels without knowing what is inside: folded clothes that sag, pillows that crush, books that do not give, and loose bags whose contents slide in the film. We do not simulate any of these in detail. Instead, we explore one reduced-order template parameterized by the responses a gripper actually feels. The goal is to train grasp policies across a wide range of those responses.</p>
+      <div class="venue">
+        <a class="chip on" href="#method">Explore the model ↗</a>
+        <a class="chip" href="#simulation">Watch demonstrations ↗</a>
+        <a class="chip" href="https://github.com/pig27777/randomization">Source code ↗</a>
+      </div>
+    </div>
+
+    <aside class="label" aria-label="Example parcel parameters">
+      <div class="head"><b>κ · SAMPLE 0001</b><span>bendable</span></div>
+      <div class="row"><span>Contents</span><span>unknown to the robot</span></div>
+      <div class="row"><span>Size</span><span>240 × 160 × 50 mm</span></div>
+      <div class="row"><span>Mass</span><span>0.29 kg</span></div>
+      <table>
+        <tr><td>R1 squeeze stiffness, y</td><td>0.50 N/mm</td></tr>
+        <tr><td>R1 squeeze stiffness, z</td><td>0.30 N/mm</td></tr>
+        <tr><td>R1 lock strain</td><td>0.20</td></tr>
+        <tr><td>R2 droop ratio</td><td>0.32</td></tr>
+        <tr><td>R4 pinch coefficient</td><td>1.0</td></tr>
+        <tr><td>Segments</td><td>6 × 3 × 2</td></tr>
+      </table>
+      <div class="barcode" role="img" aria-label="Decorative barcode"></div>
+      <div class="foot">ONE TEMPLATE · MANY PARCELS · A = g_B(κ)</div>
+    </aside>
+  </div>
+
+  <section aria-labelledby="problem-h">
+    <div class="col">
+      <p class="eyebrow">The problem</p>
+      <h2 id="problem-h">The gripper cannot see the contents, only how they respond</h2>
+      <p>Logistics parcels are diverse and opaque. Measuring every item is impossible, and high-fidelity deformable simulation is too slow and too fragile to randomize at the scale a policy needs. What matters for a grasp is narrower: how hard the parcel pushes back when squeezed, how much it sags when lifted, and how much load a pinch on its top surface can carry.</p>
+    </div>
+    <div class="tiles">
+      <div class="tile"><h3>Hard</h3><p class="eg">books · boxed goods</p><p>In this reduced model, rigid mode has no top-pinch capacity. A side grasp requires the object to fit the gripper.</p></div>
+      <div class="tile"><h3>Bendable</h3><p class="eg">folded clothes · towels</p><p>Sags when lifted and buckles when squeezed sideways.</p></div>
+      <div class="tile"><h3>Compressible</h3><p class="eg">pillows · padded items</p><p>Gives a lot, then stiffens once compacted. Too much force counts as damage.</p></div>
+    </div>
+    <div class="pair">
+      <div><h3>Full packages</h3><p>For tightly filled parcels, one approximation folds the film into equivalent surface friction and compliance.</p></div>
+      <div><h3>Loose packages</h3><p>The contents can move inside a larger bag. Gripping empty film has a different load path from squeezing through the film onto the contents.</p></div>
+    </div>
+  </section>
+
+  <section id="method" aria-labelledby="method-h"><span class="anchor-alias" id="model"></span>
+    <div class="col">
+      <p class="eyebrow">Method</p>
+      <h2 id="method-h">One template, parameterized by responses</h2>
+      <p class="eq" aria-label="A equals g sub B of kappa">A = g<sub>B</sub>(<span class="k">κ</span>)</p>
+      <p>Following the structure used for cross-embodiment robot randomization, a fixed template <i>B</i> holds the physics, a parameter vector <i>κ</i> holds only physical quantities, and a reparameterization keeps every random sample valid. Each response coordinate is defined by a fixed gripper-level measurement. The aim is to keep the coordinates interpretable as discretization changes; matching responses still requires calibration and validation.</p>
+    </div>
+
+<div class="model-explorer" data-model-explorer>
+<div class="model-tabs" role="tablist" aria-label="Understand the model">
+<button type="button" role="tab" id="template-tab" aria-controls="template-panel" aria-selected="true" tabindex="0"><span>01 / B</span> Fix the template</button>
+<button type="button" role="tab" id="response-tab" aria-controls="response-panel" aria-selected="false" tabindex="-1"><span>02 / κ</span> Describe the response</button>
+<button type="button" role="tab" id="parcel-tab" aria-controls="parcel-panel" aria-selected="false" tabindex="-1"><span>03 / A</span> Generate a parcel</button>
 </div>
-<p class="sub">以上均为现有试次的仿真回放；外袋与内容物尚未实物标定，包含失败片段。<a href="https://github.com/pig27777/randomization/blob/main/test/policy/HIDDEN_CONTENTS_REPORT.md">实验结果与模型说明 ↗</a> · <a href="https://github.com/pig27777/randomization/blob/main/video/README.md">视频来源与播放说明 ↗</a></p>
-</section>
-<section id="model" aria-labelledby="model-title">
-<div class="section-heading"><div><p class="section-index">02 / PHYSICAL REPRESENTATIONS</p><h2 id="model-title">让形变，有物理依据</h2></div><p class="section-intro">从分段刚体到体积连续体，比较材料、形状与接触对整体响应的影响。</p></div>
-<div class="formula">A = g<sub>B</sub>(X)　固定模板 B，通过材料与形状参数 X 生成不同物体 A。</div>
-<div class="cards">
-<article class="card"><span class="tag">分段内容物 · 冻结 v1.3</span><h3>刚体块 + 弹性连接</h3><p>把物体分成若干刚体块，块之间通过平移、转动弹性连接、原生阻尼和几何限位传力。硬物可合并为单刚体；易弯、易压物保留多个段。</p><p>旧方案包括围压门控的压密连接；顶面抓取还可开启辅助捏取规则。视频中的 <code>辅助捏取=1</code> 表示启用了该规则。</p><p class="sub">代表规模：易弯 36 段、易压 48 段。MuJoCo / MJWarp 3.17，步长 0.4 ms；GPU 材料算子沿用 float64 实现。</p><a href="https://github.com/pig27777/randomization/tree/main/contents/segment">分段模型源码 ↗</a></article>
-<article class="card"><span class="tag">连续体内容物 · 当前候选</span><h3>有体积的四面体弹塑性实体</h3><p>原模板为60个顶点、144个四面体，采用MuJoCo 4原生full 3D StVK与塑性。大枕头新模板增加到189个顶点、576个四面体，并试用实验性Stable Neo-Hookean材料（SNH）。不同网格或本构属于不同模板B，旧验收不能直接沿用。</p><p>同一B内，通过材料与形状X改变弹性模量、泊松比、阻尼、屈服、密度、摩擦、尺寸、圆润度和鼓包；连接拓扑保持固定。枕头实际质量按网格体积校正为0.29 kg。</p><p class="sub">MuJoCo / MJWarp 4.0，GPU Newton，步长0.5 ms；不加压密、关闭自碰撞。GPU保存完整塑性历史，不用CPU动力学或CG回退。SNH完整模型保存为MJB。</p><a href="https://github.com/pig27777/randomization/tree/main/contents/continuum">连续体模型源码 ↗</a></article>
+<div class="model-panel" id="template-panel" role="tabpanel" aria-labelledby="template-tab">
+<div class="template-art"><svg viewBox="0 0 220 120" role="img" aria-label="Box segments connected by elastic joints">
+          <g fill="var(--kraft-soft)" stroke="var(--kraft)" stroke-width="1.5">
+            <rect x="10" y="20" width="60" height="38"/><rect x="80" y="20" width="60" height="38"/><rect x="150" y="20" width="60" height="38"/>
+            <rect x="10" y="66" width="60" height="38"/><rect x="80" y="66" width="60" height="38"/><rect x="150" y="66" width="60" height="38"/>
+          </g>
+          <g stroke="var(--signal)" stroke-width="1.6" fill="none">
+            <path d="M70 39 l2 -4 l2 8 l2 -8 l2 8 l2 -4"/><path d="M140 39 l2 -4 l2 8 l2 -8 l2 8 l2 -4"/>
+            <path d="M70 85 l2 -4 l2 8 l2 -8 l2 8 l2 -4"/><path d="M140 85 l2 -4 l2 8 l2 -8 l2 8 l2 -4"/>
+            <path d="M40 58 l-4 2 l8 2 l-8 2 l4 2"/><path d="M110 58 l-4 2 l8 2 l-8 2 l4 2"/><path d="M180 58 l-4 2 l8 2 l-8 2 l4 2"/>
+          </g>
+        </svg><span class="diagram-note">Fixed connections · variable physical parameters</span></div>
+<div class="model-copy"><p class="eyebrow">B · What stays fixed</p><h3>A small mechanical structure, with explicit assumptions.</h3><p>Rigid blocks carry mass and contact geometry. Six-degree-of-freedom elastic connections let neighbouring blocks translate and rotate, producing compression, shear and bending.</p><dl class="model-facts"><div><dt>Structure</dt><dd>Segment topology and connection rules</dd></div><div><dt>Hard limit</dt><dd>Connections locked into one rigid body</dd></div><div><dt>Soft response</dt><dd>Relative motion between connected blocks</dd></div><div><dt>Scope</dt><dd>An overall response proxy, not individual cloth layers</dd></div></dl></div>
 </div>
-<figure class="model-figure"><img src="assets/shapes.png" width="840" height="600" loading="lazy" alt="同一60顶点144四面体模板生成方盒、圆角、鼓包枕形和渐变宽度四种真实体积网格"><figcaption>实际参考网格：相同连接拓扑与 240×160×50 mm 外包络。形状改变实体体积；相同平均密度下，总质量随实际网格体积变化。</figcaption></figure>
-<details><summary>哪些地方还有限制</summary><p>目前只支持单个连通实心体，未接入独立袋膜；任意拓扑、实物材料标定、目标整体响应到材料参数的换算表尚未完成。节点集中质量沿用原生 flexcomp，不能把它当作已标定的均匀密度有限元质量分布。</p><p>“硬物 / 易弯 / 易压”是探索预设名称，两种建模方法还没有标定成相同的整体响应。</p></details>
-</section>
-<section id="videos" aria-labelledby="videos-title">
-<div class="section-heading"><div><p class="section-index">03 / MODEL IN MOTION</p><h2 id="videos-title">从模型到机械臂</h2></div><p class="section-intro">回看提起、搬运和失夹的过程。成功样本与失败片段一起保留，结论对应具体配置。</p></div>
-<div class="video-grid">
-<article class="video-card wide"><video controls playsinline src="assets/continuum-pillow-snh-tetra.mp4" preload="none" poster="assets/posters/continuum-pillow-snh-tetra.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="大软枕头 · SNH四面体版 · 外表面隐藏，仿真视频"></video><div class="body"><h3>大软枕头 · SNH四面体版 · 外表面隐藏</h3><p>240×160×50 mm、0.29 kg、E=5 kPa，189节点/576四面体。全景与近景保留机械臂，隐藏外边界显示面，仅绘制实际体积网格；物理体积与接触保留。</p><p>GPU Newton、原生接触、辅助捏取=0。真实轨迹7.94秒，数值与几何未失效，但提起时失夹。不是成功录像，也没有用动画补造后续动作。</p></div></article>
-<article class="video-card"><video controls playsinline src="assets/continuum-pillow-soft5k-tetra.mp4" preload="none" poster="assets/posters/continuum-pillow-soft5k-tetra.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="大软枕头 · StVK四面体失败片，仿真视频"></video><div class="body"><h3>大软枕头 · StVK四面体失败片</h3><p>相同尺寸、质量、E=5 kPa与576四面体。隐藏外表面，原速播放；4.37秒在合拢阶段发生局部翻转，几何检查停止。</p></div></article>
-<article class="video-card"><video controls playsinline src="assets/continuum-pillow-soft5k-failed.mp4" preload="none" poster="assets/posters/continuum-pillow-soft5k-failed.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="同一大枕头试次 · 外表面显示对照，仿真视频"></video><div class="body"><h3>同一大枕头试次 · 外表面显示对照</h3><p>与左片同一轨迹，只改变显示方式；外表面是体积边界的渲染，不是另外加入的物理薄膜。</p></div></article>
-<article class="video-card wide"><video controls src="assets/continuum-native-success.mp4" playsinline preload="none" poster="assets/posters/continuum-native-success.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="连续体 · 原生接触完整成功，仿真视频"></video><div class="body"><h3>连续体 · 原生接触完整成功</h3><p>15.03 秒完成提起、搬运、放下与松开，辅助捏取=0。120×45×50 mm、40.5 g、E=100 kPa、ν=0.1、屈服=0.2；本次 plastic=0，表现为弹性响应。</p><p>无翻转/溢出/警告，最小 J=0.760，穿透峰 0.883 mm；机械臂跟踪峰 40.6 mm 仍需改进。只是一例未标定参数演示，未重复测试。</p></div></article>
-<article class="video-card"><video controls src="assets/continuum-failed-narrow.mp4" playsinline preload="none" poster="assets/posters/continuum-failed-narrow.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="失败案例 · 窄实体下压后翻转，仿真视频"></video><div class="body"><h3>失败案例 · 窄实体下压后翻转</h3><p>120×50×50 mm、E=10 kPa，原生接触。3.665 秒发生局部翻转，仿真停止。原始失败结果保留。</p></div></article>
-<article class="video-card"><video controls src="assets/continuum-tet-inversion.mp4" playsinline preload="none" poster="assets/posters/continuum-tet-inversion.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="翻转单元标红 · 10 倍慢放，仿真视频"></video><div class="body"><h3>翻转单元标红 · 10 倍慢放</h3><p>诊断回放末段真实保存状态，红色标出第一失败单元。慢放与停帧已注明，不代表新增物理步进。</p></div></article>
-<article class="video-card wide"><video controls src="assets/continuum-10s.mp4" playsinline preload="none" poster="assets/posters/continuum-10s.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="连续体 · 真实 10 秒加长片，仿真视频"></video><div class="body"><h3>连续体 · 真实 10 秒加长片</h3><p>用户自调软参数，GPU Newton，原生接触。5.414 秒失夹，之后保持终止控制目标继续真实仿真观察至 10 秒；黄色标签区分观察段。没有把失夹改成成功。</p></div></article>
-<article class="video-card"><video controls src="assets/segmented-pinch.mp4" playsinline preload="none" poster="assets/posters/segmented-pinch.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="分段 v1.3 · 辅助捏取 = 1，仿真视频"></video><div class="body"><h3>分段 v1.3 · 辅助捏取 = 1</h3><p>CPU 源轨迹，完成一次提起、搬运、放下和松开。含辅助捏取规则。</p></div></article>
-<article class="video-card"><video controls src="assets/native-comparison.mp4" playsinline preload="none" poster="assets/posters/native-comparison.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="原生接触并排 · 辅助捏取 = 0，仿真视频"></video><div class="body"><h3>原生接触并排 · 辅助捏取 = 0</h3><p>分段易弯 / CPU 与连续体 hard / GPU；材料未匹配。分别在 9.586 / 8.244 秒失夹，停止画面已标注。</p></div></article>
+<div class="model-panel responses-panel" id="response-panel" role="tabpanel" aria-labelledby="response-tab" hidden>
+<div class="response-card"><span class="response-code">R1 / COMPRESSION</span><svg viewBox="0 0 260 150" role="img" aria-label="Opposing gripper pads squeeze a parcel from both sides"><path d="M16 40h18v70H16zM226 40h18v70h-18z" fill="var(--ink)"/><rect x="62" y="45" width="136" height="60" fill="var(--kraft-soft)" stroke="var(--kraft)"/><path d="M42 75h35m-6-6 7 6-7 6M218 75h-35m6-6-7 6 7 6" fill="none" stroke="var(--signal)" stroke-width="3"/><path d="M100 45v60m30-60v60m30-60v60" stroke="var(--kraft)" stroke-dasharray="3 4"/></svg><h3>How much does it push back?</h3><p>A fixed squeeze measures the force–displacement response along y and z. Stiffness and lock strain describe the soft region and the point where compaction begins.</p><code>k = ΔF / Δx · N/mm</code></div>
+<div class="response-card"><span class="response-code">R2 / DROOP</span><svg viewBox="0 0 260 150" role="img" aria-label="A parcel held at one end bends downward under gravity"><path d="M25 22h15v48H25zM64 22h15v48H64z" fill="var(--ink)"/><path d="M45 62h168" stroke="var(--muted)" stroke-dasharray="4 5"/><path d="m44 62 38 3 38 10 36 19 33 25" fill="none" stroke="var(--kraft)" stroke-width="19"/><path d="M218 65v53m-6-5 6 6 6-6" fill="none" stroke="var(--signal)" stroke-width="3"/></svg><h3>How far does it sag?</h3><p>Lift one end with a fixed protocol and measure the far-end drop relative to the parcel length. This describes whole-object bending in a gripper-relevant coordinate.</p><code>droop = end drop / length</code></div>
+<div class="response-card"><span class="response-code">R4 / PINCH CAPACITY</span><svg viewBox="0 0 260 150" role="img" aria-label="A top pinch supports a parcel against downward load"><path d="M94 12h14v48H94zM152 12h14v48h-14z" fill="var(--ink)"/><path d="M52 117 65 77 110 63 130 45 150 63 195 77 208 117Z" fill="var(--kraft-soft)" stroke="var(--kraft)"/><path d="M130 83v46m-6-6 6 7 6-7" fill="none" stroke="var(--signal)" stroke-width="3"/></svg><h3>How much can a pinch carry?</h3><p>Measure the pull-off load of a prescribed top pinch. In the reduced model, a capacity rule can support a load and release when that capacity is exceeded.</p><code>capacity = κ_pinch × F_grip</code></div>
+<p class="model-footnote">These are gripper-level response coordinates, not direct material moduli. Size, mass, centre of mass and friction remain separate physical inputs.</p>
 </div>
-<p class="sub">视频从保存状态回放，采样之间仅作显示插值；渲染使用 CPU Mesa，视频播放速度不代表求解速度。</p>
-</section>
-<section id="experiments" aria-labelledby="experiments-title">
-<div class="section-heading"><div><p class="section-index">04 / EXPERIMENTS &amp; EVIDENCE</p><h2 id="experiments-title">让结果回到数据</h2></div><p class="section-intro">分别记录构建有效性、物理有效性与抓取结果，每个数字都对应具体实验。</p></div>
-<div class="table-wrap"><table><thead><tr><th>实验</th><th>实际结果</th><th>能说明什么</th></tr></thead><tbody>
-<tr><td>三材料 × 四形状构建</td><td class="good">12/12 构建通过；24 个随机形状合法；8 个非法输入被拒绝</td><td>固定拓扑可以改变真实体积形状；合法参数不等于动态稳定。</td></tr>
-<tr><td>相同剪切初态的恢复力</td><td>hard / bendable / compressible：22.33 / 2.32 / 0.80 N</td><td>三个预设有不同材料响应；这是恢复力范数，不是整体刚度标定。</td></tr>
-<tr><td>塑性与完整状态</td><td>初版释放实验有残余塑性；双 world 隔离及状态重放曾通过。当前精化版复测被略超 10⁻⁵ 的残差拦截。</td><td>塑性历史必须随完整 integration state 保存；旧版通过不能替代当前版本验收。</td></tr>
-<tr><td>统一 YAM 抓取</td><td><span class="good">新窄实体原生接触完整 success，15.026 s</span><br><span class="bad">原宽硬盒失夹、初始软形状塑性非有限；新 E=10 kPa 窄实体下压翻转</span></td><td>成功例为 120×45×50 mm、40.5 g、E=100 kPa，本次未屈服；不能外推到原大物体或随机 κ。</td></tr>
-<tr><td>大软枕头 · E=5 kPa</td><td class="bad">240×160×50 mm、0.29 kg：StVK/ν=.3在4.371秒翻转；ν=.45在3.312秒塑性非有限；SNH/ν=.3在7.939秒提起失夹</td><td>SNH这次无翻转、溢出或警告，J最小0.433，穿透峰0.354 mm；数值有效仍不等于抓取成功。各候选一次，非成功率测试。</td></tr>
-<tr><td>24 组 κ · 纯 GPU 常驻</td><td>1 world：<strong>19/24</strong> 组有效；32 worlds：<strong>13/24</strong> 组有效</td><td>通过组各重复 3 次、每次推进 1 秒；失败组保留并排除出有效速度统计。</td></tr>
-<tr><td>调参界面与视频</td><td>可调整形状、材料和姿态后运行原 YAM 协议；连续体新增真实 10 秒视频</td><td>GPU 动力学、CPU 画图。5.414 秒失夹后，视频继续观察至 10 秒，失夹判定保留。</td></tr>
-</tbody></table></div>
-<h3 style="margin-top:26px">速度：按推进 1 秒仿真比较</h3>
-<p class="sub">同一台 RTX 5090、相同尺寸质量、完整 YAM 初始控制保持、无界面绘图与逐步状态读回。分段 0.4 ms 需要 2,500 步；连续体 0.5 ms 需要 2,000 步。</p>
-<div class="table-wrap"><table><thead><tr><th>代表预设</th><th>分段 · 1 world</th><th>连续体 · 1 world</th><th>分段 · 32 worlds</th><th>连续体 · 32 worlds</th></tr></thead><tbody>
-<tr><td>hard / box</td><td>0.900 s *</td><td>4.998 s</td><td>0.977 s *</td><td>7.976 s</td></tr>
-<tr><td>bendable / box</td><td>8.651 s *</td><td>3.335 s</td><td>10.384 s *</td><td>4.938 s</td></tr>
-<tr><td>compressible / box</td><td>13.005 s *</td><td>3.052 s</td><td>15.478 s *</td><td class="bad">非有限，拒绝测速</td></tr>
-</tbody></table></div>
-<p class="sub">* 分段六组均触发线搜索上限警告，上表是保留无效标记的诊断成本。32 worlds 表示整批各推进 1 秒的总耗时。模型版本、积分器、自由度与材料响应不同，不能当作等精度或普遍加速倍数，也不是完整抓取吞吐。</p>
-<p class="sub">24 组 κ 中，有效组的单环境中位速度为 588 step/s；32 并行合计中位为 9,162 world-step/s。失败组没有混入这些数字。</p>
-</section>
-<section id="issues" aria-labelledby="issues-title">
-<div class="section-heading"><div><p class="section-index">05 / OPEN QUESTIONS</p><h2 id="issues-title">每一次失效，都是线索</h2></div><p class="section-intro">接触异常、夹持失稳与求解失败，界定了当前模型的使用边界。</p></div>
-<div class="issues">
-<article class="issue"><h3>大软枕头：材料能变形，顶面夹持仍未建立</h3><p>新SNH候选保持大尺寸与E=5 kPa，夹爪闭到接近零间隙，夹持峰仅1.57 N；提起后双指接触丢失，枕头留在桌上。当前抓点和动作未形成可持续承载的局部夹持，不能通过缩小物体或提高刚度把它改称大软枕头成功。</p></article>
-<article class="issue"><h3>四面体翻转后，力学结果不再可信</h3><p>局部四面体被压扁到零体积，顶点随后穿过对面，相对初态的有符号体积比 J 变成负数。单元的方向反了，继续计算可能产生异常力、穿透、反弹或数值发散。</p><p>窄实体 E=10 kPa 的新例在 3.665 秒翻转，单元 #43 的 J=-0.000772；当时数值仍有限、残差也在门槛内，几何却已经失效，所以独立停止。J&gt;0 只是必要条件，也不能代替材料和接触验收。</p></article>
-<article class="issue"><h3>软形状会出现塑性状态非有限</h3><p>某些 κ 单环境能跑，32 个 world 中仍可能有个别 world 失效。当前保留完整失败状态、原始溢出与残差，不用其余 world 的平均值掩盖失败；根因尚未确认。</p></article>
-<article class="issue"><h3>GPU 残差在浮点边界附近不总能通过</h3><p>保持 10⁻⁵ 门槛。最多两次同方程 GPU 精化能改善一些情况，但仍记录到 1.00081×10⁻⁵、1.00122×10⁻⁵ 的失败，没有放宽标准。</p></article>
-<article class="issue"><h3>原生接触抓取仍会失夹</h3><p>分段辅助捏取片可以完成一次搬运，不能用它证明纯接触成功。两模型原生接触片均保留真实失夹结果；材料、姿态、控制跟踪和接触承载仍需分别排查。</p></article>
-<article class="issue"><h3>旧分段 GPU 求解器触发线搜索上限</h3><p>诊断中的位置与速度有限，但原始警告位为 LS_ITERATIONS。保留 valid=false，未把带警告运行当作有效吞吐；没有为追求速度修改材料或求解器预算。</p></article>
-<article class="issue"><h3>实现完成不等于可以直接训练</h3><p>还需要定位首次塑性失效、验证长时程接触和参数适用范围、做实物响应标定，并完成可靠的批量抓取。当前只确认已执行的构建、短材料实验、部分有效 GPU 参数组和视频回放。</p></article>
+<div class="model-panel" id="parcel-panel" role="tabpanel" aria-labelledby="parcel-tab" hidden>
+<div class="parcel-art"><svg viewBox="0 0 440 250" role="img" aria-label="Two parcel representations: equivalent surface and a separate loose bag"><g fill="var(--kraft-soft)" stroke="var(--kraft)" stroke-width="2"><rect x="20" y="85" width="160" height="96" rx="6"/><rect x="265" y="110" width="120" height="78"/></g><g stroke="var(--kraft)" fill="none"><path d="M60 85v96m40-96v96m40-96v96M305 110v78m40-78v78"/></g><path d="M238 80q85-45 172 0l9 126H235Z" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="5 5"/><path d="M82 20h12v65H82zM112 20h12v65h-12zM315 15h12v60h-12zM345 15h12v60h-12z" fill="var(--signal)"/><path d="m327 75-38 35m56-35 20 35" fill="none" stroke="var(--muted)" stroke-dasharray="3 4"/><text x="100" y="225" text-anchor="middle" fill="var(--ink)" font-size="13">Equivalent surface</text><text x="326" y="225" text-anchor="middle" fill="var(--ink)" font-size="13">Separate bag + slack</text></svg><span class="diagram-note">Schematic representations, not simulated motion</span></div>
+<div class="model-copy"><p class="eyebrow">A · What is generated</p><h3>One response setting, one concrete model instance.</h3><p>The mapping turns response targets into connection stiffness, limits, geometry and effect parameters inside the supported calibration range.</p><dl class="model-facts"><div><dt>Full package</dt><dd>Film approximated by an equivalent contact surface</dd></div><div><dt>Loose package</dt><dd>Bag and contents have separate motion and a slack load path</dd></div><div><dt>Actual bag grasp</dt><dd>Gripper → outer film → contents; all three must be checked</dd></div></dl></div>
 </div>
-</section>
-<section id="resources" aria-labelledby="resources-title"><div class="section-heading"><div><p class="section-index">06 / EXPLORE FURTHER</p><h2 id="resources-title">继续深入</h2></div><p class="section-intro">回到实验协议、原始数据与可复现的源码。</p></div><div class="source-links">
-<a href="https://github.com/pig27777/randomization/blob/main/test/content_model/CONTINUUM_REPORT.md">实验计划、完整结果与问题记录 ↗</a>
-<a href="https://github.com/pig27777/randomization/blob/main/reports/content-continuum-test.md">任务检查报告 ↗</a>
-<a href="https://github.com/pig27777/randomization/blob/main/reports/contents-model-videos-test.md">视频记录 ↗</a>
-<a href="https://github.com/pig27777/randomization/tree/main/test/runs/2026-11-09/contents/continuum-gpu-r1">24 组 κ、状态与源码快照 ↗</a>
-<a href="https://github.com/pig27777/randomization/tree/main/test/runs/2026-11-09/contents/segmented-gpu-speed-compare-r1">分段速度对照数据 ↗</a>
-<a href="https://github.com/pig27777/randomization/tree/main/test/runs/2026-11-09/contents/continuum-video-long-r1">10 秒续算数据 ↗</a>
-</div></section>
+</div>
+<div class="mapping"><div><span class="eyebrow">MEASURE</span><b>R1 · R2 · R4</b><p>Squeeze, droop, pull-off</p></div><span aria-hidden="true">→</span><div><span class="eyebrow">MAP</span><b>Calibration table</b><p>Supported range, no extrapolation</p></div><span aria-hidden="true">→</span><div><span class="eyebrow">INSTANTIATE</span><b>A = g<sub>B</sub>(κ)</b><p>Geometry, connections and limits</p></div></div>
+<p class="note">Model diagrams are schematic. A top-pinch attachment is a reduced-model effect, not evidence of native frictional grasping. The bag-contact trials below use a separate full-arm setup.</p>
+<details class="parameter-details"><summary>Response coordinates &amp; illustrative sampling ranges</summary><p class="note">Draft sampling ranges, not calibrated material bounds or a guarantee of batch stability.</p>
+<div class="tablewrap">
+      <table class="data">
+        <thead><tr><th>Coordinate</th><th>Defined by</th><th>Bendable range</th><th>Compressible range</th></tr></thead>
+        <tbody>
+          <tr><td>Squeeze stiffness (y)</td><td>R1: secant stiffness of a fixed side squeeze</td><td class="num">0.1 – 2.0 N/mm</td><td class="num">0.03 – 0.5 N/mm</td></tr>
+          <tr><td>Squeeze stiffness (z)</td><td>R1: same test, vertical axis</td><td class="num">0.1 – 1.5 N/mm</td><td class="num">0.05 – 0.6 N/mm</td></tr>
+          <tr><td>Droop ratio</td><td>R2: sag when lifted 100 mm by one end</td><td class="num">0.2 – 0.6</td><td class="num">near rigid – 0.35</td></tr>
+          <tr><td>Pinch coefficient</td><td>R4: pull-off load ÷ grip force of a top pinch</td><td class="num">0.1 – 2</td><td class="num">0.1 – 3</td></tr>
+          <tr><td>Density</td><td>mass ÷ envelope volume</td><td class="num">80 – 400 kg/m³</td><td class="num">30 – 250 kg/m³</td></tr>
+          <tr class="hl"><td>Hard items</td><td>all joints locked, pinch coefficient 0</td><td class="num" colspan="2">density 150 – 1200 kg/m³</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    </details><details class="parameter-details"><summary>Inside the reduced model: three effect rules</summary><div class="rules">
+      <div class="rule">
+        <h3>Compaction</h3>
+        <p>When neighbouring segments are squeezed close to their limit under external pressure, a weld engages and the parcel stiffens; it releases when the pressure goes away.</p>
+        <span class="formula">engage ≥ 0.9 · limit, release &lt; 0.8</span>
+      </div>
+      <div class="rule">
+        <h3>Top pinch</h3>
+        <p>Two fingertips pressed at least 3 mm into a soft top surface attach at the pinch point. The attachment carries load up to a capacity and lets the parcel swing beneath it.</p>
+        <span class="formula">release if LP₅ₘₛ(load) &gt; κ_pinch · F</span>
+      </div>
+      <div class="rule">
+        <h3>Loose bag</h3>
+        <p>A light bag body holds the contents with slack tethers. Pinching empty film lifts the bag first; the contents follow once the slack runs out.</p>
+        <span class="formula">slack length, bag–content friction</span>
+      </div>
+    </div>
+  </details>
+  </section>
+
+  <section id="simulation" aria-labelledby="sim-h">
+    <div class="col">
+      <p class="eyebrow">Simulation</p>
+      <h2 id="sim-h">Same grasp, different parcels</h2>
+      <p>Top grasps with a parallel gripper (20 × 40 mm fingertips, 95 mm stroke). The overlay shows simulated time, phase and grip force; PINCHED marks an active top pinch.</p>
+    </div>
+<div class="carousel" data-carousel id="response-recordings" role="region" aria-roledescription="carousel" aria-label="Historical reduced-model demonstrations" tabindex="0"><div class="carousel-viewport"><figure class="slide" data-slide role="group" aria-roledescription="slide"><div class="slide-media"><video controls muted loop playsinline preload="none" width="360" height="270" src="media/bendable_ok.mp4" poster="media/bendable_ok.jpg" aria-label="A bendable parcel pinched at the centre, lifted and carried"></video></div><figcaption class="slide-copy">
+        <div class="cap"><h3>Bendable, centre pinch</h3><span class="outcome ok">success</span></div>
+        <p class="params">κ_pinch 1 · w 40 mm · d 10 mm · F 15 N</p>
+        <p>Lifted as a whole; both ends sag.</p>
+      </figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls muted loop playsinline preload="none" width="360" height="270" src="media/bendable_slip.mp4" poster="media/bendable_slip.jpg" aria-label="A bendable parcel whose pinch capacity is below its weight"></video></div><figcaption class="slide-copy">
+        <div class="cap"><h3>Bendable, weak pinch</h3><span class="outcome bad">grasp fail</span></div>
+        <p class="params">κ_pinch 0.25 · F 5 N</p>
+        <p>Capacity about 1.3 N against a 2.8 N weight: the pinch lets go at lift-off.</p>
+      </figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls muted loop playsinline preload="none" width="360" height="270" src="media/compressible_ok.mp4" poster="media/compressible_ok.jpg" aria-label="A compressible parcel pinched, lifted and carried"></video></div><figcaption class="slide-copy">
+        <div class="cap"><h3>Compressible, centre pinch</h3><span class="outcome ok">success</span></div>
+        <p class="params">κ_pinch 2 · w 80 mm · d 20 mm · F 10 N</p>
+        <p>The top gives way under the fingertips before the pinch engages.</p>
+      </figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls muted loop playsinline preload="none" width="360" height="270" src="media/compressible_drop.mp4" poster="media/compressible_drop.jpg" aria-label="A compressible parcel dropped during transport"></video></div><figcaption class="slide-copy">
+        <div class="cap"><h3>Compressible, low capacity</h3><span class="outcome bad">drop</span></div>
+        <p class="params">κ_pinch 0.5 · F 10 N</p>
+        <p>Holds during lift; transport acceleration exceeds the capacity and the parcel falls.</p>
+      </figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls muted loop playsinline preload="none" width="360" height="270" src="media/hard_fail.mp4" poster="media/hard_fail.jpg" aria-label="Fingertips stopping on a hard box without pinching"></video></div><figcaption class="slide-copy">
+        <div class="cap"><h3>Hard box</h3><span class="outcome bad">grasp fail</span></div>
+        <p class="params">κ_pinch 0 · w 40 mm · F 10 N</p>
+        <p>The fingertips cannot press in, so no pinch forms.</p>
+      </figcaption></figure></div><div class="carousel-footer"><span class="carousel-hint">One recording at a time</span><div class="carousel-controls"><button type="button" data-previous aria-label="Previous recording">←</button><output data-counter aria-live="polite">01 / 05</output><button type="button" data-next aria-label="Next recording">→</button></div></div></div>
+    <p class="note">Clips are from model version 1.2. Version 1.3 attaches the pinch at the actual pinch point, so parcels hang level and swing during transport instead of hanging tilted. These historical demonstrations use an assisted top-pinch rule; they are not real-robot or native-contact validation.</p>
+  </section>
+
+<section id="bagged-videos" aria-labelledby="bagged-title"><div class="col"><p class="eyebrow">Full-arm contact trials</p><h2 id="bagged-title">The bag is part of the grasp.</h2><p>The gripper touches the outer film. The contents change how the bag deforms and how load reaches the fingers. These trials show the full YAM arm and a close view, at 0.5× playback.</p></div><div class="carousel" data-carousel id="bag-recordings" role="region" aria-roledescription="carousel" aria-label="Bag and contents grasping recordings" tabindex="0"><div class="carousel-viewport"><figure class="slide" data-slide role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline aria-label="书本与衣物同外袋抓取并排对比" src="assets/book_clothes_comparison.mp4" preload="metadata" poster="assets/posters/book_clothes_comparison.jpg" width="1920" height="1080" style="--video-ratio:1920 / 1080">请<a href="assets/book_clothes_comparison.mp4">下载书本与衣物对比视频</a>观看。</video></div><figcaption class="slide-copy"><h3>先看对比 · 同外袋，书本 / 衣物</h3><p>同一外袋、相同堆形和抓点。书本单次成功，衣物完整运行但抬升不足；当前结果仍受接触步长影响。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline aria-label="袋装书本抓取视频" src="assets/book.mp4" preload="none" poster="assets/posters/book.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/book.mp4">下载袋装书本视频</a>观看。</video></div><figcaption class="slide-copy"><h3>袋装书本 · 单次成功</h3><p>低堆顶上方夹取，抬升约 103 mm、搬运约 99 mm。0.2 ms 步长下完成；0.1 ms 对照穿透超限，尚未通过步长稳定性验证。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline aria-label="袋装衣物抓取视频" src="assets/clothes.mp4" preload="none" poster="assets/posters/clothes.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/clothes.mp4">下载袋装衣物视频</a>观看。</video></div><figcaption class="slide-copy"><h3>袋装衣物 · 夹袋滑移</h3><p>原双指夹袋接触丢失，后期主要挂持、夹住局部折膜。搬运约 100 mm，抬升约 55 mm，未达到 100 mm 标准。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline aria-label="装纸信封上方试抓视频" src="assets/paper_envelope.mp4" preload="none" poster="assets/posters/paper_envelope.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/paper_envelope.mp4">下载装纸信封视频</a>观看。</video></div><figcaption class="slide-copy"><h3>装纸信封 · 上方试抓中止</h3><p>低堆顶上方接近。合拢时纸张与外壳穿透达到 0.15077 mm，超过本轮门槛，仿真停止。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline aria-label="装薄硬片信封侧夹视频" src="assets/card_envelope_side.mp4" preload="none" poster="assets/posters/card_envelope_side.jpg" width="960" height="1080" style="--video-ratio:960 / 1080">请<a href="assets/card_envelope_side.mp4">下载薄硬片信封视频</a>观看。</video></div><figcaption class="slide-copy"><h3>装薄硬片信封 · 侧夹未夹稳</h3><p>高堆空隙侧向接近，合拢 3 秒后仍未建立稳定双指夹持，未进入抬升。与上方试抓的支撑条件不同。</p></figcaption></figure></div><div class="carousel-footer"><span class="carousel-hint">One recording at a time</span><div class="carousel-controls"><button type="button" data-previous aria-label="Previous recording">←</button><output data-counter aria-live="polite">01 / 05</output><button type="button" data-next aria-label="Next recording">→</button></div></div></div><p class="note">Book and clothing trials share the same initial bag. The clothing trial loses its original two-sided bag grip and later holds a local film fold. The book success is a single case with unresolved timestep sensitivity; these are uncalibrated simulation proxies.</p></section>
+<section id="videos" aria-labelledby="robot-title"><div class="col"><p class="eyebrow">Additional model studies</p><h2 id="robot-title">Full-arm trajectories, with their failures intact.</h2><p>Continuum and segmented candidates are kept as separate studies. These recordings do not establish transfer of a trained response-randomized policy.</p></div><details class="recording-details"><summary>Explore 9 full-arm model recordings</summary><div class="carousel" data-carousel id="robot-recordings" role="region" aria-roledescription="carousel" aria-label="Full-arm model diagnostics" tabindex="0"><div class="carousel-viewport"><figure class="slide" data-slide role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline src="assets/continuum-pillow-snh-tetra.mp4" preload="none" poster="assets/posters/continuum-pillow-snh-tetra.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="大软枕头 · SNH四面体版 · 外表面隐藏，仿真视频"></video></div><figcaption class="slide-copy"><h3>大软枕头 · SNH四面体版 · 外表面隐藏</h3><p>240×160×50 mm、0.29 kg、E=5 kPa，189节点/576四面体。全景与近景保留机械臂，隐藏外边界显示面，仅绘制实际体积网格；物理体积与接触保留。</p><p>GPU Newton、原生接触、辅助捏取=0。真实轨迹7.94秒，数值与几何未失效，但提起时失夹。不是成功录像，也没有用动画补造后续动作。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline src="assets/continuum-pillow-soft5k-tetra.mp4" preload="none" poster="assets/posters/continuum-pillow-soft5k-tetra.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="大软枕头 · StVK四面体失败片，仿真视频"></video></div><figcaption class="slide-copy"><h3>大软枕头 · StVK四面体失败片</h3><p>相同尺寸、质量、E=5 kPa与576四面体。隐藏外表面，原速播放；4.37秒在合拢阶段发生局部翻转，几何检查停止。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls playsinline src="assets/continuum-pillow-soft5k-failed.mp4" preload="none" poster="assets/posters/continuum-pillow-soft5k-failed.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="同一大枕头试次 · 外表面显示对照，仿真视频"></video></div><figcaption class="slide-copy"><h3>同一大枕头试次 · 外表面显示对照</h3><p>与左片同一轨迹，只改变显示方式；外表面是体积边界的渲染，不是另外加入的物理薄膜。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls src="assets/continuum-native-success.mp4" playsinline preload="none" poster="assets/posters/continuum-native-success.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="连续体 · 原生接触完整成功，仿真视频"></video></div><figcaption class="slide-copy"><h3>连续体 · 原生接触完整成功</h3><p>15.03 秒完成提起、搬运、放下与松开，辅助捏取=0。120×45×50 mm、40.5 g、E=100 kPa、ν=0.1、屈服=0.2；本次 plastic=0，表现为弹性响应。</p><p>无翻转/溢出/警告，最小 J=0.760，穿透峰 0.883 mm；机械臂跟踪峰 40.6 mm 仍需改进。只是一例未标定参数演示，未重复测试。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls src="assets/continuum-failed-narrow.mp4" playsinline preload="none" poster="assets/posters/continuum-failed-narrow.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="失败案例 · 窄实体下压后翻转，仿真视频"></video></div><figcaption class="slide-copy"><h3>失败案例 · 窄实体下压后翻转</h3><p>120×50×50 mm、E=10 kPa，原生接触。3.665 秒发生局部翻转，仿真停止。原始失败结果保留。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls src="assets/continuum-tet-inversion.mp4" playsinline preload="none" poster="assets/posters/continuum-tet-inversion.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="翻转单元标红 · 10 倍慢放，仿真视频"></video></div><figcaption class="slide-copy"><h3>翻转单元标红 · 10 倍慢放</h3><p>诊断回放末段真实保存状态，红色标出第一失败单元。慢放与停帧已注明，不代表新增物理步进。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls src="assets/continuum-10s.mp4" playsinline preload="none" poster="assets/posters/continuum-10s.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="连续体 · 真实 10 秒加长片，仿真视频"></video></div><figcaption class="slide-copy"><h3>连续体 · 真实 10 秒加长片</h3><p>用户自调软参数，GPU Newton，原生接触。5.414 秒失夹，之后保持终止控制目标继续真实仿真观察至 10 秒；黄色标签区分观察段。没有把失夹改成成功。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls src="assets/segmented-pinch.mp4" playsinline preload="none" poster="assets/posters/segmented-pinch.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="分段 v1.3 · 辅助捏取 = 1，仿真视频"></video></div><figcaption class="slide-copy"><h3>分段 v1.3 · 辅助捏取 = 1</h3><p>CPU 源轨迹，完成一次提起、搬运、放下和松开。含辅助捏取规则。</p></figcaption></figure><figure class="slide" data-slide hidden role="group" aria-roledescription="slide"><div class="slide-media"><video controls src="assets/native-comparison.mp4" playsinline preload="none" poster="assets/posters/native-comparison.jpg" width="1280" height="480" style="--video-ratio:1280 / 480" aria-label="原生接触并排 · 辅助捏取 = 0，仿真视频"></video></div><figcaption class="slide-copy"><h3>原生接触并排 · 辅助捏取 = 0</h3><p>分段易弯 / CPU 与连续体 hard / GPU；材料未匹配。分别在 9.586 / 8.244 秒失夹，停止画面已标注。</p></figcaption></figure></div><div class="carousel-footer"><span class="carousel-hint">One recording at a time</span><div class="carousel-controls"><button type="button" data-previous aria-label="Previous recording">←</button><output data-counter aria-live="polite">01 / 09</output><button type="button" data-next aria-label="Next recording">→</button></div></div></div></details></section>
+  <section id="experiments" aria-labelledby="exp-h">
+    <div class="col">
+      <p class="eyebrow">Planned experiments</p>
+      <h2 id="exp-h">Which randomization transfers to real parcels?</h2>
+      <p>This is the planned comparison: keep policy architecture, training budget and reward fixed, and vary only the training-parcel distribution. Transfer results are not yet available.</p>
+    </div>
+    <div class="tablewrap">
+      <table class="data">
+        <thead><tr><th>Condition</th><th>Training parcels</th><th>Tests</th></tr></thead>
+        <tbody>
+          <tr><td class="num">R0</td><td>One nominal rigid box, no randomization</td><td>Lower bound</td></tr>
+          <tr><td class="num">R1</td><td>Rigid parcels with random size, mass, centre of mass, friction, and the same top-pinch effect</td><td>Main baseline</td></tr>
+          <tr><td class="num">RJ</td><td>Same template, joint parameters randomized directly instead of through responses</td><td>Value of response-defined κ</td></tr>
+          <tr><td class="num">R2</td><td>Response randomization, full packages only</td><td>Value of the bag representation</td></tr>
+          <tr class="hl"><td class="num">R3</td><td>Response randomization with loose bags (full method)</td><td>Unboxed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="eyebrow">Hypotheses to test</p><div class="hyp">
+      <div><b>H1</b><p>R3 beats rigid randomization (R1) on unseen real parcels.</p></div>
+      <div><b>H2</b><p>Each response dimension maps to a failure mode: compression to over-squeeze or slip, droop to grasp location, moving mass to drops in transport.</p></div>
+      <div><b>H3</b><p>Full packages can absorb the bag into the surface; loose packages need the bag represented.</p></div>
+      <div><b>H4</b><p>How well a real parcel's measured responses fall inside the training range predicts how well the policy does on it.</p></div>
+    </div>
+    <div class="col">
+      <h3>Planned real-robot evaluation</h3>
+      <p>The proposed evaluation uses a single YAM arm with a parallel gripper, a top RGB camera and a wrist RGB camera. The target set is about 30 unseen parcels: 18 full packages (6 hard, 6 bendable, 6 compressible) and 12 loose packages across poly, kraft, paperboard and bubble mailers. Ten trials per parcel and condition, with success rates reported with Wilson 95% intervals and compared per item.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="results-h">
+    <div class="pending">
+      <p class="eyebrow">Results</p>
+      <h2 id="results-h">The transfer question is still open.</h2>
+      <p>The clips above demonstrate model behaviour, including failed grasps. They do not provide real-robot transfer statistics or validate all random response settings.</p>
+    </div>
+  </section>
+
+<section id="lab-notes" aria-labelledby="notes-h"><span class="anchor-alias" id="issues"></span><span class="anchor-alias" id="resources"></span><div class="col"><p class="eyebrow">Evidence and open questions</p><h2 id="notes-h">Go back to the experiment.</h2><p>Model validity, contact reliability and task completion are recorded separately. A successful clip is not a batch-stability or real-world calibration result.</p></div><div class="evidence-links"><a href="https://github.com/pig27777/randomization/blob/main/test/policy/HIDDEN_CONTENTS_REPORT.md">Bag, contents and grasp-contact report <span>↗</span></a><a href="https://github.com/pig27777/randomization/blob/main/test/flex3d/REPORT.md">Shared YAM grasp platform <span>↗</span></a><a href="https://github.com/pig27777/randomization/blob/main/test/content_model/CONTINUUM_REPORT.md">Continuum candidates and failure diagnostics <span>↗</span></a><a href="https://github.com/pig27777/randomization/blob/main/contents/HANDOFF.md">Current model status and limitations <span>↗</span></a></div></section>
+  <section id="bibtex" aria-labelledby="bib-h">
+    <h2 id="bib-h">Project citation</h2>
+<pre class="bib">@misc{unboxed,
+  title = {Unboxed: Response-Space Randomization for Grasping Soft Parcels},
+  year = {2026},
+  howpublished = {https://pig27777.github.io/randomization/},
+  note = {Research project in progress}
+}</pre>
+  </section>
+
+  <footer>
+    <span>Unboxed · draft project page</span>
+    <span>Research in progress · Simulated demonstrations</span>
+  </footer>
 </main>
-<footer><div class="footer-inner"><span class="footer-brand">UNBOXED / DEFORMABLE MANIPULATION</span><p class="footer-note">物理建模与机器人抓取实验记录 · 2026-11-09<br>所有结果对应具体实验配置；模型尚未实物标定。 <a href="https://github.com/pig27777/randomization">源码 ↗</a></p></div></footer>
+
+
 </body>
 </html>
