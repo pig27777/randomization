@@ -6,6 +6,7 @@
 | --- | --- |
 | MuJoCo4连续体B/X、形状、GPU塑性与状态恢复 | `validate_continuum.py`；抓取复用`PYTHONPATH=contents ... test/flex3d/angles.py --backend continuum.grasp_adapter --dt .0005 --pinch-coeff 0`，使用独立`.venv-continuum` |
 | 连续体调参后机械臂抓取UI / GPU多κ测速 | `.venv-continuum/bin/python -B test/content_model/grasp_ui.py --port 8766`；单次上限10s仿真；`benchmark_continuum.py --matrix --worlds 1 32`；接口与JS检查为`check_grasp_ui.py/.cjs` |
+| 分段与连续体的GPU步进成本对照 | `.venv/bin/python -B test/content_model/benchmark_segmented.py`；`--diagnostic-linesearch`只报告带警告诊断成本、保留无效判定，对照见`CONTINUUM_REPORT.md` |
 | 第一、二轮构建与响应对照 | `run_round1.py`、`run_round2.py` |
 | 本构与模型验收、步长与交互查看 | `validate_model.py`、`stability_estimate.py`、`view_m2.py` |
 | 拖动整体响应κ并查看真实CPU变形 | `parameter_ui.py`（界面为同名HTML，冻结v1.3） |

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分段与连续体内容物 · 真实轨迹回放</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #11151b; color: #edf1f7; }
+  body { max-width: 1280px; margin: auto; padding: 28px 20px 60px; }
+  h1 { font-size: 28px; margin: 0 0 14px; }
+  h2 { font-size: 21px; margin: 0 0 10px; }
+  p { line-height: 1.65; color: #bfcad8; margin: 10px 0; }
+  section { margin-top: 36px; }
+  video { display: block; width: 100%; height: auto; background: black; border-radius: 8px; }
+  a { color: #8ecbff; }
+  .event { color: #f3d47c; }
+  footer { border-top: 1px solid #344050; margin-top: 36px; padding-top: 15px; }
+</style>
+<h1>分段与连续体内容物：真实轨迹回放</h1>
+<p>统一完整 YAM 机械臂，20 fps，全景与近景同步显示。画面来自已保存的仿真状态，未重新计算动力学。失败片在真实失夹时刻停止。</p>
+
+<section>
+  <h2>分段 v1.3 · 易弯锚点 · 辅助捏取=1</h2>
+  <p>240×160×50 mm，0.290 kg，yaw/tilt 0°/0°。源动力学 CPU，MuJoCo 3.17。</p>
+  <video controls preload="metadata" poster="keyframes/segmented-pinch.png" src="segmented-pinch.mp4"></video>
+  <p class="event">15.945 s 完成提起、搬运、放下与松开。包含冻结 v1.3 的辅助捏取规则；这段不能作为纯接触成功的证据。</p>
+</section>
+
+<section>
+  <h2>连续体 StVK/J2 · rounded · 用户自调软参数</h2>
+  <p>240×160×50 mm，实际质量 0.190346 kg，yaw/tilt 40°/25°。源动力学 GPU Newton，MuJoCo 4。compressible 是用户参数标签，未经材料标定。</p>
+  <video controls preload="metadata" poster="keyframes/continuum-user-rounded.png" src="continuum-user-rounded.mp4"></video>
+  <p class="event">原生接触、辅助捏取=0；5.414 s 在提起阶段失夹，双指接触丢失超过 50 ms，随后停止。</p>
+</section>
+
+<section>
+  <h2>原生接触并排 · 辅助捏取=0</h2>
+  <p>相同 240×160×50 mm 包络、0.290 kg、yaw/tilt 0°/0°与近景相机。左：分段易弯锚点 / CPU / 0.4 ms；右：连续体 hard/box / GPU Newton / 0.5 ms。材料未匹配，只展示动作，不能作等材料或速度比较。</p>
+  <video controls preload="metadata" poster="keyframes/native-contact-comparison.png" src="native-contact-comparison.mp4"></video>
+  <p class="event">左侧 9.586 s、右侧 8.244 s 在提起阶段失夹。右侧停止后保留末个保存画面约 1.35 s，并显示黄色“已停止”标记。</p>
+</section>
+
+<footer>
+  <p>另可单独播放 <a href="segmented-native.mp4">分段原生接触片</a>、<a href="continuum-hard-native.mp4">连续体 hard/box 原生接触片</a>。<a href="README.md">配置、来源与复现说明</a> · <a href="video-checks.json">视频验证数据</a></p>
+</footer>
+</html>

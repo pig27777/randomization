@@ -137,3 +137,39 @@ API四形状预览、同拓扑不同实际质量、7个非法输入、同源校�
 汇总：`resident-matrix/summary.json`、`analysis.json`；原始日志`resident-matrix.log.gz`（无损压缩，旁存原始SHA256）。CUDA条件循环入口因memory-allocation节点不受支持被拒绝，属于测速实现入口问题，不算材料物理失败。
 
 收尾补测：当前易弯枕形1s上限运行未重现先前失败，实际2000步、完整状态有限（`failed-state-recording/`）；这不是稳定性全域通过。易压枕形在695步非有限，公共平台正确保存`sim_fail`、18个安全几何样本及含非有限PLASTIC的完整失败状态（`failed-state-compressible/`），没有导出失效接触。矩阵结束后仅给适配器增加GPU尚未建立时保留原始异常的保护；GPU计算源码未改。
+
+## 分段物GPU速度对照：本轮计划（2026-11-09，ubun，运行前）
+
+用户询问与分段物的速度比。旧分段GPU诊断含每步读回，G5正式吞吐未完成，不能和连续体CUDA常驻时间直接相除。补测冻结v1.3分段物，复用统一YAM的`segmented.scene`及既有`mjwarp_backend.BatchStepper`（原GPU材料力与压密kernel不改），不另建抓取执行器。
+
+三材料代表各1、32world，方盒240×160×50mm、0.29kg、同0°YAM初始控制保持；分段物用原3.17环境、0.4ms/implicitfast/Newton，连续体用已有4.0、0.5ms/discrete/Newton结果。每次推进1s仿真（分段2500步、连续体2000步），3次恢复初态重复，CUDA event按100步分段计时，段内无主机读回/控制/绘图；段后检查所有world有限、原分段压缩/转角失效阈值、原始overflow/容量和Newton未触顶。失败整组拒绝速度，先两类短入口再正式，GPU持flock。
+
+对照使用已有连续体hard/bendable/compressible-box对应组，主要指标是推进1s仿真的GPU耗时及32world合计仿真秒/墙钟秒。不同模型材料响应未标定为等价，版本/积分器也不同；所得比值只代表当前两套实现的成本，不归因于几何表示本身，不冒充抓取evaluate吞吐。
+
+首轮6组均在100步检查处因raw=1024（LS_ITERATIONS）拒绝，qpos/qvel有限、Newton最多3次，非接触容量溢出。保留该严格拒绝结果。追加诊断计时：将线搜索上限单独标为警告，仍判valid=false；只有该警告时继续至完整1s、3次，任一非有限/真实容量/压缩转角越限/Newton触顶仍立即停止。仅关闭原生重复printf，保留原始警告位，不改变20次线搜索预算、容差、材料或步长。所得耗时明确标“带线搜索警告的诊断成本”，不升级成有效吞吐，不以修改判定制造通过。
+
+### 对照结果
+
+入口修正了GPU算子不在冻结CPU归档中的导入路径；没有改冻结模型或材料算子。分段三类×1/32world均完成3次×1s诊断，源码指纹未变化，所有状态有限且原压缩/转角阈值及容量检查未失败，但六组均有原始线搜索上限警告，`valid=false`保留。分段重复printf在诊断轮关闭，警告位1024完整记录，不能将下表称为无警告的有效吞吐。
+
+下表数字为**推进1秒仿真的GPU墙钟秒**；32world列表示同批32个world均推进1s的总耗时，而非单world耗时相加。
+
+| 代表预设 | 分段1world（带警告诊断） | 连续体1world（有效） | 分段32world（带警告诊断） | 连续体32world |
+| --- | ---: | ---: | ---: | ---: |
+| hard / box | 0.900 | 4.998 | 0.977 | 7.976，有效 |
+| bendable / box | 8.651 | 3.335 | 10.384 | 4.938，有效 |
+| compressible / box | 13.005 | 3.052 | 15.478 | 非有限，拒绝测速 |
+
+按当前实现的诊断成本，硬物分段在单/32world约快5.55/8.16倍；易弯连续体约快2.59/2.10倍；易压单world连续体约快4.26倍，32world不提供有效比值。这些不是等物理响应、等版本/积分器的表示法加速倍数，也不是可靠抓取evaluate/s。
+
+同尺寸同质量下，分段硬物实际折叠为单刚体，含YAM总nv14；易弯36段总nv224；易压48段总nv296。连续体三者均总nv188、144四面体，硬物也保留全部可变形自由度。3.17分段仍用float64材料算子、隐式快积分、线搜索20；4.0连续体为原生弹塑性、discrete、线搜索50及额外残差精化。因此结果只支持当前实现按类型评估，不能得出“连续体总比分快/慢”的结论。
+
+命令：`flock /tmp/claude-gpu.lock .venv/bin/python -B test/content_model/benchmark_segmented.py --diagnostic-linesearch --output test/runs/2026-11-09/contents/segmented-gpu-speed-compare-r1/diagnostic`。严格首轮为同命令去掉`--diagnostic-linesearch`、输出`formal/`。全部结果、完整κ、快照与派生比值见`segmented-gpu-speed-compare-r1/`；渲染agent并行使用CPU回放，未占GPU，数据不当作独占机器的上限。没有进入G3/G4训练验收或为提速修改solver预算。
+
+## 用户指定agent录制两类内容物视频（2026-11-09）
+
+专门的`contents_videos` agent用现有统一YAM轨迹制作4条单片及1条原生接触并排，均1280×480/20fps、CPU llvmpipe回放；没有新GPU动力学。分段辅助捏取=1片完成15.945s搬运，原生接触片9.586s失夹；连续体hard/box片8.244s失夹，用户自调rounded软参数片5.414s失夹。辅助捏取、CPU/GPU来源和提前停止已醒目标注；并排短片尾部保持末帧1.35s并注明已停止，没有续造成功动作。
+
+五条片ffprobe/全解码、源几何有限性、关键帧及HTML本地引用检查通过。父会话另外核对并排关键帧，并验证只读`http://127.0.0.1:8768/`观看页及三条主视频HTTP可用，未声称浏览器布局验收。原生并排尺寸质量角度一致，但材料/积分器未匹配，视频只作动作展示；用户自调compressible标签未实物标定。
+
+数据与观看入口：`test/runs/2026-11-09/contents/contents-model-videos-r1/index.html`；[独立视频检查报告](../../reports/contents-model-videos-test.md)。来源、完整X、命令与全部SHA在该运行README/manifest中。

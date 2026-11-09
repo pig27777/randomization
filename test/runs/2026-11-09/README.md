@@ -49,3 +49,5 @@
 | 对象 / 版本 | 问题与命令入口 | 机器 / 状态 | 报告与数据 |
 | --- | --- | --- | --- |
 | 连续体StVK/J₂，GPU Newton，固定B/可变材料与形状X | `continuum-gpu-r1`；`validate_continuum.py`、`grasp_ui.py --port 8766`、`benchmark_continuum.py --matrix --worlds 1 32 --steps 2000 --repeats 3` | ubun，RTX5090；构建/短入口/UI闭环完成，完整抓取未通过；24κ在1/32world分别19/24、13/24有效，失败不计吞吐 | [计划/命令/结果](../../content_model/CONTINUUM_REPORT.md) · [数据](contents/continuum-gpu-r1/) · [检查](../../../reports/content-continuum-test.md) |
+| 分段v1.3 / 连续体4.0 GPU成本对照 | `segmented-gpu-speed-compare-r1`；`benchmark_segmented.py`，三类×1/32world×3次×1s | ubun；分段6组均线搜索警告，完整诊断计时保留valid=false，不计有效吞吐；两模型尚未等响应标定 | [对照结果](../../content_model/CONTINUUM_REPORT.md#对照结果) · [数据](contents/segmented-gpu-speed-compare-r1/) · [检查](../../../reports/content-continuum-test.md#分段gpu速度对照补测2026-11-09) |
+| 两类内容物真实轨迹视频 | `contents-model-videos-r1`；用户指定agent、既有轨迹CPU回放 | ubun；4单片+1并排全解码/关键帧/HTTP可用性通过，无新GPU运行；非等材料或速度对比 | [观看入口](contents/contents-model-videos-r1/index.html) · [来源/参数](contents/contents-model-videos-r1/README.md) · [检查](../../../reports/contents-model-videos-test.md) |

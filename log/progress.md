@@ -508,3 +508,8 @@
 12构建/24随机网格、四形状GPU短入口和调参→YAM→录像UI完成，单次上限10s仿真；完整抓取为1失夹/2塑性非有限，当前残差复测亦未全过。
 24κ纯GPU常驻静置，1/32world分别19/24、13/24有效；有效κ中位588.02 step/s、9162.14 world-step/s，13配对合计增益中位22.106倍，16无效组不计速度。
 候选尚不能用于随机κ批量训练；[主题报告](../test/content_model/CONTINUUM_REPORT.md) · [检查](../reports/content-continuum-test.md) · [UI说明](../contents/continuum/README.md)。
+
+2026-11-09 分段/连续体GPU同场景成本：单world推进1s，hard0.900/4.998s、易弯8.651/3.335s、易压13.005/3.052s；分段0.4ms、连续体0.5ms。
+分段6个1/32world组均线搜索警告，诊断跑满3次但保留valid=false；不当作有效吞吐、等响应或普遍加速结论。[对照报告](../test/content_model/CONTINUUM_REPORT.md#对照结果)。
+用户指定agent录制4单片+1原生接触并排，ffprobe/全解码/关键帧及主视频HTTP通过；只做CPU回放，无新GPU动力学。
+[观看文件](../test/runs/2026-11-09/contents/contents-model-videos-r1/index.html) · [视频检查](../reports/contents-model-videos-test.md)。

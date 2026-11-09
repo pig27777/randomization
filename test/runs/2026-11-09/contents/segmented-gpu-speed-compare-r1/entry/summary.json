@@ -1,0 +1,188 @@
+{
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "mujoco_warp": "3.17.0",
+  "warp": "1.19.0",
+  "sources": {
+    "test/flex3d/grasp_platform.py": "600f52bc89c02b39a8ec6a561f7323c1f6fc2f95df76a275fe96dd673a8c53cc",
+    "test/content_model/benchmark_segmented.py": "94633ab730a5797f7a2a4838eb29da4aba6b644a1032dc58aa32879580df27df",
+    "test/flex3d/segmented.py": "c0c2de1302d98f4dd878e150ba4935ed5045d1223ce227c480223d530b0f2a93",
+    "contents/segment/warp_v13.py": "802513c872ab1c896479af84596c58a6732d996353769f23f94bc40e3880765b",
+    "contents/segment/warp_effects.py": "921d015cd59b34340620fbe2f6ba94e6c874b3b9b4489f171ecf4609f6c3a360",
+    "contents/segment/mjwarp_backend.py": "b4fbc6e777a147a974006c48e6ea269355e4c939a53482a24682e72fbd5bd006",
+    "bag_sim/outputs/round3_flex/source_v1_3/contents/segment/mj_adapter.py": "904e545b12105587b046ef5541fe74c3c9d4b424f0607d25730eb160b5052be6",
+    "contents/segment/warp_mechanics.py": "e181c0fedd8db3c11819026a4850daee52386c2734f55a2ec87eb3a50977ef79"
+  },
+  "groups": [
+    {
+      "valid": true,
+      "nworld": 1,
+      "timestep": 0.0004,
+      "steps": 50,
+      "rows": [
+        {
+          "repeat": 0,
+          "steps": 50,
+          "gpu_seconds": 0.011668031692504882,
+          "wall_seconds": 0.011677870992571115,
+          "valid": true,
+          "health": [
+            [
+              0.0,
+              50.0,
+              0.0,
+              0.0,
+              0.0,
+              3.0,
+              0.0
+            ]
+          ]
+        }
+      ],
+      "nv": 14,
+      "segments": 24,
+      "size": [
+        0.24,
+        0.16,
+        0.05
+      ],
+      "mass_kg": 0.29,
+      "solver": "2",
+      "integrator": "3",
+      "raw_overflow_available": true,
+      "health_columns": [
+        "failure_bits",
+        "steps",
+        "max_strain",
+        "compression_limit_ratio",
+        "bend_limit_ratio",
+        "peak_iterations",
+        "raw_overflow"
+      ],
+      "kappa": {
+        "category": "hard",
+        "size": [
+          0.24,
+          0.16,
+          0.05
+        ],
+        "mass": 0.29,
+        "com_offset": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "segments": [
+          4,
+          3,
+          2
+        ],
+        "rigid": true,
+        "squeeze_stiffness_y": 50.0,
+        "squeeze_stiffness_z": 50.0,
+        "lock_strain_y": 0.02,
+        "lock_strain_z": 0.02,
+        "droop_ratio": 0.0,
+        "damping_ratio": 0.5,
+        "mobile": false,
+        "mobile_frac": 0.3,
+        "mobile_range": 0.02,
+        "mobile_freq": 2.0,
+        "surface_friction": 0.8,
+        "skin_compliance": 0.0,
+        "pinch_coeff": 0.0
+      },
+      "median_gpu_steps_per_second": 4285.212906313768,
+      "gpu_wall_seconds_per_simulated_second": 0.583401584625244,
+      "aggregate_world_steps_per_second": 4285.212906313768,
+      "aggregate_simulated_seconds_per_gpu_second": 1.7140851625255074,
+      "category": "hard"
+    },
+    {
+      "valid": true,
+      "nworld": 1,
+      "timestep": 0.0004,
+      "steps": 50,
+      "rows": [
+        {
+          "repeat": 0,
+          "steps": 50,
+          "gpu_seconds": 0.17138755798339844,
+          "wall_seconds": 0.1713754190132022,
+          "valid": true,
+          "health": [
+            [
+              0.0,
+              50.0,
+              2.0861625716836474e-07,
+              4.635916825963661e-07,
+              2.393057049043931e-14,
+              3.0,
+              0.0
+            ]
+          ]
+        }
+      ],
+      "nv": 224,
+      "segments": 36,
+      "size": [
+        0.24,
+        0.16,
+        0.05
+      ],
+      "mass_kg": 0.2900000015999997,
+      "solver": "2",
+      "integrator": "3",
+      "raw_overflow_available": true,
+      "health_columns": [
+        "failure_bits",
+        "steps",
+        "max_strain",
+        "compression_limit_ratio",
+        "bend_limit_ratio",
+        "peak_iterations",
+        "raw_overflow"
+      ],
+      "kappa": {
+        "category": "bendable",
+        "size": [
+          0.24,
+          0.16,
+          0.05
+        ],
+        "mass": 0.29,
+        "com_offset": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "segments": [
+          6,
+          3,
+          2
+        ],
+        "rigid": false,
+        "squeeze_stiffness_y": 0.5,
+        "squeeze_stiffness_z": 0.3,
+        "lock_strain_y": 0.2,
+        "lock_strain_z": 0.2,
+        "droop_ratio": 0.32,
+        "damping_ratio": 0.5,
+        "mobile": false,
+        "mobile_frac": 0.3,
+        "mobile_range": 0.02,
+        "mobile_freq": 2.0,
+        "surface_friction": 0.8,
+        "skin_compliance": 0.0,
+        "pinch_coeff": 0.0
+      },
+      "median_gpu_steps_per_second": 291.7364631850538,
+      "gpu_wall_seconds_per_simulated_second": 8.569377899169922,
+      "aggregate_world_steps_per_second": 291.7364631850538,
+      "aggregate_simulated_seconds_per_gpu_second": 0.11669458527402155,
+      "category": "bendable"
+    }
+  ],
+  "control": "initialized YAM controls held; no CPU controller in timing",
+  "sources_unchanged": true
+}
