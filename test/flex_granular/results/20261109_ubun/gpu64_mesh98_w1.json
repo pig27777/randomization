@@ -1,0 +1,212 @@
+{
+  "host": "ubun",
+  "backend": "gpu",
+  "model": {
+    "grains": 64,
+    "divisions": 4,
+    "vertices": 98,
+    "triangles": 192,
+    "nq": 742,
+    "nv": 678,
+    "grain_radius_m": 0.008,
+    "film_radius_m": 0.0005,
+    "grain_mass_kg": 0.08235496645826429,
+    "film_mass_kg": 0.012,
+    "membrane_only": true,
+    "self_collision": "auto",
+    "solver": "CG",
+    "timestep": 0.0005,
+    "contact_time_constant_s": 0.001
+  },
+  "initial_geometry": {
+    "valid": true,
+    "outside": 0,
+    "protrusion_mm": 0.0,
+    "winding_min": 1.0
+  },
+  "nworld": 1,
+  "repeats": 3,
+  "valid": false,
+  "trials": [
+    {
+      "valid": false,
+      "failure": {
+        "step": 220,
+        "time": 0.11,
+        "geometry": {
+          "valid": true,
+          "outside": 0,
+          "protrusion_mm": 0.0,
+          "winding_min": 0.9999999999999999
+        },
+        "flags_or": 2,
+        "peak_penetration_mm": 0.8653970435261726
+      },
+      "steps": 220,
+      "nworld": 1,
+      "wall_s": 0.3293682540534064,
+      "instrumented_wall_s": 0.37013386096805334,
+      "setup_wall_s": 0.475871336995624,
+      "env_steps_per_s": 667.945369028575,
+      "realtime_factor": 0.3339726845142875,
+      "peak_contacts_total": 91,
+      "peak_constraints": 273,
+      "peak_iterations": 100,
+      "overflow_or": 512,
+      "peak_penetration_mm": 0.8653970435261726,
+      "samples": [
+        {
+          "step": 20,
+          "time": 0.01,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.0
+        },
+        {
+          "step": 40,
+          "time": 0.02,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.0
+        },
+        {
+          "step": 60,
+          "time": 0.03,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 80,
+          "time": 0.04,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 100,
+          "time": 0.05,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 120,
+          "time": 0.06,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 140,
+          "time": 0.07,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 160,
+          "time": 0.08,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 180,
+          "time": 0.09,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.07486663525924087
+        },
+        {
+          "step": 200,
+          "time": 0.1,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "flags_or": 0,
+          "peak_penetration_mm": 0.4389537498354912
+        },
+        {
+          "step": 220,
+          "time": 0.11,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "flags_or": 2,
+          "peak_penetration_mm": 0.8653970435261726
+        }
+      ],
+      "final_bad_worlds": 0,
+      "nconmax_per_world": 256,
+      "njmax": 512
+    }
+  ],
+  "median_env_steps_per_s": null,
+  "median_realtime_factor": null,
+  "source_sha256": {
+    "test/flex_granular/benchmark.py": "279615ea195546c009fe1578dff45ba04a9724f535232ea816e325fb771599a2",
+    "bag_sim/wrap.py": "93958be7481f59338b7db5444f2f6e16f90469f030c165e30688400955822d0e",
+    "test/flex_granular/gpu_checks.py": "2a02287f32d7c896486c34ebbd4f76ba0081fe63931f34430dbca54906ef96bd"
+  },
+  "sources_unchanged": true,
+  "software": {
+    "mujoco": "3.17.0",
+    "numpy": "2.5.4",
+    "mujoco_warp": "3.17.0",
+    "warp": "1.19.0"
+  },
+  "timing": "step+per-step numerical/contact counters; CPU geometry/readback separately in instrumented_wall_s",
+  "limitations": "unmeasured stretch-only film; homogeneous GPU copies; no grasping or independent solver residual acceptance"
+}

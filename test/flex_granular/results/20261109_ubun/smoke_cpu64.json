@@ -1,0 +1,73 @@
+{
+  "host": "ubun",
+  "backend": "cpu",
+  "model": {
+    "grains": 64,
+    "divisions": 4,
+    "vertices": 98,
+    "triangles": 192,
+    "nq": 742,
+    "nv": 678,
+    "grain_radius_m": 0.008,
+    "film_radius_m": 0.0005,
+    "grain_mass_kg": 0.08235496645826429,
+    "film_mass_kg": 0.012,
+    "membrane_only": true,
+    "self_collision": "auto",
+    "solver": "CG",
+    "timestep": 0.0005
+  },
+  "initial_geometry": {
+    "valid": true,
+    "outside": 0,
+    "protrusion_mm": 0.0,
+    "winding_min": 1.0
+  },
+  "nworld": 1,
+  "repeats": 1,
+  "valid": true,
+  "trials": [
+    {
+      "valid": true,
+      "failure": null,
+      "steps": 20,
+      "wall_s": 0.006104749976657331,
+      "instrumented_wall_s": 0.011596480035223067,
+      "env_steps_per_s": 3276.1374464922874,
+      "realtime_factor": 1.6380687232461437,
+      "peak_contacts": 0,
+      "peak_constraints": 0,
+      "peak_iterations": 0,
+      "peak_penetration_mm": 0.0,
+      "samples": [
+        {
+          "step": 20,
+          "time": 0.01,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 0,
+          "nefc": 0
+        }
+      ]
+    }
+  ],
+  "median_env_steps_per_s": 3276.1374464922874,
+  "median_realtime_factor": 1.6380687232461437,
+  "source_sha256": {
+    "test/flex_granular/benchmark.py": "08667674957d9b7b9d96aa407740332a1328101420c6cacce45e5ceb6211be14",
+    "bag_sim/wrap.py": "93958be7481f59338b7db5444f2f6e16f90469f030c165e30688400955822d0e"
+  },
+  "sources_unchanged": true,
+  "software": {
+    "mujoco": "3.17.0",
+    "numpy": "2.5.4",
+    "mujoco_warp": "3.17.0",
+    "warp": "1.19.0"
+  },
+  "timing": "step+per-step numerical/contact counters; CPU geometry/readback separately in instrumented_wall_s",
+  "limitations": "unmeasured stretch-only film; homogeneous GPU copies; no grasping or independent solver residual acceptance"
+}

@@ -1,0 +1,203 @@
+{
+  "host": "ubun",
+  "backend": "cpu",
+  "model": {
+    "grains": 64,
+    "divisions": 4,
+    "vertices": 98,
+    "triangles": 192,
+    "nq": 742,
+    "nv": 678,
+    "grain_radius_m": 0.008,
+    "film_radius_m": 0.0005,
+    "grain_mass_kg": 0.08235496645826429,
+    "film_mass_kg": 0.012,
+    "membrane_only": true,
+    "self_collision": "auto",
+    "solver": "CG",
+    "timestep": 0.0005
+  },
+  "initial_geometry": {
+    "valid": true,
+    "outside": 0,
+    "protrusion_mm": 0.0,
+    "winding_min": 1.0
+  },
+  "nworld": 1,
+  "repeats": 3,
+  "valid": false,
+  "trials": [
+    {
+      "valid": false,
+      "failure": {
+        "warnings": {},
+        "finite": true,
+        "geometry": {
+          "valid": false,
+          "outside": 0,
+          "protrusion_mm": 1.308056739048642,
+          "winding_min": 0.9999999999999999
+        },
+        "peak_penetration_mm": 3.4859977682792365
+      },
+      "steps": 220,
+      "wall_s": 0.08460886892862618,
+      "instrumented_wall_s": 0.13121068594045937,
+      "env_steps_per_s": 2600.200224702049,
+      "realtime_factor": 1.3001001123510245,
+      "peak_contacts": 89,
+      "peak_constraints": 267,
+      "peak_iterations": 100,
+      "peak_penetration_mm": 3.4859977682792365,
+      "samples": [
+        {
+          "step": 20,
+          "time": 0.01,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 0,
+          "nefc": 0
+        },
+        {
+          "step": 40,
+          "time": 0.02,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 0,
+          "nefc": 0
+        },
+        {
+          "step": 60,
+          "time": 0.03,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 80,
+          "time": 0.04,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 100,
+          "time": 0.05,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 120,
+          "time": 0.06,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 140,
+          "time": 0.07,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 160,
+          "time": 0.08,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 0.9999999999999999
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 180,
+          "time": 0.09,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.0,
+            "winding_min": 1.0
+          },
+          "ncon": 25,
+          "nefc": 75
+        },
+        {
+          "step": 200,
+          "time": 0.1,
+          "geometry": {
+            "valid": true,
+            "outside": 0,
+            "protrusion_mm": 0.6265015820753148,
+            "winding_min": 0.9999999999999997
+          },
+          "ncon": 45,
+          "nefc": 135
+        },
+        {
+          "step": 220,
+          "time": 0.11,
+          "geometry": {
+            "valid": false,
+            "outside": 0,
+            "protrusion_mm": 1.308056739048642,
+            "winding_min": 0.9999999999999999
+          },
+          "ncon": 89,
+          "nefc": 267
+        }
+      ]
+    }
+  ],
+  "median_env_steps_per_s": null,
+  "median_realtime_factor": null,
+  "source_sha256": {
+    "test/flex_granular/benchmark.py": "08667674957d9b7b9d96aa407740332a1328101420c6cacce45e5ceb6211be14",
+    "bag_sim/wrap.py": "93958be7481f59338b7db5444f2f6e16f90469f030c165e30688400955822d0e"
+  },
+  "sources_unchanged": true,
+  "software": {
+    "mujoco": "3.17.0",
+    "numpy": "2.5.4",
+    "mujoco_warp": "3.17.0",
+    "warp": "1.19.0"
+  },
+  "timing": "step+per-step numerical/contact counters; CPU geometry/readback separately in instrumented_wall_s",
+  "limitations": "unmeasured stretch-only film; homogeneous GPU copies; no grasping or independent solver residual acceptance"
+}
