@@ -227,3 +227,6 @@
 
 ## 2026-11-10 · 加速轮计划
 - 改动：内容物报告追加“加速轮计划”（A0–A6）；袋子报告追加“加速与底板修改”（B2″–B4″）；decisions 加 2026-11-10 条。核对：速度数字引自 CONTINUUM_REPORT“分段物GPU速度对照”；G3 报错原文见 resume_20261108/g3.log；绳数与 frictionloss 公式见 bag_sim/effect_model.py。
+
+## 2026-11-10 · flex 提速第 2 轮计划
+- 改动：袋子报告追加 F8–F12；decisions 加续条。核对：0.59 次/s、穿透 2.63/15.25/17.47 mm、CPU 20.8 ms/5.45 次/1044 行均引自袋子报告 F6/F7 节；4.0 环境见 envs/continuum-requirements.txt。
