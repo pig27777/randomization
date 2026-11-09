@@ -4,6 +4,12 @@
 
 ---
 
+## 2026-11-09 · 快递堆模型与参数审计留档
+
+- 补全书本/衣物/外袋参数说明：书本 1 刚体/24 几何，衣物 36 刚块/72 弹性连接，共用 122 顶点/240 三角形外袋。
+- 同尺寸 180×60×40 mm、内容物 0.3 kg；明确刚体模式/分块数亦不同，50 N/mm 书本声明值与 pinch_coeff 未产生本轮相应作用，不作纯材料单变量归因。
+- 4 个归档模型编译/质量/来源核对通过，未推进动力学；[模型与实验报告](../test/policy/HIDDEN_CONTENTS_REPORT.md) · [参数 JSON](../policy/results/parcel_heap_20261109/continuation/model_specification.json) · [检查报告](../reports/parcel-heap-hidden-contents-test.md)。
+
 ## 2026-11-09 · YAM 快递堆连续视频统一归档
 
 - 按用户要求新建根目录 `video/`，保存 5 段独立试次和书/衣物、步长、薄信封 3 段并排对比，含整机与近景中文标注。

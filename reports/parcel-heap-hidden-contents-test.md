@@ -51,3 +51,13 @@
 - `ffprobe` 检查全部 8 段为 H.264/yuv420p、30 fps，独立视频 960×1080、并排视频 1920×1080；帧数与采样状态/播放速度/暂停时长一致。
 - `ffmpeg -v error -i <video> -f null -` 全部完整解码通过，状态与视频 SHA256 校验通过；[检查清单](../policy/results/parcel_heap_20261109/continuation/videos/video_checks.json)。
 - [书本/衣物对比](../video/book_clothes_comparison.mp4) 13.47 s · [步长对照](../video/book_timestep_comparison.mp4) 12.07 s · [薄信封](../video/thin_envelope_comparison.mp4) 10.20 s。
+
+## 模型与参数说明核对（2026-11-09）
+
+用户要求明确书本、袋子、衣物模型及同框架下的参数差异。已在[主实验报告前部](../test/policy/HIDDEN_CONTENTS_REPORT.md)补充模型结构、共同参数、差异参数、实际连接系数和薄信封说明。
+
+执行 `.venv/bin/python policy/inspect_parcel_models.py`：从正式阶段快照与冻结 v1.3 代码构造书本、衣物、装纸信封、薄硬片信封四个模型，检查原始文件与外部 YAM 资产指纹，不推进动力学。通过外袋相同、内容物同尺寸/质量、编译刚体数/连接数核对与名义/编译质量误差 <2×10⁻⁸ kg 检查；模型参数见 [model_specification.json](../policy/results/parcel_heap_20261109/continuation/model_specification.json)。
+
+- 书本为 1 刚体/24 碰撞几何、无运行时弹性连接；衣物为 36 刚块/72 弹性连接。两者 10 个 κ 字段相同、9 个字段不同，包含刚体模式与分块数，不能写成只改材料刚度的单变量对照。
+- 核实 `pinch_coeff` 差异未在本轮启用，刚体的 50 N/mm 声明值不产生弹性变形；外袋本构有效厚度 0.208998 mm 与接触厚度 0.50 mm 分开说明。
+- 末态只读接触重建确认外袋接触滑动摩擦为 0.6，与参数表一致；未运行新抓取或改变既有结果。当前尺寸的目标响应及材料属性仍缺实物标定。

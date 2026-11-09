@@ -1,0 +1,896 @@
+{
+  "host": "ubun",
+  "mujoco": "3.17.0",
+  "inspector_sha256": "43543690da63131eb39a5c50be77e319dd170e31d0d1c31af4852c355e4d03b6",
+  "models": [
+    {
+      "case": "book",
+      "original": "policy/results/parcel_heap_20261109/continuation/overhead/grasp_book_top_center_0.0_replay1.jsonl",
+      "original_sha256": "3c8e5a56a8205d6f6755a50493681c4a0054b40d959d9abe53aa8f5127aab41b",
+      "driver_sha256": "cfb64a6f3dfe6a9461494624778f4ccb2e03c1e764a8ce1f95c396caee860cb9",
+      "kappa": {
+        "category": "hard",
+        "size": [
+          0.18,
+          0.06,
+          0.04
+        ],
+        "mass": 0.3,
+        "com_offset": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "segments": [
+          4,
+          3,
+          2
+        ],
+        "rigid": true,
+        "squeeze_stiffness_y": 50.0,
+        "squeeze_stiffness_z": 50.0,
+        "lock_strain_y": 0.02,
+        "lock_strain_z": 0.02,
+        "droop_ratio": 0.0,
+        "damping_ratio": 0.5,
+        "mobile": false,
+        "mobile_frac": 0.3,
+        "mobile_range": 0.02,
+        "mobile_freq": 2.0,
+        "surface_friction": 0.8,
+        "skin_compliance": 0.0,
+        "pinch_coeff": 0.0
+      },
+      "internal_mapping": {
+        "E_y": 555555.5555555556,
+        "E_z": 185185.1851851852,
+        "D": 726.9694444444442,
+        "table": true,
+        "in_table": {
+          "squeeze_y": false,
+          "squeeze_z": false,
+          "droop": false
+        }
+      },
+      "mapping_entry": "bendable:4x3x2",
+      "mapping_table_sha256": "e65abc104e0e8e3dc9e3f11437d41fe22318a32188fd17232e4d6819407009d9",
+      "segment_elastic_coefficients_active": false,
+      "content": {
+        "kind": "segment_rigid",
+        "descriptor_cells": 24,
+        "cell_size_mm": [
+          45.0,
+          20.0,
+          20.0
+        ],
+        "descriptor_connections": 46,
+        "compiled_bodies": 1,
+        "compiled_geoms": 24,
+        "free_body_velocity_coordinates": 6,
+        "elastic_bushings": 0,
+        "nominal_mass_kg": 0.3,
+        "compiled_mass_kg": 0.3,
+        "geom_friction": [
+          [
+            0.5,
+            0.005,
+            0.0001
+          ]
+        ],
+        "mobile_enabled": false,
+        "joints_by_axis": [
+          {
+            "axis": "x",
+            "connections": 18,
+            "fixed": 18,
+            "k_comp_N_per_m": [
+              4938.2716049382725
+            ],
+            "k_tens_N_per_m": [
+              2469.1358024691363
+            ],
+            "k_shear_N_per_m": [
+              [
+                2469.1358024691363,
+                3817598.5368084125
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                161.0549382716049,
+                0.08230452674897121
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              40.28431069958847
+            ],
+            "lock_compression": [
+              0.45
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          },
+          {
+            "axis": "y",
+            "connections": 16,
+            "fixed": 16,
+            "k_comp_N_per_m": [
+              25000.000000000004
+            ],
+            "k_tens_N_per_m": [
+              12500.000000000002
+            ],
+            "k_shear_N_per_m": [
+              [
+                12500.000000000002,
+                50000.00000000001
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                0.41666666666666674,
+                2.109375
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.6315104166666667
+            ],
+            "lock_compression": [
+              0.03
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          },
+          {
+            "axis": "z",
+            "connections": 12,
+            "fixed": 12,
+            "k_comp_N_per_m": [
+              8333.333333333334
+            ],
+            "k_tens_N_per_m": [
+              4166.666666666667
+            ],
+            "k_shear_N_per_m": [
+              [
+                4166.666666666667,
+                4166.666666666667
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                0.1388888888888889,
+                0.703125
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.2105034722222222
+            ],
+            "lock_compression": [
+              0.04
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          }
+        ]
+      },
+      "shell_initial_vertex_span_mm": [
+        240.0,
+        110.0,
+        46.5
+      ],
+      "shell_sha256": "b5b9c1320c95e232fd1b053605c12cd76448cfbda61fd76a26ea2112c5622701",
+      "flexes": [
+        {
+          "name": "bag",
+          "vertices": 122,
+          "triangles": 240,
+          "compiled_edges": 358,
+          "mass_kg": 0.012,
+          "contact_thickness_mm": 0.5,
+          "elasticity": {
+            "young": 4784743.764693455,
+            "poisson": 0.3,
+            "thickness": 0.0002089976076418101,
+            "damping": 0.0001,
+            "elastic2d": "both"
+          },
+          "membrane_Et_N_per_m": 1000.0,
+          "bending_Et3_over_12_1nu2_Nm": 4e-06,
+          "contact": {
+            "contype": "2",
+            "conaffinity": "7",
+            "condim": "3",
+            "priority": "2",
+            "friction": ".6 .005 .0001",
+            "solref": "0.0008 1",
+            "solimp": ".999 .999 .0001",
+            "selfcollide": "auto"
+          }
+        }
+      ],
+      "settings": {
+        "stack_lift": 0.0,
+        "curvature_fix": true,
+        "solver": "CG",
+        "iterations": 2000,
+        "contact_time_s": 0.0008,
+        "timestep_scale": 0.5,
+        "adaptive_close": true,
+        "every_step_safety": true,
+        "wall_limit_s": 1800,
+        "carry_x": 0.1
+      },
+      "compiled_model": {
+        "nv": 410,
+        "njnt": 380,
+        "neq": 1,
+        "initial_active_equalities": 1
+      },
+      "inactive_parameters": {
+        "pinch_coeff": "No pinch attachment is installed by this heap driver.",
+        "surface_friction": "Kappa field does not install pad-content pairs in the heap fixture; flex uses mu=0.6.",
+        "skin_compliance": "Heap fixture does not install the equivalent skin pad-content pair.",
+        "mobile_defaults": "mobile_frac/range/freq are inactive when mobile=False."
+      }
+    },
+    {
+      "case": "clothes",
+      "original": "policy/results/parcel_heap_20261109/continuation/overhead/grasp_clothes_top_center_0.0.jsonl",
+      "original_sha256": "b0000ed78ec963a7ee6d28c4f628590d294daa83dc02859ece3cdce69d53308a",
+      "driver_sha256": "cb5ecf264e079cc3a59106c44561f45906400bc823da67467056c61ac43450b8",
+      "kappa": {
+        "category": "bendable",
+        "size": [
+          0.18,
+          0.06,
+          0.04
+        ],
+        "mass": 0.3,
+        "com_offset": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "segments": [
+          6,
+          3,
+          2
+        ],
+        "rigid": false,
+        "squeeze_stiffness_y": 0.5,
+        "squeeze_stiffness_z": 0.3,
+        "lock_strain_y": 0.2,
+        "lock_strain_z": 0.2,
+        "droop_ratio": 0.32,
+        "damping_ratio": 0.5,
+        "mobile": false,
+        "mobile_frac": 0.3,
+        "mobile_range": 0.02,
+        "mobile_freq": 2.0,
+        "surface_friction": 0.8,
+        "skin_compliance": 0.0,
+        "pinch_coeff": 1.0
+      },
+      "internal_mapping": {
+        "E_y": 6585.534653561587,
+        "E_z": 743.5416950451126,
+        "D": 0.24265933987889127,
+        "table": true,
+        "in_table": {
+          "squeeze_y": true,
+          "squeeze_z": true,
+          "droop": true
+        }
+      },
+      "mapping_entry": "bendable:6x3x2",
+      "mapping_table_sha256": "e65abc104e0e8e3dc9e3f11437d41fe22318a32188fd17232e4d6819407009d9",
+      "segment_elastic_coefficients_active": true,
+      "content": {
+        "kind": "segment_rigid",
+        "descriptor_cells": 36,
+        "cell_size_mm": [
+          30.0,
+          20.0,
+          20.0
+        ],
+        "descriptor_connections": 72,
+        "compiled_bodies": 36,
+        "compiled_geoms": 36,
+        "free_body_velocity_coordinates": 216,
+        "elastic_bushings": 72,
+        "nominal_mass_kg": 0.3,
+        "compiled_mass_kg": 0.2999999988000001,
+        "geom_friction": [
+          [
+            0.5,
+            0.005,
+            0.0001
+          ]
+        ],
+        "mobile_enabled": false,
+        "joints_by_axis": [
+          {
+            "axis": "x",
+            "connections": 30,
+            "fixed": 0,
+            "k_comp_N_per_m": [
+              87.8071287141545
+            ],
+            "k_tens_N_per_m": [
+              43.90356435707725
+            ],
+            "k_shear_N_per_m": [
+              [
+                43.90356435707725,
+                3845.639133593688
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                0.07210573375488165,
+                0.0014634521452359082
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.01839229647502939
+            ],
+            "lock_compression": [
+              0.45
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          },
+          {
+            "axis": "y",
+            "connections": 24,
+            "fixed": 0,
+            "k_comp_N_per_m": [
+              197.5660396068476
+            ],
+            "k_tens_N_per_m": [
+              98.7830198034238
+            ],
+            "k_shear_N_per_m": [
+              [
+                98.7830198034238,
+                395.1320792136952
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                0.0032927673267807937,
+                0.0074087264852567844
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.0026753734530093947
+            ],
+            "lock_compression": [
+              0.30000000000000004
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          },
+          {
+            "axis": "z",
+            "connections": 18,
+            "fixed": 0,
+            "k_comp_N_per_m": [
+              22.306250851353376
+            ],
+            "k_tens_N_per_m": [
+              11.153125425676688
+            ],
+            "k_shear_N_per_m": [
+              [
+                11.153125425676688,
+                11.153125425676688
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                0.00037177084752255626,
+                0.0008364844069257515
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.00030206381361207695
+            ],
+            "lock_compression": [
+              0.4
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          }
+        ]
+      },
+      "shell_initial_vertex_span_mm": [
+        240.0,
+        110.0,
+        46.5
+      ],
+      "shell_sha256": "b5b9c1320c95e232fd1b053605c12cd76448cfbda61fd76a26ea2112c5622701",
+      "flexes": [
+        {
+          "name": "bag",
+          "vertices": 122,
+          "triangles": 240,
+          "compiled_edges": 358,
+          "mass_kg": 0.012,
+          "contact_thickness_mm": 0.5,
+          "elasticity": {
+            "young": 4784743.764693455,
+            "poisson": 0.3,
+            "thickness": 0.0002089976076418101,
+            "damping": 0.0001,
+            "elastic2d": "both"
+          },
+          "membrane_Et_N_per_m": 1000.0,
+          "bending_Et3_over_12_1nu2_Nm": 4e-06,
+          "contact": {
+            "contype": "2",
+            "conaffinity": "7",
+            "condim": "3",
+            "priority": "2",
+            "friction": ".6 .005 .0001",
+            "solref": "0.0008 1",
+            "solimp": ".999 .999 .0001",
+            "selfcollide": "auto"
+          }
+        }
+      ],
+      "settings": {
+        "stack_lift": 0.0,
+        "curvature_fix": true,
+        "solver": "CG",
+        "iterations": 2000,
+        "contact_time_s": 0.0008,
+        "timestep_scale": 0.5,
+        "adaptive_close": true,
+        "every_step_safety": true,
+        "wall_limit_s": 1800,
+        "carry_x": 0.1
+      },
+      "compiled_model": {
+        "nv": 620,
+        "njnt": 415,
+        "neq": 73,
+        "initial_active_equalities": 1
+      },
+      "inactive_parameters": {
+        "pinch_coeff": "No pinch attachment is installed by this heap driver.",
+        "surface_friction": "Kappa field does not install pad-content pairs in the heap fixture; flex uses mu=0.6.",
+        "skin_compliance": "Heap fixture does not install the equivalent skin pad-content pair.",
+        "mobile_defaults": "mobile_frac/range/freq are inactive when mobile=False."
+      }
+    },
+    {
+      "case": "paper_envelope",
+      "original": "policy/results/parcel_heap_20261109/continuation/overhead/grasp_paper_envelope_top_center_0.0.jsonl",
+      "original_sha256": "2f209211ea9af430ab3dbf50a0dde1d9094ef3a3e121c859ea40d4ad5778cad6",
+      "driver_sha256": "cb5ecf264e079cc3a59106c44561f45906400bc823da67467056c61ac43450b8",
+      "kappa": null,
+      "internal_mapping": null,
+      "mapping_entry": null,
+      "mapping_table_sha256": "e65abc104e0e8e3dc9e3f11437d41fe22318a32188fd17232e4d6819407009d9",
+      "segment_elastic_coefficients_active": false,
+      "content": {
+        "kind": "paper_flex",
+        "descriptor_cells": null,
+        "cell_size_mm": null,
+        "descriptor_connections": null,
+        "compiled_bodies": 45,
+        "compiled_geoms": 1,
+        "free_body_velocity_coordinates": 135,
+        "elastic_bushings": 0,
+        "nominal_mass_kg": 0.012,
+        "compiled_mass_kg": 0.012000000000000002,
+        "geom_friction": [
+          [
+            0.5,
+            0.005,
+            0.0001
+          ]
+        ],
+        "mobile_enabled": false,
+        "joints_by_axis": []
+      },
+      "shell_initial_vertex_span_mm": [
+        219.99999999999997,
+        110.0,
+        0.9500000000000064
+      ],
+      "shell_sha256": "932b1ea71c8b57d22f66c11fcb0c2f6376452363e7b7ab74f69508a863b3ac71",
+      "flexes": [
+        {
+          "name": "bag",
+          "vertices": 122,
+          "triangles": 240,
+          "compiled_edges": 358,
+          "mass_kg": 0.006,
+          "contact_thickness_mm": 0.15,
+          "elasticity": {
+            "young": 351605423.20387155,
+            "poisson": 0.3,
+            "thickness": 8.532291603080617e-05,
+            "damping": 0.0001,
+            "elastic2d": "both"
+          },
+          "membrane_Et_N_per_m": 30000.0,
+          "bending_Et3_over_12_1nu2_Nm": 2.0000000000000005e-05,
+          "contact": {
+            "contype": "2",
+            "conaffinity": "7",
+            "condim": "3",
+            "priority": "2",
+            "friction": ".6 .005 .0001",
+            "solref": "0.0008 1",
+            "solimp": ".999 .999 .0001",
+            "selfcollide": "auto"
+          }
+        },
+        {
+          "name": "paper",
+          "vertices": 45,
+          "triangles": 64,
+          "compiled_edges": 108,
+          "mass_kg": 0.012,
+          "contact_thickness_mm": 0.3,
+          "elasticity": {
+            "young": 202999485.73528755,
+            "poisson": 0.3,
+            "thickness": 0.00014778362561528933,
+            "damping": 0.0001,
+            "elastic2d": "both"
+          },
+          "membrane_Et_N_per_m": 30000.0,
+          "bending_Et3_over_12_1nu2_Nm": 6e-05,
+          "contact": {
+            "contype": "2",
+            "conaffinity": "7",
+            "condim": "3",
+            "priority": "2",
+            "friction": ".6 .005 .0001",
+            "solref": "0.0008 1",
+            "solimp": ".999 .999 .0001",
+            "selfcollide": "auto"
+          }
+        }
+      ],
+      "settings": {
+        "stack_lift": 0.0,
+        "curvature_fix": true,
+        "solver": "CG",
+        "iterations": 2000,
+        "contact_time_s": 0.0008,
+        "timestep_scale": 0.5,
+        "adaptive_close": true,
+        "every_step_safety": true,
+        "wall_limit_s": 1800,
+        "carry_x": 0.1
+      },
+      "compiled_model": {
+        "nv": 545,
+        "njnt": 515,
+        "neq": 1,
+        "initial_active_equalities": 1
+      },
+      "inactive_parameters": {
+        "pinch_coeff": "No pinch attachment is installed by this heap driver.",
+        "surface_friction": "Kappa field does not install pad-content pairs in the heap fixture; flex uses mu=0.6.",
+        "skin_compliance": "Heap fixture does not install the equivalent skin pad-content pair.",
+        "mobile_defaults": "mobile_frac/range/freq are inactive when mobile=False."
+      }
+    },
+    {
+      "case": "card_envelope",
+      "original": "policy/results/parcel_heap_20261109/continuation/side_gap/grasp_gap_side_0.0.jsonl",
+      "original_sha256": "ed5efe7c05d3a893df81c2b0a9b505c7c6da6a055c3d9497a04b8ab594337f56",
+      "driver_sha256": "cfb64a6f3dfe6a9461494624778f4ccb2e03c1e764a8ce1f95c396caee860cb9",
+      "kappa": {
+        "category": "hard",
+        "size": [
+          0.16,
+          0.07,
+          0.0003
+        ],
+        "mass": 0.012,
+        "com_offset": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "segments": [
+          4,
+          3,
+          2
+        ],
+        "rigid": true,
+        "squeeze_stiffness_y": 50.0,
+        "squeeze_stiffness_z": 50.0,
+        "lock_strain_y": 0.02,
+        "lock_strain_z": 0.02,
+        "droop_ratio": 0.0,
+        "damping_ratio": 0.5,
+        "mobile": false,
+        "mobile_frac": 0.3,
+        "mobile_range": 0.02,
+        "mobile_freq": 2.0,
+        "surface_friction": 0.8,
+        "skin_compliance": 0.0,
+        "pinch_coeff": 0.0
+      },
+      "internal_mapping": {
+        "E_y": 97222222.22222224,
+        "E_z": 1339.285714285714,
+        "D": 17.027357142857134,
+        "table": true,
+        "in_table": {
+          "squeeze_y": false,
+          "squeeze_z": false,
+          "droop": false
+        }
+      },
+      "mapping_entry": "bendable:4x3x2",
+      "mapping_table_sha256": "e65abc104e0e8e3dc9e3f11437d41fe22318a32188fd17232e4d6819407009d9",
+      "segment_elastic_coefficients_active": false,
+      "content": {
+        "kind": "segment_rigid",
+        "descriptor_cells": 24,
+        "cell_size_mm": [
+          40.0,
+          23.333333333333336,
+          0.15
+        ],
+        "descriptor_connections": 46,
+        "compiled_bodies": 1,
+        "compiled_geoms": 24,
+        "free_body_velocity_coordinates": 6,
+        "elastic_bushings": 0,
+        "nominal_mass_kg": 0.012,
+        "compiled_mass_kg": 0.012,
+        "geom_friction": [
+          [
+            0.5,
+            0.005,
+            0.0001
+          ]
+        ],
+        "mobile_enabled": false,
+        "joints_by_axis": [
+          {
+            "axis": "x",
+            "connections": 18,
+            "fixed": 18,
+            "k_comp_N_per_m": [
+              8506.944444444445
+            ],
+            "k_tens_N_per_m": [
+              4253.472222222223
+            ],
+            "k_shear_N_per_m": [
+              [
+                4253.472222222223,
+                148987.93945312494
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                4.966264648437498,
+                0.19298161008230455
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              1.2898115646299506
+            ],
+            "lock_compression": [
+              0.45
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          },
+          {
+            "axis": "y",
+            "connections": 16,
+            "fixed": 16,
+            "k_comp_N_per_m": [
+              25000.0
+            ],
+            "k_tens_N_per_m": [
+              12500.0
+            ],
+            "k_shear_N_per_m": [
+              [
+                12500.0,
+                12500.0
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                2.3437499999999997e-05,
+                1.6666666666666665
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.4166725260416666
+            ],
+            "lock_compression": [
+              0.03
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          },
+          {
+            "axis": "z",
+            "connections": 12,
+            "fixed": 12,
+            "k_comp_N_per_m": [
+              8333.333333333332
+            ],
+            "k_tens_N_per_m": [
+              4166.666666666666
+            ],
+            "k_shear_N_per_m": [
+              [
+                4166.666666666666,
+                4166.666666666666
+              ]
+            ],
+            "k_bend_Nm_per_rad": [
+              [
+                0.18904320987654322,
+                0.5555555555555555
+              ]
+            ],
+            "k_twist_Nm_per_rad": [
+              0.18614969135802467
+            ],
+            "lock_compression": [
+              0.04
+            ],
+            "lock_bending_rad": [
+              1.0
+            ]
+          }
+        ]
+      },
+      "shell_initial_vertex_span_mm": [
+        219.99999999999997,
+        110.0,
+        0.9500000000000064
+      ],
+      "shell_sha256": "8c10636b795af8a9ba79b6bc872e577d1d8575cb5a5272fb56db449e700354c5",
+      "flexes": [
+        {
+          "name": "bag",
+          "vertices": 122,
+          "triangles": 240,
+          "compiled_edges": 358,
+          "mass_kg": 0.006,
+          "contact_thickness_mm": 0.15,
+          "elasticity": {
+            "young": 351605423.20387155,
+            "poisson": 0.3,
+            "thickness": 8.532291603080617e-05,
+            "damping": 0.0001,
+            "elastic2d": "both"
+          },
+          "membrane_Et_N_per_m": 30000.0,
+          "bending_Et3_over_12_1nu2_Nm": 2.0000000000000005e-05,
+          "contact": {
+            "contype": "2",
+            "conaffinity": "7",
+            "condim": "3",
+            "priority": "2",
+            "friction": ".6 .005 .0001",
+            "solref": "0.0008 1",
+            "solimp": ".999 .999 .0001",
+            "selfcollide": "auto"
+          }
+        }
+      ],
+      "settings": {
+        "stack_lift": 0.17,
+        "curvature_fix": true,
+        "solver": "CG",
+        "iterations": 2000,
+        "contact_time_s": 0.0008,
+        "timestep_scale": 0.5,
+        "adaptive_close": true,
+        "every_step_safety": true,
+        "wall_limit_s": 1800,
+        "carry_x": -0.1
+      },
+      "compiled_model": {
+        "nv": 422,
+        "njnt": 382,
+        "neq": 1,
+        "initial_active_equalities": 1
+      },
+      "inactive_parameters": {
+        "pinch_coeff": "No pinch attachment is installed by this heap driver.",
+        "surface_friction": "Kappa field does not install pad-content pairs in the heap fixture; flex uses mu=0.6.",
+        "skin_compliance": "Heap fixture does not install the equivalent skin pad-content pair.",
+        "mobile_defaults": "mobile_frac/range/freq are inactive when mobile=False."
+      }
+    }
+  ],
+  "same_parameters": {
+    "size": [
+      0.18,
+      0.06,
+      0.04
+    ],
+    "mass": 0.3,
+    "com_offset": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "damping_ratio": 0.5,
+    "mobile": false,
+    "mobile_frac": 0.3,
+    "mobile_range": 0.02,
+    "mobile_freq": 2.0,
+    "surface_friction": 0.8,
+    "skin_compliance": 0.0
+  },
+  "different_parameters": {
+    "category": {
+      "book": "hard",
+      "clothes": "bendable"
+    },
+    "segments": {
+      "book": [
+        4,
+        3,
+        2
+      ],
+      "clothes": [
+        6,
+        3,
+        2
+      ]
+    },
+    "rigid": {
+      "book": true,
+      "clothes": false
+    },
+    "squeeze_stiffness_y": {
+      "book": 50.0,
+      "clothes": 0.5
+    },
+    "squeeze_stiffness_z": {
+      "book": 50.0,
+      "clothes": 0.3
+    },
+    "lock_strain_y": {
+      "book": 0.02,
+      "clothes": 0.2
+    },
+    "lock_strain_z": {
+      "book": 0.02,
+      "clothes": 0.2
+    },
+    "droop_ratio": {
+      "book": 0.0,
+      "clothes": 0.32
+    },
+    "pinch_coeff": {
+      "book": 0.0,
+      "clothes": 1.0
+    }
+  },
+  "audit_passed": true,
+  "dynamics_steps": 0,
+  "note": "Historical policy heap models. Effective coefficients are not measured book/fabric material properties."
+}
