@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>内容物建模实验记录</title>
+<meta name="description" content="分段内容物与三维弹塑性连续体：建模方法、已做实验、真实结果与遇到的问题。">
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans CJK SC",sans-serif;color:#24343c;background:#f6f8fa;line-height:1.75;--muted:#667680;--line:#dce3e8;--accent:#196d61}*{box-sizing:border-box}body{margin:0}a{color:var(--accent);text-underline-offset:3px}header,main,footer{max-width:1080px;margin:auto;padding:30px 24px}header{padding-top:52px;padding-bottom:20px}.eyebrow{font-size:12px;color:var(--muted);letter-spacing:.08em}h1{font-size:clamp(27px,4vw,40px);line-height:1.3;margin:12px 0 16px}h2{font-size:23px;line-height:1.4;margin:0 0 20px}h3{font-size:17px;margin:0 0 10px}p{margin:10px 0}.lead{max-width:820px;color:#50616c}nav{display:flex;gap:22px;flex-wrap:wrap;margin-top:24px;font-size:14px}.notice{border-left:3px solid #c18332;background:#fff9ed;padding:14px 18px;margin:26px 0 0;font-size:14px}main{padding-top:10px}section{margin:28px 0 46px;scroll-margin-top:24px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid var(--line);background:white;border-radius:10px;padding:22px}.card p{font-size:14px}.sub{font-size:13px;color:var(--muted)}.tag{display:inline-block;font-size:11px;color:var(--accent);background:#eaf3f0;padding:3px 8px;border-radius:4px;margin-bottom:12px}.formula{font:15px ui-monospace,monospace;background:#ecf3f1;color:#195c50;padding:12px 16px;border-radius:6px;margin:18px 0}.table-wrap{overflow-x:auto;background:white;border:1px solid var(--line);border-radius:9px}table{border-collapse:collapse;width:100%;font-size:14px;min-width:580px;text-align:left}th,td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#eef2f5;font-weight:600}tr:last-child td{border-bottom:0}.good{color:#16734a}.bad{color:#a44536}.pending{color:#8b682d}figure{margin:22px 0}figure img{width:100%;max-width:840px;display:block;border-radius:8px;border:1px solid var(--line);background:white}figcaption{font-size:12px;color:var(--muted);margin-top:9px}.issues{display:grid;gap:12px}.issue{padding:17px 20px;border:1px solid var(--line);border-radius:8px;background:white}.issue p{font-size:14px;margin:5px 0 0}.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.video-card{background:white;border:1px solid var(--line);border-radius:10px;overflow:hidden}.video-card video{width:100%;display:block;background:#111;aspect-ratio:1280/480}.video-card .body{padding:16px 18px}.video-card h3{font-size:16px}.video-card p{font-size:13px;color:#586b76}.wide{grid-column:1/-1}details{background:white;border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin-top:18px;font-size:14px}summary{cursor:pointer;font-weight:600}code{font:12px ui-monospace,monospace;background:#edf1f4;padding:2px 5px;border-radius:4px}.source-links{display:flex;gap:12px 24px;flex-wrap:wrap;font-size:13px}footer{border-top:1px solid var(--line);font-size:12px;color:var(--muted);padding-bottom:45px}@media(max-width:720px){header,main,footer{padding-left:17px;padding-right:17px}header{padding-top:30px}.cards,.video-grid{grid-template-columns:1fr}.wide{grid-column:auto}.card{padding:18px}section{margin-bottom:34px}nav{gap:14px}th,td{padding:11px 13px}}
+</style>
+</head>
+<body>
+<header>
+<div class="eyebrow">实验记录 · 2026-11-09 · ubun / RTX 5090</div>
+<h1>内容物怎么建模，实验走到了哪里</h1>
+<p class="lead">对比分段刚体与三维弹塑性连续体。记录实际采用的方法、已经执行的实验和遇到的问题，便于回看与继续迭代。</p>
+<nav aria-label="页面导航"><a href="#model">建模方法</a><a href="#experiments">实验结果</a><a href="#issues">遇到的问题</a><a href="#videos">视频</a><a href="https://github.com/pig27777/randomization">GitHub 源码 ↗</a></nav>
+<div class="notice"><strong>当前结论：</strong>连续体候选、GPU 步进和调参抓取界面已实现；可靠抓取、随机参数批量稳定性仍未通过。参数尚未用实物标定，视频中的任务结果按真实事件标注。</div>
+</header>
+<main>
+<section id="model">
+<h2>01 · 怎么建模</h2>
+<div class="formula">A = g<sub>B</sub>(X)　固定模板 B，通过材料与形状参数 X 生成不同物体 A。</div>
+<div class="cards">
+<article class="card"><span class="tag">分段内容物 · 冻结 v1.3</span><h3>刚体块 + 弹性连接</h3><p>把物体分成若干刚体块，块之间通过平移、转动弹性连接、原生阻尼和几何限位传力。硬物可合并为单刚体；易弯、易压物保留多个段。</p><p>旧方案包括围压门控的压密连接；顶面抓取还可开启辅助捏取规则。视频中的 <code>辅助捏取=1</code> 表示启用了该规则。</p><p class="sub">代表规模：易弯 36 段、易压 48 段。MuJoCo / MJWarp 3.17，步长 0.4 ms；GPU 材料算子沿用 float64 实现。</p><a href="https://github.com/pig27777/randomization/tree/main/contents/segment">分段模型源码 ↗</a></article>
+<article class="card"><span class="tag">连续体内容物 · 当前候选</span><h3>有体积的四面体弹塑性实体</h3><p>用 60 个顶点、144 个四面体填满整个实体，采用 MuJoCo 4 原生 full 3D StVK 弹性与 J₂ 塑性。超过屈服阈值后更新塑性参考状态，卸载后可以保留形变。</p><p>材料与形状都进入 X：弹性模量、泊松比、阻尼、屈服、密度、摩擦，以及尺寸、圆润度、中央鼓包和宽度渐变。连接拓扑保持不变。</p><p class="sub">MuJoCo / MJWarp 4.0，GPU Newton，步长 0.5 ms；不加压密、关闭自碰撞。GPU 保存完整塑性历史，不用 CPU 动力学或 CG 回退。</p><a href="https://github.com/pig27777/randomization/tree/main/contents/continuum">连续体模型源码 ↗</a></article>
+</div>
+<figure><img src="assets/shapes.png" width="840" height="600" loading="lazy" alt="同一60顶点144四面体模板生成方盒、圆角、鼓包枕形和渐变宽度四种真实体积网格"><figcaption>实际参考网格：相同连接拓扑与 240×160×50 mm 外包络。形状改变实体体积；相同平均密度下，总质量随实际网格体积变化。</figcaption></figure>
+<details><summary>哪些地方还有限制</summary><p>目前只支持单个连通实心体，未接入独立袋膜；任意拓扑、实物材料标定、目标整体响应到材料参数的换算表尚未完成。节点集中质量沿用原生 flexcomp，不能把它当作已标定的均匀密度有限元质量分布。</p><p>“硬物 / 易弯 / 易压”是探索预设名称，两种建模方法还没有标定成相同的整体响应。</p></details>
+</section>
+<section id="experiments">
+<h2>02 · 已经做过的实验</h2>
+<div class="table-wrap"><table><thead><tr><th>实验</th><th>实际结果</th><th>能说明什么</th></tr></thead><tbody>
+<tr><td>三材料 × 四形状构建</td><td class="good">12/12 构建通过；24 个随机形状合法；8 个非法输入被拒绝</td><td>固定拓扑可以改变真实体积形状；合法参数不等于动态稳定。</td></tr>
+<tr><td>相同剪切初态的恢复力</td><td>hard / bendable / compressible：22.33 / 2.32 / 0.80 N</td><td>三个预设有不同材料响应；这是恢复力范数，不是整体刚度标定。</td></tr>
+<tr><td>塑性与完整状态</td><td>初版释放实验有残余塑性；双 world 隔离及状态重放曾通过。当前精化版复测被略超 10⁻⁵ 的残差拦截。</td><td>塑性历史必须随完整 integration state 保存；旧版通过不能替代当前版本验收。</td></tr>
+<tr><td>统一 YAM 抓取</td><td class="bad">原生接触完整任务：硬盒提起失夹，两个初始软形状出现塑性非有限值</td><td>短入口能运行，不代表可靠抓取。用户自调软参数另有 5.414 s 后失夹的完整轨迹。</td></tr>
+<tr><td>24 组 κ · 纯 GPU 常驻</td><td>1 world：<strong>19/24</strong> 组有效；32 worlds：<strong>13/24</strong> 组有效</td><td>通过组各重复 3 次、每次推进 1 秒；失败组保留并排除出有效速度统计。</td></tr>
+<tr><td>调参界面与视频</td><td>可调整形状、材料和姿态后运行原 YAM 协议；连续体新增真实 10 秒视频</td><td>GPU 动力学、CPU 画图。5.414 秒失夹后，视频继续观察至 10 秒，失夹判定保留。</td></tr>
+</tbody></table></div>
+<h3 style="margin-top:26px">速度：按推进 1 秒仿真比较</h3>
+<p class="sub">同一台 RTX 5090、相同尺寸质量、完整 YAM 初始控制保持、无界面绘图与逐步状态读回。分段 0.4 ms 需要 2,500 步；连续体 0.5 ms 需要 2,000 步。</p>
+<div class="table-wrap"><table><thead><tr><th>代表预设</th><th>分段 · 1 world</th><th>连续体 · 1 world</th><th>分段 · 32 worlds</th><th>连续体 · 32 worlds</th></tr></thead><tbody>
+<tr><td>hard / box</td><td>0.900 s *</td><td>4.998 s</td><td>0.977 s *</td><td>7.976 s</td></tr>
+<tr><td>bendable / box</td><td>8.651 s *</td><td>3.335 s</td><td>10.384 s *</td><td>4.938 s</td></tr>
+<tr><td>compressible / box</td><td>13.005 s *</td><td>3.052 s</td><td>15.478 s *</td><td class="bad">非有限，拒绝测速</td></tr>
+</tbody></table></div>
+<p class="sub">* 分段六组均触发线搜索上限警告，上表是保留无效标记的诊断成本。32 worlds 表示整批各推进 1 秒的总耗时。模型版本、积分器、自由度与材料响应不同，不能当作等精度或普遍加速倍数，也不是完整抓取吞吐。</p>
+<p class="sub">24 组 κ 中，有效组的单环境中位速度为 588 step/s；32 并行合计中位为 9,162 world-step/s。失败组没有混入这些数字。</p>
+</section>
+<section id="issues">
+<h2>03 · 遇到的问题</h2>
+<div class="issues">
+<article class="issue"><h3>软形状会出现塑性状态非有限</h3><p>某些 κ 单环境能跑，32 个 world 中仍可能有个别 world 失效。当前保留完整失败状态、原始溢出与残差，不用其余 world 的平均值掩盖失败；根因尚未确认。</p></article>
+<article class="issue"><h3>GPU 残差在浮点边界附近不总能通过</h3><p>保持 10⁻⁵ 门槛。最多两次同方程 GPU 精化能改善一些情况，但仍记录到 1.00081×10⁻⁵、1.00122×10⁻⁵ 的失败，没有放宽标准。</p></article>
+<article class="issue"><h3>原生接触抓取仍会失夹</h3><p>分段辅助捏取片可以完成一次搬运，不能用它证明纯接触成功。两模型原生接触片均保留真实失夹结果；材料、姿态、控制跟踪和接触承载仍需分别排查。</p></article>
+<article class="issue"><h3>旧分段 GPU 求解器触发线搜索上限</h3><p>诊断中的位置与速度有限，但原始警告位为 LS_ITERATIONS。保留 valid=false，未把带警告运行当作有效吞吐；没有为追求速度修改材料或求解器预算。</p></article>
+<article class="issue"><h3>实现完成不等于可以直接训练</h3><p>还需要定位首次塑性失效、验证长时程接触和参数适用范围、做实物响应标定，并完成可靠的批量抓取。当前只确认已执行的构建、短材料实验、部分有效 GPU 参数组和视频回放。</p></article>
+</div>
+</section>
+<section id="videos">
+<h2>真实轨迹视频</h2>
+<div class="video-grid">
+<article class="video-card wide"><video controls preload="metadata" src="assets/continuum-10s.mp4"></video><div class="body"><h3>连续体 · 真实 10 秒加长片</h3><p>用户自调软参数，GPU Newton，原生接触。5.414 秒失夹，之后保持终止控制目标继续真实仿真观察至 10 秒；黄色标签区分观察段。没有把失夹改成成功。</p></div></article>
+<article class="video-card"><video controls preload="metadata" src="assets/segmented-pinch.mp4"></video><div class="body"><h3>分段 v1.3 · 辅助捏取 = 1</h3><p>CPU 源轨迹，完成一次提起、搬运、放下和松开。含辅助捏取规则。</p></div></article>
+<article class="video-card"><video controls preload="metadata" src="assets/native-comparison.mp4"></video><div class="body"><h3>原生接触并排 · 辅助捏取 = 0</h3><p>分段易弯 / CPU 与连续体 hard / GPU；材料未匹配。分别在 9.586 / 8.244 秒失夹，停止画面已标注。</p></div></article>
+</div>
+<p class="sub">视频从保存状态回放，采样之间仅作显示插值；渲染使用 CPU Mesa，视频播放速度不代表求解速度。</p>
+</section>
+<section><h2>原始资料</h2><div class="source-links">
+<a href="https://github.com/pig27777/randomization/blob/main/test/content_model/CONTINUUM_REPORT.md">实验计划、完整结果与问题记录 ↗</a>
+<a href="https://github.com/pig27777/randomization/blob/main/reports/content-continuum-test.md">任务检查报告 ↗</a>
+<a href="https://github.com/pig27777/randomization/blob/main/reports/contents-model-videos-test.md">视频记录 ↗</a>
+<a href="https://github.com/pig27777/randomization/tree/main/test/runs/2026-11-09/contents/continuum-gpu-r1">24 组 κ、状态与源码快照 ↗</a>
+<a href="https://github.com/pig27777/randomization/tree/main/test/runs/2026-11-09/contents/segmented-gpu-speed-compare-r1">分段速度对照数据 ↗</a>
+<a href="https://github.com/pig27777/randomization/tree/main/test/runs/2026-11-09/contents/continuum-video-long-r1">10 秒续算数据 ↗</a>
+</div></section>
+</main>
+<footer>内容物建模实验记录 · 最后整理：2026-11-09。所有“通过”仅指对应实验与配置。网页本轮按用户要求跳过额外检查。</footer>
+</body>
+</html>

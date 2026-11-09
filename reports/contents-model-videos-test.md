@@ -1,5 +1,15 @@
 # 内容物模型视频检查
 
+## 追加轮计划：真实延长连续体观察段
+
+2026-11-09，复用用户 rounded 软参数试次 `continuum-gpu-r1/ui/203244-ddf55a34/trial`，从含 PLASTIC 与已保存 ctrl 的完整 `final_integration_state` 恢复，保留 5.413873 s 的 grasp_fail。保持终止控制目标，以现有 GPU Newton 动力学继续至总仿真时间 10 s；每约 20 ms 保存安全几何与完整状态。所有 GPU 步进持 `/tmp/claude-gpu.lock`，不修改平台、模型、判据、参数或 UI。若首次有效性失败，立即保留最早失败状态与最后安全几何，不转 CPU/CG。若软参数不能达到10 s，仅对 hard/box 的8.244 s完整终止态执行一次同类观察至12 s，不再挑参数。
+
+通过标准：恢复完整 integration state，保留原失夹结果；新增物理时间真实推进，观察段明确标注“失夹后保持姿态观察”；采用统一 CPU Mesa 回放。用户随后要求“不用检查”，本轮跳过额外 ffprobe、全解码和关键帧检查，只保留推进必需的运行时有效性停止规则。结果写入 `continuum-video-long-r1/`，旧轨迹/视频不覆盖；观看入口增加新文件。状态：已完成真实10秒软参数片。
+
+追加结果：完整integration state含PLASTIC恢复差0，从5.413872719 s推进9173步至10.000318527 s，真实增加4.586445808 s。保持原ctrl，未继续抓取状态机，原grasp_fail结果保留。追加段failure_bits=0、minJ=0.219504932、残差峰9.998210042e-6、overflow=0，未触发失效，不需要hard/box补录。渲染与标签编码进程正常结束；按用户要求未做额外视频检查。
+
+新增 [真实10秒片](../test/runs/2026-11-09/contents/contents-model-videos-r1/continuum-user-rounded-10s-observe.mp4) 已加入原 [观看页](../test/runs/2026-11-09/contents/contents-model-videos-r1/index.html) 首段。数据、完整恢复/保持控制说明、命令和源码快照见 [continuum-video-long-r1/README.md](../test/runs/2026-11-09/contents/continuum-video-long-r1/README.md)。原轨迹、旧片、UI与共享报告索引均未修改。
+
 最近检查：2026-11-09 21:22（Asia/Shanghai），机器 `ubun`。结论：5 条最终视频与原生 HTML 播放入口通过检查；仅验证回放交付，没有新增动力学或物理验收。
 
 ## 范围与方法

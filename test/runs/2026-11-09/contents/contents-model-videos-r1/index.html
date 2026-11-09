@@ -16,7 +16,15 @@
   footer { border-top: 1px solid #344050; margin-top: 36px; padding-top: 15px; }
 </style>
 <h1>分段与连续体内容物：真实轨迹回放</h1>
-<p>统一完整 YAM 机械臂，20 fps，全景与近景同步显示。画面来自已保存的仿真状态，未重新计算动力学。失败片在真实失夹时刻停止。</p>
+<p>统一完整 YAM 机械臂，20 fps，全景与近景同步显示。画面来自真实保存的仿真状态。原失夹时刻明确标注；新增加长片将失夹后的真实观察段单独标黄。</p>
+
+<section>
+  <h2>最新加长片 · 连续体软参数 · 真实 10 秒</h2>
+  <p>复用下方 rounded 用户软参数配置，从含塑性状态的完整终止状态继续 GPU Newton 仿真。总时长 10.0003 s，真实新增约 4.59 s。</p>
+  <video controls preload="metadata" src="continuum-user-rounded-10s-observe.mp4"></video>
+  <p class="event">5.414 s 原抓取任务失夹；后段为“失夹后保持姿态观察”，保持终止控制目标。原失夹结果保留，观察段未改判抓取成功。</p>
+  <p><a href="continuum-user-rounded-10s-observe.json">加长片来源、状态恢复与运行数据</a>。本轮按用户要求未额外做视频检查。</p>
+</section>
 
 <section>
   <h2>分段 v1.3 · 易弯锚点 · 辅助捏取=1</h2>

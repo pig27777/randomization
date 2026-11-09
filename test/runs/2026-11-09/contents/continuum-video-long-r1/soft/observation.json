@@ -1,0 +1,60 @@
+{
+  "source": "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-09/contents/continuum-gpu-r1/ui/203244-ddf55a34/trial",
+  "start_s": 5.413872718811035,
+  "requested_end_s": 10.0,
+  "last_safe_time_s": 10.00031852722168,
+  "steps": 9173,
+  "failure": null,
+  "status": "time_budget_reached",
+  "held_ctrl": [
+    0.6208851337432861,
+    2.5583159923553467,
+    1.0688605308532715,
+    0.36230000853538513,
+    -0.03992847353219986,
+    -1.6375688314437866,
+    0.0
+  ],
+  "initial_plastic_norm": 0.029177714055073217,
+  "final_plastic_norm": 0.029504901155654226,
+  "restore_max_abs_difference": 0.0,
+  "state_includes_plastic": true,
+  "dynamics": "GPU Newton",
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "gpu_health": [
+    {
+      "failure_bits": 0.0,
+      "minimum_J": 0.21950493220595194,
+      "peak_relative_residual": 9.998210042200782e-06,
+      "overflow_or": 0.0,
+      "peak_iterations": 9.0,
+      "plastic_norm": 0.029504901155654233,
+      "steps": 9173.0,
+      "peak_before_refinement": 1.0107833453947122e-05,
+      "refinement_attempts": 1.0,
+      "refinement_applied": 1.0,
+      "refinement_rejected": 0.0,
+      "refinement_nonfinite": 0.0
+    }
+  ],
+  "wall_s": 29.37284273491241,
+  "hostname": "ubun",
+  "label": "失夹后保持姿态观察",
+  "original_task_outcome": "grasp_fail",
+  "original_task_reason": "both fingertip contacts/connection lost >50ms",
+  "original_task_end_s": 5.413872718811035,
+  "source_sha256": {
+    "model.xml": "0bfa5f47c9bf96e5cddeefc6583d79fc789678d2dd88cbcf7ebb7d7dd6335614",
+    "trajectory.npz": "15c6b1bee9a497b1cd38bd9feac1ebc578ab300a8c20558e31ea550e7397f18e",
+    "result.json": "0017564586a3228d66732d75e862ee310cd9645682bef32cc515b3cf3ae76142"
+  }
+}

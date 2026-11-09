@@ -1,5 +1,9 @@
 # 分段与连续体内容物视频
 
+## 最新追加：连续体真实10秒观察片
+
+[continuum-user-rounded-10s-observe.mp4](continuum-user-rounded-10s-observe.mp4) 已加入 [观看页](index.html) 首段。原软参数任务5.413873 s失夹，完整恢复含PLASTIC的终止state后，在GPU Newton上保持原ctrl真实继续到10.000319 s，新增4.586446 s。观察段标黄“失夹后保持姿态观察”，原grasp_fail保留。恢复差0，追加9173步未触发运行时有效性失败；详细来源/命令/数据见 [continuum-video-long-r1/README.md](../continuum-video-long-r1/README.md)。按用户“不用检查”，此新片未额外做ffprobe、全解码或关键帧检查；下方旧5条视频的检查结果仍仅适用于旧片。
+
 ## 本轮计划
 
 问题：将已有完整 YAM 机械臂状态回放为可观看视频，展示分段与连续体内容物的真实运动、变形和停止事件。每个配置复用一次既有轨迹，不重新运行动力学、不占用 GPU、不改参数或判据。

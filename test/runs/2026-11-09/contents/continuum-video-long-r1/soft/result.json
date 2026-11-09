@@ -1,0 +1,266 @@
+{
+  "config": {
+    "category": "compressible",
+    "yaw": 40,
+    "tilt": 25,
+    "dt": 0.0005,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 600.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "material": "compressible",
+    "shape": "rounded",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "young": 3006.660569760869,
+    "poisson": 0.05,
+    "damping": 0.02,
+    "yield_strain": 0.01995638838946398,
+    "density": 151,
+    "friction": 0.8,
+    "roundness": 0.6,
+    "bulge": 0.49,
+    "taper": 0.1
+  },
+  "hostname": "ubun",
+  "mujoco": "4.0.0",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv-continuum/bin/python",
+  "frozen_v13_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "platform": "e183d1c0e78784d543651754ce852bb67f029764edc965e0211807a28f823e1c",
+    "backend": "7e502e1190fa70f42cdd40063bcc7ee9dfbcf47d7335cd82d6c3249aba1d6903",
+    "continuum_model": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "continuum_gpu": "13c33f07f00eb0913855fe7c3f7abbd906b27052b731936558a9ed19a40da163",
+    "continuum_residual": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d"
+  },
+  "backend": "continuum.grasp_adapter",
+  "robot_source_sha256": "63d03be809bc8767fa4638330202e387a905bcb158ab078c1067125c18ec84bd",
+  "outcome": "grasp_fail",
+  "reason": "both fingertip contacts/connection lost >50ms",
+  "phase": "post_grasp_fail_hold",
+  "sim_time_s": 10.00031852722168,
+  "wall_s": 88.2097865609685,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.7553942268714309,
+    "nonfinger_mm": 0.0,
+    "grip_N": 0.03232620478396682,
+    "down_N": 0.8474645380897605,
+    "tracking_mm": 5.838406400786232
+  },
+  "model_metrics": {
+    "min_determinant": 0.27396419875004346,
+    "peak_plastic_norm": 0.02916736957914519,
+    "peak_relative_residual": 9.999356737665592e-06
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.30099791288375854
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.30099791288375854,
+      "end_s": 3.3608477115631104
+    },
+    {
+      "phase": "close",
+      "start_s": 3.3608477115631104,
+      "end_s": 5.363852500915527
+    }
+  ],
+  "initial_com": [
+    -0.2500499839584034,
+    0.04001624033165475,
+    0.016936970878547685
+  ],
+  "final_com": [
+    -0.2504728741943836,
+    0.039152050437405723,
+    0.014682098891353237
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.09998105791856636,
+    "ik_max_rotation_deg": 0.00011430274677842448,
+    "tracking_max_mm": 5.838406400786232,
+    "tracking_p95_mm": 3.829761378470118,
+    "actuator_peak_Nm": [
+      0.06619453430175781,
+      1.1920661926269531,
+      0.3590526580810547,
+      0.23216772079467773,
+      0.07315654307603836,
+      0.044135093688964844
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 188,
+    "vertices": 60,
+    "tetrahedra": 144,
+    "nplastic": 864,
+    "representation": "full_3d_elastoplastic_continuum",
+    "parameters_X": {
+      "size": [
+        0.24,
+        0.16,
+        0.05
+      ],
+      "density": 151,
+      "young": 3006.660569760869,
+      "poisson": 0.05,
+      "damping": 0.02,
+      "yield_strain": 0.01995638838946398,
+      "friction": 0.8,
+      "roundness": 0.6,
+      "bulge": 0.49,
+      "taper": 0.1
+    },
+    "template_B": {
+      "count": [
+        5,
+        4,
+        3
+      ],
+      "timestep": 0.0005,
+      "iterations": 100,
+      "ls_iterations": 50,
+      "tolerance": 1e-08,
+      "contact_time": 0.005,
+      "radius": 0.001
+    },
+    "template_sha256": "405fa06491caeb85e830ed0713517e0713836024a1644652cde72034c7cd4cf5",
+    "topology_sha256": "1b40fce721adc93b1a4b45862029e3914170d2ed899c88f3086ca66857d51c72",
+    "mass_kg": 0.1903462031330585,
+    "size_mm": [
+      240.0,
+      160.0,
+      50.0
+    ],
+    "native_contact_only": true,
+    "gpu_health": [
+      {
+        "failure_bits": 0.0,
+        "minimum_J": 0.2592638049957765,
+        "peak_relative_residual": 9.999356737665592e-06,
+        "overflow_or": 0.0,
+        "peak_iterations": 10.0,
+        "plastic_norm": 0.02917771405507322,
+        "steps": 10827.0,
+        "peak_before_refinement": 1.0041321480106198e-05,
+        "refinement_attempts": 10.0,
+        "refinement_applied": 10.0,
+        "refinement_rejected": 0.0,
+        "refinement_nonfinite": 0.0
+      }
+    ],
+    "software": {
+      "mujoco": "4.0.0",
+      "mujoco_warp": "4.0.0",
+      "warp": "1.19.0",
+      "device": "cuda:0",
+      "solver": "Newton",
+      "dynamics": "GPU",
+      "residual_tolerance": 1e-05,
+      "refinement_steps": 2
+    }
+  },
+  "warnings": {},
+  "observation": {
+    "source": "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-09/contents/continuum-gpu-r1/ui/203244-ddf55a34/trial",
+    "start_s": 5.413872718811035,
+    "requested_end_s": 10.0,
+    "last_safe_time_s": 10.00031852722168,
+    "steps": 9173,
+    "failure": null,
+    "status": "time_budget_reached",
+    "held_ctrl": [
+      0.6208851337432861,
+      2.5583159923553467,
+      1.0688605308532715,
+      0.36230000853538513,
+      -0.03992847353219986,
+      -1.6375688314437866,
+      0.0
+    ],
+    "initial_plastic_norm": 0.029177714055073217,
+    "final_plastic_norm": 0.029504901155654226,
+    "restore_max_abs_difference": 0.0,
+    "state_includes_plastic": true,
+    "dynamics": "GPU Newton",
+    "software": {
+      "mujoco": "4.0.0",
+      "mujoco_warp": "4.0.0",
+      "warp": "1.19.0",
+      "device": "cuda:0",
+      "solver": "Newton",
+      "dynamics": "GPU",
+      "residual_tolerance": 1e-05,
+      "refinement_steps": 2
+    },
+    "gpu_health": [
+      {
+        "failure_bits": 0.0,
+        "minimum_J": 0.21950493220595194,
+        "peak_relative_residual": 9.998210042200782e-06,
+        "overflow_or": 0.0,
+        "peak_iterations": 9.0,
+        "plastic_norm": 0.029504901155654233,
+        "steps": 9173.0,
+        "peak_before_refinement": 1.0107833453947122e-05,
+        "refinement_attempts": 1.0,
+        "refinement_applied": 1.0,
+        "refinement_rejected": 0.0,
+        "refinement_nonfinite": 0.0
+      }
+    ],
+    "wall_s": 29.37284273491241,
+    "hostname": "ubun",
+    "label": "失夹后保持姿态观察",
+    "original_task_outcome": "grasp_fail",
+    "original_task_reason": "both fingertip contacts/connection lost >50ms",
+    "original_task_end_s": 5.413872718811035,
+    "source_sha256": {
+      "model.xml": "0bfa5f47c9bf96e5cddeefc6583d79fc789678d2dd88cbcf7ebb7d7dd6335614",
+      "trajectory.npz": "15c6b1bee9a497b1cd38bd9feac1ebc578ab300a8c20558e31ea550e7397f18e",
+      "result.json": "0017564586a3228d66732d75e862ee310cd9645682bef32cc515b3cf3ae76142"
+    }
+  }
+}
