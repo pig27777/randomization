@@ -1,5 +1,19 @@
 # 内容物模型视频检查
 
+## 追加结果：真实原生接触成功录像
+
+复用负责人已完成的 `continuum-grasp-success-r1/narrow-100k` 实际success，按用户要求立即CPU Mesa回放，不新跑动力学。120×45×50 mm、40.5 g、E100 kPa、ν0.1、屈服应变0.2、damping0.02、friction0.8、yaw/tilt0°/0°，辅助捏取=0、无辅助绑定。原公共完整任务15.025556564 s完成提起、搬运、放下与松开。
+
+已生成观看目录 `continuum-native-success.mp4` 并复制 `docs/assets/continuum-native-success.mp4`，原观看index已置首播放。右侧近景仅将中心440×330图像显示放大为640×480。片内标明该例plastic_norm=0，是弹塑性框架中的弹性响应演示；单个小尺寸成功不外推全域可靠。机械臂跟踪峰40.5994 mm单列；源GPU无失败/overflow、Jmin0.759582、残差峰9.999877e-6、Newton最多7次、穿透峰0.882846 mm。
+
+渲染与标签编码进程均正常结束。按用户“不用检查”，没有额外ffprobe、解码或关键帧QA。来源/命令/事件见 [narrow-100k-video/README.md](../test/runs/2026-11-09/contents/continuum-grasp-success-r1/narrow-100k-video/README.md)。
+
+## 追加计划：保留窄实体失败与翻转解释
+
+按用户“失败的也要”与“四面体翻转给我解释是什么”，复用 `continuum-grasp-success-r1/narrow-10k`。仅CPU恢复第一失败步的完整integration state并提取实际qpos，不推进动力学；建立独立render-only复制记录，保留源最后安全几何并追加实际失败几何。用统一入口录制完整失败片及末0.8 s/10倍慢放/末帧保持3 s的四面体诊断片，标红负有符号体积单元。原试次不修改，状态仍为sim_fail。按用户“不用检查”不额外执行ffprobe、解码或关键帧QA。输出放观看目录并复制docs/assets，页面明确区别实际采样状态、显示插值与慢放。
+
+结果：两片已编码并复制 `docs/assets/continuum-failed-narrow.mp4`、`docs/assets/continuum-tet-inversion.mp4`，原观看index已追加失败与解释。第一失败GPU时刻3.665325642 s，源结果最后安全时刻3.664825678 s；单元ID43的J=-0.000772392，与原GPU翻转失效一致。没有改原试次，没有CPU动力学，未额外做视频QA。回放来源、命令及metadata见 [narrow-10k-video/README.md](../test/runs/2026-11-09/contents/continuum-grasp-success-r1/narrow-10k-video/README.md)。
+
 ## 追加轮计划：真实延长连续体观察段
 
 2026-11-09，复用用户 rounded 软参数试次 `continuum-gpu-r1/ui/203244-ddf55a34/trial`，从含 PLASTIC 与已保存 ctrl 的完整 `final_integration_state` 恢复，保留 5.413873 s 的 grasp_fail。保持终止控制目标，以现有 GPU Newton 动力学继续至总仿真时间 10 s；每约 20 ms 保存安全几何与完整状态。所有 GPU 步进持 `/tmp/claude-gpu.lock`，不修改平台、模型、判据、参数或 UI。若首次有效性失败，立即保留最早失败状态与最后安全几何，不转 CPU/CG。若软参数不能达到10 s，仅对 hard/box 的8.244 s完整终止态执行一次同类观察至12 s，不再挑参数。

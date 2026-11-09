@@ -15,7 +15,7 @@
 <h1>内容物怎么建模，实验走到了哪里</h1>
 <p class="lead">对比分段刚体与三维弹塑性连续体。记录实际采用的方法、已经执行的实验和遇到的问题，便于回看与继续迭代。</p>
 <nav aria-label="页面导航"><a href="#model">建模方法</a><a href="#experiments">实验结果</a><a href="#issues">遇到的问题</a><a href="#bagged-videos">袋子＋内容物夹取</a><a href="#videos">内容物视频</a><a href="https://github.com/pig27777/randomization">GitHub 源码 ↗</a></nav>
-<div class="notice"><strong>当前结论：</strong>连续体候选、GPU 步进和调参抓取界面已实现；可靠抓取、随机参数批量稳定性仍未通过。参数尚未用实物标定，视频中的任务结果按真实事件标注。</div>
+<div class="notice"><strong>当前结论：</strong>已取得一例窄小连续体的原生接触完整抓取成功；原宽软物及随机参数批量稳定性仍未通过。参数尚未用实物标定，一例演示不代表成功率，所有失败记录保留。</div>
 </header>
 <main>
 <section id="model">
@@ -34,7 +34,7 @@
 <tr><td>三材料 × 四形状构建</td><td class="good">12/12 构建通过；24 个随机形状合法；8 个非法输入被拒绝</td><td>固定拓扑可以改变真实体积形状；合法参数不等于动态稳定。</td></tr>
 <tr><td>相同剪切初态的恢复力</td><td>hard / bendable / compressible：22.33 / 2.32 / 0.80 N</td><td>三个预设有不同材料响应；这是恢复力范数，不是整体刚度标定。</td></tr>
 <tr><td>塑性与完整状态</td><td>初版释放实验有残余塑性；双 world 隔离及状态重放曾通过。当前精化版复测被略超 10⁻⁵ 的残差拦截。</td><td>塑性历史必须随完整 integration state 保存；旧版通过不能替代当前版本验收。</td></tr>
-<tr><td>统一 YAM 抓取</td><td class="bad">原生接触完整任务：硬盒提起失夹，两个初始软形状出现塑性非有限值</td><td>短入口能运行，不代表可靠抓取。用户自调软参数另有 5.414 s 后失夹的完整轨迹。</td></tr>
+<tr><td>统一 YAM 抓取</td><td><span class="good">新窄实体原生接触完整 success，15.026 s</span><br><span class="bad">原宽硬盒失夹、初始软形状塑性非有限；新 E=10 kPa 窄实体下压翻转</span></td><td>成功例为 120×45×50 mm、40.5 g、E=100 kPa，本次未屈服；不能外推到原大物体或随机 κ。</td></tr>
 <tr><td>24 组 κ · 纯 GPU 常驻</td><td>1 world：<strong>19/24</strong> 组有效；32 worlds：<strong>13/24</strong> 组有效</td><td>通过组各重复 3 次、每次推进 1 秒；失败组保留并排除出有效速度统计。</td></tr>
 <tr><td>调参界面与视频</td><td>可调整形状、材料和姿态后运行原 YAM 协议；连续体新增真实 10 秒视频</td><td>GPU 动力学、CPU 画图。5.414 秒失夹后，视频继续观察至 10 秒，失夹判定保留。</td></tr>
 </tbody></table></div>
@@ -51,6 +51,7 @@
 <section id="issues">
 <h2>03 · 遇到的问题</h2>
 <div class="issues">
+<article class="issue"><h3>四面体翻转后，力学结果不再可信</h3><p>局部四面体被压扁到零体积，顶点随后穿过对面，相对初态的有符号体积比 J 变成负数。单元的方向反了，继续计算可能产生异常力、穿透、反弹或数值发散。</p><p>窄实体 E=10 kPa 的新例在 3.665 秒翻转，单元 #43 的 J=-0.000772；当时数值仍有限、残差也在门槛内，几何却已经失效，所以独立停止。J&gt;0 只是必要条件，也不能代替材料和接触验收。</p></article>
 <article class="issue"><h3>软形状会出现塑性状态非有限</h3><p>某些 κ 单环境能跑，32 个 world 中仍可能有个别 world 失效。当前保留完整失败状态、原始溢出与残差，不用其余 world 的平均值掩盖失败；根因尚未确认。</p></article>
 <article class="issue"><h3>GPU 残差在浮点边界附近不总能通过</h3><p>保持 10⁻⁵ 门槛。最多两次同方程 GPU 精化能改善一些情况，但仍记录到 1.00081×10⁻⁵、1.00122×10⁻⁵ 的失败，没有放宽标准。</p></article>
 <article class="issue"><h3>原生接触抓取仍会失夹</h3><p>分段辅助捏取片可以完成一次搬运，不能用它证明纯接触成功。两模型原生接触片均保留真实失夹结果；材料、姿态、控制跟踪和接触承载仍需分别排查。</p></article>
@@ -73,6 +74,9 @@
 <section id="videos">
 <h2>真实轨迹视频</h2>
 <div class="video-grid">
+<article class="video-card wide"><video controls preload="metadata" src="assets/continuum-native-success.mp4"></video><div class="body"><h3>连续体 · 原生接触完整成功</h3><p>15.03 秒完成提起、搬运、放下与松开，辅助捏取=0。120×45×50 mm、40.5 g、E=100 kPa、ν=0.1、屈服=0.2；本次 plastic=0，表现为弹性响应。</p><p>无翻转/溢出/警告，最小 J=0.760，穿透峰 0.883 mm；机械臂跟踪峰 40.6 mm 仍需改进。只是一例未标定参数演示，未重复测试。</p></div></article>
+<article class="video-card"><video controls preload="metadata" src="assets/continuum-failed-narrow.mp4"></video><div class="body"><h3>失败案例 · 窄实体下压后翻转</h3><p>120×50×50 mm、E=10 kPa，原生接触。3.665 秒发生局部翻转，仿真停止。原始失败结果保留。</p></div></article>
+<article class="video-card"><video controls preload="metadata" src="assets/continuum-tet-inversion.mp4"></video><div class="body"><h3>翻转单元标红 · 10 倍慢放</h3><p>诊断回放末段真实保存状态，红色标出第一失败单元。慢放与停帧已注明，不代表新增物理步进。</p></div></article>
 <article class="video-card wide"><video controls preload="metadata" src="assets/continuum-10s.mp4"></video><div class="body"><h3>连续体 · 真实 10 秒加长片</h3><p>用户自调软参数，GPU Newton，原生接触。5.414 秒失夹，之后保持终止控制目标继续真实仿真观察至 10 秒；黄色标签区分观察段。没有把失夹改成成功。</p></div></article>
 <article class="video-card"><video controls preload="metadata" src="assets/segmented-pinch.mp4"></video><div class="body"><h3>分段 v1.3 · 辅助捏取 = 1</h3><p>CPU 源轨迹，完成一次提起、搬运、放下和松开。含辅助捏取规则。</p></div></article>
 <article class="video-card"><video controls preload="metadata" src="assets/native-comparison.mp4"></video><div class="body"><h3>原生接触并排 · 辅助捏取 = 0</h3><p>分段易弯 / CPU 与连续体 hard / GPU；材料未匹配。分别在 9.586 / 8.244 秒失夹，停止画面已标注。</p></div></article>

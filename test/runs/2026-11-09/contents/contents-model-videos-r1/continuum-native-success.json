@@ -1,0 +1,144 @@
+{
+  "source": "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-09/contents/continuum-grasp-success-r1/narrow-100k",
+  "video": "continuum-native-success.mp4",
+  "outcome": "success",
+  "sim_time_s": 15.025556564331055,
+  "actual_X": {
+    "size": [
+      0.12,
+      0.045,
+      0.05
+    ],
+    "density": 150,
+    "young": 100000,
+    "poisson": 0.1,
+    "damping": 0.02,
+    "yield_strain": 0.2,
+    "friction": 0.8,
+    "roundness": 0.0,
+    "bulge": 0.0,
+    "taper": 0.0
+  },
+  "mass_kg": 0.040500000000000015,
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 600.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "material": "bendable",
+    "shape": "box",
+    "size": [
+      0.12,
+      0.045,
+      0.05
+    ],
+    "young": 100000,
+    "poisson": 0.1,
+    "damping": 0.02,
+    "yield_strain": 0.2,
+    "density": 150,
+    "friction": null,
+    "roundness": null,
+    "bulge": null,
+    "taper": null,
+    "simulation_seconds": 30
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.30099791288375854
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.30099791288375854,
+      "end_s": 5.346845626831055
+    },
+    {
+      "phase": "close",
+      "start_s": 5.346845626831055,
+      "end_s": 8.524629592895508
+    },
+    {
+      "phase": "lift",
+      "start_s": 8.524629592895508,
+      "end_s": 11.02525520324707
+    },
+    {
+      "phase": "lift_hold",
+      "start_s": 11.02525520324707,
+      "end_s": 11.226144790649414
+    },
+    {
+      "phase": "carry",
+      "start_s": 11.226144790649414,
+      "end_s": 12.999170303344727
+    },
+    {
+      "phase": "carry_hold",
+      "start_s": 12.999170303344727,
+      "end_s": 13.300004959106445
+    },
+    {
+      "phase": "lower",
+      "start_s": 13.300004959106445,
+      "end_s": 14.524831771850586
+    },
+    {
+      "phase": "open",
+      "start_s": 14.524831771850586,
+      "end_s": 15.025556564331055
+    }
+  ],
+  "model_metrics": {
+    "min_determinant": 0.7595820614733984,
+    "peak_plastic_norm": 0.0,
+    "peak_relative_residual": 9.999877250579997e-06
+  },
+  "peaks": {
+    "penetration_mm": 0.8828456047922373,
+    "nonfinger_mm": 0.0,
+    "grip_N": 9.980526169034668,
+    "down_N": 11.957370100609227,
+    "tracking_mm": 40.59942221522549
+  },
+  "gpu_health": [
+    {
+      "failure_bits": 0.0,
+      "minimum_J": 0.7595820614733984,
+      "peak_relative_residual": 9.999877250579997e-06,
+      "overflow_or": 0.0,
+      "peak_iterations": 7.0,
+      "plastic_norm": 0.0,
+      "steps": 30056.0,
+      "peak_before_refinement": 1.6932868530011837e-05,
+      "refinement_attempts": 1849.0,
+      "refinement_applied": 1849.0,
+      "refinement_rejected": 0.0,
+      "refinement_nonfinite": 0.0
+    }
+  ],
+  "source_sha256": {
+    "platform": "600f52bc89c02b39a8ec6a561f7323c1f6fc2f95df76a275fe96dd673a8c53cc",
+    "backend": "7b7f161e3941eabe3f401b6fe71b86095608c0b66e011c5a0a4df527a9b193b6",
+    "continuum_model": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "continuum_gpu": "13c33f07f00eb0913855fe7c3f7abbd906b27052b731936558a9ed19a40da163",
+    "continuum_residual": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d"
+  },
+  "right_display_crop": [
+    740,
+    75,
+    440,
+    330
+  ],
+  "right_display_scale": [
+    640,
+    480
+  ],
+  "additional_video_QA": "not run: user requested no checks"
+}

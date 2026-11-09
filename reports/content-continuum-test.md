@@ -2,7 +2,7 @@
 
 2026-11-09，ubun，RTX5090；隔离MuJoCo/MJWarp4.0.0、Warp1.19.0。
 
-固定B的三维StVK/J₂内容物、真实体积形状参数化、GPU Newton推进、完整塑性状态记录和统一YAM适配已实现。UI可调参后运行、显示真实样本并生成录像，单次上限10秒仿真。**当前完整抓取未验收通过，不能据此进入训练。**
+固定B的三维StVK/J₂内容物、真实体积形状参数化、GPU Newton推进、完整塑性状态记录和统一YAM适配已实现。UI可调参后运行、显示真实样本并生成录像，单次上限10秒仿真。**后续已取得一例窄小实体完整原生接触success；可靠抓取与随机κ训练仍未验收。**
 
 | 范围 | 方法 / 结果 |
 | --- | --- |
@@ -40,3 +40,9 @@ flock /tmp/claude-gpu.lock .venv-continuum/bin/python -B test/content_model/benc
 [详细对照表与限制](../test/content_model/CONTINUUM_REPORT.md#对照结果) · [原始数据和源码快照](../test/runs/2026-11-09/contents/segmented-gpu-speed-compare-r1/)。GPU调用均持锁；视频agent仅做CPU回放，没有重算动力学。
 
 用户另指定agent录制两类模型视频，已完成4单片+1原生接触并排，全部1280×480/20fps、ffprobe/全解码与关键帧检查通过；父会话验证观看页与主视频HTTP可用。播放入口`http://127.0.0.1:8768/`；[视频检查报告](contents-model-videos-test.md)。标签明确辅助捏取/源CPU或GPU/材料不匹配/提前失夹，不将视频回放当速度或物理验收。
+
+## 成功片及翻转失败片（2026-11-09，用户后续要求）
+
+沿用原统一平台、同B、GPU Newton、pinch_coeff=0，仅调整X。首例120×50×50mm/E10kPa在3.665326s单元#43翻转（J=-.000772392），已保留失败片与标红慢放。第二例120×45×50mm/40.5g/E100kPa/ν.1/yield.2，在15.02556s完成原生接触完整success。runtime无失效、overflow或warning，Jmin.75958，残差峰9.99988e-6，穿透峰.88285mm；提起保持/搬运采样桌面反力0，最终质心x=.25366m。跟踪峰40.60mm单列。本次plastic=0，不将该成功例说成软塑性大物体成功或成功率验证。
+
+数据：`test/runs/2026-11-09/contents/continuum-grasp-success-r1/`。新片分别为`continuum-native-success.mp4`、`continuum-failed-narrow.mp4`、`continuum-tet-inversion.mp4`，放于原视频目录和`docs/assets/`。取得成功后停止剩余参数探索，全部失败保留；按用户要求未额外检查/重跑，录像进程正常结束。

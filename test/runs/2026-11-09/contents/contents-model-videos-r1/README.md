@@ -1,5 +1,19 @@
 # 分段与连续体内容物视频
 
+## 最新追加：连续体原生接触成功片
+
+[continuum-native-success.mp4](continuum-native-success.mp4) 来自 [narrow-100k](../continuum-grasp-success-r1/narrow-100k/) 的实际success，原公共YAM协议完整运行15.025556564 s并完成提起、搬运、放下与松开。原生接触，辅助捏取=0，无辅助绑定。120×45×50 mm、0.0405 kg、E=100000 Pa、ν=0.1、yield_strain=0.2、damping=0.02、density=150 kg/m³、friction=0.8、box，yaw/tilt=0°/0°。60顶点/144四面体，MuJoCo/MJWarp4 GPU Newton，0.5 ms步长。
+
+本次塑性范数=0，是弹塑性框架中的弹性响应，不能把这一小尺寸单次成功外推为软塑性大物体或全参数可靠。GPU failure_bits=0、Jmin=0.759582、overflow=0、Newton最多7次、残差峰9.999877e-6；穿透峰0.882846 mm，机械臂跟踪误差峰40.5994 mm单列。
+
+右侧近景从原640×480图像中心裁切440×330并显示放大至640×480（约1.45倍），只是显示处理，不改变相机朝向、状态或动力学。左侧完整机械臂全景保留。已复制 `docs/assets/continuum-native-success.mp4`，原观看页首段提供播放。源参数、事件与指标见 [continuum-native-success.json](continuum-native-success.json)，回放命令见 [narrow-100k-video/README.md](../continuum-grasp-success-r1/narrow-100k-video/README.md)。按用户“不用检查”，仅要求渲染/编码进程正常结束，没有额外ffprobe、解码或关键帧QA；下方早期旧片检查结果不覆盖此新片。
+
+## 最新追加：失败记录与四面体翻转解释
+
+[continuum-failed-narrow.mp4](continuum-failed-narrow.mp4) 是120×50×50 mm、0.045 kg、E=10 kPa、ν=0.1、屈服应变0.2、yaw/tilt=0°/0°的原生接触试次，辅助捏取=0。在接近阶段第7331步四面体翻转，未形成夹持。最后安全时刻3.664825678 s，第一失败GPU状态时刻3.665325642 s，模型单元ID43的有符号体积比J=-0.000772392。
+
+[continuum-tet-inversion.mp4](continuum-tet-inversion.mp4) 标红该翻转单元，末0.8 s按10倍慢放，末帧停留3 s。J=V/V₀从正值经过0变成负值，表示局部单元朝向反转、体积网格失效，而非物体整体旋转。实际失败几何从完整GPU第一失败状态仅作CPU恢复与几何提取，未推进CPU动力学，原始试次未改。详细来源与复制记录见 [narrow-10k-video/README.md](../continuum-grasp-success-r1/narrow-10k-video/README.md)。两片已复制至 `docs/assets/` 同名文件；按用户“不用检查”，没有额外ffprobe、解码或关键帧QA。
+
 ## 最新追加：连续体真实10秒观察片
 
 [continuum-user-rounded-10s-observe.mp4](continuum-user-rounded-10s-observe.mp4) 已加入 [观看页](index.html) 首段。原软参数任务5.413873 s失夹，完整恢复含PLASTIC的终止state后，在GPU Newton上保持原ctrl真实继续到10.000319 s，新增4.586446 s。观察段标黄“失夹后保持姿态观察”，原grasp_fail保留。恢复差0，追加9173步未触发运行时有效性失败；详细来源/命令/数据见 [continuum-video-long-r1/README.md](../continuum-video-long-r1/README.md)。按用户“不用检查”，此新片未额外做ffprobe、全解码或关键帧检查；下方旧5条视频的检查结果仍仅适用于旧片。

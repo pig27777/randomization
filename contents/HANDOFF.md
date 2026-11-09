@@ -20,6 +20,8 @@
 
 ## 2. 一句话现状
 
+**2026-11-09 连续体首个原生接触成功例**：同B/GPU Newton、辅助捏取0，120×45×50mm、40.5g、E100kPa/ν.1/yield.2的窄实体15.026s完整提起搬运放下松开。无倒置/overflow/warning，Jmin.7596、穿透峰.8828mm，跟踪峰40.60mm；本次plastic=0，是弹性响应实例，不能外推到大软物或随机κ成功率。前一120×50mm/E10kPa样本翻转失败保留，网页有标红慢放；[本轮结果](../test/content_model/CONTINUUM_REPORT.md#成功例及停止探索)。
+
 **2026-11-09 分段/连续体GPU成本与视频补充**：同YAM、尺寸/质量的单world推进1s仿真，当前分段/连续体hard为0.900/4.998s、易弯8.651/3.335s、易压13.005/3.052s；分段六个1/32world组均有线搜索上限警告，完整诊断保留valid=false，不作有效吞吐或等响应加速结论。用户指定agent完成4单片+1原生接触并排，均为旧轨迹CPU回放、事件醒目标注；[对照与视频记录](../test/content_model/CONTINUUM_REPORT.md#分段物gpu速度对照本轮计划2026-11-09ubun运行前) · [视频检查](../reports/contents-model-videos-test.md)。
 
 **2026-11-09 连续体候选（ubun，用户要求实施）**：新`continuum/`采用MuJoCo/MJWarp4原生3D StVK/J₂、GPU Newton，固定60节点/144四面体B；X含真实圆润/鼓包/渐变体积形状与材料，不加压密。三材料×四形状构建、四形状短入口及调参抓取UI闭环已完成。完整三组抓取为硬盒提起失夹、两软形状塑性非有限；当前复测另有残差门槛失败，不能进入训练。纯GPU接触静置24κ×1/32world、各有效组3次×1s：19/24与13/24有效；有效κ中位588.02 step/s与9162.14 world-step/s，配对合计增益中位22.106倍，失败组不计速度。UI单次上限10s仿真；不是纯GPU闭环抓取控制器。独立`.venv-continuum`不升级旧环境；[模型/UI说明](continuum/README.md) · [主题报告](../test/content_model/CONTINUUM_REPORT.md) · [检查报告](../reports/content-continuum-test.md)。

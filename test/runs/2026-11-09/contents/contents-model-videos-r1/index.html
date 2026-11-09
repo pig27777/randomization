@@ -19,6 +19,28 @@
 <p>统一完整 YAM 机械臂，20 fps，全景与近景同步显示。画面来自真实保存的仿真状态。原失夹时刻明确标注；新增加长片将失夹后的真实观察段单独标黄。</p>
 
 <section>
+  <h2>最新成功片 · 连续体原生接触完整搬运</h2>
+  <p>120×45×50 mm，40.5 g，E=100 kPa，ν=0.1，屈服应变0.2，摩擦0.8，yaw/tilt=0°/0°。GPU Newton；原生接触、辅助捏取=0，没有辅助绑定。</p>
+  <video controls preload="metadata" src="continuum-native-success.mp4"></video>
+  <p class="event">15.026 s 完成提起、搬运、放下与松开，原任务结果success。该配置没有发生屈服（塑性范数=0），是弹塑性框架中的弹性响应演示；它是单个小尺寸参数配置的成功结果。</p>
+  <p>机械臂跟踪误差峰值40.60 mm，内容物接触穿透峰值0.883 mm。右侧近景仅作1.45倍显示放大。<a href="continuum-native-success.json">实际参数与源轨迹元数据</a>；按用户要求未额外做视频检查。</p>
+</section>
+
+<section>
+  <h2>新失败记录 · 窄实体在接近阶段发生四面体翻转</h2>
+  <p>120×50×50 mm，0.045 kg，E=10,000 Pa，ν=0.1，屈服应变0.2，yaw/tilt=0°/0°。原生接触、辅助捏取=0；尚未形成夹持即在第7331步停止。</p>
+  <video controls preload="metadata" src="continuum-failed-narrow.mp4"></video>
+  <p class="event">最后安全时刻3.664826 s，第一失败GPU状态3.665326 s。视频包含该真实失败状态的几何；这是失败记录，没有补造后续抓取。</p>
+</section>
+
+<section>
+  <h2>四面体翻转是什么意思？</h2>
+  <p>实体由四面体小单元填满。把一个顶点压过对面的三角形时，单元先被压扁成零体积，再变成朝向相反的“内外翻转”状态。这里用有符号体积比J=V/V₀描述：J&gt;0保留原朝向，J=0压扁，J&lt;0翻转。它表示局部体积网格失效，不是整个物体转了个方向。</p>
+  <video controls preload="metadata" src="continuum-tet-inversion.mp4"></video>
+  <p class="event">红色显示第一失败状态的翻转单元ID 43，J=-0.00077239。只回放最后0.8秒，10倍慢放并保持末帧3秒；插值与停帧仅用于显示，不是新增物理推进。</p>
+</section>
+
+<section>
   <h2>最新加长片 · 连续体软参数 · 真实 10 秒</h2>
   <p>复用下方 rounded 用户软参数配置，从含塑性状态的完整终止状态继续 GPU Newton 仿真。总时长 10.0003 s，真实新增约 4.59 s。</p>
   <video controls preload="metadata" src="continuum-user-rounded-10s-observe.mp4"></video>
