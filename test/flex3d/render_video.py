@@ -68,9 +68,11 @@ def render(run,output,tetra=False,focus=False):
     renderer_name=renderer._gl_context.renderer
     option=mujoco.MjvOption()
     option.geomgroup[3]=False
+    option.flags[mujoco.mjtVisFlag.mjVIS_TENDON]=False
     option.flags[mujoco.mjtVisFlag.mjVIS_FLEXFACE]=True
     detail_option=mujoco.MjvOption()
     detail_option.geomgroup[3]=False
+    detail_option.flags[mujoco.mjtVisFlag.mjVIS_TENDON]=False
     detail_option.flags[mujoco.mjtVisFlag.mjVIS_FLEXFACE]=not tetra
     detail_option.flags[mujoco.mjtVisFlag.mjVIS_FLEXSKIN]=not tetra
     tets=model.flex_elem.reshape(-1,4) if tetra else None
@@ -89,7 +91,8 @@ def render(run,output,tetra=False,focus=False):
         focus_reference=rest_vertices[tets[min_tet]].mean(0)
     fps=20
     cfg=result["config"]
-    title=f'3D flex | {"TETRAHEDRA | " if tetra else ""}{cfg["category"]} | yaw {cfg["yaw"]:g} deg | pinch {cfg["pinch_coeff"]:g} | {result["outcome"]}'
+    model_label='Segmented v1.3' if result.get('backend')=='segmented' else '3D flex'
+    title=f'{model_label} | {"TETRAHEDRA | " if tetra else ""}{cfg["category"]} | yaw {cfg["yaw"]:g} deg | pinch {cfg["pinch_coeff"]:g} | {result["outcome"]}'
     if focus:title=f'{cfg.get("shape","box").upper()} tetrahedra | 10x slow | RED = inverted | final frame held 3s'
     label=f"drawtext=text='{title}':fontcolor=white:fontsize=20:x=16:y=12:box=1:boxcolor=black@0.65"
     if focus:label+=",tpad=stop_mode=clone:stop_duration=3"
@@ -105,7 +108,13 @@ def render(run,output,tetra=False,focus=False):
         a=float(np.clip((t-times[j])/max(times[j+1]-times[j],1e-12),0,1)) if len(times)>1 else 0.
         data.qpos[:]=(1-a)*states[j]+a*states[min(j+1,len(states)-1)]
         mujoco.mj_forward(model,data)
-        detail.lookat[:]=data.flexvert_xpos.mean(0) if model.nflex else [0,0,.15]
+        if model.nflex:
+            detail.lookat[:]=data.flexvert_xpos.mean(0)
+        elif result.get('backend')=='segmented':
+            content_geoms=[g for g in range(model.ngeom) if model.geom(g).name.startswith('s') and model.geom(g).name[1:].isdigit()]
+            detail.lookat[:]=data.geom_xpos[content_geoms].mean(0)
+        else:
+            detail.lookat[:]=[0,0,.15]
         if focus:
             full.lookat[:]=data.flexvert_xpos.mean(0)
             detail.lookat[:]=data.flexvert_xpos[tets[min_tet]].mean(0)

@@ -1,0 +1,174 @@
+{
+  "config": {
+    "category": "compressible",
+    "yaw": 0,
+    "tilt": 0,
+    "dt": 0.0004,
+    "pinch_coeff": 1.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27
+  },
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv/bin/python",
+  "frozen_v13_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "platform": "69d4e8636b7ce1adbb52e10c638ba7b96b36678d31434d03499e1b75d3c06e26",
+    "backend": "23035c1c7236ed6c889a4fd8de49cbd98c9aa39dea599d3ca72363d62f2dcf24"
+  },
+  "backend": "segmented",
+  "robot_source_sha256": "63d03be809bc8767fa4638330202e387a905bcb158ab078c1067125c18ec84bd",
+  "outcome": "success",
+  "reason": "",
+  "phase": "open",
+  "sim_time_s": 14.20560000001228,
+  "wall_s": 27.334157337085344,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.8499211708079273,
+    "nonfinger_mm": 0.0,
+    "grip_N": 9.992834021653437,
+    "down_N": 2.8961795703971087,
+    "tracking_mm": 43.41309472369734
+  },
+  "model_metrics": {
+    "max_strain": 0.35079302516037997,
+    "max_relative_angle_deg": 27.524136059488708,
+    "confinement_N": 2.987167035354639
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3004000000000045
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.3004000000000045,
+      "end_s": 4.125199999999611
+    },
+    {
+      "phase": "close",
+      "start_s": 4.125199999999611,
+      "end_s": 8.070799999999334
+    },
+    {
+      "phase": "lift",
+      "start_s": 8.070799999999334,
+      "end_s": 10.57120000000461
+    },
+    {
+      "phase": "lift_hold",
+      "start_s": 10.57120000000461,
+      "end_s": 10.771600000005034
+    },
+    {
+      "phase": "carry",
+      "start_s": 10.771600000005034,
+      "end_s": 12.544800000008776
+    },
+    {
+      "phase": "carry_hold",
+      "start_s": 12.544800000008776,
+      "end_s": 12.84520000000941
+    },
+    {
+      "phase": "lower",
+      "start_s": 12.84520000000941,
+      "end_s": 13.705200000011224
+    },
+    {
+      "phase": "open",
+      "start_s": 13.705200000011224,
+      "end_s": 14.20560000001228
+    }
+  ],
+  "initial_com": [
+    -0.2500074129444148,
+    0.03998991381322398,
+    0.057565107094550316
+  ],
+  "final_com": [
+    0.22320559159941739,
+    0.03415333096663898,
+    0.05741398261193458
+  ],
+  "pinch_events": [
+    {
+      "t": 8.070399999999333,
+      "event": "bind",
+      "segment": 20,
+      "segments": [
+        20,
+        32,
+        17,
+        29
+      ]
+    },
+    {
+      "t": 13.705200000011224,
+      "event": "open",
+      "segment": 20,
+      "segments": [
+        20,
+        32,
+        17,
+        29
+      ]
+    }
+  ],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.09512410665936805,
+    "ik_max_rotation_deg": 6.326793855935186,
+    "tracking_max_mm": 43.41309472369734,
+    "tracking_p95_mm": 29.62362964104892,
+    "actuator_peak_Nm": [
+      1.7479490571618435,
+      3.2049874268922736,
+      1.8595544386619878,
+      0.4469514087147104,
+      0.16812267891427995,
+      0.18817591162707537
+    ],
+    "control_clip_steps": 4890,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 296,
+    "segments": 48,
+    "elastic_connections": 104
+  },
+  "warnings": {}
+}

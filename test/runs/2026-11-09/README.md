@@ -30,6 +30,13 @@
 | 策略 / 场景 | [续轮结果（2026-11-09，CPU 独立运行）](../../policy/HIDDEN_CONTENTS_REPORT.md#续轮结果2026-11-09cpu-独立运行) | 结果 |
 | 策略 / 场景 | [连续视频导出计划（2026-11-09，用户要求视频）](../../policy/HIDDEN_CONTENTS_REPORT.md#连续视频导出计划2026-11-09用户要求视频) | 计划 / 阶段 |
 
+## 分段内容物与κ界面
+
+| 对象 / 版本 | 问题与运行标识 | 机器 / 状态 | 报告与数据 |
+| --- | --- | --- | --- |
+| 分段内容物，冻结v1.3 | `segmented-v13-yam-r1`：统一平台两类×六姿态＋纯接触对照 | ubun，CPU，14次结束：4任务success/5抓取失败/5初始化失败；跟踪未验收 | [主题报告](../../flex3d/REPORT.md#分段内容物-v13-接入本轮计划2026-11-09ubun) · [数据](contents/segmented-v13-yam-r1/) · [检查](../../../reports/segmented-v13-platform-test.md) |
+| 分段内容物，冻结v1.3 | `segmented-v13-parameter-ui-r1`：κ拖动、真实材料响应与本地服务 | ubun，CPU；3项物理检查、HTTP/JS契约通过，浏览器未验 | [说明与命令](../../content_model/TOOLS.md) · [数据](contents/segmented-v13-parameter-ui-r1/) · [检查](../../../reports/segmented-parameter-ui-test.md) |
+
 ## 仓库维护检查
 
 | 对象 | 运行标识 | 状态 | 报告与数据 |

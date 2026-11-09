@@ -1,0 +1,121 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0004,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27
+  },
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv/bin/python",
+  "frozen_v13_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "platform": "69d4e8636b7ce1adbb52e10c638ba7b96b36678d31434d03499e1b75d3c06e26",
+    "backend": "23035c1c7236ed6c889a4fd8de49cbd98c9aa39dea599d3ca72363d62f2dcf24"
+  },
+  "backend": "segmented",
+  "robot_source_sha256": "63d03be809bc8767fa4638330202e387a905bcb158ab078c1067125c18ec84bd",
+  "outcome": "grasp_fail",
+  "reason": "both fingertip contacts/connection lost >50ms",
+  "phase": "lift",
+  "sim_time_s": 9.586000000002532,
+  "wall_s": 23.748539240914397,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.13720403668222203,
+    "nonfinger_mm": 0.0,
+    "grip_N": 5.908888940405514,
+    "down_N": 20.0308324778683,
+    "tracking_mm": 26.57154398463526
+  },
+  "model_metrics": {
+    "max_strain": 0.40132168606597,
+    "max_relative_angle_deg": 11.51353560917562,
+    "confinement_N": 20.045359886957282
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3004000000000045
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.3004000000000045,
+      "end_s": 5.266399999999486
+    },
+    {
+      "phase": "close",
+      "start_s": 5.266399999999486,
+      "end_s": 9.150400000001612
+    }
+  ],
+  "initial_com": [
+    -0.24999975717960168,
+    0.04000004114254718,
+    0.024408107789382374
+  ],
+  "final_com": [
+    -0.25102980223426336,
+    0.04114995321392606,
+    0.024409459735453547
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.09396367963946904,
+    "ik_max_rotation_deg": 0.00043125982830025724,
+    "tracking_max_mm": 26.57154398463526,
+    "tracking_p95_mm": 26.379049295689505,
+    "actuator_peak_Nm": [
+      0.26935634615671233,
+      4.711199800926863,
+      1.0472003852000284,
+      2.2878616214998964,
+      0.1472292020565079,
+      0.023173254994425463
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 224,
+    "segments": 36,
+    "elastic_connections": 72
+  },
+  "warnings": {}
+}

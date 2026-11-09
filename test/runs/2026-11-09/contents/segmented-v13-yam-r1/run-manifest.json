@@ -1,0 +1,18 @@
+{
+  "hostname": "ubun",
+  "recorded_at": "2026-11-09T17:45:56.606307+08:00",
+  "external_lock": "/tmp/claude-gpu.lock",
+  "mode": "CPU behavior; not throughput",
+  "command": "OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 flock /tmp/claude-gpu.lock .venv/bin/python -u -B test/flex3d/run_suite.py behavior --backend segmented --workers 2 --output test/runs/2026-11-09/contents/segmented-v13-yam-r1/matrix",
+  "release_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "test/flex3d/segmented.py": "23035c1c7236ed6c889a4fd8de49cbd98c9aa39dea599d3ca72363d62f2dcf24",
+    "test/flex3d/grasp_platform.py": "69d4e8636b7ce1adbb52e10c638ba7b96b36678d31434d03499e1b75d3c06e26",
+    "test/flex3d/render_video.py": "d15760bc34eb7a5d601df90ffb48c8c7d0128d6b4ef883b1897d1c3db744bdc3"
+  },
+  "videos": [
+    "bendable-yaw45-clean.mp4",
+    "compressible-yaw45-clean.mp4"
+  ],
+  "interrupted_render": "Initial renders were interrupted after excessive tendon visual geometry; only visualization flags changed before re-export. Incomplete MP4/PPM products removed."
+}

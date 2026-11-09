@@ -1,0 +1,20 @@
+{
+  "config": {
+    "category": "compressible",
+    "yaw": 0,
+    "tilt": -30,
+    "dt": 0.0004,
+    "pinch_coeff": 1.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27
+  },
+  "backend": "segmented",
+  "hostname": "ubun",
+  "outcome": "setup_fail",
+  "reason": "YAM initial pose unreachable: {'position_mm': 14.702070795761927, 'rotation_deg': 3.534868411960895}",
+  "error": "RuntimeError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/angles.py\", line 18, in execute\n    return run(backend,cfg,output)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/grasp_platform.py\", line 159, in run\n    robot = backend.scene(cfg)\n            ^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/segmented.py\", line 76, in scene\n    robot = attach_robot(cfg, built, SegmentSim, center, top, kappa.size, kappa.mass)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/grasp_platform.py\", line 93, in attach_robot\n    robot = Yam(ANCHORS[cfg.category], 0, fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/policy/yam_probe_robot.py\", line 133, in __init__\n    raise RuntimeError(f'YAM initial pose unreachable: {self.ik_errors[-1]}')\nRuntimeError: YAM initial pose unreachable: {'position_mm': 14.702070795761927, 'rotation_deg': 3.534868411960895}\n",
+  "timing_is_throughput": false
+}

@@ -6,6 +6,7 @@
 | --- | --- |
 | 第一、二轮构建与响应对照 | `run_round1.py`、`run_round2.py` |
 | 本构与模型验收、步长与交互查看 | `validate_model.py`、`stability_estimate.py`、`view_m2.py` |
+| 拖动整体响应κ并查看真实CPU变形 | `parameter_ui.py`（界面为同名HTML，冻结v1.3） |
 | v1 验收、分布与顶面抓分析 | `freeze_v1.py`、`response_distribution.py`、`analyze_top_grasp.py` |
 | v1.2/v1.3 捏取验收 | `validate_pinch.py` |
 | v1.4 捏取候选 CPU 对照 | `validate_pinch_v14.py` |
@@ -25,5 +26,13 @@
 ```
 
 新轮次结果放 `test/runs/YYYY-MM-DD/contents/<run-id>/`，在支持的入口显式传输出参数。原脚本用于历史轮次复现时，保留其固定输入、冻结源码选择与输出约定，先读对应报告；不要把旧脚本直接指向当前模型后引用其历史通过结论。新的机械臂抓取对比仍使用 [公共平台](../flex3d/README.md)。
+
+κ预览从仓库根目录启动：
+
+```sh
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 .venv/bin/python -B test/content_model/parameter_ui.py --port 8765
+```
+
+在运行项目的机器打开 `http://127.0.0.1:8765`。调参重建并计算3秒，支持两类内容物、横向/厚度压缩和固定端悬垂。响应刚度和下垂范围来自冻结映射表，阻尼与载荷为预览控制。此处边界载荷与参考测法不同，结果用于探索，不能当作响应命中或抓取验收；关闭页面后2秒暂停步进。暂停/重新运行、旋转/缩放不改冻结源码。
 
 原 `contents/segment/tests/` 和独立测试脚本已移到本目录。模型的采样、参数换算、测量和任务适配接口仍随模型维护，不从模型代码反向导入本目录。

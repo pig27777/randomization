@@ -8,12 +8,15 @@
 
 公共平台固定机械臂、20×40 mm/2 mm圆角指尖、姿态、v2.2动作、结果判定与记录；`native_flex.py`仅负责3D flex本体、表面顶点捏取及翻转检测。`rigid_control.py`提供第二种模型的入口控制，验证公共流程不依赖四面体；没有将它作为硬物顶面抓的通过证明。
 
+`segmented.py`只读接入冻结v1.3分段内容物，保留发布版bushing/阻尼/限位，使用其0.4ms步长；首轮14次原任务结果为4 success、5 grasp_fail、5 setup_fail，成功样本的机械臂跟踪峰值约42–43mm，不能称整套平台物理验收通过。完整结果见报告末节。
+
 ## 运行
 
 在仓库根目录，使用已有`.venv`，不安装包。每次输出目录必须不存在。
 
 ```sh
 .venv/bin/python -B test/flex3d/angles.py --yaw 45 --output test/flex3d/results/NEW_RUN/one
+.venv/bin/python -B test/flex3d/angles.py --backend segmented --dt .0004 --yaw 45 --output test/runs/YYYY-MM-DD/contents/NEW_RUN/one
 .venv/bin/python -B test/flex3d/angles.py --model-options '{"young":20000,"poisson":0.3}' --output test/flex3d/results/NEW_RUN/material
 .venv/bin/python -B test/flex3d/run_suite.py behavior --workers 2 --output test/flex3d/results/NEW_RUN/matrix
 flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex3d/run_suite.py speed --locked --workers 1 --trials 1 --output test/flex3d/results/NEW_RUN/speed1

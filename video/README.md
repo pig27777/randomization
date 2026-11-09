@@ -14,6 +14,12 @@ YAM 快递堆视频为归档试次按原配置重放后的连续积分状态，3
 
 模型尚未实物标定，薄壳接触存在步长敏感性。视频不代表真实机械臂效果；结果解释见[实验报告](../test/policy/HIDDEN_CONTENTS_REPORT.md)。密集状态、重放一致性、字幕及视频检查记录位于[来源档案](../policy/results/parcel_heap_20261109/continuation/videos/)。
 
+## 冻结分段内容物：统一YAM平台
+
+[易弯内容物45°抓取](../test/runs/2026-11-09/contents/segmented-v13-yam-r1/bendable-yaw45-clean.mp4) · [易压内容物45°抓取](../test/runs/2026-11-09/contents/segmented-v13-yam-r1/compressible-yaw45-clean.mp4)：冻结v1.3、原平台动作、pinch_coeff=1，使用动态掌部捏取连接。各为一次任务success的原轨迹回放，左右是机械臂和内容物近景，20fps/1倍速；不是原生摩擦承重证明。
+
+14次矩阵为4任务success、5抓取失败、5初始化失败；成功样本跟踪峰值约42–43mm，未宣称完整物理验收。[实验报告](../test/flex3d/REPORT.md#分段内容物-v13-接入本轮计划2026-11-09ubun) · [帧数、CPU渲染与完整解码检查](../test/runs/2026-11-09/contents/segmented-v13-yam-r1/video-checks.json)。
+
 ## 薄膜与自由颗粒
 
 [GPU 连续 5 秒落袋与重排](flex_granular_gpu5s.mp4)：64 个直径 16 mm 的自由球粒、98 个 2D flex 膜顶点，单环境 GPU 连续 10000 步，100 Hz 记录、25 fps/1 倍速回放。左为半透明袋膜，右为线框内视；无机械臂动作。
