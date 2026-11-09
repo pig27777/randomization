@@ -1,6 +1,7 @@
 """Render saved trial states on CPU (Mesa llvmpipe), without using the GPU lock."""
 import argparse
 import ctypes
+from contextlib import contextmanager
 import json
 import os
 from pathlib import Path
@@ -41,6 +42,12 @@ class SoftwareContext:
     def make_current(self):
         if not EGL.eglMakeCurrent(self.display,self.surface,self.surface,self.context):
             raise RuntimeError("could not make Mesa context current")
+
+    @contextmanager
+    def as_current(self):
+        # MuJoCo 4 classic Renderer also uses this context-manager interface.
+        self.make_current()
+        yield self
 
     def free(self):
         if getattr(self,"context",None):

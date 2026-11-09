@@ -1,0 +1,112 @@
+{
+  "valid": true,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 4.998106277465819,
+      "synchronized_wall_seconds": 4.998708956642076,
+      "end_to_end_seconds": 5.000363055965863,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9988916419223678,
+          "peak_relative_residual": 9.994716120631744e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.0,
+          "steps": 2000.0,
+          "peak_before_refinement": 1.2450704496343728e-05,
+          "refinement_attempts": 742.0,
+          "refinement_applied": 742.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 2000,
+      "gpu_seconds": 5.002179321289062,
+      "synchronized_wall_seconds": 5.002389905275777,
+      "end_to_end_seconds": 5.004443040932529,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9988889053604689,
+          "peak_relative_residual": 9.99971075486589e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 5.0,
+          "plastic_norm": 0.0,
+          "steps": 2000.0,
+          "peak_before_refinement": 1.2605108005354935e-05,
+          "refinement_attempts": 716.0,
+          "refinement_applied": 716.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "steps": 2000,
+      "gpu_seconds": 4.949784393310546,
+      "synchronized_wall_seconds": 4.950232305680402,
+      "end_to_end_seconds": 4.9519376900279894,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9988917367204119,
+          "peak_relative_residual": 9.999911182686444e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 5.0,
+          "plastic_norm": 0.0,
+          "steps": 2000.0,
+          "peak_before_refinement": 1.2681657351979732e-05,
+          "refinement_attempts": 695.0,
+          "refinement_applied": 695.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "median_gpu_steps_per_second": 400.15155520343524,
+  "median_gpu_ms_per_step": 2.4990531387329096,
+  "aggregate_world_steps_per_second": 400.15155520343524,
+  "median_wall_steps_per_second": 400.103310144209,
+  "per_world_realtime_ratio": 0.20007577760171763,
+  "case": {
+    "id": "hard-box",
+    "material": "hard",
+    "shape": "box",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 100000.0,
+    "poisson": 0.25,
+    "damping": 0.02,
+    "yield_strain": 0.05,
+    "friction": 0.8,
+    "roundness": 0.0,
+    "bulge": 0.0,
+    "taper": 0.0
+  }
+}

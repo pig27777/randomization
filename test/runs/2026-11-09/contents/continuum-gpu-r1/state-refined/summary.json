@@ -1,0 +1,21 @@
+{
+  "hostname": "ubun",
+  "mode": "state",
+  "sources": {
+    "test/content_model/validate_continuum.py": "5aa3bf0f58c8019d77872e9919b590f945ef57163babf9504582527768a26532",
+    "contents/continuum/__init__.py": "7712a9c3ed89f94fe1ff044d0f5bfa70622784d50d15de48778b96791f7b7c38",
+    "contents/continuum/gpu.py": "13c33f07f00eb0913855fe7c3f7abbd906b27052b731936558a9ed19a40da163",
+    "contents/continuum/grasp_adapter.py": "7e502e1190fa70f42cdd40063bcc7ee9dfbcf47d7335cd82d6c3249aba1d6903",
+    "contents/continuum/model.py": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "bag_sim/flex_residual.py": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d"
+  },
+  "results": {
+    "state": {
+      "passed": false,
+      "error": "continuum GPU validity failure: [(1, {'failure_bits': 16.0, 'minimum_J': 0.999999999842556, 'peak_relative_residual': 1.0012224299710441e-05, 'overflow_or': 0.0, 'peak_iterations': 1.0, 'plastic_norm': 0.0, 'steps': 12.0, 'peak_before_refinement': 1.0012224299710441e-05, 'refinement_attempts': 2.0, 'refinement_applied': 0.0, 'refinement_rejected': 2.0, 'refinement_nonfinite': 0.0})]",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 162, in main\n    report[\"results\"][name] = dict(passed=True, data=function())\n                                                     ^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 157, in <lambda>\n    \"plastic\":lambda:plastic_release(args.output), \"state\":lambda:state_and_isolation(args.output)}\n                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 124, in state_and_isolation\n    advance(sim,20)\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 63, in advance\n    sim.assert_valid()\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/gpu.py\", line 166, in assert_valid\n    raise RuntimeError(f\"continuum GPU validity failure: {bad[:3]}\")\nRuntimeError: continuum GPU validity failure: [(1, {'failure_bits': 16.0, 'minimum_J': 0.999999999842556, 'peak_relative_residual': 1.0012224299710441e-05, 'overflow_or': 0.0, 'peak_iterations': 1.0, 'plastic_norm': 0.0, 'steps': 12.0, 'peak_before_refinement': 1.0012224299710441e-05, 'refinement_attempts': 2.0, 'refinement_applied': 0.0, 'refinement_rejected': 2.0, 'refinement_nonfinite': 0.0})]\n"
+    }
+  },
+  "valid": false,
+  "sources_unchanged": true
+}

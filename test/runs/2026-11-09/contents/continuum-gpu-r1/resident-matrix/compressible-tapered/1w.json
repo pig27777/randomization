@@ -1,0 +1,112 @@
+{
+  "valid": true,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 3.1764270477294927,
+      "synchronized_wall_seconds": 3.176907286280766,
+      "end_to_end_seconds": 3.178123157005757,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.8741975569027417,
+          "peak_relative_residual": 9.93099046317579e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 9.0,
+          "plastic_norm": 0.001264860066628411,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.93099046317579e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 2000,
+      "gpu_seconds": 3.13565219116211,
+      "synchronized_wall_seconds": 3.1361434338614345,
+      "end_to_end_seconds": 3.1373905029613525,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.8741026077336558,
+          "peak_relative_residual": 9.85854955748067e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 7.0,
+          "plastic_norm": 0.0012653781929835353,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.85854955748067e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "steps": 2000,
+      "gpu_seconds": 3.09611116027832,
+      "synchronized_wall_seconds": 3.0979927668813616,
+      "end_to_end_seconds": 3.0995480800047517,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.8740424403973597,
+          "peak_relative_residual": 9.933223994079926e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 7.0,
+          "plastic_norm": 0.0012647020959705583,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.933223994079926e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "median_gpu_steps_per_second": 637.8258423038865,
+  "median_gpu_ms_per_step": 1.567826095581055,
+  "aggregate_world_steps_per_second": 637.8258423038865,
+  "median_wall_steps_per_second": 637.725933835068,
+  "per_world_realtime_ratio": 0.31891292115194325,
+  "case": {
+    "id": "compressible-tapered",
+    "material": "compressible",
+    "shape": "tapered",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 3000.0,
+    "poisson": 0.05,
+    "damping": 0.02,
+    "yield_strain": 0.02,
+    "friction": 0.8,
+    "roundness": 0.3,
+    "bulge": 0.2,
+    "taper": 0.35
+  }
+}

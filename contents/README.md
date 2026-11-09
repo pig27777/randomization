@@ -6,6 +6,7 @@
 
 | 版本或方案 | 建模入口 | 版本依据与边界 |
 | --- | --- | --- |
+| 三维弹塑性连续体候选 | [continuum/](continuum/README.md) | MuJoCo/MJWarp4、GPU Newton；固定B改变材料与真实体积形状X，验收见[连续体报告](../test/content_model/CONTINUUM_REPORT.md) |
 | 分段模型 v1 | `segment/model.py`、`segment/bushing.py`、`segment/mj_adapter.py` | [冻结标签](segment/results/freeze_v1_newton/release_v1/v1.json)；历史包保持原样 |
 | 顶面捏取 v1.2 | 分段本体与 `segment/pinch.py` 的历史 weld 规则 | [冻结标签](segment/results/pinch_effect_v1_2/v22_review/release_v1_2/v1.2.json)；复现使用标签旁的归档，当前源码已演进 |
 | 顶面捏取 v1.3 | `segment/pinch.py`，共享分段本体 | [冻结标签](segment/results/pinch_connect_v1_3/release_v1_3/v1.3.json)；connect 连接，当前冻结参考 |

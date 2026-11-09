@@ -1,0 +1,106 @@
+{
+  "hostname": "ubun",
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "sources": {
+    "test/content_model/benchmark_continuum.py": "131dfd1cc8b45b3393ac21eb33dd756872b7a5c7d3ff09430eff99f8422c559b",
+    "contents/continuum/__init__.py": "7712a9c3ed89f94fe1ff044d0f5bfa70622784d50d15de48778b96791f7b7c38",
+    "contents/continuum/gpu.py": "13c33f07f00eb0913855fe7c3f7abbd906b27052b731936558a9ed19a40da163",
+    "contents/continuum/grasp_adapter.py": "7e502e1190fa70f42cdd40063bcc7ee9dfbcf47d7335cd82d6c3249aba1d6903",
+    "contents/continuum/model.py": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "bag_sim/flex_residual.py": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d",
+    "test/flex3d/grasp_platform.py": "e183d1c0e78784d543651754ce852bb67f029764edc965e0211807a28f823e1c"
+  },
+  "sources_unchanged": true,
+  "valid": true,
+  "nworld": 1,
+  "full_robot": true,
+  "control": "held at initialized values",
+  "protocol": "initial contact settling only; no live YAM controller or grasp evaluation",
+  "timestep": 0.0005,
+  "nv": 188,
+  "nplastic": 864,
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 400,
+      "gpu_seconds": 0.9655369873046875,
+      "synchronized_wall_seconds": 0.965566247003153,
+      "gpu_steps_per_second": 414.2772418450862,
+      "wall_steps_per_second": 414.2646879398362,
+      "valid": true,
+      "health": {
+        "failure_bits": 0.0,
+        "minimum_J": 0.9989587752718939,
+        "peak_relative_residual": 9.99066269532275e-06,
+        "overflow_or": 0.0,
+        "peak_iterations": 6.0,
+        "plastic_norm": 0.0,
+        "steps": 400.0,
+        "peak_before_refinement": 1.2309514710560882e-05,
+        "refinement_attempts": 124.0,
+        "refinement_applied": 124.0,
+        "refinement_rejected": 0.0,
+        "refinement_nonfinite": 0.0
+      }
+    },
+    {
+      "repeat": 1,
+      "steps": 400,
+      "gpu_seconds": 0.9686873779296875,
+      "synchronized_wall_seconds": 0.9687173300189897,
+      "gpu_steps_per_second": 412.92991847885327,
+      "wall_steps_per_second": 412.91715096307695,
+      "valid": true,
+      "health": {
+        "failure_bits": 0.0,
+        "minimum_J": 0.9988918371663186,
+        "peak_relative_residual": 9.999639605352941e-06,
+        "overflow_or": 0.0,
+        "peak_iterations": 5.0,
+        "plastic_norm": 0.0,
+        "steps": 400.0,
+        "peak_before_refinement": 1.2382314090151085e-05,
+        "refinement_attempts": 119.0,
+        "refinement_applied": 119.0,
+        "refinement_rejected": 0.0,
+        "refinement_nonfinite": 0.0
+      }
+    },
+    {
+      "repeat": 2,
+      "steps": 400,
+      "gpu_seconds": 0.9858737182617188,
+      "synchronized_wall_seconds": 0.98590394097846,
+      "gpu_steps_per_second": 405.73147715640033,
+      "wall_steps_per_second": 405.7190395273399,
+      "valid": true,
+      "health": {
+        "failure_bits": 0.0,
+        "minimum_J": 0.9989641590780363,
+        "peak_relative_residual": 9.996778356128454e-06,
+        "overflow_or": 0.0,
+        "peak_iterations": 6.0,
+        "plastic_norm": 0.0,
+        "steps": 400.0,
+        "peak_before_refinement": 1.1910595742849688e-05,
+        "refinement_attempts": 123.0,
+        "refinement_applied": 123.0,
+        "refinement_rejected": 0.0,
+        "refinement_nonfinite": 0.0
+      }
+    }
+  ],
+  "median_gpu_steps_per_second": 412.92991847885327,
+  "median_gpu_ms_per_step": 2.421718444824219,
+  "median_wall_steps_per_second": 412.91715096307695,
+  "gpu_realtime_ratio": 0.20646495923942665
+}

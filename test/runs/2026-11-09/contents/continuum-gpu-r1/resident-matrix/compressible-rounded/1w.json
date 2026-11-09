@@ -1,0 +1,112 @@
+{
+  "valid": true,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 3.192057800292969,
+      "synchronized_wall_seconds": 3.1929423972032964,
+      "end_to_end_seconds": 3.194594147033058,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9304917174696286,
+          "peak_relative_residual": 8.239115236622736e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 8.0,
+          "plastic_norm": 0.0006211379462797383,
+          "steps": 2000.0,
+          "peak_before_refinement": 8.239115236622736e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 2000,
+      "gpu_seconds": 3.1667244110107426,
+      "synchronized_wall_seconds": 3.1675334606552497,
+      "end_to_end_seconds": 3.168645287049003,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9305541536382315,
+          "peak_relative_residual": 7.921515394862941e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 8.0,
+          "plastic_norm": 0.0006202741805562352,
+          "steps": 2000.0,
+          "peak_before_refinement": 7.921515394862941e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "steps": 2000,
+      "gpu_seconds": 3.166697113037109,
+      "synchronized_wall_seconds": 3.167542834067717,
+      "end_to_end_seconds": 3.1686315779807046,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9305120399547102,
+          "peak_relative_residual": 8.28552991556185e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 7.0,
+          "plastic_norm": 0.0006190549357193797,
+          "steps": 2000.0,
+          "peak_before_refinement": 8.28552991556185e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "median_gpu_steps_per_second": 631.5674307009393,
+  "median_gpu_ms_per_step": 1.5833622055053713,
+  "aggregate_world_steps_per_second": 631.5674307009393,
+  "median_wall_steps_per_second": 631.4042476362115,
+  "per_world_realtime_ratio": 0.3157837153504697,
+  "case": {
+    "id": "compressible-rounded",
+    "material": "compressible",
+    "shape": "rounded",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 3000.0,
+    "poisson": 0.05,
+    "damping": 0.02,
+    "yield_strain": 0.02,
+    "friction": 0.8,
+    "roundness": 0.8,
+    "bulge": 0.0,
+    "taper": 0.0
+  }
+}

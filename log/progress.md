@@ -503,3 +503,8 @@
 2026-11-09 分段内容物大小/比例展示：三种同密度尺度、三种等体积等质量比例，各1次45°统一YAM任务，5 success/1扁平包grasp_fail，无模型失效/警告。
 六段单片＋两段固定镜头并排视频已完成并全解码检查；大包穿透1.065mm、跟踪峰30.45–48.18mm，仍非完整物理验收。
 形状仅为长方体比例，不宣称圆柱/圆枕支持；[视频](../video/README.md#改变大小与形状比例) · [实验报告](../test/flex3d/REPORT.md#分段内容物尺寸与形状比例视频本轮计划2026-11-09ubun) · [检查](../reports/segmented-size-shape-test.md)。
+
+2026-11-09 连续体内容物：MuJoCo/MJWarp4、GPU Newton，固定60节点/144四面体B，X改变真实形状与材料；不加压密，旧环境不升级。
+12构建/24随机网格、四形状GPU短入口和调参→YAM→录像UI完成，单次上限10s仿真；完整抓取为1失夹/2塑性非有限，当前残差复测亦未全过。
+24κ纯GPU常驻静置，1/32world分别19/24、13/24有效；有效κ中位588.02 step/s、9162.14 world-step/s，13配对合计增益中位22.106倍，16无效组不计速度。
+候选尚不能用于随机κ批量训练；[主题报告](../test/content_model/CONTINUUM_REPORT.md) · [检查](../reports/content-continuum-test.md) · [UI说明](../contents/continuum/README.md)。

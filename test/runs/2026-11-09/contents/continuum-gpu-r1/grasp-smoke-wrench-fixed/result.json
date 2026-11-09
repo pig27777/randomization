@@ -1,0 +1,28 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.02,
+    "arm_height": 0.27,
+    "material": "hard",
+    "shape": "box",
+    "size": null,
+    "young": null,
+    "poisson": null,
+    "damping": null,
+    "yield_strain": null,
+    "density": null
+  },
+  "backend": "continuum.grasp_adapter",
+  "hostname": "ubun",
+  "outcome": "execution_error",
+  "reason": "continuum GPU validity failure: [(0, {'failure_bits': 16.0, 'minimum_J': 0.9999999353270718, 'peak_relative_residual': 1.2452744121100437e-05, 'overflow_or': 0.0, 'peak_iterations': 6.0, 'plastic_norm': 0.0, 'steps': 21.0})]",
+  "error": "RuntimeError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/angles.py\", line 18, in execute\n    return run(backend,cfg,output)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/grasp_platform.py\", line 280, in run\n    sim.step()\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/grasp_adapter.py\", line 51, in step\n    self.gpu.sync(self.d)\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/gpu.py\", line 158, in sync\n    self.assert_valid()\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/gpu.py\", line 153, in assert_valid\n    raise RuntimeError(f\"continuum GPU validity failure: {bad[:3]}\")\nRuntimeError: continuum GPU validity failure: [(0, {'failure_bits': 16.0, 'minimum_J': 0.9999999353270718, 'peak_relative_residual': 1.2452744121100437e-05, 'overflow_or': 0.0, 'peak_iterations': 6.0, 'plastic_norm': 0.0, 'steps': 21.0})]\n",
+  "timing_is_throughput": false
+}

@@ -1,0 +1,107 @@
+{
+  "valid": false,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 3.285196701049805,
+      "synchronized_wall_seconds": 3.2860350938281044,
+      "end_to_end_seconds": 3.2872162979329005,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.6441071335466558,
+          "peak_relative_residual": 9.997718042249287e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 7.0,
+          "plastic_norm": 0.004906868448971261,
+          "steps": 2000.0,
+          "peak_before_refinement": 1.0030419006548542e-05,
+          "refinement_attempts": 5.0,
+          "refinement_applied": 5.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 2000,
+      "gpu_seconds": 3.2958385925292966,
+      "synchronized_wall_seconds": 3.2967311567626894,
+      "end_to_end_seconds": 3.297827086993493,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.644346918061333,
+          "peak_relative_residual": 9.995432076026989e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 7.0,
+          "plastic_norm": 0.004903321487332263,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.995432076026989e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "steps": 100,
+      "gpu_seconds": 0.1682051239013672,
+      "synchronized_wall_seconds": 0.1772469289135188,
+      "end_to_end_seconds": 0.17741072503849864,
+      "valid": false,
+      "health": [
+        {
+          "failure_bits": 19.0,
+          "minimum_J": 0.9564811966159785,
+          "peak_relative_residual": Infinity,
+          "overflow_or": 25.0,
+          "peak_iterations": 5.0,
+          "plastic_norm": Infinity,
+          "steps": 100.0,
+          "peak_before_refinement": Infinity,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "case": {
+    "id": "compressible-pillow",
+    "material": "compressible",
+    "shape": "pillow",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 3000.0,
+    "poisson": 0.05,
+    "damping": 0.02,
+    "yield_strain": 0.02,
+    "friction": 0.8,
+    "roundness": 0.8,
+    "bulge": 0.6,
+    "taper": 0.0
+  }
+}

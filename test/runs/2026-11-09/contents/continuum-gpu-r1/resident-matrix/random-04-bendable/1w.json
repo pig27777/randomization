@@ -1,0 +1,112 @@
+{
+  "valid": true,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 2.967498031616211,
+      "synchronized_wall_seconds": 2.967684028088115,
+      "end_to_end_seconds": 2.9690023579169065,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9700843048063469,
+          "peak_relative_residual": 9.997469078163556e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.00021157110453014184,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.997469078163556e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 2000,
+      "gpu_seconds": 2.9682589416503906,
+      "synchronized_wall_seconds": 2.9684360922547057,
+      "end_to_end_seconds": 2.9697936840821058,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9701505882753082,
+          "peak_relative_residual": 9.999568323001002e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.00021155457363941806,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.999568323001002e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "steps": 2000,
+      "gpu_seconds": 2.9680459594726556,
+      "synchronized_wall_seconds": 2.96820570086129,
+      "end_to_end_seconds": 2.9692377070896327,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9701740377239314,
+          "peak_relative_residual": 9.698528888918017e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.0002115517506993928,
+          "steps": 2000.0,
+          "peak_before_refinement": 1.0009737291876433e-05,
+          "refinement_attempts": 1.0,
+          "refinement_applied": 1.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "median_gpu_steps_per_second": 673.8440129664798,
+  "median_gpu_ms_per_step": 1.4840229797363278,
+  "aggregate_world_steps_per_second": 673.8440129664798,
+  "median_wall_steps_per_second": 673.8077483712318,
+  "per_world_realtime_ratio": 0.3369220064832399,
+  "case": {
+    "id": "random-04-bendable",
+    "material": "bendable",
+    "shape": "box",
+    "size": [
+      0.2634381671371081,
+      0.16286110604248621,
+      0.05466475860030462
+    ],
+    "density": 128.11453127643483,
+    "young": 10276.137246125629,
+    "poisson": 0.21961668635732667,
+    "damping": 0.01617525504952269,
+    "yield_strain": 0.02231428432117349,
+    "friction": 0.870127128608692,
+    "roundness": 0.6706523430114664,
+    "bulge": 0.5498860430780624,
+    "taper": 0.18334860972448752
+  }
+}

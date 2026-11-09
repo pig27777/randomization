@@ -148,11 +148,13 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
 
 
 
-def run(backend, cfg, output):
+def run(backend, cfg, output, *, on_sample=None):
     output.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
     (output/"config.json").write_text(json.dumps(asdict(cfg),indent=2))
     source_files = {"platform": Path(__file__), "backend": Path(backend.__file__)}
+    if hasattr(backend, "source_files"):
+        source_files.update(backend.source_files())
     source_hashes = {k: hashlib.sha256(v.read_bytes()).hexdigest() for k,v in source_files.items()}
     for k,v in source_files.items():
         (output/(k+"_source.py")).write_bytes(v.read_bytes())
@@ -179,6 +181,7 @@ def run(backend, cfg, output):
     phases=[]
     trace=[]
     states=[]
+    integration_states=[]
     state_times=[]
     contact_tip_z=None
     open_gap=None
@@ -188,7 +191,7 @@ def run(backend, cfg, output):
     loss=0.
     stable=0.
     sample_every=max(1,round(.02/dt))
-    for step in range(round(30/dt)):
+    for step in range(round(getattr(cfg, "simulation_seconds", 30.)/dt)):
         elapsed=float(d.time)-phase_start
         current_tips=tips(robot)
         tip_mid=current_tips.mean(0)
@@ -274,11 +277,23 @@ def run(backend, cfg, output):
                 d.xfrc_applied[m.body(f"{side}_finger").id,:3]=(1 if j else -1)*spring_force*direction
         robot.command(target,gap)
         previous_time=float(d.time)
-        sim.step()
+        try:
+            sim.step()
+        except RuntimeError:
+            model_failure, _ = backend.check_state(sim)
+            if not model_failure:
+                raise
+            # Keep the last safely exported geometry and the backend's complete
+            # failure state, even when a per-step validity check stops early.
+            outcome, reason = "sim_fail", model_failure
+            break
         if d.time < previous_time+dt/2:
             outcome,reason="sim_fail","MuJoCo automatic state reset"
         if step%sample_every==0:
-            mujoco.mj_forward(m,d)
+            if hasattr(backend, "refresh"):
+                backend.refresh(sim)
+            else:
+                mujoco.mj_forward(m,d)
             model_failure,health=backend.check_state(sim)
             tracking=float(np.linalg.norm(d.site_xpos[robot.site]-target)*1000)
             robot.tracking.append(tracking)
@@ -294,6 +309,10 @@ def run(backend, cfg, output):
                 outcome,reason="sim_fail",model_failure
             states.append(d.qpos.copy())
             state_times.append(float(d.time))
+            if hasattr(backend, "record_state"):
+                integration_states.append(backend.record_state(sim))
+            if on_sample is not None:
+                on_sample(robot, trace[-1])
             if time.perf_counter()-started>cfg.wall_limit:
                 outcome,reason="compute_limit","wall budget reached; incomplete trial"
         if cfg.smoke_seconds and d.time>=cfg.smoke_seconds:
@@ -311,8 +330,13 @@ def run(backend, cfg, output):
             if phase=="open":open_gap=gap
     if outcome=="pending":outcome,reason="incomplete","simulation time budget reached"
     (output/"trace.json").write_text(json.dumps(trace,indent=2))
+    extra_state = {}
+    if integration_states:
+        extra_state = dict(integration_state=np.asarray(integration_states),
+                           integration_state_spec=np.asarray(backend.STATE_SPEC),
+                           final_integration_state=backend.record_state(sim))
     np.savez_compressed(output/"trajectory.npz",qpos=np.array(states),time=np.array(state_times),
-                        final_qpos=d.qpos,final_qvel=d.qvel)
+                        final_qpos=d.qpos,final_qvel=d.qvel,**extra_state)
     result=dict(config=asdict(cfg),hostname=platform.node(),mujoco=mujoco.__version__,python=sys.executable,
                 frozen_v13_sha256=RELEASE_SHA,source_sha256=source_hashes,backend=backend.__name__,
                 robot_source_sha256=hashlib.sha256((ROOT/"policy/yam_probe_robot.py").read_bytes()).hexdigest(),

@@ -54,6 +54,11 @@ flock /tmp/claude-gpu.lock .venv/bin/python -B test/flex3d/run_suite.py speed --
 | `attachment(robot,cfg)` | 可选捏取；提供`active/load/events/try_bind/check_load/release`，不用捏取时返回空连接实现 |
 | `check_state(sim)` | 返回`(失效原因或None, 记录指标字典)`；如四面体翻转、段模型越限等，由各模型负责，公共平台不猜测 |
 | `summarize(trace)` / `dimensions(sim)` | 模型测量摘要与自由度/网格规模 |
+| 可选 `refresh(sim)` | GPU等后端自行刷新采样状态；未提供时仍用原CPU forward |
+| 可选 `record_state(sim)` / `STATE_SPEC` | 保存含塑性等历史的完整integration state，额外写入NPZ，不改变原qpos记录 |
+| 可选 `source_files()` | 补充依赖源码快照与指纹 |
+
+直接调用`run(..., on_sample=callback)`可观察已记录样本并渲染UI画面，不参与控制或判定。适配器配置可提供`simulation_seconds`限制时长；没有此字段仍为原30秒。连续体UI显式使用10秒，失败事件提前停止。后端逐步有效性检查若抛出且`check_state`给出模型失效原因，平台保存最后安全导出的几何、完整后端失败状态与`sim_fail`结果；未知运行异常仍交原异常处理。
 
 原生flex仅用MuJoCo原生StVK弹性和discrete积分。捏取连接到真实掌部，反作用回传机械臂；冻结v1.3的聚拢弹簧是既定抓取效果规则的一部分，不是补充材料本构。I-37只计掌部向下的拉离反力和水平分量。`pinch_coeff=0`关闭这一效果，用于区分原生接触与捏取规则。
 

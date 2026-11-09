@@ -1,0 +1,59 @@
+{
+  "valid": false,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 200,
+      "gpu_seconds": 0.5745891418457031,
+      "synchronized_wall_seconds": 0.5822163179982454,
+      "end_to_end_seconds": 0.5824513150146231,
+      "valid": false,
+      "health": [
+        {
+          "failure_bits": 19.0,
+          "minimum_J": 0.9759613084694483,
+          "peak_relative_residual": Infinity,
+          "overflow_or": 25.0,
+          "peak_iterations": 5.0,
+          "plastic_norm": Infinity,
+          "steps": 200.0,
+          "peak_before_refinement": Infinity,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "case": {
+    "id": "random-10-bendable",
+    "material": "bendable",
+    "shape": "box",
+    "size": [
+      0.24612532946576726,
+      0.1419311196027163,
+      0.0574003569626944
+    ],
+    "density": 184.04726947368772,
+    "young": 11250.476684409648,
+    "poisson": 0.20928822322904467,
+    "damping": 0.026313593183972542,
+    "yield_strain": 0.020490582436382417,
+    "friction": 0.8576203501982418,
+    "roundness": 0.7386063988898277,
+    "bulge": 0.2716330545354412,
+    "taper": 0.253714565846973
+  }
+}

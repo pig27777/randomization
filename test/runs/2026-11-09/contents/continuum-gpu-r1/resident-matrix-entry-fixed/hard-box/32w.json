@@ -1,0 +1,25 @@
+{
+  "nworld": 32,
+  "valid": false,
+  "error": "Conditional body graph contains an unsupported operation (memory allocation)",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 136, in main\n    try: group = check_group(robot.sim, worlds, args.steps, args.repeats, folder)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 67, in check_group\n    graph, count, active = device_loop(gpu, steps)\n                           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 45, in device_loop\n    wp.capture_while(active, while_body=body)\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 14309, in capture_while\n    raise RuntimeError(runtime.get_error_string())\nRuntimeError: Conditional body graph contains an unsupported operation (memory allocation)\n",
+  "case": {
+    "id": "hard-box",
+    "material": "hard",
+    "shape": "box",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 100000.0,
+    "poisson": 0.25,
+    "damping": 0.02,
+    "yield_strain": 0.05,
+    "friction": 0.8,
+    "roundness": 0.0,
+    "bulge": 0.0,
+    "taper": 0.0
+  }
+}

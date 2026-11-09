@@ -43,3 +43,9 @@
 | 对象 | 运行标识 | 状态 | 报告与数据 |
 | --- | --- | --- | --- |
 | 仓库代码组织 | `code-cleanup` | 通过：88 项回归、30 个入口 | [任务检查报告](../../../reports/code-cleanup-test.md) · `repository/code-cleanup/` |
+
+## MuJoCo4连续体内容物
+
+| 对象 / 版本 | 问题与命令入口 | 机器 / 状态 | 报告与数据 |
+| --- | --- | --- | --- |
+| 连续体StVK/J₂，GPU Newton，固定B/可变材料与形状X | `continuum-gpu-r1`；`validate_continuum.py`、`grasp_ui.py --port 8766`、`benchmark_continuum.py --matrix --worlds 1 32 --steps 2000 --repeats 3` | ubun，RTX5090；构建/短入口/UI闭环完成，完整抓取未通过；24κ在1/32world分别19/24、13/24有效，失败不计吞吐 | [计划/命令/结果](../../content_model/CONTINUUM_REPORT.md) · [数据](contents/continuum-gpu-r1/) · [检查](../../../reports/content-continuum-test.md) |

@@ -1,0 +1,48 @@
+{
+  "hostname": "ubun",
+  "sources": {
+    "test/content_model/benchmark_continuum.py": "eb2c43797a8f27192b346a5484168126a81c9ff592ad7d63d031c04f5af83d81",
+    "contents/continuum/__init__.py": "7712a9c3ed89f94fe1ff044d0f5bfa70622784d50d15de48778b96791f7b7c38",
+    "contents/continuum/gpu.py": "13c33f07f00eb0913855fe7c3f7abbd906b27052b731936558a9ed19a40da163",
+    "contents/continuum/grasp_adapter.py": "7e502e1190fa70f42cdd40063bcc7ee9dfbcf47d7335cd82d6c3249aba1d6903",
+    "contents/continuum/model.py": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "bag_sim/flex_residual.py": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d",
+    "test/flex3d/grasp_platform.py": "e183d1c0e78784d543651754ce852bb67f029764edc965e0211807a28f823e1c"
+  },
+  "full_robot": true,
+  "seed": 20261109,
+  "control": "held at initialized values",
+  "steps_per_repeat": 40,
+  "repeats": 1,
+  "protocol": "GPU-controlled loop, no host reads in timing; initial contact settling only",
+  "groups": [
+    {
+      "nworld": 32,
+      "valid": false,
+      "error": "Error while parsing function \"_continue_loop\" at /home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py:32:\n        if int(metrics[w, 0]) != 0: valid = False\n;Error mutating a constant valid inside a dynamic loop, use the following syntax: pi = float(3.141) to declare a dynamic variable",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 136, in main\n    try: group = check_group(robot.sim, worlds, args.steps, args.repeats, folder)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 67, in check_group\n    graph, count, active = device_loop(gpu, steps)\n                           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 45, in device_loop\n    wp.capture_while(active, while_body=body)\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 14278, in capture_while\n    while_body(**kwargs)\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py\", line 43, in body\n    wp.launch(_continue_loop, 1, inputs=[gpu.metrics, steps, count, active])\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 12041, in launch\n    module_exec = kernel.module.load(device, block_dim)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 5227, in load\n    raise e\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 5224, in load\n    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 4972, in _compile\n    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, is_cpu)\n                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 1907, in locked_call\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 4833, in _run_codegen\n    builder = ModuleBuilder(\n              ^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 3501, in __init__\n    self.build_kernel(kernel)\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/context.py\", line 3620, in build_kernel\n    kernel.adj.build(self)\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 1907, in locked_call\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 2415, in build\n    raise type(original_exc)(*new_args).with_traceback(original_exc.__traceback__) from None\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 2395, in build\n    adj.eval(adj.tree.body[0])\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 6693, in eval\n    return emit_node(adj, node)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 3632, in emit_FunctionDef\n    adj.eval(f)\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 6693, in eval\n    return emit_node(adj, node)\n           ^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 4393, in emit_For\n    adj.materialize_redefinitions(adj.loop_symbols[-1])\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/warp/_src/codegen.py\", line 4138, in materialize_redefinitions\n    raise WarpCodegenError(\nwarp._src.codegen.WarpCodegenError: Error while parsing function \"_continue_loop\" at /home/ubuntu/workspace/gzl/randomization/test/content_model/benchmark_continuum.py:32:\n        if int(metrics[w, 0]) != 0: valid = False\n;Error mutating a constant valid inside a dynamic loop, use the following syntax: pi = float(3.141) to declare a dynamic variable\n",
+      "case": {
+        "id": "hard-box",
+        "material": "hard",
+        "shape": "box",
+        "size": [
+          0.24,
+          0.16,
+          0.05
+        ],
+        "density": 151.04166666666666,
+        "young": 100000.0,
+        "poisson": 0.25,
+        "damping": 0.02,
+        "yield_strain": 0.05,
+        "friction": 0.8,
+        "roundness": 0.0,
+        "bulge": 0.0,
+        "taper": 0.0
+      }
+    }
+  ],
+  "sources_unchanged": true,
+  "valid_groups": 0,
+  "invalid_groups": 1
+}

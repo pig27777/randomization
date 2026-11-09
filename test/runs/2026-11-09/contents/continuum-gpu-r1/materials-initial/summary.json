@@ -1,0 +1,21 @@
+{
+  "hostname": "ubun",
+  "mode": "materials",
+  "sources": {
+    "test/content_model/validate_continuum.py": "4de9a726ef40d264ba89edf6d7a2473f65b121f9a54fee2996ac19c1a7392a9b",
+    "contents/continuum/__init__.py": "7712a9c3ed89f94fe1ff044d0f5bfa70622784d50d15de48778b96791f7b7c38",
+    "contents/continuum/gpu.py": "b343ce2f38d91d94dccf06fea76742dc6d5525232a042a4e0c3e1ee91ceabb6b",
+    "contents/continuum/grasp_adapter.py": "b714500468793f333c5daff682cc3efff54ae6e2bf76774c1dc2a07d45d6b79e",
+    "contents/continuum/model.py": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "bag_sim/flex_residual.py": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d"
+  },
+  "results": {
+    "materials": {
+      "passed": false,
+      "error": "reference tetrahedra must have positive volume",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 159, in main\n    report[\"results\"][name] = dict(passed=True, data=function())\n                                                     ^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 153, in <lambda>\n    checks = {\"construction\": construction, \"materials\": lambda:materials(args.output),\n                                                                ^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/validate_continuum.py\", line 71, in materials\n    sim = Simulation(built.model, built.data)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/gpu.py\", line 101, in __init__\n    raise ValueError(\"reference tetrahedra must have positive volume\")\nValueError: reference tetrahedra must have positive volume\n"
+    }
+  },
+  "valid": false,
+  "sources_unchanged": true
+}

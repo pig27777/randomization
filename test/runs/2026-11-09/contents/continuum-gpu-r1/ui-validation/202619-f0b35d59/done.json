@@ -1,0 +1,32 @@
+{
+  "outcome": "execution_error",
+  "reason": "dict() got multiple values for keyword argument 'mass_kg'",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/grasp_ui.py\", line 147, in worker\n    frames.draw(robot, dict(t=0., phase=\"preview\", **backend.dimensions(robot.sim)))\n  File \"/home/ubuntu/workspace/gzl/randomization/test/content_model/grasp_ui.py\", line 126, in draw\n    sample = dict(mass_kg=float(sim.m.body_mass[sim.m.flex_vertbodyid].sum()), **sample)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: dict() got multiple values for keyword argument 'mass_kg'\n",
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 600.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "material": "hard",
+    "shape": "box",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "young": 100000.0,
+    "poisson": 0.25,
+    "damping": 0.02,
+    "yield_strain": 0.05,
+    "density": 151.04166666666666,
+    "friction": 0.8,
+    "roundness": 0.0,
+    "bulge": 0.0,
+    "taper": 0.0
+  }
+}

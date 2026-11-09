@@ -1,0 +1,112 @@
+{
+  "valid": true,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 3.353295532226562,
+      "synchronized_wall_seconds": 3.3545612551970407,
+      "end_to_end_seconds": 3.3556526829488575,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9750677700098824,
+          "peak_relative_residual": 9.230654397683382e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.00010012248401677923,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.230654397683382e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 2000,
+      "gpu_seconds": 3.347530548095704,
+      "synchronized_wall_seconds": 3.347699265112169,
+      "end_to_end_seconds": 3.3487522659124807,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9750376384699292,
+          "peak_relative_residual": 9.218189254990105e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.00010008388217153081,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.218189254990105e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 2,
+      "steps": 2000,
+      "gpu_seconds": 3.3253664855957035,
+      "synchronized_wall_seconds": 3.3255698900902644,
+      "end_to_end_seconds": 3.327221120009199,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9750713425708621,
+          "peak_relative_residual": 9.169955196903319e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.00010004392692022442,
+          "steps": 2000.0,
+          "peak_before_refinement": 9.169955196903319e-06,
+          "refinement_attempts": 0.0,
+          "refinement_applied": 0.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "median_gpu_steps_per_second": 597.4553394703842,
+  "median_gpu_ms_per_step": 1.673765274047852,
+  "aggregate_world_steps_per_second": 597.4553394703842,
+  "median_wall_steps_per_second": 597.4252289752758,
+  "per_world_realtime_ratio": 0.2987276697351921,
+  "case": {
+    "id": "bendable-tapered",
+    "material": "bendable",
+    "shape": "tapered",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 10000.0,
+    "poisson": 0.2,
+    "damping": 0.02,
+    "yield_strain": 0.02,
+    "friction": 0.8,
+    "roundness": 0.3,
+    "bulge": 0.2,
+    "taper": 0.35
+  }
+}

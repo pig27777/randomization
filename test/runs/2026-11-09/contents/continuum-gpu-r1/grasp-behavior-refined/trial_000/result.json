@@ -1,0 +1,202 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 600.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "material": "hard",
+    "shape": "box",
+    "size": null,
+    "young": null,
+    "poisson": null,
+    "damping": null,
+    "yield_strain": null,
+    "density": null,
+    "friction": null,
+    "roundness": null,
+    "bulge": null,
+    "taper": null
+  },
+  "hostname": "ubun",
+  "mujoco": "4.0.0",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv-continuum/bin/python",
+  "frozen_v13_sha256": "940efb2f424e8920940687f1a313f93a09cbc64a5c81ff6df45ffc93edad415e",
+  "source_sha256": {
+    "platform": "e8480fa76417cb7eb2fecab10c053880c222c43f24335d55578c3b24accb19ea",
+    "backend": "32880b744a0f6aea5e4ec7b36e5d1decd9dc66ba4cd22a11077d5c88abdc2ef9",
+    "continuum_model": "85840af6941f77353d4cd7eae6b8dd7df602a5221718740a32227a07662cb5ea",
+    "continuum_gpu": "13c33f07f00eb0913855fe7c3f7abbd906b27052b731936558a9ed19a40da163",
+    "continuum_residual": "8f31c261f4c7e061f855f49baa30ee6a4e4330dc5f07e5ba23b50d814ada0d9d"
+  },
+  "backend": "continuum.grasp_adapter",
+  "robot_source_sha256": "63d03be809bc8767fa4638330202e387a905bcb158ab078c1067125c18ec84bd",
+  "outcome": "grasp_fail",
+  "reason": "both fingertip contacts/connection lost >50ms",
+  "phase": "lift",
+  "sim_time_s": 8.244283676147461,
+  "wall_s": 141.03137041802984,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.31679298263043165,
+    "nonfinger_mm": 0.0,
+    "grip_N": 1.4516791080553235,
+    "down_N": 20.029228121127183,
+    "tracking_mm": 49.00425403242977
+  },
+  "model_metrics": {
+    "min_determinant": 0.959974402821207,
+    "peak_plastic_norm": 0.0,
+    "peak_relative_residual": 9.99999888513881e-06
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.30099791288375854
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.30099791288375854,
+      "end_s": 5.517414569854736
+    },
+    {
+      "phase": "close",
+      "start_s": 5.517414569854736,
+      "end_s": 7.814342975616455
+    }
+  ],
+  "initial_com": [
+    -0.2500006027519702,
+    0.039998347700263066,
+    0.025984111552437135
+  ],
+  "final_com": [
+    -0.2600809102257093,
+    0.05389116642375786,
+    0.025983717410902798
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.09999359071504293,
+    "ik_max_rotation_deg": 0.0004312598283072448,
+    "tracking_max_mm": 49.00425403242977,
+    "tracking_p95_mm": 48.327533399891976,
+    "actuator_peak_Nm": [
+      0.46708202362060547,
+      6.110221862792969,
+      2.0739974975585938,
+      1.568342924118042,
+      0.2085123509168625,
+      0.03714025020599365
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 188,
+    "vertices": 60,
+    "tetrahedra": 144,
+    "nplastic": 864,
+    "representation": "full_3d_elastoplastic_continuum",
+    "parameters_X": {
+      "size": [
+        0.24,
+        0.16,
+        0.05
+      ],
+      "density": 151.04166666666666,
+      "young": 100000.0,
+      "poisson": 0.25,
+      "damping": 0.02,
+      "yield_strain": 0.05,
+      "friction": 0.8,
+      "roundness": 0.0,
+      "bulge": 0.0,
+      "taper": 0.0
+    },
+    "template_B": {
+      "count": [
+        5,
+        4,
+        3
+      ],
+      "timestep": 0.0005,
+      "iterations": 100,
+      "ls_iterations": 50,
+      "tolerance": 1e-08,
+      "contact_time": 0.005,
+      "radius": 0.001
+    },
+    "template_sha256": "405fa06491caeb85e830ed0713517e0713836024a1644652cde72034c7cd4cf5",
+    "topology_sha256": "1b40fce721adc93b1a4b45862029e3914170d2ed899c88f3086ca66857d51c72",
+    "mass_kg": 0.29000000000000004,
+    "size_mm": [
+      240.0,
+      160.0,
+      50.0
+    ],
+    "native_contact_only": true,
+    "gpu_health": [
+      {
+        "failure_bits": 0.0,
+        "minimum_J": 0.959974402821207,
+        "peak_relative_residual": 9.99999888513881e-06,
+        "overflow_or": 0.0,
+        "peak_iterations": 8.0,
+        "plastic_norm": 0.0,
+        "steps": 16486.0,
+        "peak_before_refinement": 1.3162869826063126e-05,
+        "refinement_attempts": 1377.0,
+        "refinement_applied": 1377.0,
+        "refinement_rejected": 0.0,
+        "refinement_nonfinite": 0.0
+      }
+    ],
+    "software": {
+      "mujoco": "4.0.0",
+      "mujoco_warp": "4.0.0",
+      "warp": "1.19.0",
+      "device": "cuda:0",
+      "solver": "Newton",
+      "dynamics": "GPU",
+      "residual_tolerance": 1e-05,
+      "refinement_steps": 2
+    }
+  },
+  "warnings": {}
+}

@@ -1,0 +1,83 @@
+{
+  "valid": false,
+  "nworld": 1,
+  "software": {
+    "mujoco": "4.0.0",
+    "mujoco_warp": "4.0.0",
+    "warp": "1.19.0",
+    "device": "cuda:0",
+    "solver": "Newton",
+    "dynamics": "GPU",
+    "residual_tolerance": 1e-05,
+    "refinement_steps": 2
+  },
+  "rows": [
+    {
+      "repeat": 0,
+      "steps": 2000,
+      "gpu_seconds": 3.07421615600586,
+      "synchronized_wall_seconds": 3.074786426848732,
+      "end_to_end_seconds": 3.0760284210555255,
+      "valid": true,
+      "health": [
+        {
+          "failure_bits": 0.0,
+          "minimum_J": 0.9649338542966435,
+          "peak_relative_residual": 9.979261844812975e-06,
+          "overflow_or": 0.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": 0.00025482706112686226,
+          "steps": 2000.0,
+          "peak_before_refinement": 1.005078897337496e-05,
+          "refinement_attempts": 3.0,
+          "refinement_applied": 3.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    },
+    {
+      "repeat": 1,
+      "steps": 1300,
+      "gpu_seconds": 2.1543653564453127,
+      "synchronized_wall_seconds": 2.1687414929037914,
+      "end_to_end_seconds": 2.1697091090027243,
+      "valid": false,
+      "health": [
+        {
+          "failure_bits": 19.0,
+          "minimum_J": 0.9654295838484968,
+          "peak_relative_residual": Infinity,
+          "overflow_or": 25.0,
+          "peak_iterations": 6.0,
+          "plastic_norm": Infinity,
+          "steps": 1300.0,
+          "peak_before_refinement": Infinity,
+          "refinement_attempts": 2.0,
+          "refinement_applied": 2.0,
+          "refinement_rejected": 0.0,
+          "refinement_nonfinite": 0.0
+        }
+      ]
+    }
+  ],
+  "case": {
+    "id": "bendable-pillow",
+    "material": "bendable",
+    "shape": "pillow",
+    "size": [
+      0.24,
+      0.16,
+      0.05
+    ],
+    "density": 151.04166666666666,
+    "young": 10000.0,
+    "poisson": 0.2,
+    "damping": 0.02,
+    "yield_strain": 0.02,
+    "friction": 0.8,
+    "roundness": 0.8,
+    "bulge": 0.6,
+    "taper": 0.0
+  }
+}

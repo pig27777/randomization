@@ -1,0 +1,28 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.005,
+    "wall_limit": 600.0,
+    "smoke_seconds": 0.02,
+    "arm_height": 0.27,
+    "material": "hard",
+    "shape": "box",
+    "size": null,
+    "young": null,
+    "poisson": null,
+    "damping": null,
+    "yield_strain": null,
+    "density": null
+  },
+  "backend": "continuum.grasp_adapter",
+  "hostname": "ubun",
+  "outcome": "execution_error",
+  "reason": "operands could not be broadcast together with remapped shapes [original->remapped]: (74,6)  and requested shape (1,74)",
+  "error": "ValueError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/angles.py\", line 18, in execute\n    return run(backend,cfg,output)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/test/flex3d/grasp_platform.py\", line 280, in run\n    sim.step()\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/grasp_adapter.py\", line 50, in step\n    self.gpu.step(ctrl=self.d.ctrl, external=self.d.xfrc_applied)\n  File \"/home/ubuntu/workspace/gzl/randomization/contents/continuum/gpu.py\", line 138, in step\n    self.data.xfrc_applied.assign(np.broadcast_to(external, self.data.xfrc_applied.shape).astype(np.float32))\n                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/numpy/lib/_stride_tricks_impl.py\", line 517, in broadcast_to\n    return _broadcast_to(array, shape, subok=subok, readonly=True)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/workspace/gzl/randomization/.venv-continuum/lib/python3.12/site-packages/numpy/lib/_stride_tricks_impl.py\", line 456, in _broadcast_to\n    it = np.nditer(\n         ^^^^^^^^^^\nValueError: operands could not be broadcast together with remapped shapes [original->remapped]: (74,6)  and requested shape (1,74)\n",
+  "timing_is_throughput": false
+}
