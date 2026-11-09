@@ -7,8 +7,9 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ProcessPoolExecutor
-from dataclasses import replace
+from dataclasses import asdict,dataclass,replace
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -32,6 +33,44 @@ TOP_ROTATION = np.diag([1., -1., -1.])
 # Rotate the overhead pose about world x: approach horizontally from negative y,
 # with vertical finger closure. All rotations remain proper SO(3) matrices.
 SIDE_ROTATION = np.array([[1., 0., 0.], [0., 0., -1.], [0., 1., 0.]]) @ TOP_ROTATION
+
+
+@dataclass(frozen=True)
+class HeapSettings:
+    stack_lift: float = 0.
+    curvature_fix: bool = False
+    solver: str = 'Newton'
+    iterations: int = 100
+    contact_time_s: float = .002
+    timestep_scale: float = 1.
+    adaptive_close: bool = False
+    every_step_safety: bool = False
+    wall_limit_s: float = 300.
+    carry_x: float = -.1
+
+
+SETTINGS = HeapSettings()
+BACKEND_RUN = None
+_CURVATURE_HELPERS = {}
+
+
+def apply_curvature(sim,run):
+    manifest=json.loads((run/'helper_manifest.json').read_text())
+    source=run/'source_helpers/flex_curvature.py'
+    checksum=digest(source)
+    if checksum!=manifest['sha256']:
+        raise RuntimeError('curvature helper changed')
+    if checksum not in _CURVATURE_HELPERS:
+        spec=importlib.util.spec_from_file_location('frozen_flex_curvature',source)
+        module=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        _CURVATURE_HELPERS[checksum]=module.apply_curved_reference_fix
+    apply=_CURVATURE_HELPERS[checksum]
+    import mujoco
+    changes=[apply(sim.m,sim.built.xml,mujoco.mj_id2name(sim.m,mujoco.mjtObj.mjOBJ_FLEX,i))
+             for i in range(sim.m.nflex)]
+    mujoco.mj_forward(sim.m,sim.d)
+    return changes
 
 
 def vector(values):
@@ -86,12 +125,13 @@ def parcel_xml(name, center, half, mass, yaw=0.):
             'solref=".002 1" solimp=".99 .99 .0001" rgba=".48 .34 .22 1"/></body>')
 
 
-def scene(case, layout, action='center', jitter=0.):
+def scene(case, layout, action='center', jitter=0., *, settings=None):
     import mujoco
     import mj_adapter as A
     from model import ANCHORS, build
     from yam_probe_robot import Yam
 
+    settings = SETTINGS if settings is None else settings
     thin = 'envelope' in case
     radius = .000075 if thin else .00025
     length, width, height = (.22, .11, .0008) if thin else (.24, .11, .046)
@@ -139,12 +179,33 @@ def scene(case, layout, action='center', jitter=0.):
         name = f'parcel_{i}'
         neighbors.append(name)
         fragments.append(parcel_xml(name,pos,half,mass,0. if i<len(supports)-1 else .08))
-    built = A.scene(desc,origin,pads=(),dt=.0001 if thin else DT,worldbody=''.join(fragments),
-                    pad_contact=False,table_contact=False,solver='Newton')
+    dt=(.0001 if thin else DT)*settings.timestep_scale
+    built = A.scene(desc,origin,pads=(),dt=dt,worldbody=''.join(fragments),
+                    pad_contact=False,table_contact=False,solver=settings.solver)
     root = ET.fromstring(built.xml)
     root.find('option').set('integrator','discrete')
-    root.find('option').set('iterations','100')
+    root.find('option').set('iterations',str(settings.iterations))
     root.find('size').set('memory','128M')
+    for flex in root.iter('flexcomp'):
+        flex.find('contact').set('solref',f'{settings.contact_time_s} 1')
+    if settings.stack_lift:
+        # Lift only package objects, then support the whole heap with a free box.
+        # Robot mounting and table remain unchanged; no body is pinned in place.
+        for body in root.find('worldbody').findall('body'):
+            pos=np.fromstring(body.get('pos','0 0 0'),sep=' ')
+            if body.get('name')=='obj' and not has_segment_content:
+                continue
+            pos[2]+=settings.stack_lift
+            body.set('pos',vector(pos))
+        for flex in root.iter('flexcomp'):
+            points=np.fromstring(flex.get('point'),sep=' ').reshape(-1,3)
+            points[:,2]+=settings.stack_lift
+            flex.set('point',vector(points))
+        shell[:,2]+=settings.stack_lift
+        foundation=parcel_xml('heap_foundation',[-.21,.10,settings.stack_lift/2],
+                              [.34,.22,settings.stack_lift/2],3.)
+        root.find('worldbody').append(ET.fromstring(foundation))
+        neighbors.append('heap_foundation')
     if not has_segment_content:
         dummy = root.find("worldbody/body[@name='obj']")
         dummy.set('gravcomp','1')
@@ -153,7 +214,7 @@ def scene(case, layout, action='center', jitter=0.):
     built.xml = ET.tostring(root, encoding='unicode')
     built.heap_info = dict(case=case,layout=layout,thin=thin,radius=radius,
                            shell_initial=shell,faces=faces,neighbors=neighbors,
-                           has_segment_content=has_segment_content,height=height,
+                           has_segment_content=has_segment_content,height=height,settings=asdict(settings),
                            shell_sha256=hashlib.sha256(shell.tobytes()+faces.tobytes()).hexdigest())
     z = SUPPORT_Z + (height*.52 if not thin else .010)
     grasp = np.array([*CENTER,z])
@@ -164,17 +225,30 @@ def scene(case, layout, action='center', jitter=0.):
     elif action == 'side':
         grasp[1] -= width*.48
         grasp[2] = SUPPORT_Z + height*.5 + .0005
+        if settings.adaptive_close:
+            # Visible local film mid-height at the exposed rim, not the hidden
+            # content center: both fingers should straddle the same local patch.
+            taper=min(1.,(width/2-abs(grasp[1]-CENTER[1]))/(width*.15))
+            grasp[2]=SUPPORT_Z+2*radius+.0003+height*taper/2
     elif action != 'center':
         raise ValueError(action)
     grasp[0] += jitter
+    grasp[2] += settings.stack_lift
     rotation = SIDE_ROTATION if action == 'side' else TOP_ROTATION
     start = grasp + ([0.,-.07,0.] if action == 'side' else [0.,0.,.09])
     robot = Yam(k,0,fixture=dict(built=built,sim_factory=HeapSim,target=start,rotation=rotation))
     robot.grasp_target = grasp
+    robot.settings = settings
+    if settings.every_step_safety:
+        robot.control_period_steps=max(1,round((.0025 if thin else .01)/dt))
     return robot
 
 
 def install_backend(run):
+    global SETTINGS,BACKEND_RUN
+    BACKEND_RUN=run
+    path=run/'settings.json'
+    SETTINGS=HeapSettings(**json.loads(path.read_text())) if path.exists() else HeapSettings()
     load_backend(run)
     # Define the subclass after selecting and verifying the frozen release.
     global HeapSim
@@ -184,6 +258,7 @@ def install_backend(run):
         def __init__(self,built):
             super().__init__(built)
             self.info = built.heap_info
+            self.curvature_changes = apply_curvature(self,BACKEND_RUN) if self.info['settings']['curvature_fix'] else []
             self.bag_bodies = np.flatnonzero(np.isin(np.arange(self.m.nbody),
                 self.m.flex_vertbodyid[self.m.flex_vertadr[0]:self.m.flex_vertadr[0]+self.m.flex_vertnum[0]]))
             self.paper_bodies = (np.unique(self.m.flex_vertbodyid[self.m.flex_vertadr[1]:
@@ -271,6 +346,31 @@ def contacts(robot):
                 direct_content_support_contacts=bypass)
 
 
+def contact_safety(robot):
+    """Every-step geometry guards; no contact-force decoding or Python contact loop."""
+    sim=robot.sim; c=sim.d.contact
+    g=c.geom; valid=g>=0; safe=np.maximum(g,0)
+    object_geom=sim._obj_geom_mask[safe] & valid & sim.info['has_segment_content']
+    target=object_geom | (c.flex>=0)
+    active=c.efc_address>=0
+    depth=np.maximum(-c.dist*1000,0.)
+    package=target.any(axis=1) & active
+    environment=np.isin(g,list(sim.neighbor_geoms|{sim.table_geom}))
+    content=object_geom | (c.flex>0)
+    bypass=active & ((content[:,0]&environment[:,1]) | (content[:,1]&environment[:,0]))
+    robot_geom=robot.robot_mask[safe]&valid
+    nonfinger=robot.nonfinger_mask[safe]&valid
+    nonfinger_hit=active & ((nonfinger[:,0]&(target[:,1]|environment[:,1])) |
+                            (nonfinger[:,1]&(target[:,0]|environment[:,0])))
+    robot_pair=active & robot_geom.all(axis=1)
+    neighbor=active & ((robot_geom[:,0]&np.isin(g[:,1],list(sim.neighbor_geoms))) |
+                       (robot_geom[:,1]&np.isin(g[:,0],list(sim.neighbor_geoms))))
+    maximum=lambda mask: float(np.max(depth[mask],initial=0.))
+    return dict(penetration_mm=maximum(package),nonfinger_mm=maximum(nonfinger_hit),
+                self_contact_mm=maximum(robot_pair),neighbor_contact_mm=maximum(neighbor),
+                direct_content_support_contacts=int(bypass.sum()))
+
+
 def outside_count(points, vertices, faces):
     """Solid-angle containment of content body centers in the closed target shell."""
     outside = 0
@@ -291,6 +391,8 @@ def evaluate(job):
     sim = robot.sim
     m,d = sim.m,sim.d
     dt = m.opt.timestep
+    settings=robot.settings
+    check_every=robot.control_period_steps if settings.every_step_safety else 25
     initial_overlap_mm = max((max(0.,-c.dist)*1000 for c in d.contact),default=0.)
     initial_com = sim.package_com()
     initial_neighbors = d.xipos[sim.neighbor_bodies].copy()
@@ -301,11 +403,16 @@ def evaluate(job):
     bypass_peak = 0
     preflight = job.get('preflight',False)
     outcome,reason = 'pending',''
-    durations = [.25] if preflight else [.25,.8,1.8,1.5,1.,.3]
+    durations = [.25] if preflight else [.25,.8,3. if settings.adaptive_close else 1.8,1.5,1.,.3]
     names = ['settle'] if preflight else ['settle','approach','close','lift','carry','hold']
     last = dict(force=[0.,0.],support_N=0.)
     rest_com = initial_com.copy()
+    force_stable_s=0.
+    neighbor_peak=0.
+    solver_peak=0
+    phase_times=[]
     for phase,duration in zip(names,durations):
+        phase_start=float(d.time)
         states.append(dict(phase=phase,t=float(d.time),qpos=d.qpos.tolist()))
         for step in range(round(duration/dt)):
             alpha = (step+1)/round(duration/dt)
@@ -318,14 +425,33 @@ def evaluate(job):
                 if phase in ('lift','carry','hold'):
                     target[2] += .15*(smooth if phase=='lift' else 1.)
                 if phase in ('carry','hold'):
-                    target[0] -= .1*(smooth if phase=='carry' else 1.)
+                    target[0] += settings.carry_x*(smooth if phase=='carry' else 1.)
                 measured = min(last['force'])
                 # One symmetric native gripper actuator; object label is not read.
                 gap += np.clip((measured-6.)*.01,-.04,.015)*dt
                 gap = float(np.clip(gap,-.010,.095))
             robot.command(target,gap)
             sim.step()
-            if step%25==0:
+            solver_peak=max(solver_peak,int(d.solver_niter.max()))
+            if settings.every_step_safety and int(d.solver_niter.max())>=m.opt.iterations:
+                outcome,reason='numeric_limit','constraint solver reached its iteration budget'
+                last=contacts(robot)
+                break
+            neighbor_peak=max(neighbor_peak,float(np.linalg.norm(d.xipos[sim.neighbor_bodies]-initial_neighbors,axis=1).max()))
+            if settings.every_step_safety:
+                safety=contact_safety(robot)
+                for key in peaks:peaks[key]=max(peaks[key],safety[key])
+                bypass_peak=max(bypass_peak,safety['direct_content_support_contacts'])
+                if not preflight and (safety['penetration_mm']>(.15 if sim.info['thin'] else 1.) or
+                                       safety['direct_content_support_contacts']):
+                    outcome,reason='invalid_physics','per-step contact penetrates tolerance or bypasses shell'
+                    last=contacts(robot)
+                    break
+                if not preflight and (safety['nonfinger_mm']>0. or safety['self_contact_mm']>0.):
+                    outcome,reason='robot_interference','per-step robot body or self collision'
+                    last=contacts(robot)
+                    break
+            if step%check_every==0:
                 last = contacts(robot)
                 bypass_peak = max(bypass_peak,last['direct_content_support_contacts'])
                 for key in peaks:
@@ -338,8 +464,8 @@ def evaluate(job):
                 if reason:
                     outcome = 'sim_fail'
                     break
-                if time.perf_counter()-wall > 300.:
-                    outcome,reason = 'compute_limit','300 s wall limit reached; no success/failure inference'
+                if time.perf_counter()-wall > settings.wall_limit_s:
+                    outcome,reason = 'compute_limit',f'{settings.wall_limit_s:g} s wall limit reached; no success/failure inference'
                     break
                 if np.min(sim.shell_points()[:,2]) < -.01:
                     outcome,reason = 'sim_fail','shell passed through the table'
@@ -348,6 +474,13 @@ def evaluate(job):
                                        last['direct_content_support_contacts']):
                     outcome,reason = 'invalid_physics','contact penetrates tolerance or bypasses shell'
                     break
+            if phase=='close' and settings.adaptive_close:
+                force_stable_s=force_stable_s+dt if min(last['force'])>=5.4 else 0.
+                if force_stable_s>=.15:
+                    break
+        phase_times.append(dict(phase=phase,start_s=phase_start,end_s=float(d.time)))
+        if phase=='close' and settings.adaptive_close and outcome=='pending' and force_stable_s<.15:
+            outcome,reason='grasp_fail','no stable bilateral grip within full-travel close timeout'
         if phase=='settle':
             rest_com = sim.package_com().copy()
         if outcome!='pending':
@@ -388,9 +521,9 @@ def evaluate(job):
             outcome = 'invalid_physics'
         elif peaks['nonfinger_mm']>0. or peaks['self_contact_mm']>0.:
             outcome = 'robot_interference'
-        elif displacement[2]<.10 or -displacement[0]<.07 or last['support_N']>.05*mass*9.81:
+        elif displacement[2]<.10 or np.sign(settings.carry_x)*displacement[0]<.07 or last['support_N']>.05*mass*9.81:
             outcome = 'grasp_fail'
-        elif neighbors_delta.max()>.03:
+        elif (neighbor_peak if settings.every_step_safety else neighbors_delta.max())>.03:
             outcome = 'neighbor_disturbance'
         else:
             outcome = 'success'
@@ -403,11 +536,13 @@ def evaluate(job):
                 timestep_s=dt,initial_overlap_mm=initial_overlap_mm,
                 content_centers_outside=escaped,direct_content_support_contacts_peak=bypass_peak,
                 initial_settle_displacement_mm=((rest_com-initial_com)*1000).tolist(),
-                max_neighbor_displacement_mm=float(neighbors_delta.max()*1000),
+                max_neighbor_displacement_mm=float((neighbor_peak if settings.every_step_safety else neighbors_delta.max())*1000),
                 shell_vertex_inside_content_mm=inside_mm,peaks=peaks,warnings=warnings,
                 last_contact=last,shell_sha256=sim.info['shell_sha256'],film_thickness_mm=sim.info['radius']*2000,
                 shell_after=sim.shell_points().tolist(),robot=robot.diagnostics(),
-                readings=readings,keyframes=states,dimensions=dict(nv=m.nv,nflex=m.nflex,nvert=m.nflexvert))
+                readings=readings,keyframes=states,phase_times=phase_times,settings=asdict(settings),
+                solver_iterations_peak=solver_peak,
+                curvature_changes=sim.curvature_changes,dimensions=dict(nv=m.nv,nflex=m.nflex,nvert=m.nflexvert))
 
 
 def worker(job):
@@ -430,6 +565,7 @@ def main():
     parser.add_argument('--layout',choices=LAYOUTS)
     parser.add_argument('--action',choices=('center','end','corner','side'))
     parser.add_argument('--jitter',type=float)
+    parser.add_argument('--label',help='Optional filename suffix for an independently archived repeat')
     parser.add_argument('--workers',type=int,default=2)
     args = parser.parse_args()
     if args.stage=='prepare':
@@ -452,29 +588,38 @@ def main():
     cases = [args.case] if args.case else CASES
     layouts = [args.layout] if args.layout else LAYOUTS
     jobs = [dict(case=c,layout=l,preflight=True) for c in cases for l in layouts]
+    if args.stage=='preflight' and args.action:
+        jobs=[dict(job,action=args.action) for job in jobs]
     if args.stage in ('contact','grasp'):
         rows = [json.loads(line) for p in args.run.glob('preflight*.jsonl') for line in p.read_text().splitlines()]
-        passed = {(r['case'],r['layout']) for r in rows if r['outcome']=='preflight_pass'}
+        passed = {(r['case'],r['layout']) for r in rows if r['outcome']=='preflight_pass' and
+                  r.get('settings',asdict(HeapSettings()))==asdict(SETTINGS)}
         actions = ('center','side') if args.stage=='contact' else ('center','end','corner','side')
         jitters = (0.,) if args.stage=='contact' else (0.,.002)
         jobs = [dict(case=c,layout=l,action=a,jitter=j,preflight=False)
                 for c in cases for l in layouts if (c,l) in passed
                 for a in ([args.action] if args.action else actions)
                 for j in ([args.jitter] if args.jitter is not None else jitters)]
-    suffix = '_'.join(str(x) for x in (args.stage,args.case,args.layout,args.action,args.jitter) if x is not None)
+    if args.label and (not args.label.replace('_','').isalnum()):
+        parser.error('--label must contain only letters, numbers, or underscores')
+    suffix = '_'.join(str(x) for x in (args.stage,args.case,args.layout,args.action,args.jitter,args.label) if x is not None)
     dest = args.run/f'{suffix}.jsonl'
     if dest.exists():
         raise FileExistsError(dest)
     from yam_probe_robot import asset_fingerprint
     save(args.run/'yam_asset_sha256.json',asset_fingerprint())
     files = [ROOT/'policy/parcel_heap.py',ROOT/'policy/yam_probe_robot.py',ROOT/'test/policy/HIDDEN_CONTENTS_REPORT.md']
+    if (args.run/'settings.json').exists():
+        files.append((args.run/'settings.json').resolve())
     snapshot = args.run/'driver_source'/suffix
     snapshot.mkdir(parents=True)
     for file in files:
         (snapshot/file.name).write_bytes(file.read_bytes())
     import mujoco
-    save(args.run/f'{suffix}_metadata.json',dict(host=platform.node(),jobs=len(jobs),bag_dt=DT,envelope_dt=.0001,
-         wall_limit_s=300.,python=sys.version,mujoco=mujoco.__version__,numpy=np.__version__,
+    save(args.run/f'{suffix}_metadata.json',dict(host=platform.node(),jobs=len(jobs),settings=asdict(SETTINGS),
+         helper_sha256=digest(args.run/'source_helpers/flex_curvature.py') if SETTINGS.curvature_fix else None,
+         settings_sha256=digest(args.run/'settings.json') if (args.run/'settings.json').exists() else None,
+         python=sys.version,mujoco=mujoco.__version__,numpy=np.__version__,
          stage=args.stage,started=time.strftime('%Y-%m-%dT%H:%M:%S%z'),
          files={str(f.relative_to(ROOT)):digest(f) for f in files}))
     with ProcessPoolExecutor(max_workers=args.workers) as pool, dest.open('w') as stream:

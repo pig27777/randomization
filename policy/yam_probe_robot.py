@@ -138,6 +138,7 @@ class Yam:
         mujoco.mj_forward(m,d)
         self.nominal_pad_offset = np.mean(d.geom_xpos[self.pad_geom],axis=0) - d.site_xpos[self.site]
         self.steps = 0
+        self.control_period_steps = 25
 
     def residual(self, q, target):
         self.kin.qpos[self.qadr] = q
@@ -179,7 +180,7 @@ class Yam:
     def command(self, position, gap_command):
         m,d = self.sim.m,self.sim.d
         self.target = np.asarray(position)
-        if self.steps % 25 == 0:
+        if self.steps % self.control_period_steps == 0:
             self.solve(self.target)
         ff = d.qfrc_bias[self.dofs] - d.qfrc_gravcomp[self.dofs]
         ctrl = self.qtarget + ff/m.actuator_gainprm[self.act,0]
@@ -197,7 +198,7 @@ class Yam:
         axis /= np.linalg.norm(axis)
         raw = {'pA': max(0.,-float(forces['left']@axis)),
                'pB': max(0.,float(forces['right']@axis))}
-        if self.steps % 25 == 0:
+        if self.steps % self.control_period_steps == 0:
             self.tracking.append(float(np.linalg.norm(d.site_xpos[self.site]-self.target)*1000))
             for c in d.contact:
                 g1,g2 = c.geom

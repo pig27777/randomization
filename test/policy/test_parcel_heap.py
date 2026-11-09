@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import sys
 import unittest
+from dataclasses import replace
 
 import numpy as np
 
@@ -13,6 +14,31 @@ heap.install_backend(heap.RUN/'contact_fix')
 
 
 class HeapContract(unittest.TestCase):
+    def test_raised_heap_preserves_shell_and_content_geometry(self):
+        low=heap.scene('book','gap')
+        high=heap.scene('book','gap','side',settings=replace(heap.HeapSettings(),stack_lift=.17,
+                                                          adaptive_close=True,every_step_safety=True))
+        np.testing.assert_allclose(high.sim.shell_points()-low.sim.shell_points(),
+                                   np.broadcast_to([0,0,.17],high.sim.shell_points().shape),atol=1e-10)
+        np.testing.assert_allclose(high.sim.d.xipos[high.sim.content_bodies]-low.sim.d.xipos[low.sim.content_bodies],
+                                   [[0,0,.17]],atol=1e-10)
+        foundation=high.sim.m.body('heap_foundation').id
+        self.assertEqual(high.sim.m.body_dofnum[foundation],6)
+        self.assertAlmostEqual(high.sim.m.body_mass[foundation],3.)
+        self.assertLessEqual(max((-c.dist for c in high.sim.d.contact),default=0.),1e-7)
+
+    def test_per_step_guard_matches_native_contact_decoder(self):
+        import json,mujoco
+        path=heap.RUN/'contact_fix/contact.jsonl'
+        row=next(json.loads(line) for line in path.read_text().splitlines()
+                 if json.loads(line)['case']=='paper_envelope' and json.loads(line)['action']=='center')
+        robot=heap.scene(row['case'],row['layout'])
+        robot.sim.d.qpos[:]=row['keyframes'][-1]['qpos']
+        mujoco.mj_forward(robot.sim.m,robot.sim.d)
+        full=heap.contacts(robot);fast=heap.contact_safety(robot)
+        self.assertGreater(fast['penetration_mm'],.15)
+        for key,value in fast.items():self.assertAlmostEqual(value,full[key])
+
     def test_side_approaches_towards_package(self):
         np.testing.assert_array_equal(heap.SIDE_ROTATION[:,2],[0.,1.,0.])
         self.assertAlmostEqual(abs(heap.SIDE_ROTATION[2,1]),1.)
