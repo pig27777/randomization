@@ -219,3 +219,8 @@
 ## 2026-11-08 · Git 初始化（用户要求，两台机器共用）
 - 改动：新增 `.gitignore`（字节码、工作目录 MuJoCo 日志、袋子静置缓存、pstats）、`envs/mjwarp-requirements.txt`（uv freeze，12 包）；AGENTS.md §8 加“两台机器”一条；`git init -b main` 并首次提交 96f4b6b（8606 文件，.git 394 MB）。
 - 检查：已暂存文件中无 __pycache__/.pyc/cache；单文件最大 56 MB（r3 诊断 gpu.json，<100 MB GitHub 上限）；未发现凭据类文件名。未推送：尚无远端，本机 gh 未登录。
+- 推送：用户确认合并远端 README、保持公开；合并提交 769a653，已推送到 https://github.com/pig27777/randomization（main 跟踪 origin/main）。GitHub 对 56 MB 文件给出大文件提示，未拒收。
+
+## 2026-11-09 · MuJoCo 3D flex 测试计划
+- 改动：新建 `test/flex3d/REPORT.md`（第 1 轮计划 T1–T5）；decisions 加 2026-11-09 条。核对：锚点尺寸/质量取自 contents/segment/model.py ANCHORS；T1 阈值沿用 test/contact_transfer/README.md 的 5%/0.05 mm/1 mm/s；κ 范围取自 sampling.BOUNDS。
+- 2026-11-09 同步：远端已有另一会话写的 `test/flex3d/REPORT.md`（据原任务重建计划并按用户要求改为机械臂多角度抓取）；本机未提交的计划稿不覆盖它，已移到会话草稿区备份。
