@@ -6,6 +6,7 @@
 <meta name="description" content="分段内容物与三维弹塑性连续体：建模方法、已做实验、真实结果与遇到的问题。">
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans CJK SC",sans-serif;color:#24343c;background:#f6f8fa;line-height:1.75;--muted:#667680;--line:#dce3e8;--accent:#196d61}*{box-sizing:border-box}body{margin:0}a{color:var(--accent);text-underline-offset:3px}header,main,footer{max-width:1080px;margin:auto;padding:30px 24px}header{padding-top:52px;padding-bottom:20px}.eyebrow{font-size:12px;color:var(--muted);letter-spacing:.08em}h1{font-size:clamp(27px,4vw,40px);line-height:1.3;margin:12px 0 16px}h2{font-size:23px;line-height:1.4;margin:0 0 20px}h3{font-size:17px;margin:0 0 10px}p{margin:10px 0}.lead{max-width:820px;color:#50616c}nav{display:flex;gap:22px;flex-wrap:wrap;margin-top:24px;font-size:14px}.notice{border-left:3px solid #c18332;background:#fff9ed;padding:14px 18px;margin:26px 0 0;font-size:14px}main{padding-top:10px}section{margin:28px 0 46px;scroll-margin-top:24px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{border:1px solid var(--line);background:white;border-radius:10px;padding:22px}.card p{font-size:14px}.sub{font-size:13px;color:var(--muted)}.tag{display:inline-block;font-size:11px;color:var(--accent);background:#eaf3f0;padding:3px 8px;border-radius:4px;margin-bottom:12px}.formula{font:15px ui-monospace,monospace;background:#ecf3f1;color:#195c50;padding:12px 16px;border-radius:6px;margin:18px 0}.table-wrap{overflow-x:auto;background:white;border:1px solid var(--line);border-radius:9px}table{border-collapse:collapse;width:100%;font-size:14px;min-width:580px;text-align:left}th,td{padding:13px 16px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#eef2f5;font-weight:600}tr:last-child td{border-bottom:0}.good{color:#16734a}.bad{color:#a44536}.pending{color:#8b682d}figure{margin:22px 0}figure img{width:100%;max-width:840px;display:block;border-radius:8px;border:1px solid var(--line);background:white}figcaption{font-size:12px;color:var(--muted);margin-top:9px}.issues{display:grid;gap:12px}.issue{padding:17px 20px;border:1px solid var(--line);border-radius:8px;background:white}.issue p{font-size:14px;margin:5px 0 0}.video-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.video-card{background:white;border:1px solid var(--line);border-radius:10px;overflow:hidden}.video-card video{width:100%;display:block;background:#111;aspect-ratio:1280/480}.video-card .body{padding:16px 18px}.video-card h3{font-size:16px}.video-card p{font-size:13px;color:#586b76}.wide{grid-column:1/-1}details{background:white;border:1px solid var(--line);border-radius:8px;padding:14px 18px;margin-top:18px;font-size:14px}summary{cursor:pointer;font-weight:600}code{font:12px ui-monospace,monospace;background:#edf1f4;padding:2px 5px;border-radius:4px}.source-links{display:flex;gap:12px 24px;flex-wrap:wrap;font-size:13px}footer{border-top:1px solid var(--line);font-size:12px;color:var(--muted);padding-bottom:45px}@media(max-width:720px){header,main,footer{padding-left:17px;padding-right:17px}header{padding-top:30px}.cards,.video-grid{grid-template-columns:1fr}.wide{grid-column:auto}.card{padding:18px}section{margin-bottom:34px}nav{gap:14px}th,td{padding:11px 13px}}
+.bagged-videos video{aspect-ratio:8/9;object-fit:contain}.bagged-videos .wide video{aspect-ratio:16/9}
 </style>
 </head>
 <body>
@@ -13,7 +14,7 @@
 <div class="eyebrow">实验记录 · 2026-11-09 · ubun / RTX 5090</div>
 <h1>内容物怎么建模，实验走到了哪里</h1>
 <p class="lead">对比分段刚体与三维弹塑性连续体。记录实际采用的方法、已经执行的实验和遇到的问题，便于回看与继续迭代。</p>
-<nav aria-label="页面导航"><a href="#model">建模方法</a><a href="#experiments">实验结果</a><a href="#issues">遇到的问题</a><a href="#videos">视频</a><a href="https://github.com/pig27777/randomization">GitHub 源码 ↗</a></nav>
+<nav aria-label="页面导航"><a href="#model">建模方法</a><a href="#experiments">实验结果</a><a href="#issues">遇到的问题</a><a href="#bagged-videos">袋子＋内容物夹取</a><a href="#videos">内容物视频</a><a href="https://github.com/pig27777/randomization">GitHub 源码 ↗</a></nav>
 <div class="notice"><strong>当前结论：</strong>连续体候选、GPU 步进和调参抓取界面已实现；可靠抓取、随机参数批量稳定性仍未通过。参数尚未用实物标定，视频中的任务结果按真实事件标注。</div>
 </header>
 <main>
@@ -56,6 +57,18 @@
 <article class="issue"><h3>旧分段 GPU 求解器触发线搜索上限</h3><p>诊断中的位置与速度有限，但原始警告位为 LS_ITERATIONS。保留 valid=false，未把带警告运行当作有效吞吐；没有为追求速度修改材料或求解器预算。</p></article>
 <article class="issue"><h3>实现完成不等于可以直接训练</h3><p>还需要定位首次塑性失效、验证长时程接触和参数适用范围、做实物响应标定，并完成可靠的批量抓取。当前只确认已执行的构建、短材料实验、部分有效 GPU 参数组和视频回放。</p></article>
 </div>
+</section>
+<section id="bagged-videos" aria-labelledby="bagged-title">
+<h2 id="bagged-title">袋子＋内容物夹取</h2>
+<p>完整 YAM 机械臂从快递堆中夹取外袋与内部物体。每段同时展示整机和抓取近景，0.5 倍速播放；末帧停留 2 秒。</p>
+<div class="video-grid bagged-videos">
+<article class="video-card wide"><video controls playsinline preload="metadata" aria-label="书本与衣物同外袋抓取并排对比" src="assets/book_clothes_comparison.mp4">请<a href="assets/book_clothes_comparison.mp4">下载书本与衣物对比视频</a>观看。</video><div class="body"><h3>先看对比 · 同外袋，书本 / 衣物</h3><p>同一外袋、相同堆形和抓点。书本单次成功，衣物完整运行但抬升不足；当前结果仍受接触步长影响。</p></div></article>
+<article class="video-card"><video controls playsinline preload="metadata" aria-label="袋装书本抓取视频" src="assets/book.mp4">请<a href="assets/book.mp4">下载袋装书本视频</a>观看。</video><div class="body"><h3>袋装书本 · 单次成功</h3><p>低堆顶上方夹取，抬升约 103 mm、搬运约 99 mm。0.2 ms 步长下完成；0.1 ms 对照穿透超限，尚未通过步长稳定性验证。</p></div></article>
+<article class="video-card"><video controls playsinline preload="metadata" aria-label="袋装衣物抓取视频" src="assets/clothes.mp4">请<a href="assets/clothes.mp4">下载袋装衣物视频</a>观看。</video><div class="body"><h3>袋装衣物 · 抬升不足</h3><p>与书本使用相同外袋和抓点。完整运行并搬运约 100 mm，但只抬升约 55 mm，未达到 100 mm 标准。</p></div></article>
+<article class="video-card"><video controls playsinline preload="metadata" aria-label="装纸信封上方试抓视频" src="assets/paper_envelope.mp4">请<a href="assets/paper_envelope.mp4">下载装纸信封视频</a>观看。</video><div class="body"><h3>装纸信封 · 上方试抓中止</h3><p>低堆顶上方接近。合拢时纸张与外壳穿透达到 0.15077 mm，超过本轮门槛，仿真停止。</p></div></article>
+<article class="video-card"><video controls playsinline preload="metadata" aria-label="装薄硬片信封侧夹视频" src="assets/card_envelope_side.mp4">请<a href="assets/card_envelope_side.mp4">下载薄硬片信封视频</a>观看。</video><div class="body"><h3>装薄硬片信封 · 侧夹未夹稳</h3><p>高堆空隙侧向接近，合拢 3 秒后仍未建立稳定双指夹持，未进入抬升。与上方试抓的支撑条件不同。</p></div></article>
+</div>
+<p class="sub">以上均为现有试次的仿真回放；外袋与内容物尚未实物标定，包含失败片段。<a href="https://github.com/pig27777/randomization/blob/main/test/policy/HIDDEN_CONTENTS_REPORT.md">实验结果与模型说明 ↗</a> · <a href="https://github.com/pig27777/randomization/blob/main/video/README.md">视频来源与播放说明 ↗</a></p>
 </section>
 <section id="videos">
 <h2>真实轨迹视频</h2>
