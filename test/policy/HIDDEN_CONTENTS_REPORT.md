@@ -193,3 +193,28 @@ flock /tmp/claude-gpu.lock .venv/bin/python policy/parcel_heap.py contact --run 
 **现在取得了同外袋书/衣物的完整配对轨迹，但尚未取得数值稳定的内容物影响证据，薄信封也没有有效成功样本。** 0.2 ms 下两种内容物有不同的抬升响应；0.1 ms 的书本反例表明，当前结果仍可能受离散接触影响，不能直接用于宣称策略收益或训练内容物识别。较高堆形让侧向路径通过了几何筛查，但并未自动带来有效薄信封抓取。
 
 下一步的前置问题是受夹/抬升状态下外壳—内容物、外壳—外壳与外壳—支撑的接触收敛，需保留足够状态比较同一受载工作点下的求解器、步长与网格；通过后才适合扩展抓点、埋压、质量分布或学习策略。当前实验没有否定真实任务的价值，也没有解决大规模快递山拣取；不把单例成功当作真实部署依据。
+
+## 连续视频导出计划（2026-11-09，用户要求视频）
+
+原档只有阶段边界 qpos，禁止把稀疏关键帧插值冒充连续动力学录像。按归档源码与冻结配置重放五个已有试次，各一次：书本/衣物堆顶中心、书本 0.1 ms 反例、纸张信封堆顶中心、薄硬片信封高堆空隙侧夹。CPU 独立运行授权沿用；不变更物理参数或验收线，不计作新策略样本。
+
+以 30 Hz 保存真实积分状态，离线渲染 0.5 倍速视频。重放需与原档结局、阶段名称/时刻、穿透峰值和位移一致（数值绝对差 ≤1e-6 mm，阶段 qpos 最大坐标差 ≤1e-10）；不一致则标明并停止使用该重放作为原试次视频。片头/画面注明支持条件、步长、结局与模型局限。按用户补充要求，所有 MP4 统一放仓库根目录 `video/`；密集状态、来源 hash 和导出检查保存在 `continuation/videos/`。
+
+视频导出已完成：5 次重放均与原记录结局一致，阶段 qpos、阶段时刻、位移和接触峰值差均为 0。共保留 580 个真实积分采样状态，没有在稀疏阶段关键帧之间插值。原 24 条正式记录的计数及结论不变。
+
+| 对比视频 | 时长 | 输出 |
+| --- | --- | --- |
+| [书本 / 衣物](../../video/book_clothes_comparison.mp4) | 13.47 s | 1920×1080，30 fps |
+| [书本步长对照](../../video/book_timestep_comparison.mp4) | 12.07 s | 1920×1080，30 fps |
+| [薄信封试抓](../../video/thin_envelope_comparison.mp4) | 10.20 s | 1920×1080，30 fps |
+
+另有 5 段独立视频，全部位于 [video/](../../video/README.md)，格式 H.264/yuv420p、带 faststart，中文标注仿真时间、动作阶段、支撑条件和停止原因；每段同时有整机与近景。末帧暂停 2 s，并排时短片一侧继续暂停至长片结束，画面明确标记末帧。5 次重放及 8 个 MP4 的帧数、尺寸、帧率、源 hash 与完整解码检查均通过，见 [video_checks.json](../../policy/results/parcel_heap_20261109/continuation/videos/video_checks.json)。
+
+```sh
+.venv/bin/python policy/video_parcel_heap.py record --trial book
+.venv/bin/python policy/video_parcel_heap.py render --trial book
+# 其余 trial: clothes, book_small_step, paper_envelope, card_envelope_side
+.venv/bin/python policy/video_parcel_heap.py compose
+```
+
+已有状态或视频拒绝覆盖。录像用途是展示现有试次，不新增策略样本；原有接触稳定性与实物标定限制仍适用。

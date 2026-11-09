@@ -42,3 +42,12 @@
 - `test_parcel_heap.py` 6 项、`test_probe_feedback.py` 3 项通过。新增检查覆盖底箱增高保持几何与质量、逐步接触检查与原生接触解码一致；原 YAM 默认路径精确回归通过。
 - 归档配置时相对路径曾触发启动错误，修复为绝对路径后重启；没有生成动力学结果。一个正式书本进程以 143 终止、无结果，原因未知，另存 `replay1`，原空文件和终止说明保留。
 - [续轮原始记录](../policy/results/parcel_heap_20261109/continuation/) · [续轮 CSV](../policy/results/parcel_heap_20261109/continuation/trials.csv) · [续轮审计](../policy/results/parcel_heap_20261109/continuation/summary.json)。
+
+## 视频导出检查（2026-11-09）
+
+按用户要求新建根目录 [video/](../video/README.md)，全部 8 个 MP4 统一放入；包含 5 段独立试次与 3 段并排对比。原档只有阶段边界姿态，因此从带 hash 的阶段源码/配置重放补录 30 Hz 实际积分状态，未做阶段关键帧插值。5 次重放的结局、阶段姿态/时刻、位移和接触峰值与原档差均为零，共 580 个状态；不改变原实验样本数。
+
+- `policy/video_parcel_heap.py record/render --trial ...` 与 `compose` 导出完成，中文标注、0.5 倍速、整机/近景及末帧暂停已目视检查。
+- `ffprobe` 检查全部 8 段为 H.264/yuv420p、30 fps，独立视频 960×1080、并排视频 1920×1080；帧数与采样状态/播放速度/暂停时长一致。
+- `ffmpeg -v error -i <video> -f null -` 全部完整解码通过，状态与视频 SHA256 校验通过；[检查清单](../policy/results/parcel_heap_20261109/continuation/videos/video_checks.json)。
+- [书本/衣物对比](../video/book_clothes_comparison.mp4) 13.47 s · [步长对照](../video/book_timestep_comparison.mp4) 12.07 s · [薄信封](../video/thin_envelope_comparison.mp4) 10.20 s。
