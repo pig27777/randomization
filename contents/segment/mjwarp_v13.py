@@ -11,6 +11,7 @@ specs are grouped into structural buckets (same segment counts and options) and 
 from __future__ import annotations
 
 import dataclasses
+import copy
 import math
 import time
 
@@ -33,6 +34,8 @@ wp.set_module_options({"enable_backward": False, "enable_fp_fma": False})
 
 BATCHABLE = {f.name for f in dataclasses.fields(mjw_types.Model)
              if mjw_util.is_array_spec(f.type) and getattr(f.type, 'shape', ())[:1] == ('*',)}
+MODEL_FIELDS = {f.name for f in dataclasses.fields(mjw_types.Model)}
+SHARED_FIELDS = {'bvh_aabb', 'dof_M0', 'dof_length'}
 SETTLE, APPROACH, PRESS, CLOSE, LIFT, CARRY, LOWER, OPEN, PULL = range(9)
 PHASE_NAMES = ('settle', 'approach', 'press', 'close', 'lift', 'carry', 'lower', 'open', 'pull')
 CONTROLLED = (CLOSE, LIFT, CARRY, LOWER, PULL)
@@ -61,15 +64,42 @@ def signature(sim):
     return (sim.desc.rigid, sim.desc.kappa.segments, sim.desc.mobile is not None, shape)
 
 
-def stacked_model(sims):
+def union_aabbs(values):
+    """Conservative union of MuJoCo's local AABBs (center, half extent)."""
+    values=np.asarray(values)
+    if values.ndim!=3 or values.shape[-1]!=6 or np.any(values[...,3:]<0):
+        raise ValueError('expected [environment, node, 6] AABBs with nonnegative half extents')
+    lower=np.min(values[...,:3]-values[...,3:],axis=0)
+    upper=np.max(values[...,:3]+values[...,3:],axis=0)
+    return np.concatenate([(lower+upper)/2,(upper-lower)/2],axis=-1)
+
+
+def stacked_model(sims, shared_audit=None):
     """One MJWarp model; fields that differ between environments become batched arrays."""
     base = sims[0].m
+    audit={}
+    for name in sorted(SHARED_FIELDS):
+        values=np.stack([getattr(s.m,name) for s in sims])
+        span=np.ptp(values,axis=0)
+        audit[name]=dict(policy='conservative union' if name=='bvh_aabb' else 'first model representative',
+            maximum_elementwise_range=float(np.max(span,initial=0.)),
+            minimum_value=float(np.min(values,initial=np.inf)),maximum_value=float(np.max(values,initial=-np.inf)),
+            consumed_by_mjwarp=name in MODEL_FIELDS,representative_index=0)
+    inertia=np.array([s.m.stat.meaninertia for s in sims])
+    audit['stat.meaninertia']=dict(policy='first model representative',minimum_value=float(inertia.min()),
+        maximum_value=float(inertia.max()),maximum_elementwise_range=float(np.ptp(inertia)),representative_index=0)
+    if any(not np.array_equal(base.bvh_aabb,s.m.bvh_aabb) for s in sims[1:]):
+        # Do not mutate the CPU reference models retained for comparison.
+        base=copy.copy(base)
+        base.bvh_aabb[:]=union_aabbs(np.stack([s.m.bvh_aabb for s in sims]))
     differs, fixed_mismatch = ['eq_data'], []
     for name in dir(base):
         value = getattr(base, name)
         if name.startswith('_') or not isinstance(value, np.ndarray):
             continue
         if all(np.array_equal(value, getattr(s.m, name)) for s in sims[1:]):
+            continue
+        if name in SHARED_FIELDS:
             continue
         (differs if name in BATCHABLE else fixed_mismatch).append(name)
     if fixed_mismatch:
@@ -80,6 +110,7 @@ def stacked_model(sims):
         target = getattr(model, name)
         values = np.stack([getattr(s.m, name) for s in sims])
         target.assign(wp.array(values, dtype=target.dtype))
+    if shared_audit is not None:shared_audit.update(audit)
     return model, differs
 
 
@@ -108,7 +139,8 @@ class Batch:
         self.mass = np.array([x.mass for x in sims])
         self.dt = sim.m.opt.timestep
         with wp.ScopedDevice('cuda:0'):
-            self.model, self.batched_fields = stacked_model(sims)
+            self.shared_model_fields={}
+            self.model, self.batched_fields = stacked_model(sims,self.shared_model_fields)
             self.model.opt.warn_overflow = 0
             self.data = mjw.put_data(sim.m, sim.d, nworld=n, nconmax=nconmax, njmax=njmax)
             self.data.qpos.assign(np.stack([x.d.qpos for x in sims]).astype(np.float32))
@@ -525,5 +557,6 @@ def run_specs(specs, nconmax=400, njmax=3000, progress=None):
         for i, r in zip(idx, run(batch, progress=progress)):
             r['bucket'] = str(key)
             r['batched_fields'] = batch.batched_fields
+            r['shared_model_fields'] = batch.shared_model_fields
             results[i] = r
     return results

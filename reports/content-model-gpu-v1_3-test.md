@@ -1,6 +1,6 @@
 # 内容物 v1.3 GPU 后端检查
 
-最近测试：2026-11-08（Asia/Taipei）。**结论：硬物R3探索排除本例读数错误，确认首接触/合拢停止与保持增益链路有实际夹紧差异，按用户要求停止。G1已通过；已批准的R1y四次正式补跑及G3–G5未进入。GPU平台指定MJWarp，但当前后端尚未供训练；CPU v1.3保留参考。**
+最近测试：2026-11-10（Asia/Taipei，机器ubun）。**结论：G2易弯R1y五次正式通过；硬物R3保持力按审阅只记录。G3已有E4正式数据复核85/90=94.44%<95%，未通过，按用户要求停止；E5/G4/G5未继续，GPU训练后端尚未就绪。A0的小试不能替代G3/G4完整验收。冻结CPU v1.3不改。**
 
 以下11月6日结果保留为历史；本次续检见文末，未将探索结果改算正式验收。
 
@@ -45,3 +45,23 @@
 证据：[诊断指纹汇总](../contents/segment/results/warp_backend_v1_3/r3_diagnostic_20261108/closed_loop/summary.json)、[离线分析](../contents/segment/results/warp_backend_v1_3/r3_diagnostic_20261108/closed_loop/analysis.json)、[逐时刻比较](../contents/segment/results/warp_backend_v1_3/r3_diagnostic_20261108/closed_loop/comparison.csv)。原始逐接触数据`cpu.json`/`gpu.json`及短试、日志保留在上述目录，无覆盖旧正式结果。
 
 结束静态检查通过：9项相关源码AST、6个相关JSON严格解析、6项冻结CPU源码与原归档SHA、诊断前后源码及分析输入哈希、6条新增结果链接；无额外物理运行，无本线实验残留进程。[审计记录](../contents/segment/results/warp_backend_v1_3/r3_diagnostic_20261108/audit.json)。
+
+
+## 11月10日续检（ubun）
+
+范围：恢复G2/G3记录、A0异κ同桶共享字段与CPU输入隔离、离线E4任务类别核对。沿用冻结v1.3/协议v2.2；未改验收标准、材料、接触或捏取规则。
+
+| 检查 / 方法 | 本轮结果 |
+|---|---|
+| 易弯R1y原正式+4次正式的汇总核对 | 通过：5次中位误差−0.44738%，每次最大绝对误差3.49685%；[汇总](../contents/segment/results/warp_backend_v1_3/resume_20261108/r1y_five_formal.json) |
+| `PYTHONPATH=contents/segment:test/content_model /home/ubuntu/Dev/Envs/mjwarp/bin/python -B -m unittest discover -s test/content_model/tests -p test_mjwarp_batching.py -t test/content_model -v` | 3/3通过：AABB保守覆盖、实际CPU模型不变、未知共享差异仍拒绝 |
+| `validate_tasks_v13.py describe` / 相关源码AST | 完整E4 90、E5 50；原缺失20项硬物参考已用原正式实跑记录精确补齐；静态解析通过 |
+| 持锁 `validate_tasks_v13.py a0-smoke` | 2个κ单环境/同批类别一致，0/4 sim_fail、溢出0；全为grasp_fail，不能宣称成功抓取行为已验 |
+| 持锁 `validate_tasks_v13.py e4-audit --e4-reuse … --cpu-reference-reuse …` | **门槛失败，预期退出码2**：85/90=94.44%<95%；hard/bendable/compressible分别30/30、28/30、27/30；硬物力峰中位差0.00014372%通过 |
+| 原始结果、源码和冻结归档审计 | A0运行14个实际导入源码前后相同，离线审计5个前后相同；7个关键运行源码与原G3开始一致，冻结v1.3模型/归档完整；JSON与链接检查见[检查记录](../test/runs/2026-11-10/contents/v13-a0/checks.json) |
+
+首次用`test.content_model…`模块名启动单测因Python标准库`test`包冲突未加载，改为项目约定的discover后3项通过；未改测试断言。两κ小试Batch运行墙钟29.651/91.632/95.246s仅供入口成本诊断，不是G5有效吞吐。所有物理小试持锁、无运行中改源码；原G3数据只读复核，不增加GPU正式重复次数。
+
+**遗留/限制**：E4两项易弯GPU未绑定、三项易压CPU超载掉落而GPU成功，首个数值/控制分歧尚未隔离。原G3因E5构建错误未写结束审计和机器名，本轮不补造历史证据。A0局部通过不能替代完整G3/G4；未继续E5全50、G4、G5或A1–A6，缺训练吞吐/显存/solver_niter结论，不发布GPU就绪标签。下一轮建议先固定5例逐阶段诊断后再过G3，门槛不变。
+
+[主题报告](../test/content_model/REPORT.md) · [运行索引/完整命令](../test/runs/2026-11-10/README.md) · [E4汇总](../test/runs/2026-11-10/contents/v13-a0/e4-audit/summary.json) · [反例](../test/runs/2026-11-10/contents/v13-a0/e4-audit/counterexamples.json)。

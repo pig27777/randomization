@@ -1,0 +1,210 @@
+[
+ {
+  "outcome": "grasp_fail",
+  "reason": "top pinch conditions or current grip force absent",
+  "cls": "bendable",
+  "max_grip_force_N": 0.1707054011758032,
+  "lift_height_mm": null,
+  "measured_pinch_coeff": null,
+  "pull_force_N": 0.0,
+  "peak_weld_force_N": 0.0,
+  "pinch_events": [],
+  "phases": [
+   [
+    0.0,
+    "settle"
+   ],
+   [
+    0.3000000000000045,
+    "approach"
+   ],
+   [
+    0.8391999999999729,
+    "press"
+   ],
+   [
+    0.9891999999999563,
+    "close"
+   ]
+  ],
+  "max_real_grip_force_N": 0.1964524166205221,
+  "max_spring_force_N": 0.0,
+  "failure_state": null,
+  "sim_s": 4.5599999999995635,
+  "batch_wall_s": 95.24550758022815,
+  "batch_steps": 11400,
+  "overflow_checks": 0,
+  "protocol": "v2.2",
+  "backend": "mjwarp_v13",
+  "bucket": "(False, (4, 4, 3), False)",
+  "batched_fields": [
+   "body_inertia",
+   "body_invweight0",
+   "body_ipos",
+   "body_mass",
+   "body_pos",
+   "body_subtreemass",
+   "dof_invweight0",
+   "eq_data",
+   "geom_aabb",
+   "geom_rbound",
+   "geom_size",
+   "geom_solref",
+   "light_poscom0",
+   "pair_friction",
+   "pair_solref",
+   "pair_solreffriction",
+   "qpos0",
+   "qpos_spring",
+   "site_pos",
+   "tendon_damping",
+   "tendon_invweight0",
+   "tendon_length0",
+   "tendon_range"
+  ],
+  "shared_model_fields": {
+   "bvh_aabb": {
+    "policy": "conservative union",
+    "maximum_elementwise_range": 0.012200240000000001,
+    "minimum_value": -0.025,
+    "maximum_value": 2.0,
+    "consumed_by_mjwarp": false,
+    "representative_index": 0
+   },
+   "dof_M0": {
+    "policy": "first model representative",
+    "maximum_elementwise_range": 0.024046754899999998,
+    "minimum_value": 1.0104947e-07,
+    "maximum_value": 100.0,
+    "consumed_by_mjwarp": false,
+    "representative_index": 0
+   },
+   "dof_length": {
+    "policy": "first model representative",
+    "maximum_elementwise_range": 0.011730208452536306,
+    "minimum_value": 0.03532738357498595,
+    "maximum_value": 1.0,
+    "consumed_by_mjwarp": true,
+    "representative_index": 0
+   },
+   "stat.meaninertia": {
+    "policy": "first model representative",
+    "minimum_value": 2.043112573248131,
+    "maximum_value": 2.045892237745956,
+    "maximum_elementwise_range": 0.002779664497825074,
+    "representative_index": 0
+   }
+  }
+ },
+ {
+  "outcome": "grasp_fail",
+  "reason": "both contacts lost for >50 ms",
+  "cls": "bendable",
+  "max_grip_force_N": 2.9524870634275326,
+  "lift_height_mm": null,
+  "measured_pinch_coeff": null,
+  "pull_force_N": 0.0,
+  "peak_weld_force_N": 3.9271810467288413,
+  "pinch_events": [
+   {
+    "t": 4.356799999999586,
+    "event": "bind",
+    "segments": 2
+   },
+   {
+    "t": 4.359599999999586,
+    "event": "overload"
+   }
+  ],
+  "phases": [
+   [
+    0.0,
+    "settle"
+   ],
+   [
+    0.3000000000000045,
+    "approach"
+   ],
+   [
+    0.8539999999999712,
+    "press"
+   ],
+   [
+    1.7047999999998775,
+    "close"
+   ],
+   [
+    4.356799999999586,
+    "lift"
+   ]
+  ],
+  "max_real_grip_force_N": 2.6545386149790513,
+  "max_spring_force_N": 2.0352091482991885,
+  "failure_state": null,
+  "sim_s": 4.5599999999995635,
+  "batch_wall_s": 95.24550758022815,
+  "batch_steps": 11400,
+  "overflow_checks": 0,
+  "protocol": "v2.2",
+  "backend": "mjwarp_v13",
+  "bucket": "(False, (4, 4, 3), False)",
+  "batched_fields": [
+   "body_inertia",
+   "body_invweight0",
+   "body_ipos",
+   "body_mass",
+   "body_pos",
+   "body_subtreemass",
+   "dof_invweight0",
+   "eq_data",
+   "geom_aabb",
+   "geom_rbound",
+   "geom_size",
+   "geom_solref",
+   "light_poscom0",
+   "pair_friction",
+   "pair_solref",
+   "pair_solreffriction",
+   "qpos0",
+   "qpos_spring",
+   "site_pos",
+   "tendon_damping",
+   "tendon_invweight0",
+   "tendon_length0",
+   "tendon_range"
+  ],
+  "shared_model_fields": {
+   "bvh_aabb": {
+    "policy": "conservative union",
+    "maximum_elementwise_range": 0.012200240000000001,
+    "minimum_value": -0.025,
+    "maximum_value": 2.0,
+    "consumed_by_mjwarp": false,
+    "representative_index": 0
+   },
+   "dof_M0": {
+    "policy": "first model representative",
+    "maximum_elementwise_range": 0.024046754899999998,
+    "minimum_value": 1.0104947e-07,
+    "maximum_value": 100.0,
+    "consumed_by_mjwarp": false,
+    "representative_index": 0
+   },
+   "dof_length": {
+    "policy": "first model representative",
+    "maximum_elementwise_range": 0.011730208452536306,
+    "minimum_value": 0.03532738357498595,
+    "maximum_value": 1.0,
+    "consumed_by_mjwarp": true,
+    "representative_index": 0
+   },
+   "stat.meaninertia": {
+    "policy": "first model representative",
+    "minimum_value": 2.043112573248131,
+    "maximum_value": 2.045892237745956,
+    "maximum_elementwise_range": 0.002779664497825074,
+    "representative_index": 0
+   }
+  }
+ }
+]
