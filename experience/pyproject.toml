@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yam-experience"
+version = "0.1.0"
+description = "Unified articulated YAM grasp experiment platform"
+requires-python = ">=3.10"
+dependencies = ["mujoco>=3.17,<5", "numpy>=1.24"]
+
+[project.optional-dependencies]
+video = ["PyOpenGL>=3.1"]
+
+[project.scripts]
+yam-grasp = "yam_platform.angles:main"
+yam-suite = "yam_platform.run_suite:main"
+yam-benchmark = "yam_platform.benchmark:main"
+
+[tool.setuptools.packages.find]
+include = ["yam_platform*"]
+
+[tool.setuptools.package-data]
+yam_platform = ["tetra_view.html", "assets/i2rt-yam-menagerie/*", "assets/i2rt-yam-menagerie/upstream/*", "assets/i2rt-yam-menagerie/upstream/assets/*.stl", "assets/i2rt-yam-menagerie/upstream/assets/linear_4310/*.stl"]

@@ -10,7 +10,7 @@
 | 外袋模型、接口与环境 | [袋子说明](bag_sim/README.md) |
 | 最近发生了什么 | [进度流水](log/progress.md) |
 | 实验计划、结果与复现证据 | [按对象查](test/README.md) · [按日期查](test/runs/README.md) |
-| 机械臂抓取、模型对比、轨迹与测速 | [统一抓取平台](test/flex3d/README.md) |
+| 机械臂抓取、模型对比、轨迹与测速 | [experience 统一抓取平台](experience/README.md) |
 | 已讨论的方向与待办 | [决策](log/decisions.md) · [想法池](log/ideas.md) |
 | 展示视频及其限制 | [视频说明](video/README.md) |
 | 修改前的协作与文件约定 | [AGENTS.md](AGENTS.md) |
@@ -23,7 +23,8 @@
 randomization/
 ├── contents/        各版内容物模型、参数与交接；旧方案归入 legacy/
 ├── bag_sim/         各版袋子/整包建模、几何、材料与共享运行模块
-├── policy/          策略、YAM 场景、冻结的内容物副本与结果
+├── experience/      统一 YAM 实验平台代码、YAM 资产、动作与回放
+├── policy/          策略、模型场景适配、冻结的内容物副本与结果
 ├── proxy_eval/      代理真实测试集与评估入口
 ├── isaaclab/        Isaac Lab 可行性验证及独立环境入口
 ├── test/            按对象维护公共测试；runs/YYYY-MM-DD/ 管理轮次与新结果
@@ -47,7 +48,7 @@ randomization/
 .venv/bin/python -B -c 'import sys; from importlib.metadata import version; print(sys.version); print({name: version(name) for name in ("mujoco", "mujoco-warp", "warp-lang", "numpy")})'
 ```
 
-实际运行沿用各主题文档的命令：机械臂与新模型对比从[统一抓取平台](test/flex3d/README.md)进入；内容物从[交接中的环境与入口](contents/HANDOFF.md)进入；袋子和 Isaac Lab 分别见[袋子说明](bag_sim/README.md#2-环境与运行)与[Isaac Lab 说明](isaaclab/README.md)。历史文档中的 `/home/ubuntu/Dev/...` 是原机器路径，先核对本机环境；不同后端使用的 MuJoCo / Newton 版本并不相同，依赖文件不是所有实验的通用安装清单。
+实际运行沿用各主题文档的命令：机械臂与新模型对比从[experience 统一抓取平台](experience/README.md)进入；内容物从[交接中的环境与入口](contents/HANDOFF.md)进入；袋子和 Isaac Lab 分别见[袋子说明](bag_sim/README.md#2-环境与运行)与[Isaac Lab 说明](isaaclab/README.md)。历史文档中的 `/home/ubuntu/Dev/...` 是原机器路径，先核对本机环境；不同后端使用的 MuJoCo / Newton 版本并不相同，依赖文件不是所有实验的通用安装清单。
 
 正式运行遵循 [AGENTS.md 第 8 节](AGENTS.md#8-本项目协作约定)：先登记计划、记录机器名，按要求持 `/tmp/claude-gpu.lock`，新输出使用唯一的运行标识。
 

@@ -57,7 +57,8 @@ def archived_trial(name):
     metadata=json.loads((run/(stage+'_metadata.json')).read_text())
     snapshot=run/'driver_source'/stage
     for file,expected in metadata['files'].items():
-        if digest(snapshot/Path(file).name)!=expected:
+        archived = snapshot / file if file.startswith('experience/') else snapshot / Path(file).name
+        if digest(archived)!=expected:
             raise RuntimeError(f'archived source mismatch: {file}')
     if digest(run/'settings.json')!=metadata['settings_sha256']:
         raise RuntimeError('archived settings changed')

@@ -5,6 +5,11 @@ from itertools import permutations
 from xml.etree import ElementTree as ET
 import mujoco
 import numpy as np
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from bag_sim.frozen_content import activate
+RELEASE_SHA = activate()
 from grasp_platform import MuJoCoSim,TrialConfig,attach_robot,vec,tips,measure_contacts
 from pinch import PinchAttachment
 

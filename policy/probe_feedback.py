@@ -133,9 +133,11 @@ def execute(run, stage, jobs, workers):
     if path.exists():
         raise FileExistsError(f'refusing to overwrite {path}')
     import mujoco
+    from yam_probe_robot import platform_source_files, snapshot_platform
+    platform_sources = list(platform_source_files().values())
     sources = {str(p.relative_to(ROOT)): digest(p) for p in
                [ROOT / 'policy/probe_env.py', ROOT / 'policy/probe_feedback.py',
-                ROOT / 'policy/yam_probe_robot.py', ROOT / 'test/policy/PROBE_REPORT.md']}
+                ROOT / 'policy/yam_probe_robot.py', ROOT / 'test/policy/PROBE_REPORT.md', *platform_sources]}
     metadata = dict(stage=stage, host=platform.node(), started=time.strftime('%Y-%m-%dT%H:%M:%S%z'),
                     python=sys.version, mujoco=mujoco.__version__, numpy=np.__version__,
                     workers=workers, episodes=len(jobs), code_sha256=sources,
@@ -150,6 +152,7 @@ def execute(run, stage, jobs, workers):
     snapshot.mkdir(parents=True, exist_ok=True)
     for name in ('probe_env.py', 'probe_feedback.py', 'yam_probe_robot.py'):
         (snapshot / name).write_bytes((ROOT / 'policy' / name).read_bytes())
+    snapshot_platform(snapshot)
     t0, counts, rows = time.perf_counter(), Counter(), []
     with path.open('x') as stream, ProcessPoolExecutor(max_workers=workers,
             mp_context=multiprocessing.get_context('fork')) as pool:

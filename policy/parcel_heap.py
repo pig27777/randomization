@@ -606,15 +606,19 @@ def main():
     dest = args.run/f'{suffix}.jsonl'
     if dest.exists():
         raise FileExistsError(dest)
-    from yam_probe_robot import asset_fingerprint
+    from yam_probe_robot import asset_fingerprint, platform_source_files, snapshot_platform
+    platform_sources = list(platform_source_files().values())
     save(args.run/'yam_asset_sha256.json',asset_fingerprint())
-    files = [ROOT/'policy/parcel_heap.py',ROOT/'policy/yam_probe_robot.py',ROOT/'test/policy/HIDDEN_CONTENTS_REPORT.md']
+    files = [ROOT/'policy/parcel_heap.py',ROOT/'policy/yam_probe_robot.py',ROOT/'test/policy/HIDDEN_CONTENTS_REPORT.md', *platform_sources]
     if (args.run/'settings.json').exists():
         files.append((args.run/'settings.json').resolve())
     snapshot = args.run/'driver_source'/suffix
     snapshot.mkdir(parents=True)
     for file in files:
+        if file in platform_sources:
+            continue
         (snapshot/file.name).write_bytes(file.read_bytes())
+    snapshot_platform(snapshot)
     import mujoco
     save(args.run/f'{suffix}_metadata.json',dict(host=platform.node(),jobs=len(jobs),settings=asdict(SETTINGS),
          helper_sha256=digest(args.run/'source_helpers/flex_curvature.py') if SETTINGS.curvature_fix else None,

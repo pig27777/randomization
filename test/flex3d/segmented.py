@@ -4,6 +4,11 @@ from xml.etree import ElementTree as ET
 
 import numpy as np
 
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from bag_sim.frozen_content import activate
+RELEASE_SHA = activate()
 from grasp_platform import MuJoCoSim, TrialConfig, attach_robot, measure_contacts
 import mj_adapter as A
 from model import ANCHORS, build
