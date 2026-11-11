@@ -19,7 +19,7 @@ from top_grasp import real_grip_force
 
 from film_pinch import FilmPinch, contact_forces
 
-def evaluate_film(k, bag, params, coefficient, seed=0, cache_dir=None, observer=None):
+def evaluate_film(k, bag, params, coefficient, seed=0, cache_dir=None, observer=None, binding_cls=None):
     """Frozen v2.2 controller and v1.3 spring/filter, with attachment targets on upper film only."""
     wall = time.perf_counter()
     u, v, psi, width, depth, force, lift_v, accel = params
@@ -48,7 +48,7 @@ def evaluate_film(k, bag, params, coefficient, seed=0, cache_dir=None, observer=
         else:
             binding = BagPinch(sim, coefficient)
     else:
-        binding = FilmPinch(sim, coefficient)
+        binding = (binding_cls or FilmPinch)(sim, coefficient)
     spring = PinchSpring()
     dt = sim.m.opt.timestep
     check = max(1, round(.010/dt))
@@ -79,7 +79,8 @@ def evaluate_film(k, bag, params, coefficient, seed=0, cache_dir=None, observer=
         nonlocal actual_depth
         actual_depth = max(0., press_start-arm[2])
         gap = sim.pad_pos('pB')[1]-sim.pad_pos('pA')[1]-.004
-        spring.arm(gap, binding.candidate(tips()) is not None)
+        # F12 的规则在压完时只看接触，聚拢在合拢结束时判；F7 的 FilmPinch 没有 press_eligible，行为不变。
+        spring.arm(gap, getattr(binding, 'press_eligible', binding.candidate)(tips()) is not None)
         go('close')
 
     while outcome is None:
@@ -175,4 +176,5 @@ def evaluate_film(k, bag, params, coefficient, seed=0, cache_dir=None, observer=
                 first_contact=first_contact,actual_depth_mm=actual_depth*1e3 if actual_depth is not None else None,
                 effective_depth_mm=effective_d*1e3,press_peak_N=press_peak,phases=phases,
                 penetration_mm=pen*1e3,sim_s=t,wall_s=time.perf_counter()-wall,cache_hit=sim.cache_hit,
-                max_ncon=sim.max_ncon,max_nefc=sim.max_nefc,pkg_weight_N=sim.pkg_mass*9.81)
+                max_ncon=sim.max_ncon,max_nefc=sim.max_nefc,pkg_weight_N=sim.pkg_mass*9.81,
+                gather_mm=None if getattr(binding,'last_gather',None) is None else 1e3*binding.last_gather)

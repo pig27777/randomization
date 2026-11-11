@@ -1,0 +1,645 @@
+{
+ "host": "ubun",
+ "mujoco": "3.17.0",
+ "dt": 0.0005,
+ "set": "side",
+ "schedule_s": {
+  "set": [
+   0.0,
+   0.2
+  ],
+  "approach": [
+   0.2,
+   0.8
+  ],
+  "press": [
+   0.8,
+   1.1
+  ],
+  "close": [
+   1.1,
+   1.9
+  ],
+  "lift": [
+   1.9,
+   3.9
+  ],
+  "hold1": [
+   3.9,
+   5.9
+  ],
+  "move": [
+   5.9,
+   7.9
+  ],
+  "hold2": [
+   7.9,
+   10.9
+  ],
+  "lower": [
+   10.9,
+   12.9
+  ],
+  "open": [
+   12.9,
+   13.2
+  ],
+  "back": [
+   13.2,
+   13.7
+  ],
+  "rest": [
+   13.7,
+   15.9
+  ]
+ },
+ "rule": {
+  "gather_min_m": 0.008,
+  "depth_coef": 1.0,
+  "depth_crit_m": 0.005,
+  "grip_force_N": 15.0,
+  "press_force_N": 20.0,
+  "rope_damping": 0.0,
+  "rope_solreflimit": "0.005 1"
+ },
+ "cases": [
+  {
+   "case": "1",
+   "contents": "hard",
+   "thickness_mm": 40,
+   "mass_kg": 0.5,
+   "slack_mm": [
+    40,
+    40
+   ],
+   "face": "long",
+   "fixed_block": false,
+   "side_plate_k0_N_m": 0.0,
+   "side_plate_dmax_mm": 0.0,
+   "depth_mm": 0.0,
+   "gather_mm": 40.0,
+   "film": true,
+   "grip_force_N": 15.0,
+   "grip_reached": true,
+   "pad_plates": [],
+   "press_force_N": 0.92,
+   "grip_point_box_mm": [
+    150.0,
+    0.0,
+    20.0
+   ],
+   "rope_limits_mm": {
+    "annn": 190.3,
+    "annm": 190.3,
+    "annp": 190.3,
+    "anmn": 226.2,
+    "anmp": 226.2,
+    "anpn": 298.4,
+    "anpm": 310.7,
+    "anpp": 298.3,
+    "amnn": 10.0,
+    "amnp": 10.0,
+    "ampn": 250.0,
+    "ampp": 250.0,
+    "apnn": 190.3,
+    "apnm": 190.3,
+    "apnp": 190.3,
+    "apmn": 226.2,
+    "apmp": 226.2,
+    "appn": 298.4,
+    "appm": 310.7,
+    "appp": 298.3
+   },
+   "mode": "rope",
+   "rope_overload_release": {
+    "t": 2.4025,
+    "palm_rise_mm": 41.7
+   },
+   "liftoff_palm_rise_mm": null,
+   "hang_pitch_deg": 0.0,
+   "hang_roll_deg": -0.0,
+   "hang_droop_deg": [
+    0.0,
+    -0.0
+   ],
+   "hang_airborne": false,
+   "hang_taut_ropes": 0,
+   "hang_rope_tension_N": {},
+   "capacity_N": 15.0,
+   "pin_peak_over_capacity": null,
+   "rope_peak_over_capacity": 1.003,
+   "swing_amp0_mm": 0.0,
+   "swing_half_time_s": null,
+   "swing_amp_end_mm": 0.0,
+   "rest_still": true,
+   "rest_max_speed_mm_s": 0.0,
+   "rest_pitch_roll_deg": [
+    -0.0,
+    -0.0
+   ],
+   "rest_droop_deg": [
+    0.0,
+    -0.0
+   ],
+   "rope_force_unengaged_max_N": 0.0,
+   "rope_force_slack_rope_max_N": 0.0,
+   "carry_contents_disp_mm": 5.8,
+   "push_approach_mm": 19.1,
+   "push_close_mm": 0.6,
+   "push_total_mm": 19.7,
+   "press_force_max_N": 4.58,
+   "press_force_limited": false,
+   "hang_face_normal_elev_deg": 0.0,
+   "rest_face_normal_elev_deg": 0.0,
+   "nan_at_s": null,
+   "warnings": {},
+   "solver_capped_steps": 0,
+   "mean_step_us": 15.41,
+   "mean_python_us": 8.46
+  },
+  {
+   "case": "2",
+   "contents": "bendable",
+   "thickness_mm": 40,
+   "mass_kg": 0.5,
+   "slack_mm": [
+    40,
+    40
+   ],
+   "face": "long",
+   "fixed_block": false,
+   "side_plate_k0_N_m": 125.0,
+   "side_plate_dmax_mm": 40.0,
+   "depth_mm": 4.17,
+   "gather_mm": 44.17,
+   "film": true,
+   "grip_force_N": 15.0,
+   "grip_reached": true,
+   "pad_plates": [
+    "10",
+    "20"
+   ],
+   "press_force_N": 1.17,
+   "grip_point_box_mm": [
+    150.0,
+    4.3,
+    20.0
+   ],
+   "rope_limits_mm": {
+    "annn": 194.6,
+    "annm": 194.6,
+    "annp": 194.6,
+    "anmn": 230.6,
+    "anmp": 230.5,
+    "anpn": 302.7,
+    "anpm": 315.1,
+    "anpp": 302.7,
+    "amnn": 14.5,
+    "amnp": 14.5,
+    "ampn": 254.3,
+    "ampp": 254.2,
+    "apnn": 194.5,
+    "apnm": 194.5,
+    "apnp": 194.5,
+    "apmn": 230.5,
+    "apmp": 230.5,
+    "appn": 302.6,
+    "appm": 314.9,
+    "appp": 302.6
+   },
+   "mode": "rope",
+   "touchdown": {
+    "t": 11.8745,
+    "palm_rise_mm": 159.3
+   },
+   "put_down_release": {
+    "t": 12.9,
+    "palm_rise_mm": 159.1
+   },
+   "liftoff_palm_rise_mm": 153.3,
+   "hang_pitch_deg": -4.4,
+   "hang_roll_deg": -45.3,
+   "hang_droop_deg": [
+    6.3,
+    6.2
+   ],
+   "hang_airborne": true,
+   "hang_taut_ropes": 2,
+   "hang_rope_tension_N": {
+    "amnn": 16.03,
+    "amnp": 15.2
+   },
+   "capacity_N": 15.0,
+   "pin_peak_over_capacity": null,
+   "rope_peak_over_capacity": 0.627,
+   "swing_amp0_mm": 25.3,
+   "swing_half_time_s": null,
+   "swing_amp_end_mm": 16.0,
+   "rest_still": true,
+   "rest_max_speed_mm_s": 0.0,
+   "rest_pitch_roll_deg": [
+    0.0,
+    -0.0
+   ],
+   "rest_droop_deg": [
+    0.0,
+    0.0
+   ],
+   "rope_force_unengaged_max_N": 0.0,
+   "rope_force_slack_rope_max_N": 0.0,
+   "carry_contents_disp_mm": 306.0,
+   "push_approach_mm": 14.5,
+   "push_close_mm": 1.0,
+   "push_total_mm": 15.5,
+   "press_force_max_N": 3.21,
+   "press_force_limited": false,
+   "hang_face_normal_elev_deg": 45.4,
+   "rest_face_normal_elev_deg": 0.0,
+   "nan_at_s": null,
+   "warnings": {},
+   "solver_capped_steps": 0,
+   "mean_step_us": 33.64,
+   "mean_python_us": 55.01
+  },
+  {
+   "case": "3",
+   "contents": "compressible",
+   "thickness_mm": 120,
+   "mass_kg": 0.29,
+   "slack_mm": [
+    0,
+    0
+   ],
+   "face": "long",
+   "fixed_block": false,
+   "side_plate_k0_N_m": 25.0,
+   "side_plate_dmax_mm": 50.0,
+   "depth_mm": 12.62,
+   "gather_mm": 12.62,
+   "film": true,
+   "grip_force_N": 15.0,
+   "grip_reached": true,
+   "pad_plates": [
+    "10",
+    "20"
+   ],
+   "press_force_N": 0.84,
+   "grip_point_box_mm": [
+    150.1,
+    12.8,
+    60.0
+   ],
+   "rope_limits_mm": {
+    "annn": 171.0,
+    "annm": 163.2,
+    "annp": 171.0,
+    "anmn": 225.0,
+    "anmp": 225.0,
+    "anpn": 304.8,
+    "anpm": 340.0,
+    "anpp": 304.8,
+    "amnn": 62.8,
+    "amnp": 62.8,
+    "ampn": 262.8,
+    "ampp": 262.8,
+    "apnn": 170.8,
+    "apnm": 163.0,
+    "apnp": 170.8,
+    "apmn": 224.8,
+    "apmp": 224.8,
+    "appn": 304.7,
+    "appm": 339.8,
+    "appp": 304.7
+   },
+   "mode": "rope+connect",
+   "pin_overload_release": {
+    "t": 2.6355,
+    "palm_rise_mm": 86.1
+   },
+   "touchdown": {
+    "t": 11.829,
+    "palm_rise_mm": 170.1
+   },
+   "put_down_release": {
+    "t": 12.9,
+    "palm_rise_mm": 170.1
+   },
+   "liftoff_palm_rise_mm": 138.1,
+   "hang_pitch_deg": -0.6,
+   "hang_roll_deg": -66.5,
+   "hang_droop_deg": [
+    0.4,
+    0.4
+   ],
+   "hang_airborne": true,
+   "hang_taut_ropes": 2,
+   "hang_rope_tension_N": {
+    "amnn": 3.6,
+    "amnp": 3.26
+   },
+   "capacity_N": 15.0,
+   "pin_peak_over_capacity": 1.001,
+   "rope_peak_over_capacity": 0.39,
+   "swing_amp0_mm": 69.5,
+   "swing_half_time_s": null,
+   "swing_amp_end_mm": 43.1,
+   "rest_still": true,
+   "rest_max_speed_mm_s": 0.01,
+   "rest_pitch_roll_deg": [
+    -0.0,
+    -90.0
+   ],
+   "rest_droop_deg": [
+    0.0,
+    0.0
+   ],
+   "rope_force_unengaged_max_N": 0.0,
+   "rope_force_slack_rope_max_N": 0.0,
+   "carry_contents_disp_mm": 338.9,
+   "push_approach_mm": 4.5,
+   "push_close_mm": 3.1,
+   "push_total_mm": 7.6,
+   "press_force_max_N": 1.56,
+   "press_force_limited": false,
+   "hang_face_normal_elev_deg": 66.4,
+   "rest_face_normal_elev_deg": 90.0,
+   "nan_at_s": null,
+   "warnings": {},
+   "solver_capped_steps": 0,
+   "mean_step_us": 29.25,
+   "mean_python_us": 55.28
+  },
+  {
+   "case": "4",
+   "contents": "hard",
+   "thickness_mm": 40,
+   "mass_kg": 0.5,
+   "slack_mm": [
+    0,
+    0
+   ],
+   "face": "long",
+   "fixed_block": false,
+   "side_plate_k0_N_m": 0.0,
+   "side_plate_dmax_mm": 0.0,
+   "depth_mm": 0.0,
+   "gather_mm": 0.0,
+   "film": true,
+   "grip_force_N": 15.0,
+   "grip_reached": true,
+   "pad_plates": [],
+   "press_force_N": 0.92,
+   "grip_point_box_mm": [
+    150.0,
+    0.0,
+    20.0
+   ],
+   "mode": "miss",
+   "liftoff_palm_rise_mm": null,
+   "hang_pitch_deg": -0.0,
+   "hang_roll_deg": 0.0,
+   "hang_droop_deg": [
+    0.0,
+    -0.0
+   ],
+   "hang_airborne": false,
+   "hang_taut_ropes": 0,
+   "hang_rope_tension_N": {},
+   "capacity_N": 15.0,
+   "pin_peak_over_capacity": null,
+   "rope_peak_over_capacity": null,
+   "swing_amp0_mm": 0.0,
+   "swing_half_time_s": null,
+   "swing_amp_end_mm": 0.0,
+   "rest_still": true,
+   "rest_max_speed_mm_s": 0.0,
+   "rest_pitch_roll_deg": [
+    -0.0,
+    0.0
+   ],
+   "rest_droop_deg": [
+    0.0,
+    -0.0
+   ],
+   "rope_force_unengaged_max_N": 0.0,
+   "rope_force_slack_rope_max_N": 0.0,
+   "carry_contents_disp_mm": 0.0,
+   "push_approach_mm": 19.1,
+   "push_close_mm": 0.6,
+   "push_total_mm": 19.7,
+   "press_force_max_N": 4.58,
+   "press_force_limited": false,
+   "hang_face_normal_elev_deg": -0.0,
+   "rest_face_normal_elev_deg": -0.0,
+   "nan_at_s": null,
+   "warnings": {},
+   "solver_capped_steps": 0,
+   "mean_step_us": 15.36,
+   "mean_python_us": 5.09
+  },
+  {
+   "case": "5",
+   "contents": "compressible",
+   "thickness_mm": 120,
+   "mass_kg": 0.29,
+   "slack_mm": [
+    0,
+    0
+   ],
+   "face": "long",
+   "fixed_block": true,
+   "side_plate_k0_N_m": 25.0,
+   "side_plate_dmax_mm": 50.0,
+   "depth_mm": 18.23,
+   "gather_mm": 18.23,
+   "film": true,
+   "grip_force_N": 15.0,
+   "grip_reached": true,
+   "pad_plates": [
+    "10",
+    "20"
+   ],
+   "press_force_N": 1.43,
+   "grip_point_box_mm": [
+    150.0,
+    18.5,
+    60.0
+   ],
+   "rope_limits_mm": {
+    "annn": 176.6,
+    "annm": 168.8,
+    "annp": 176.6,
+    "anmn": 230.6,
+    "anmp": 230.6,
+    "anpn": 310.5,
+    "anpm": 345.7,
+    "anpp": 310.4,
+    "amnn": 68.5,
+    "amnp": 68.5,
+    "ampn": 268.5,
+    "ampp": 268.5,
+    "apnn": 176.6,
+    "apnm": 168.8,
+    "apnp": 176.6,
+    "apmn": 230.6,
+    "apmp": 230.6,
+    "appn": 310.5,
+    "appm": 345.6,
+    "appp": 310.4
+   },
+   "mode": "rope+connect",
+   "pin_overload_release": {
+    "t": 2.7185,
+    "palm_rise_mm": 104.3
+   },
+   "touchdown": {
+    "t": 11.785,
+    "palm_rise_mm": 180.4
+   },
+   "put_down_release": {
+    "t": 12.9,
+    "palm_rise_mm": 180.4
+   },
+   "liftoff_palm_rise_mm": 44.7,
+   "hang_pitch_deg": 0.6,
+   "hang_roll_deg": -82.4,
+   "hang_droop_deg": [
+    0.1,
+    0.1
+   ],
+   "hang_airborne": true,
+   "hang_taut_ropes": 2,
+   "hang_rope_tension_N": {
+    "amnn": 2.9,
+    "amnp": 2.92
+   },
+   "capacity_N": 15.0,
+   "pin_peak_over_capacity": 1.001,
+   "rope_peak_over_capacity": 0.466,
+   "swing_amp0_mm": 11.2,
+   "swing_half_time_s": null,
+   "swing_amp_end_mm": 20.2,
+   "rest_still": true,
+   "rest_max_speed_mm_s": 0.0,
+   "rest_pitch_roll_deg": [
+    0.0,
+    -90.0
+   ],
+   "rest_droop_deg": [
+    0.0,
+    0.0
+   ],
+   "rope_force_unengaged_max_N": 0.0,
+   "rope_force_slack_rope_max_N": 0.0,
+   "carry_contents_disp_mm": 294.6,
+   "push_approach_mm": 2.0,
+   "push_close_mm": 0.0,
+   "push_total_mm": 1.9,
+   "press_force_max_N": 1.56,
+   "press_force_limited": false,
+   "hang_face_normal_elev_deg": 82.2,
+   "rest_face_normal_elev_deg": 90.0,
+   "nan_at_s": null,
+   "warnings": {},
+   "solver_capped_steps": 0,
+   "mean_step_us": 27.93,
+   "mean_python_us": 55.72
+  },
+  {
+   "case": "6",
+   "contents": "hard",
+   "thickness_mm": 40,
+   "mass_kg": 0.5,
+   "slack_mm": [
+    40,
+    40
+   ],
+   "face": "short",
+   "fixed_block": false,
+   "side_plate_k0_N_m": 0.0,
+   "side_plate_dmax_mm": 0.0,
+   "depth_mm": 0.0,
+   "gather_mm": 40.0,
+   "film": true,
+   "grip_force_N": 15.0,
+   "grip_reached": true,
+   "pad_plates": [],
+   "press_force_N": 0.92,
+   "grip_point_box_mm": [
+    0.0,
+    100.0,
+    20.0
+   ],
+   "rope_limits_mm": {
+    "annn": 140.3,
+    "annm": 140.3,
+    "annp": 140.3,
+    "anmn": 10.0,
+    "anmp": 10.0,
+    "anpn": 140.3,
+    "anpm": 140.3,
+    "anpp": 140.3,
+    "amnn": 229.4,
+    "amnp": 229.3,
+    "ampn": 229.4,
+    "ampp": 229.3,
+    "apnn": 366.2,
+    "apnm": 373.9,
+    "apnp": 366.2,
+    "apmn": 350.0,
+    "apmp": 350.0,
+    "appn": 366.2,
+    "appm": 373.9,
+    "appp": 366.2
+   },
+   "mode": "rope",
+   "rope_overload_release": {
+    "t": 2.516,
+    "palm_rise_mm": 61.8
+   },
+   "liftoff_palm_rise_mm": null,
+   "hang_pitch_deg": 0.0,
+   "hang_roll_deg": -0.0,
+   "hang_droop_deg": [
+    0.0,
+    -0.0
+   ],
+   "hang_airborne": false,
+   "hang_taut_ropes": 0,
+   "hang_rope_tension_N": {},
+   "capacity_N": 15.0,
+   "pin_peak_over_capacity": null,
+   "rope_peak_over_capacity": 1.002,
+   "swing_amp0_mm": 0.0,
+   "swing_half_time_s": null,
+   "swing_amp_end_mm": 0.0,
+   "rest_still": true,
+   "rest_max_speed_mm_s": 0.03,
+   "rest_pitch_roll_deg": [
+    0.0,
+    -0.0
+   ],
+   "rest_droop_deg": [
+    0.0,
+    -0.0
+   ],
+   "rope_force_unengaged_max_N": 0.0,
+   "rope_force_slack_rope_max_N": 0.0,
+   "carry_contents_disp_mm": 8.2,
+   "push_approach_mm": 19.1,
+   "push_close_mm": 0.6,
+   "push_total_mm": 19.7,
+   "press_force_max_N": 4.63,
+   "press_force_limited": false,
+   "hang_face_normal_elev_deg": -0.0,
+   "rest_face_normal_elev_deg": -0.0,
+   "nan_at_s": null,
+   "warnings": {},
+   "solver_capped_steps": 0,
+   "mean_step_us": 16.79,
+   "mean_python_us": 8.44
+  }
+ ],
+ "mean_step_us": 23.06,
+ "mean_python_us": 31.33
+}

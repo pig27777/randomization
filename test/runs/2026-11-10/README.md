@@ -20,3 +20,19 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 flock /tmp/claude-gpu.lock /home/ubuntu
 ```
 
 最后一条为离线读取正式旧数据，不运行物理；退出码2是门槛未过。小试只包含4个环境次，不是完整E5，也不作训练吞吐结论。各自原始JSON、日志、上下文/源码审计保留，无覆盖旧记录。
+
+## 袋子表示探索：松弛绳最小演示（slack-rope-demo-r1）
+
+- 对象/版本：新的探索表示（3段铰接盒+6根只受拉的绳+mocap夹持点），不属于现有袋子或内容物版本；v1.3易弯锚点只作测速对照。脚本 `test/bag_model/slack_rope_demo.py`。
+- 机器：`ubun`，CPU MuJoCo 3.17单线程；22:37:28–22:37:35。不排GPU队列，不作结论。
+- 问题：同一个模板只改松弛量和夹持位置，能否得到满装/松装、居中/偏心的悬挂行为；MJWarp能否按世界设置绳长上限。
+- 状态：8例完成且无数值异常。松弛控制离地时机符合预期；摆动几乎不衰减、偏心倾斜39–50°、易弯下垂由绳几何决定，这三点不合预期。MJWarp按世界设置`tendon_range`可行，`tendon_limited`不可。
+- 报告：[运行报告](bag/slack-rope-demo-r1/REPORT.md) · [任务检查](../../../reports/slack-rope-demo-test.md)；数据：[summary](bag/slack-rope-demo-r1/summary.json) · [总览视频](bag/slack-rope-demo-r1/overview_2x4.webm)。
+
+## 袋子表示探索：四部分软包最小演示（four-part-pack-demo-r1）
+
+- 对象/版本：探索模板（4×2段内容物带压板、摩擦表面、8根松弛绳、手掌+双指和夹持判定规则），不属于现有袋子或内容物版本，不接入v1.3。脚本 `test/bag_model/four_part_pack_demo.py`。
+- 机器：`ubun`，CPU MuJoCo 3.17单线程；23:44:30–23:46:55。运行时有其他负载，耗时只作量级。不排GPU队列，不作结论。
+- 问题：同一模板能否产生“捏不到 / 只捏到膜 / 捏到内容物 / 超载松脱 / 偏心 / 捏袋边”这些行为；3倍弯曲刚度下的下垂；松弛时绳阻尼的影响；绳穿过内容物的影响。
+- 状态：10例完成，无数值异常。第1、2、5、6、7例符合预期；第3例因压板行程等于聚拢阈值而捏不到；第4例走connect，没有用绳；松弛的绳的阻尼会拖动没捏到的内容物（67–108 mm）；摆动不衰减；第8例远端着桌。未调参。
+- 报告：[运行报告](bag/four-part-pack-demo-r1/REPORT.md) · [任务检查](../../../reports/four-part-pack-demo-test.md)；数据：[summary](bag/four-part-pack-demo-r1/summary.json) · [总览视频](bag/four-part-pack-demo-r1/overview_2x4.webm)。
