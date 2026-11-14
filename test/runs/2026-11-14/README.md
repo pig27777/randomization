@@ -14,3 +14,5 @@
 | parcel-long-stability | validate.py --mode stress --n 512 --seconds 30 --output <此目录>/bag/parcel-long-stability | 两拓扑，NaN/Inf 0/1024 |
 
 其他 parcel-* 为本轮调试/修正记录，summary、metadata 和关键日志保留，重复临时轨迹已清理。完整命令均从仓库根目录执行，脚本路径前缀为 test/content_model/parcel/。
+
+45°补充运行 `bag/parcel-yam-yaw45-seed7-r1/`，原型3、seed=7、yaw45°、tilt0°、dt0.5ms，ubun，success。命令与关键数字见同一主题报告，目录保存模型、轨迹、源码、日志和视频。

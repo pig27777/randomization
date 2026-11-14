@@ -13,3 +13,9 @@
 测试局限包括完整 YAM 的 GPU 批次、全 A–G 矩阵、全参数能量审计及实物标定尚未完成。静置性能数字不代表动态抓取性能。首轮仓库检查后未实现的记录已由本轮实际实现与实测结果更新，早期失败与修正保留在主题报告。
 
 源码检查命令为 `python -m compileall -q contents/parcel test/content_model/parcel experience/yam_platform/protocol.py experience/yam_platform/render_video.py` 及对上述源码/任务文档的 `git diff --cached --check`，均通过。YAM 源码与详细 trace 已无损归档并检查，生成数据的原始 XML/SVG 格式保留。
+
+## 2026-11-14 45°视频补充
+
+执行共享YAM入口，`--backend parcel.yam_adapter --model-options '{"prototype":3,"seed":7}' --yaw 45 --tilt 0 --dt .0005`，正式运行持GPU锁。松装易弯原型水平45°完整脚本判定success，最大穿透1.447 mm，跟踪误差峰值42.348 mm。视频使用共享render_video入口和Mesa CPU渲染，输出在 [本轮目录](../test/runs/2026-11-14/bag/parcel-yam-yaw45-seed7-r1/)。单次演示未扩大其他原型或多seed验证。
+
+视频检查完成，ffprobe时长17.10秒，已查看12.5秒帧确认显示yaw45°与提起状态，源快照归档完整性和逐文件字节比对通过。

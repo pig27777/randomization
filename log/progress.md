@@ -564,3 +564,8 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - YAM 六类各一次，松装三类成功、满装三类材料不足；最大穿透3.604 mm。7项行为测试通过，1024环境30秒 NaN/Inf 为0。
 - 4096三段静置full约590万 env-step/s，CUDA Graph开启；GPU整台YAM、全能量审计和实物标定仍待验证。
 - [主题报告](../test/content_model/parcel/REPORT.md) · [任务检查](../reports/random-parcel-physics-test.md)。
+
+
+### 2026-11-14 随机包裹 YAM 45°（ubun）
+- 原型3、seed7、yaw45°/tilt0°完整v2.2脚本success，最大穿透1.447 mm，跟踪峰值42.348 mm。
+- 已按共享平台保存轨迹并生成视频，单次演示结论见[主题报告](../test/content_model/parcel/REPORT.md)。
