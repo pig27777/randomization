@@ -1,0 +1,144 @@
+{
+  "config": {
+    "category": "compressible",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 1.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "prototype": 5,
+    "seed": 7,
+    "region": 0
+  },
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "python": "/home/ubuntu/Dev/Envs/mjwarp/bin/python",
+  "frozen_v13_sha256": null,
+  "source_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "37d544dd620ca133a66c9d2d424df431839d55091a0aecde29c601ecf9e833c4",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "5ff5a5621d85c63dc7031eff7a1ce0fe33eaf44cc89b058eb6251efa84fc8a8b",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "eb8d17b3a4379065f8cc839b4f64bc20fe91b8eac393da5d59fc4e31ec031227",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "platform": "5ff5a5621d85c63dc7031eff7a1ce0fe33eaf44cc89b058eb6251efa84fc8a8b",
+    "backend": "7df3e423f6222600e9952584c37532f7c453da8136456d803169dacf2f4ad2ae",
+    "parcel_model": "634f0f31dfd6dc260426ef1fe4d55e1059440d0f0ed2717ec42faee459b27ec7",
+    "parcel___init__": "cd20c79e594d19f302b6ec5d6743a6da26ab4e3f7f38eab4892ee800b5eb320f",
+    "parcel_kernels": "e9b165642747f703d0af46bfdf368ef646483db3757326de17b0826d47c6389f"
+  },
+  "backend": "parcel.yam_adapter",
+  "robot_source_sha256": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+  "outcome": "grasp_fail",
+  "reason": "v1.3 pinch eligibility absent at end of close",
+  "phase": "close",
+  "sim_time_s": 10.45050000000128,
+  "wall_s": 11.674760363064706,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.9947845404170239,
+    "nonfinger_mm": 0.0,
+    "grip_N": 9.513096939116226,
+    "down_N": 18.388409563041854,
+    "tracking_mm": 25.083278743240665
+  },
+  "model_metrics": {},
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3005000000000002
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.3005000000000002,
+      "end_s": 5.633999999999597
+    }
+  ],
+  "initial_com": [
+    -0.24088782265339467,
+    0.03850164087322504,
+    0.03399187796135142
+  ],
+  "final_com": [
+    -0.24373813814227915,
+    0.04232049369163839,
+    0.03398138863441129
+  ],
+  "pinch_events": [
+    {
+      "time": 10.45000000000128,
+      "state": 0,
+      "reason": 3,
+      "gathered": 0.005377058405429125,
+      "normal": [
+        16.44817543029785,
+        0.0
+      ],
+      "gap": 0.029606251939344352,
+      "probability": 0.0
+    }
+  ],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.03500636854187066,
+    "ik_max_rotation_deg": 0.00013013913548639858,
+    "tracking_max_mm": 25.083278743240665,
+    "tracking_p95_mm": 24.692661014569,
+    "actuator_peak_Nm": [
+      0.12888558863606647,
+      4.259467823898689,
+      0.7620839927961356,
+      2.1494476367003514,
+      0.08186744503882194,
+      0.15500391726956764
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 23,
+    "rigid_bodies": 3
+  },
+  "warnings": {}
+}

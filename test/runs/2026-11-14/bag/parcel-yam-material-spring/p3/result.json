@@ -1,0 +1,149 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0005,
+    "pinch_coeff": 1.0,
+    "contact_time": 0.005,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "prototype": 3,
+    "seed": 7,
+    "region": 0
+  },
+  "hostname": "ubun",
+  "mujoco": "3.17.0",
+  "python": "/home/ubuntu/Dev/Envs/mjwarp/bin/python",
+  "frozen_v13_sha256": null,
+  "source_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "37d544dd620ca133a66c9d2d424df431839d55091a0aecde29c601ecf9e833c4",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "0f163d020939bfc0365cc9512762af22a6d11dfb6d9dfb0ae64b6c35ebbdd99e",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "eb8d17b3a4379065f8cc839b4f64bc20fe91b8eac393da5d59fc4e31ec031227",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "platform": "0f163d020939bfc0365cc9512762af22a6d11dfb6d9dfb0ae64b6c35ebbdd99e",
+    "backend": "79a56108553f070197cee40b3bd53d5981fbba130f66ba2b344580444b3dee49",
+    "parcel_model": "8d2d9e86b447abed0ced30a881351a656f4257f82a5164af47d98288b711492c",
+    "parcel___init__": "cd20c79e594d19f302b6ec5d6743a6da26ab4e3f7f38eab4892ee800b5eb320f",
+    "parcel_kernels": "019b5dc20c4613f9975063016ee2b309d6b665d4eb9e54e1eea966f8b636e982"
+  },
+  "backend": "parcel.yam_adapter",
+  "robot_source_sha256": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+  "outcome": "grasp_fail",
+  "reason": "both fingertip contacts/connection lost >50ms",
+  "phase": "lift",
+  "sim_time_s": 10.880500000001806,
+  "wall_s": 12.811514121945947,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.9099819175761303,
+    "nonfinger_mm": 0.0,
+    "grip_N": 7.28115638578274,
+    "down_N": 20.168170071158748,
+    "tracking_mm": 27.430920345890733
+  },
+  "model_metrics": {},
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3005000000000002
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.3005000000000002,
+      "end_s": 4.790500000000065
+    },
+    {
+      "phase": "close",
+      "start_s": 4.790500000000065,
+      "end_s": 10.191500000000964
+    }
+  ],
+  "initial_com": [
+    -0.24088782269383666,
+    0.03850164087705551,
+    0.03399187795394366
+  ],
+  "final_com": [
+    -0.24428168785385165,
+    0.04338908282412861,
+    0.033991878170902816
+  ],
+  "pinch_events": [
+    {
+      "time": 10.191000000000964,
+      "state": 1,
+      "reason": 0,
+      "gathered": 0.00851120613515377,
+      "normal": [
+        13.953376770019531,
+        4.954813480377197
+      ],
+      "gap": 0.016186375919115717,
+      "probability": 0.8789522647857666
+    }
+  ],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.004023346277840718,
+    "ik_max_rotation_deg": 0.00013013913548639858,
+    "tracking_max_mm": 27.430920345890733,
+    "tracking_p95_mm": 27.269232952482213,
+    "actuator_peak_Nm": [
+      0.36165667060827644,
+      4.940163617892551,
+      0.7713170220345518,
+      2.479419766009574,
+      0.14271007724487433,
+      0.02649721387126469
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 23,
+    "rigid_bodies": 3
+  },
+  "warnings": {}
+}

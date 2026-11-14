@@ -161,7 +161,7 @@ def run(backend, cfg, output, *, on_sample=None):
         backend.save_model(sim, output)
     (output/"robot_assets.json").write_text(json.dumps(asset_fingerprint(),indent=2))
     pinch = backend.attachment(robot,cfg)
-    spring = PinchSpring()
+    spring = backend.gathering_spring(robot, cfg) if hasattr(backend, "gathering_spring") else PinchSpring()
     dt = cfg.dt
     gap = .040
     filtered = np.zeros(2)

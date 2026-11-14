@@ -103,6 +103,8 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
         focus_reference=rest_vertices[tets[min_tet]].mean(0)
     cfg=result["config"]
     model_label='Segmented v1.3' if result.get('backend')=='segmented' else '3D flex'
+    if result.get('backend') == 'parcel.yam_adapter':
+        model_label=f'Parcel prototype {cfg["prototype"]}'
     title=f'{model_label} | {"TETRAHEDRA | " if tetra else ""}{cfg["category"]} | yaw {cfg["yaw"]:g} deg | pinch {cfg["pinch_coeff"]:g} | {result["outcome"]}'
     if view=='detail':title=f'{model_label} | {cfg["category"]} | {result["outcome"]}'
     if focus:title=f'{cfg.get("shape","box").upper()} tetrahedra | 10x slow | RED = inverted | final frame held 3s'
