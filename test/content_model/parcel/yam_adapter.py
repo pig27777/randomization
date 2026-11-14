@@ -21,6 +21,14 @@ class Config(TrialConfig):
     prototype: int = 3
     seed: int = 7
     region: int = 0
+    grasp_face: str = "top"
+    side_pitch_deg: float = 0.0
+
+    def __post_init__(self):
+        if self.grasp_face not in ("top", "side") or self.region not in range(4):
+            raise ValueError("Invalid grasp face or material region")
+        if not np.isfinite(self.side_pitch_deg) or not 0 <= self.side_pitch_deg < 90:
+            raise ValueError("Side approach pitch must be in [0,90) degrees")
 
 
 def scene(cfg):
@@ -72,7 +80,13 @@ def scene(cfg):
                 joint.set('damping',str(2*p['damping']*np.sqrt(k*mass*cell[0]**2/12)))
     built=SimpleNamespace(xml=ET.tostring(root,encoding='unicode'),desc=SimpleNamespace(),cfg=cfg,
                           params=params,states=states,rigid=rigid)
-    robot=attach_robot(cfg,built,ParcelSim,np.array([-.25,.04]),size[2]+.001,size,float(p['mass']))
+    center=np.array([-.25,.04])
+    approach=None
+    if cfg.grasp_face == "side":
+        pitch=np.radians(cfg.side_pitch_deg)
+        approach=dict(direction=np.array([0.,np.cos(pitch),-np.sin(pitch)]),closing=np.array([-1.,0.,0.]),
+                      contact_point=np.array([center[0],center[1]-size[1]/2,.001+size[2]/2]))
+    robot=attach_robot(cfg,built,ParcelSim,center,size[2]+.001,size,float(p['mass']),approach=approach)
     robot.sim.robot=robot
     return robot
 

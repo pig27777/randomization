@@ -569,3 +569,8 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 ### 2026-11-14 随机包裹 YAM 45°（ubun）
 - 原型3、seed7、yaw45°/tilt0°完整v2.2脚本success，最大穿透1.447 mm，跟踪峰值42.348 mm。
 - 已按共享平台保存轨迹并生成视频，单次演示结论见[主题报告](../test/content_model/parcel/REPORT.md)。
+
+
+### 2026-11-14 随机包裹 YAM 侧面（ubun）
+- 同一原型3/seed7，纯水平侧向初始位置误差4.006 mm，setup_fail；改为侧面下倾30°后运行至close，未聚拢材料，grasp_fail。
+- 峰值穿透0.209 mm，已交付4.10秒真实过程视频；默认top及新增参数边界检查通过，见[主题报告](../test/content_model/parcel/REPORT.md)。

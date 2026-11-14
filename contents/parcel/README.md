@@ -83,3 +83,5 @@ PYTHONPATH=.:test/content_model /home/ubuntu/Dev/Envs/mjwarp/bin/python -m exper
 六原型编号可用于 `--model-options` 的 `prototype`。YAM 适配器在 CPU 上执行同一 Warp 材料力核，沿用共享 v2.2 机械臂动作、闭合判据、事件判定、轨迹保存和 CPU 视频回放。当前 GPU 批次验证对象是包裹与夹持代理，整台 YAM 的异构 GPU 批次仍待接入。
 
 本轮结果和未通过项目见 [报告](../../test/content_model/parcel/REPORT.md)。完整实物薄膜、疲劳、塑性、撕裂传播、温度相关材料和多件滑动仍待支持。
+
+侧面抓取可通过YAM入口的 `--model-options '{"prototype":3,"seed":7,"grasp_face":"side","region":1,"side_pitch_deg":30}'` 调用。该姿态从长边前侧面中央沿+y、向下倾斜指定角度接近，沿-x闭合。纯水平接近在当前安装位置初始化不可达；30°斜向首轮尚未捕获成功，实际回放与失败记录见主题报告。

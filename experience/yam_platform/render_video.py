@@ -105,6 +105,8 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     model_label='Segmented v1.3' if result.get('backend')=='segmented' else '3D flex'
     if result.get('backend') == 'parcel.yam_adapter':
         model_label=f'Parcel prototype {cfg["prototype"]}'
+        if cfg.get("grasp_face") == "side":
+            model_label+=f' | side grasp {cfg.get("side_pitch_deg",0):g} deg'
     title=f'{model_label} | {"TETRAHEDRA | " if tetra else ""}{cfg["category"]} | yaw {cfg["yaw"]:g} deg | pinch {cfg["pinch_coeff"]:g} | {result["outcome"]}'
     if view=='detail':title=f'{model_label} | {cfg["category"]} | {result["outcome"]}'
     if focus:title=f'{cfg.get("shape","box").upper()} tetrahedra | 10x slow | RED = inverted | final frame held 3s'

@@ -16,3 +16,5 @@
 其他 parcel-* 为本轮调试/修正记录，summary、metadata 和关键日志保留，重复临时轨迹已清理。完整命令均从仓库根目录执行，脚本路径前缀为 test/content_model/parcel/。
 
 45°补充运行 `bag/parcel-yam-yaw45-seed7-r1/`，原型3、seed=7、yaw45°、tilt0°、dt0.5ms，ubun，success。命令与关键数字见同一主题报告，目录保存模型、轨迹、源码、日志和视频。
+
+侧面补充 `bag/parcel-yam-side-seed7-r1/` 为纯水平初始化不可达；`bag/parcel-yam-side-pitch30-seed7-r2/` 为侧面向下30°接近，close阶段grasp_fail。两次均原型3/seed7/region1、ubun，命令与结果见主题报告，r2保存真实视频和完整轨迹。

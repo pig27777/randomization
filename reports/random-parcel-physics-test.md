@@ -19,3 +19,9 @@
 执行共享YAM入口，`--backend parcel.yam_adapter --model-options '{"prototype":3,"seed":7}' --yaw 45 --tilt 0 --dt .0005`，正式运行持GPU锁。松装易弯原型水平45°完整脚本判定success，最大穿透1.447 mm，跟踪误差峰值42.348 mm。视频使用共享render_video入口和Mesa CPU渲染，输出在 [本轮目录](../test/runs/2026-11-14/bag/parcel-yam-yaw45-seed7-r1/)。单次演示未扩大其他原型或多seed验证。
 
 视频检查完成，ffprobe时长17.10秒，已查看12.5秒帧确认显示yaw45°与提起状态，源快照归档完整性和逐文件字节比对通过。
+
+## 2026-11-14 侧面抓取补充
+
+新增适配器参数grasp_face=side和side_pitch_deg，通过共享approach接口接入，默认top保留。原型3、seed7、region1，dt0.5ms，ubun，正式运行持flock。纯水平侧向r1为setup_fail，初始位置误差4.006 mm。保留侧面抓取点，30°向下接近的r2执行4.0565秒，close阶段grasp_fail，未聚拢材料，闭合时无双指有效接触。最大穿透0.209 mm。
+
+已生成并检查4.10秒的[侧向尝试视频](../test/runs/2026-11-14/bag/parcel-yam-side-pitch30-seed7-r2/yam.mp4)，原失败结果、配置、源码快照和轨迹保留。Config默认值、非法face/region/pitch/NaN边界检查以及compileall通过。该次只验证新增入口和实际失败过程，尚无侧面抓取成功结论。
