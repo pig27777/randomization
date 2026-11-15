@@ -18,6 +18,7 @@
 | 四部分软包探索演示（内容物+表面+松弛膜+夹爪）；`--set top` 顶面捏取（r1 情况），`--set side` 水平捏侧面（r2） | `four_part_pack_demo.py` |
 | 统一YAM平台的侧面捏取适配器（v1.3本体＋松弛绳＋夹持规则），需要平台的可选接近方向，尚未运行 | `side_pinch_adapter.py`、`test_side_pinch_adapter.py` |
 | 自动回归 | `test_*.py` |
+| 既有双膜片纯接触原型，MuJoCo/MJWarp4.0.1 | `physical_parcel_checks.py`、`physical_parcel_benchmark.py`、`physical_parcel_yam.py`；结果见 [主题报告](PHYSICAL_PARCEL_REPORT.md) |
 
 `deadline_watch.py` 是旧 F6/F7 批次的期限看守，只服务其历史 manifest，不能作为新实验的通用启动器。旧脚本里的期限、阈值和动作不因目录整理而改变。
 

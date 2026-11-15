@@ -1,0 +1,52 @@
+{
+  "machine": "ubun",
+  "results": {
+    "compliance": {
+      "passed": true,
+      "bending": [
+        {
+          "stiffness_Nm_rad": 0.8,
+          "mass_kg": 0.3,
+          "frequency_Hz": 23.25581395349073,
+          "angle_range_rad": [
+            -0.02885073154077491,
+            0.14999414973907405
+          ],
+          "late_amplitude_rad": 7.584217664860756e-09
+        },
+        {
+          "stiffness_Nm_rad": 0.08,
+          "mass_kg": 0.3,
+          "frequency_Hz": null,
+          "angle_range_rad": [
+            8.68370309827778e-07,
+            0.14999941494514596
+          ],
+          "late_amplitude_rad": 2.6053095102517795e-06
+        },
+        {
+          "stiffness_Nm_rad": 0.008,
+          "mass_kg": 0.3,
+          "frequency_Hz": null,
+          "angle_range_rad": [
+            0.05185082312577811,
+            0.14999994149422696
+          ],
+          "late_amplitude_rad": 0.057494966388840524
+        }
+      ],
+      "compression": {
+        "delta_m": 0.004,
+        "expected_N": 3.52,
+        "actual_N": 3.52,
+        "force_error_N": 0.0,
+        "final_delta_m": -0.0009605002061903844
+      },
+      "limitations": [
+        "joint relaxation isolates payload from envelope contacts",
+        "natural frequency unresolved when fewer than two crossings are recorded"
+      ],
+      "wall_s": 32.303398489020765
+    }
+  }
+}

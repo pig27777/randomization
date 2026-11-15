@@ -574,3 +574,10 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 ### 2026-11-14 随机包裹 YAM 侧面（ubun）
 - 同一原型3/seed7，纯水平侧向初始位置误差4.006 mm，setup_fail；改为侧面下倾30°后运行至close，未聚拢材料，grasp_fail。
 - 峰值穿透0.209 mm，已交付4.10秒真实过程视频；默认top及新增参数边界检查通过，见[主题报告](../test/content_model/parcel/REPORT.md)。
+
+
+### 2026-11-15 双膜片纯接触原型（ubun，用户要求停止测试）
+- 复用200顶点存档膜，迁入MuJoCo/MJWarp4.0.1；底膜支持误差0.0788%，外力提拉68.858 mm。
+- 最大已测8192环境，9032.73环境步/s、29400 MiB，9216 Graph创建OOM；每轮50步仅1.25 ms。
+- 捕获未通过，默认25 μs角动量漂移4.281%；6.25 μs复核0.7301%，完整抓取尚未验证。
+- [主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-test.md)。

@@ -1,0 +1,33 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 2.5e-05,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.001,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.002,
+    "arm_height": 0.27,
+    "mode": "rigid",
+    "bag_size": [
+      0.35,
+      0.25
+    ],
+    "payload_size": [
+      0.12,
+      0.08,
+      0.03
+    ],
+    "payload_mass": 0.3,
+    "joint_stiffness": 0.08,
+    "simulation_seconds": 30.0
+  },
+  "backend": "physical_parcel_yam",
+  "hostname": "ubun",
+  "outcome": "setup_fail",
+  "reason": "YAM initial pose unreachable: {'position_mm': 385.044292609641, 'rotation_deg': 114.88733945782744}",
+  "error": "RuntimeError",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/Dev/Projects/random/experience/yam_platform/angles.py\", line 23, in execute\n    return run(backend,cfg,output)\n           ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/Dev/Projects/random/experience/yam_platform/protocol.py\", line 172, in run\n    robot = backend.scene(cfg)\n            ^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/Dev/Projects/random/test/bag_model/physical_parcel_yam.py\", line 82, in scene\n    return attach_robot(cfg, built, ParcelSim, np.array(p.cfg.center), top,\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/Dev/Projects/random/experience/yam_platform/protocol.py\", line 99, in attach_robot\n    robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/Dev/Projects/random/experience/yam_platform/robot.py\", line 103, in __init__\n    raise RuntimeError(f'YAM initial pose unreachable: {self.ik_errors[-1]}')\nRuntimeError: YAM initial pose unreachable: {'position_mm': 385.044292609641, 'rotation_deg': 114.88733945782744}\n",
+  "timing_is_throughput": false
+}

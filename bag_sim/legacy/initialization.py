@@ -1,6 +1,9 @@
 """Collision-free loading preparation; never changes material reference data."""
 import numpy as np
-from contents import signed_distance
+if __package__:
+    from .contents import signed_distance
+else:
+    from contents import signed_distance
 
 
 def edge_colors(edges):

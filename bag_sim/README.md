@@ -250,3 +250,10 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
    - 大于约 0.8 ms 的步长会让轻节点的接触被步长上限压软，于是穿过。
 4. **内容物只通过字符串替换接入 `scene()`**（改 conaffinity、删指垫对、换求解器、补 TendonInfo），内容物接口一变就可能失效，接口需求已写进 I-27。
 5. 平放时边缘完全贴桌会卡死，所以背片外圈有 0.2 rad 的上翘静止角；空袋平放时边缘约翘起 8 mm。
+
+
+## 既有双膜片纯接触原型（2026-11-15）
+
+新增 `physical_parcel.py` 与 `physical_parcel_gpu.py`，复用 `geometry/kraft_coarse_35.npz`，分开参考材料构型与包裹状态，提供单刚体、三段弯曲及厚度向压缩入口。环境为项目内 MuJoCo/MJWarp4.0.1。当前材料采用未实物标定的薄膜预设，默认25 μs。
+
+底膜支撑和膜节点外力提拉完成。捕获夹具尚未记录到指尖反力，默认步长角动量检查超标，整体物理验收尚未通过。GPU最大已测8192环境、9032.73环境步/s，9216 Graph创建OOM，计时每轮仅1.25 ms仿真。用户要求停止测试，本轮已结束。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-test.md)。

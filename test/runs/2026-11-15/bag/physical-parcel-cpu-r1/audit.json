@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "reference_max_internal_force_N": 0.0,
+  "metadata": {
+    "config": {
+      "geometry": "geometry/kraft_coarse_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "rigid",
+      "areal_mass": 0.12,
+      "membrane": 1000.0,
+      "bending": 0.00135,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 0.00015,
+      "rayleigh": 0.0001,
+      "radius": 0.001,
+      "friction": 0.45,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 0.0004,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere"
+    },
+    "geometry": {
+      "source": "bag_sim/geometry/kraft_coarse_35.npz",
+      "source_sha256": "ce77e774d7a01061815c207202613e420e1985da3382fb96a91ce2464de93604",
+      "vertices": 200,
+      "triangles": 396,
+      "edges": 594,
+      "reference_area_m2": 0.21404516892328201,
+      "film_mass_kg": 0.02568542027079384,
+      "min_reference_edge_m": 0.018299659860784512,
+      "max_reference_edge_m": 0.12506398362438323,
+      "preparation": {
+        "maximum_edge_strain": 0.0033387167959733066,
+        "minimum_wall_gap_m": 0.007530204677047353,
+        "method": "generic front/back plateau + projections + wall gap"
+      }
+    },
+    "nq": 607,
+    "nv": 606,
+    "neq": 0,
+    "bending": "reference dihedral energy, existing bag_model gradient",
+    "compression_axis": "segment-local -z"
+  },
+  "initial_penetration_m": 0.0012180427784962708,
+  "mass_error_kg": 0.0,
+  "wall_s": 0.39593874104321003
+}

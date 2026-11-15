@@ -1,0 +1,82 @@
+{
+  "machine": "ubun",
+  "results": {
+    "slack": {
+      "passed": true,
+      "payload_size_m": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass_kg": 0.3,
+      "paired_force_protocol": "same 3.8N ramp, same four top-sheet material node region",
+      "results": {
+        "loose": {
+          "passed": true,
+          "diagnostic": true,
+          "loading": "external ramped 3.8N on four real film nodes",
+          "captured_by_friction": false,
+          "vertices": [
+            93,
+            94,
+            112,
+            111
+          ],
+          "payload_lift_m": 0.068858303395685,
+          "late_table_support_N": 0.0,
+          "peak_penetration_m": 0.0003039124401203338,
+          "geometry": {
+            "source": "bag_sim/geometry/kraft_coarse_35.npz",
+            "source_sha256": "ce77e774d7a01061815c207202613e420e1985da3382fb96a91ce2464de93604",
+            "vertices": 200,
+            "triangles": 396,
+            "edges": 594,
+            "reference_area_m2": 0.21404516892328201,
+            "film_mass_kg": 0.02568542027079384,
+            "min_reference_edge_m": 0.018299659860784512,
+            "max_reference_edge_m": 0.12506398362438323,
+            "preparation": {
+              "maximum_edge_strain": 0.002984700293218623,
+              "minimum_wall_gap_m": 0.007636648018442329,
+              "method": "generic front/back plateau + projections + wall gap"
+            }
+          },
+          "tension_onset_s": 2.499999998203939e-05
+        },
+        "tight": {
+          "passed": true,
+          "diagnostic": true,
+          "loading": "external ramped 3.8N on four real film nodes",
+          "captured_by_friction": false,
+          "vertices": [
+            93,
+            94,
+            111,
+            112
+          ],
+          "payload_lift_m": 0.07242025438750765,
+          "late_table_support_N": 0.0,
+          "peak_penetration_m": 0.0004137170680112742,
+          "geometry": {
+            "source": "bag_sim/geometry/kraft_coarse_35.npz",
+            "source_sha256": "ce77e774d7a01061815c207202613e420e1985da3382fb96a91ce2464de93604",
+            "vertices": 200,
+            "triangles": 396,
+            "edges": 594,
+            "reference_area_m2": 0.06966417582284884,
+            "film_mass_kg": 0.00835970109874186,
+            "min_reference_edge_m": 0.010770329614269006,
+            "max_reference_edge_m": 0.07011419257183242,
+            "preparation": {
+              "maximum_edge_strain": 0.021960768855124213,
+              "minimum_wall_gap_m": 0.0047385139269010435,
+              "method": "generic front/back plateau + projections + wall gap"
+            }
+          },
+          "tension_onset_s": 2.499999998203939e-05
+        }
+      },
+      "wall_s": 187.71031157905236
+    }
+  }
+}

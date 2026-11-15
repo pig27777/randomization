@@ -1,0 +1,7 @@
+{
+  "worlds": 9216,
+  "valid": false,
+  "error": "RuntimeError",
+  "reason": "Graph creation error: Warp CUDA error 2: out of memory (in function wp_cuda_graph_create_exec, /builds/omniverse/warp/warp/native/warp.cu:3649)",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/ubuntu/Dev/Projects/random/test/bag_model/physical_parcel_benchmark.py\", line 136, in main\n    result=benchmark(worlds,Config(mode=args.mode),args.steps,args.repeats,args.output/f'worlds-{worlds}',initial_qpos,args.profile)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/ubuntu/Dev/Projects/random/test/bag_model/physical_parcel_benchmark.py\", line 51, in benchmark\n    wp.capture_launch(graph)\n  File \"/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/context.py\", line 14407, in capture_launch\n    raise RuntimeError(f\"Graph creation error: {runtime.get_error_string()}\")\nRuntimeError: Graph creation error: Warp CUDA error 2: out of memory (in function wp_cuda_graph_create_exec, /builds/omniverse/warp/warp/native/warp.cu:3649)\n"
+}

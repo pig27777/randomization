@@ -42,8 +42,12 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
     near PE corners the plain projections left edges 0.018 mm apart. Edge targets come from the
     unloaded reference, which stays unchanged.
     """
-    from initialization import edge_colors
-    from contents import signed_distance
+    if __package__:
+        from .legacy.initialization import edge_colors
+        from .legacy.contents import signed_distance
+    else:
+        from initialization import edge_colors
+        from contents import signed_distance
 
     q = start.copy()
     front = np.unique(faces[np.isin(panel_ids, front_ids)])
