@@ -1,0 +1,54 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Module reset_data__locals__reset_xfrc_applied_36d71606 36d7160 load on device 'cuda:0' took 0.33 ms  (cached)
+Module reset_data__locals__reset_M_29a8070b 29a8070 load on device 'cuda:0' took 0.24 ms  (cached)
+Module reset_data__locals__reset_mocap_7165be97 7165be9 load on device 'cuda:0' took 0.23 ms  (cached)
+Module reset_data__locals__reset_contact_5c3f2c17 5c3f2c1 load on device 'cuda:0' took 0.22 ms  (cached)
+Module reset_data__locals__reset_sleep_a8d12f5c a8d12f5 load on device 'cuda:0' took 0.22 ms  (cached)
+Module reset_data__locals__reset_nworld_a914623a a914623 load on device 'cuda:0' took 0.25 ms  (cached)
+Module bag_sim.physical_parcel_gpu e585130 load on device 'cuda:0' took 0.34 ms  (cached)
+Module mujoco_warp._src.set_const d6f38b0 load on device 'cuda:0' took 0.50 ms  (cached)
+Module mujoco_warp._src.smooth 368b5b3 load on device 'cuda:0' took 0.53 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_ca86cb1a 831f0d6 load on device 'cuda:0' took 0.29 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_76d25309 797032f load on device 'cuda:0' took 0.25 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_18dec08e 5763785 load on device 'cuda:0' took 9.36 ms  (cached)
+Module _transmission__locals__kernel_dea7390e dea7390 load on device 'cuda:0' took 1.80 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_ebc933cb c6bbdda load on device 'cuda:0' took 0.28 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_b7425cff b9bad6a load on device 'cuda:0' took 0.27 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_b4cb59d0 1bd7694 load on device 'cuda:0' took 10.08 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_eec678c9 d0d9967 load on device 'cuda:0' took 10.44 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_1591afed 7a79fe4 load on device 'cuda:0' took 10.61 ms  (cached)
+Warp CUDA error 2: out of memory (in function wp_alloc_device_async, /builds/omniverse/warp/warp/native/warp.cu:812)
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/physical_parcel_mixed_gpu.py", line 152, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/physical_parcel_mixed_gpu.py", line 43, in main
+    batch=Batch(args.worlds_per_group,sim.parcel.cfg,parcel=sim.parcel,model=sim.m,data=sim.d,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/bag_sim/physical_parcel_gpu.py", line 181, in __init__
+    self.d=mjw.put_data(cpu_m,cpu_d,nworld=nworld,nconmax=contact_capacity,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/mujoco_warp/_src/diff.py", line 200, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/mujoco_warp/_src/io.py", line 2783, in put_data
+    _allocate_island_arrays(mjm, d, nworld, njmax, mjd)
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/mujoco_warp/_src/io.py", line 2157, in _allocate_island_arrays
+    d.map_iefc2efc = wp.array(map_iefc2efc, dtype=int)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/types.py", line 3578, in __init__
+    self._init_from_data(data, dtype, shape, device, copy, pinned)
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/types.py", line 3945, in _init_from_data
+    self._init_new(dtype, shape, None, device, pinned)
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/types.py", line 4065, in _init_new
+    ptr = allocator.allocate(capacity)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/context.py", line 5558, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 33554432 bytes on device 'cuda:0'

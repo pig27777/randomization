@@ -60,6 +60,62 @@ def film_box_geometry(m, d, faces, geom):
                 geometric_depth_upper_m=depth_upper)
 
 
+def film_primitive_geometry(m, d, faces, geom):
+    """Adaptive SDF bounds over full film triangles, independent of contacts.
+
+    Signed distances are 1-Lipschitz; subdivision supplies a conservative depth
+    upper bound to 0.25 mm even when no triangle vertex lies inside the solid.
+    """
+    kind = int(m.geom_type[geom])
+    radius, half = m.geom_size[geom, :2]
+    rotation = d.geom_xmat[geom].reshape(3, 3)
+    triangles = (d.flexvert_xpos[faces] - d.geom_xpos[geom]) @ rotation
+    def sdf(points):
+        if kind == mujoco.mjtGeom.mjGEOM_SPHERE:
+            return np.linalg.norm(points, axis=-1) - radius
+        if kind == mujoco.mjtGeom.mjGEOM_CAPSULE:
+            q = points.copy()
+            q[..., 2] -= np.clip(q[..., 2], -half, half)
+            return np.linalg.norm(q, axis=-1) - radius
+        if kind == mujoco.mjtGeom.mjGEOM_CYLINDER:
+            q = np.stack([np.linalg.norm(points[..., :2], axis=-1)-radius,
+                          np.abs(points[..., 2])-half], axis=-1)
+            return np.linalg.norm(np.maximum(q, 0), axis=-1) + np.minimum(q.max(axis=-1), 0)
+        raise ValueError('unsupported primitive geometry')
+    depth, upper = 0., 0.
+    cells = triangles
+    for level in range(10):
+        samples = np.concatenate([cells, cells.mean(axis=1)[:,None]], axis=1)
+        values = sdf(samples)
+        diameter = np.linalg.norm(cells-np.roll(cells, 1, axis=1), axis=2).max(axis=1)
+        # Every point is within at most diameter of an evaluated vertex.
+        bound = np.maximum(0., -values.min(axis=1) + diameter)
+        depth = max(depth, float(max(0., -values.min())))
+        active = (bound > 0) & (diameter > .00025) & (bound > depth + .00025)
+        if (~active).any():
+            upper = max(upper, float(bound[~active].max()))
+        if not active.any():
+            break
+        a,b,c = cells[active].transpose(1,0,2)
+        ab,bc,ca = (a+b)/2,(b+c)/2,(c+a)/2
+        cells = np.concatenate([np.stack(t,axis=1) for t in [(a,ab,ca),(ab,b,bc),(ca,bc,c),(ab,bc,ca)]])
+    else:
+        upper = max(upper, float(bound.max()))
+    phi = np.linspace(0, 2*np.pi, 24, endpoint=False)
+    if kind == mujoco.mjtGeom.mjGEOM_SPHERE:
+        points = np.array([[radius*np.sin(t)*np.cos(p),radius*np.sin(t)*np.sin(p),radius*np.cos(t)]
+                           for t in np.linspace(0,np.pi,9) for p in phi])
+    else:
+        extent = half + (radius if kind == mujoco.mjtGeom.mjGEOM_CAPSULE else 0)
+        points = np.array([[radius*np.cos(p), radius*np.sin(p), z] for z in [-half,0,half] for p in phi]
+                          + [[0,0,-extent],[0,0,extent]])
+    winding = winding_number(d.flexvert_xpos, faces, points @ rotation.T + d.geom_xpos[geom])
+    return dict(geom=m.geom(geom).name,intersecting_triangles=int(depth>0),
+                outside_corners=int(np.sum(np.abs(winding)<.5)), corner_winding=winding.tolist(),
+                sampled_depth_m=depth,geometric_depth_upper_m=max(depth,upper),
+                surface_samples=len(points),method='adaptive 1-Lipschitz SDF bound, 0.25 mm tolerance')
+
+
 def film_payload_geometry(m, d, faces):
     """Audit payload faces independently of the native contact candidate list."""
     rows = []
@@ -67,7 +123,10 @@ def film_payload_geometry(m, d, faces):
         name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, geom) or ""
         if not name.startswith(("payload_geom_", "plate_geom_")):
             continue
-        rows.append(film_box_geometry(m, d, faces, geom))
+        if int(m.geom_type[geom]) in (mujoco.mjtGeom.mjGEOM_BOX, mujoco.mjtGeom.mjGEOM_MESH):
+            rows.append(film_box_geometry(m, d, faces, geom))
+        else:
+            rows.append(film_primitive_geometry(m, d, faces, geom))
     return dict(intersecting_triangles=sum(row["intersecting_triangles"] for row in rows),
                 outside_corners=sum(row["outside_corners"] for row in rows),
                 sampled_depth_m=max(row["sampled_depth_m"] for row in rows),

@@ -1,0 +1,790 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0001,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.001,
+    "wall_limit": 3600.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "lift_height": 0.25,
+    "gripper_overtravel": 0.005,
+    "complete_motion": false,
+    "mode": "rigid",
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.3351240552802553,
+      0.23843549057309454
+    ],
+    "payload_size": [
+      0.10305851846097146,
+      0.03953629504753294,
+      0.03953629504753294
+    ],
+    "payload_mass": 0.03405935643027601,
+    "joint_stiffness": 0.06514541452828612,
+    "simulation_seconds": 18.0,
+    "grasp_face": "top",
+    "support_height": 0.15,
+    "support_size": [
+      0.3751240552802553,
+      0.2784354905730945
+    ],
+    "check_initial_robot_contacts": true,
+    "side_start_distance": 0.1,
+    "side_height_offset": 0.0,
+    "initial_state": "/home/ubuntu/workspace/gzl/randomization-latest/test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/preparation/prepared/group-3/initial_state.npz",
+    "bend_damping_ratio": 0.5415986005310721,
+    "rayleigh": 0.00037435004765876915,
+    "material": {
+      "young_pa": 3867203269.3227496,
+      "thickness_m": 0.00010582740633803161,
+      "density_kg_m3": 866.129832465375,
+      "poisson": 0.28452122195241436
+    },
+    "bag_profile": "kraft",
+    "payload_shape": "capsule",
+    "payload_euler": [
+      -0.024244526751438414,
+      -0.018836363814183105,
+      -0.20477462590660833
+    ],
+    "payload_offset": [
+      0.008960675086371963,
+      -0.0002197412769001858,
+      0.0008458067547110265
+    ],
+    "density_gradient": [
+      -0.0005122642717535209,
+      0.06799570760333398,
+      0.16320426741639799
+    ],
+    "payload_friction": 0.3620596964783168,
+    "bag_radius": 0.00035,
+    "cushion_core_young_pa": null,
+    "cushion_damping_ratio": null,
+    "joint_damping": 0.0009605713444530309,
+    "surface_point": [
+      -0.10988299986982075,
+      -0.016135136447627707,
+      0.1764091166341479
+    ],
+    "surface_normal": [
+      0.9246926587482927,
+      -0.2812171973212864,
+      0.25663276249881684
+    ],
+    "surface_closing": [
+      0.14109308593138667,
+      0.8792137257665874,
+      0.45505600262604406
+    ],
+    "surface_region": "side",
+    "friction": 0.6452396240623481,
+    "compression_k1": 756.7116646976023,
+    "compression_k2": 355833.3811266216,
+    "compression_damping": 1.253052980404764
+  },
+  "hostname": "ubun",
+  "mujoco": "4.0.1",
+  "python": "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/bin/python",
+  "frozen_v13_sha256": null,
+  "source_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "1f9d46b16b5c99d1084251c247b3d61175bf3542eb4fc11eedd13dd16149f324",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "d964502558c31332c560ee9e7318666cb4441d329b26a70d0a1d55399959c867",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "902cb5b007a3547f6841bb6537e792dfe6bba9d0a44dd92a474a39ee2296a99c",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "platform": "d964502558c31332c560ee9e7318666cb4441d329b26a70d0a1d55399959c867",
+    "backend": "13d551f8dc9cc08b19ac33c538d86c5c74b2b539eec25993530e66c6d3046b86",
+    "parcel_model": "5de129d8b70141b6f4be175390ace666c8477e5c9a337ac8f689f0da263160ff",
+    "parcel_contents": "65f3acf41d03864e864749a37494f045da0914fd429d4f5a096c9443913b64ef",
+    "parcel_material": "baf174e77d2e79ee16a869cebcf32b0e8387953f6c8e0ffd4c18724ccd9dcb4c",
+    "parcel_wrap": "96a392f5fe216aee0dc04fd9e01eda8c74603eaf07e00f35a13b3478b1dd9694",
+    "parcel_geometry_check": "0a30fbf90bc612d3f482d99871dfbdf8062ddca1917b2579cdfa07f1f59eb5ea",
+    "cpu_yam_adapter": "6da51f557a7c554b0627d14453e60442cd45decaca3b59b1f918277335058017",
+    "gpu_model": "17b7ec8efa04b9fbd0778295ff342527cad1c405764bc07f95b6e0547ddcb35d"
+  },
+  "backend": "physical_parcel_yam_gpu",
+  "robot_source_sha256": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+  "outcome": "grasp_fail",
+  "reason": "both fingertip contacts/connection lost >50ms",
+  "phase": "lift",
+  "motion_completed": false,
+  "grasp_failure": null,
+  "sim_time_s": 5.613553047180176,
+  "wall_s": 726.1345931040014,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.15670806169509888,
+    "nonfinger_mm": 0.003129243850708008,
+    "grip_N": 0.050903227452405275,
+    "down_N": 1.3947942805051585,
+    "tracking_mm": 60.82335982028839
+  },
+  "model_metrics": {
+    "load_transfer": "native finger-film-payload contacts",
+    "attachments": 0
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.3001970052719116
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.3001970052719116,
+      "end_s": 3.062228202819824
+    },
+    {
+      "phase": "close",
+      "start_s": 3.062228202819824,
+      "end_s": 5.563485145568848
+    }
+  ],
+  "initial_com": [
+    -0.24196004817184455,
+    0.0393287782625655,
+    0.17131685054786416
+  ],
+  "final_com": [
+    -0.24959738552570343,
+    0.03355409950017929,
+    0.17121538519859314
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.07985036733739598,
+    "ik_max_rotation_deg": 0.0007741730503540167,
+    "tracking_max_mm": 60.82335982028839,
+    "tracking_p95_mm": 60.82251834323818,
+    "actuator_peak_Nm": [
+      0.588076189160347,
+      1.1562497168779373,
+      0.8875030651688576,
+      10.0,
+      0.5250825424736831,
+      0.12816858291625977
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 440,
+    "film_vertices": 142,
+    "film_triangles": 280,
+    "artificial_attachments": 0
+  },
+  "warnings": {},
+  "benchmark_timings": {
+    "cpu_command_s": 1.1930111822694016,
+    "cpu_ik_s": 0.05713594604458194,
+    "cpu_geometry_check_s": 3.786691067962238,
+    "cpu_feedback_s": 11.758980623162643,
+    "physical_step_s": 704.140266615017
+  },
+  "gpu_timing": {
+    "setup_s": 1.9996462800008885,
+    "setup_components": {
+      "cpu_parcel_compile_s": 2.3199754650704563e-07,
+      "model_upload_s": 0.029597240998555208,
+      "data_upload_allocation_s": 0.02893482400031644,
+      "custom_arrays_upload_s": 0.000554976002604235,
+      "first_reset_and_kernel_compile_s": 0.66689729099744
+    },
+    "upload_control_s": 1.7178166663507,
+    "physics_s": 541.3968971653012,
+    "download_s": 159.64444621153234,
+    "steps": 56132
+  },
+  "gpu_health": {
+    "overflow_bits": [
+      0
+    ],
+    "nonfinite": [
+      0
+    ],
+    "native_nacon": 13,
+    "peak_solver_iterations": [
+      9
+    ],
+    "last_contacts_per_world": [
+      13
+    ],
+    "peak_penetration_m": [
+      0.00015670806169509888
+    ],
+    "parameters": [
+      [
+        1.0,
+        0.36205968260765076,
+        0.6452396512031555,
+        1.0,
+        1.0,
+        1.0
+      ]
+    ],
+    "parameter_columns": [
+      "payload_mass_scale",
+      "payload_mu",
+      "table_mu",
+      "joint_k_scale",
+      "joint_d_scale",
+      "compression_k_scale"
+    ]
+  },
+  "attempts_per_second": 0.001377155157593179,
+  "execution_engine": "GPU physics + CPU shared controller",
+  "stages": {
+    "approach": {
+      "index": 77,
+      "t": 1.540243148803711,
+      "phase": "approach",
+      "com": [
+        -0.24422943644570466,
+        0.037727717109223714,
+        0.17144458338303836
+      ],
+      "tip_mid": [
+        -0.08687684076810118,
+        -0.047946060345950316,
+        0.18671312476887889
+      ],
+      "gap": 0.04002373106777668,
+      "command_gap": 0.04,
+      "grip_N": 0.046310750974060615,
+      "spring_N": 0.0,
+      "attached": false,
+      "pinch_load_N": 0.0,
+      "finite": true,
+      "warnings": 0,
+      "payload_geometry": {
+        "intersecting_triangles": 1,
+        "outside_corners": 0,
+        "sampled_depth_m": 6.518038268392423e-05,
+        "geometric_depth_upper_m": 0.00031475108335635626,
+        "boxes": [
+          {
+            "geom": "payload_geom_0",
+            "intersecting_triangles": 1,
+            "outside_corners": 0,
+            "corner_winding": [
+              1.0,
+              1.0,
+              0.9999999999999999,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              0.9999999999999997,
+              0.9999999999999989,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sampled_depth_m": 6.518038268392423e-05,
+            "geometric_depth_upper_m": 0.00031475108335635626,
+            "surface_samples": 74,
+            "method": "adaptive 1-Lipschitz SDF bound, 0.25 mm tolerance"
+          }
+        ]
+      },
+      "support_geometry": {
+        "geom": "table",
+        "intersecting_triangles": 0,
+        "outside_corners": 8,
+        "corner_winding": [
+          0.0,
+          0.0,
+          0.0,
+          8.834874115176436e-18,
+          0.0,
+          -4.417437057588218e-18,
+          0.0,
+          -4.417437057588218e-18
+        ],
+        "sampled_depth_m": 0.0,
+        "geometric_depth_upper_m": 0.0
+      },
+      "gpu_overflow_bits": 0,
+      "gpu_nonfinite": false,
+      "tracking_mm": 23.357625149454996,
+      "grip_each_N": [
+        0.0,
+        0.13217781112864724
+      ],
+      "contact_magnitude_each_N": [
+        0.0,
+        0.3477669692188593
+      ],
+      "force_on_fingers_N": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.30273530491890477,
+          -0.15456135572199178,
+          -0.07351181777584281
+        ]
+      ],
+      "support_N": 0.5222893139131817,
+      "top_contact_each": [
+        false,
+        true
+      ],
+      "penetration_mm": 0.1401382229782731,
+      "nonfinger_mm": 0.0,
+      "post_support_N": 0.5222893139131817,
+      "floor_support_N": 0.0,
+      "loaded": true,
+      "gripping": false,
+      "load_bearing": false
+    },
+    "close": {
+      "index": 154,
+      "t": 3.0792107582092285,
+      "phase": "close",
+      "com": [
+        -0.2481031032561556,
+        0.033646552031367474,
+        0.17124942899605142
+      ],
+      "tip_mid": [
+        -0.11067947583389623,
+        -0.07860835869894084,
+        0.18924501397993637
+      ],
+      "gap": 0.039997922256588936,
+      "command_gap": 0.03965999999999966,
+      "grip_N": 2.4705595314163596e-77,
+      "spring_N": 0.0,
+      "attached": false,
+      "pinch_load_N": 0.0,
+      "finite": true,
+      "warnings": 0,
+      "payload_geometry": {
+        "intersecting_triangles": 1,
+        "outside_corners": 0,
+        "sampled_depth_m": 0.00017196846279372152,
+        "geometric_depth_upper_m": 0.0004216838814222352,
+        "boxes": [
+          {
+            "geom": "payload_geom_0",
+            "intersecting_triangles": 1,
+            "outside_corners": 0,
+            "corner_winding": [
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              0.9999999999999994,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              0.9999999999999999,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              0.9999999999999999,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0
+            ],
+            "sampled_depth_m": 0.00017196846279372152,
+            "geometric_depth_upper_m": 0.0004216838814222352,
+            "surface_samples": 74,
+            "method": "adaptive 1-Lipschitz SDF bound, 0.25 mm tolerance"
+          }
+        ]
+      },
+      "support_geometry": {
+        "geom": "table",
+        "intersecting_triangles": 0,
+        "outside_corners": 8,
+        "corner_winding": [
+          0.0,
+          0.0,
+          0.0,
+          -1.766974823035287e-17,
+          0.0,
+          -4.417437057588218e-18,
+          0.0,
+          4.417437057588218e-18
+        ],
+        "sampled_depth_m": 0.0,
+        "geometric_depth_upper_m": 0.0
+      },
+      "gpu_overflow_bits": 0,
+      "gpu_nonfinite": false,
+      "tracking_mm": 59.36538406147061,
+      "grip_each_N": [
+        0.0,
+        0.0
+      ],
+      "contact_magnitude_each_N": [
+        0.0,
+        0.0
+      ],
+      "force_on_fingers_N": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "support_N": 0.5032577860639886,
+      "top_contact_each": [
+        false,
+        false
+      ],
+      "penetration_mm": 0.1490082499088986,
+      "nonfinger_mm": 0.0,
+      "post_support_N": 0.5032577860639886,
+      "floor_support_N": 0.0,
+      "loaded": false,
+      "gripping": false,
+      "load_bearing": false
+    },
+    "lift": {
+      "index": 279,
+      "t": 5.580408096313477,
+      "phase": "lift",
+      "com": [
+        -0.24959199766805967,
+        0.0335440988068887,
+        0.17121544529077848
+      ],
+      "tip_mid": [
+        -0.11158895381794827,
+        -0.07994830204043396,
+        0.1891038038720947
+      ],
+      "gap": -0.008561941795051098,
+      "command_gap": -0.01,
+      "grip_N": 2.4462524595154897e-292,
+      "spring_N": 0.0,
+      "attached": false,
+      "pinch_load_N": 0.0,
+      "finite": true,
+      "warnings": 0,
+      "payload_geometry": {
+        "intersecting_triangles": 1,
+        "outside_corners": 0,
+        "sampled_depth_m": 0.0002575246959035868,
+        "geometric_depth_upper_m": 0.0005075111696838882,
+        "boxes": [
+          {
+            "geom": "payload_geom_0",
+            "intersecting_triangles": 1,
+            "outside_corners": 0,
+            "corner_winding": [
+              1.0,
+              0.9999999999999997,
+              0.9999999999999999,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              0.9999999999999999,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              0.9999999999999999,
+              1.0,
+              0.9999999999999994,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0,
+              1.0000000000000002,
+              1.0,
+              1.0
+            ],
+            "sampled_depth_m": 0.0002575246959035868,
+            "geometric_depth_upper_m": 0.0005075111696838882,
+            "surface_samples": 74,
+            "method": "adaptive 1-Lipschitz SDF bound, 0.25 mm tolerance"
+          }
+        ]
+      },
+      "support_geometry": {
+        "geom": "table",
+        "intersecting_triangles": 0,
+        "outside_corners": 8,
+        "corner_winding": [
+          1.766974823035287e-17,
+          -8.834874115176436e-18,
+          1.766974823035287e-17,
+          -1.766974823035287e-17,
+          0.0,
+          -4.417437057588218e-18,
+          4.417437057588218e-18,
+          -4.417437057588218e-18
+        ],
+        "sampled_depth_m": 0.0,
+        "geometric_depth_upper_m": 0.0
+      },
+      "gpu_overflow_bits": 0,
+      "gpu_nonfinite": false,
+      "tracking_mm": 60.575083698238636,
+      "grip_each_N": [
+        0.0,
+        0.0
+      ],
+      "contact_magnitude_each_N": [
+        0.0,
+        0.0
+      ],
+      "force_on_fingers_N": [
+        [
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "support_N": 0.7616992660120104,
+      "top_contact_each": [
+        false,
+        false
+      ],
+      "penetration_mm": 0.1536398588221324,
+      "nonfinger_mm": 0.0,
+      "post_support_N": 0.7616992660120104,
+      "floor_support_N": 0.0,
+      "loaded": false,
+      "gripping": false,
+      "load_bearing": false
+    },
+    "lift_hold": {
+      "missing": true
+    }
+  },
+  "stage_selection": "Actual contact-vector peak for approach; grip peak for close; load-bearing first for lift/hold, otherwise contact peak. No missing phase is synthesized."
+}

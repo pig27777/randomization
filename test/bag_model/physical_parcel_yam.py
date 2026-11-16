@@ -31,6 +31,8 @@ class Config(TrialConfig):
     simulation_seconds: float = 30.0
     grasp_face: str = "top"
     support_height: float = 0.0
+    support_size: tuple = (.07,.05)
+    check_initial_robot_contacts: bool = False
     side_start_distance: float = 0.1
     side_height_offset: float = 0.0
     initial_state: str | None = None
@@ -38,14 +40,37 @@ class Config(TrialConfig):
     rayleigh: float = 1e-4
     material: dict | None = None
     bag_profile: str | None = None
+    payload_shape: str = "box"
+    payload_euler: tuple = (0., 0., 0.)
+    payload_offset: tuple = (0., 0., 0.)
+    density_gradient: tuple = (0., 0., 0.)
+    payload_friction: float | None = None
+    bag_radius: float | None = None
+    cushion_core_young_pa: float | None = None
+    cushion_damping_ratio: float | None = None
+    joint_damping: float = .003
+    surface_point: tuple | None = None
+    surface_normal: tuple | None = None
+    surface_closing: tuple | None = None
+    surface_region: str | None = None
     friction: float = .45
     compression_k1: float = 800.
     compression_k2: float = 20000.
     compression_damping: float = 1.
 
     def __post_init__(self):
+        surface=(self.surface_point,self.surface_normal,self.surface_closing)
+        if any(v is not None for v in surface):
+            if any(v is None or np.shape(v)!=(3,) or not np.isfinite(v).all() for v in surface):
+                raise ValueError("surface point, normal and closing require three finite vectors")
+            if (abs(np.linalg.norm(self.surface_normal)-1)>1e-9
+                or abs(np.linalg.norm(self.surface_closing)-1)>1e-9
+                or abs(np.dot(self.surface_normal,self.surface_closing))>1e-9):
+                raise ValueError("surface normal and closing must be orthonormal")
         if self.grasp_face not in ("top", "side"):
             raise ValueError("grasp_face must be top or side")
+        if np.shape(self.support_size)!=(2,) or not np.isfinite(self.support_size).all() or min(self.support_size)<=0:
+            raise ValueError("support_size needs two positive finite lengths")
         if not np.isfinite(self.support_height) or self.support_height < 0:
             raise ValueError("support_height must be finite and nonnegative")
         if self.grasp_face == "side" and not 0 <= self.tilt < 90:
@@ -119,13 +144,25 @@ def compile_yam_model(parcel, built, xml):
 
 
 def parcel_world(cfg):
-    material = material_parameters(**cfg.material) if cfg.material is not None else {}
+    material = {}
     profile = parcel_profile(cfg.bag_profile) if cfg.bag_profile is not None else None
     if profile is not None:
         material.update(profile["shell"])
+    if cfg.material is not None:
+        material.update(material_parameters(**cfg.material))
+    if cfg.bag_radius is not None:
+        material['radius'] = cfg.bag_radius
+    if profile is not None and profile['cushion'] is not None and cfg.cushion_core_young_pa is not None:
+        profile['cushion'] = dict(profile['cushion'])
+        profile['cushion']['cushion_soft_modulus_pa_per_m'] = cfg.cushion_core_young_pa / material['material_thickness']
+        profile['cushion']['cushion_range_m'] = .7 * material['material_thickness']
+        profile['cushion']['cushion_damping_ratio'] = cfg.cushion_damping_ratio
     p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
         payload_size=tuple(cfg.payload_size), payload_mass=cfg.payload_mass,
-        joint_stiffness=cfg.joint_stiffness, center=(-0.25, 0.04),
+        joint_stiffness=cfg.joint_stiffness, joint_damping=cfg.joint_damping,
+        payload_shape=cfg.payload_shape, payload_euler=tuple(cfg.payload_euler),
+        payload_offset=tuple(cfg.payload_offset), density_gradient=tuple(cfg.density_gradient),
+        payload_friction=cfg.payload_friction, center=(-0.25, 0.04),
         timestep=cfg.dt, contact_time=cfg.contact_time,
         bend_damping_ratio=cfg.bend_damping_ratio, rayleigh=cfg.rayleigh,
         friction=cfg.friction, compression_k1=cfg.compression_k1,
@@ -155,7 +192,7 @@ def parcel_world(cfg):
     if cfg.support_height:
         table = world.find("geom[@name='table']")
         corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
-        half = np.array([.035, .025, cfg.support_height / 2])
+        half = np.r_[np.asarray(cfg.support_size)/2,cfg.support_height/2]
         ET.SubElement(root.find("asset"), "mesh", name="raised_support", vertex=vec(corners * half))
         table.set("type", "mesh")
         table.set("mesh", "raised_support")
@@ -172,10 +209,17 @@ def initialize_state(parcel, model, data, cfg):
     data.qpos[dofs[:, 2]] += cfg.support_height
     data.qpos[model.joint("payload_free").qposadr[0] + 2] += cfg.support_height
     if cfg.initial_state:
-        expected = json.dumps(dict(model=asdict(parcel.cfg), support_height=cfg.support_height), sort_keys=True)
+        expected = state_signature(parcel,cfg)
         with np.load(cfg.initial_state) as state:
             qpos, qvel = state["qpos"], state["qvel"]
-            if state["config_json"].item() != expected:
+            actual=json.loads(state["config_json"].item())
+            expected_config=json.loads(expected)
+            # Old prepared box states predate these optional payload fields.
+            for name in ('payload_shape','payload_euler','payload_offset','density_gradient','payload_friction'):
+                default=json.loads(json.dumps(ParcelConfig.__dataclass_fields__[name].default))
+                if name not in actual['model'] and expected_config['model'][name]==default:
+                    actual['model'][name]=default
+            if actual != expected_config:
                 raise ValueError("prepared state uses a different parcel or support configuration")
             if qpos.shape != (parcel.m.nq,) or qvel.shape != (parcel.m.nv,):
                 raise ValueError("prepared state has incompatible dimensions")
@@ -187,8 +231,15 @@ def initialize_state(parcel, model, data, cfg):
     parcel.forward(model, data, dofs)
 
 
+def state_signature(parcel,cfg):
+    signature=dict(model=asdict(parcel.cfg),support_height=cfg.support_height)
+    # Archived prepared states use the original 70x50mm support signature.
+    if tuple(cfg.support_size)!=(.07,.05):signature['support_size']=cfg.support_size
+    return json.dumps(signature,sort_keys=True)
+
+
 def save_initial_state(parcel, data, cfg, path):
-    signature = json.dumps(dict(model=asdict(parcel.cfg), support_height=cfg.support_height), sort_keys=True)
+    signature = state_signature(parcel,cfg)
     np.savez_compressed(path, qpos=data.qpos, qvel=data.qvel, config_json=np.asarray(signature))
 
 
@@ -197,7 +248,11 @@ def scene(cfg):
     current = p.envelope["current"]
     top = float(current[:, 2].max() + p.cfg.radius + cfg.support_height)
     approach = None
-    if cfg.grasp_face == "side":
+    if cfg.surface_point is not None:
+        approach = dict(direction=-np.asarray(cfg.surface_normal, float),
+                        closing=np.asarray(cfg.surface_closing, float),
+                        contact_point=np.asarray(cfg.surface_point, float))
+    elif cfg.grasp_face == "side":
         pitch = np.deg2rad(cfg.tilt)
         yaw = np.deg2rad(cfg.yaw)
         inward = np.array([-np.sin(yaw), np.cos(yaw), 0.])
@@ -220,9 +275,30 @@ def scene(cfg):
                         np.array([*cfg.bag_size, cfg.payload_size[2]]),
                         cfg.payload_mass + p.envelope["masses"].sum(), approach=approach)
     initial = measure(robot)
+    if cfg.check_initial_robot_contacts:
+        robot.initial_collision_report=initial_robot_collisions(robot)
+        if max(robot.initial_collision_report.values())>.001:
+            raise RuntimeError(f"initial robot collision exceeds 1 mm: {robot.initial_collision_report}")
     if initial["penetration_mm"] > 1:
         raise RuntimeError(f"initial film contact penetration exceeds 1 mm: {initial['penetration_mm']:.6g} mm")
     return robot
+
+
+def initial_robot_collisions(robot):
+    result=dict(robot_self_m=0.,robot_support_m=0.,robot_film_m=0.)
+    sim=robot.sim
+    support={sim.table_geom}
+    if sim.floor_geom>=0:support.add(sim.floor_geom)
+    for c in sim.d.contact:
+        if c.efc_address<0:continue
+        geoms=[int(g) for g in c.geom if g>=0]
+        robots=[g for g in geoms if robot.robot_mask[g]]
+        if not robots:continue
+        depth=max(0.,-float(c.dist))
+        if len(robots)==2:result['robot_self_m']=max(result['robot_self_m'],depth)
+        if any(g in support for g in geoms):result['robot_support_m']=max(result['robot_support_m'],depth)
+        if any(f>=0 for f in c.flex):result['robot_film_m']=max(result['robot_film_m'],depth)
+    return result
 
 
 def measure(robot):
@@ -286,7 +362,8 @@ def summarize(trace):
 
 def source_files():
     return {name: ROOT / path for name, path in dict(
-        parcel_model="bag_sim/physical_parcel.py", parcel_material="bag_sim/bag_model.py",
+        parcel_model="bag_sim/physical_parcel.py", parcel_contents="bag_sim/parcel_contents.py",
+        parcel_material="bag_sim/bag_model.py",
         parcel_wrap="bag_sim/wrap.py", parcel_geometry_check="test/bag_model/physical_parcel_checks.py").items()}
 
 

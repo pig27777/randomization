@@ -1,0 +1,39 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Warp CUDA error 2: out of memory (in function wp_alloc_device_async, /builds/omniverse/warp/warp/native/warp.cu:812)
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/physical_parcel_yam_benchmark.py", line 515, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/physical_parcel_yam_benchmark.py", line 512, in main
+    {'prepare':prepare,'trial':trial,'benchmark':benchmark,'sample-timing':sample_timing}[args.command](args)
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/physical_parcel_yam_benchmark.py", line 380, in benchmark
+    batch=Batch(args.worlds,sim.parcel.cfg,seed=args.seed,randomize=True,
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/bag_sim/physical_parcel_gpu.py", line 181, in __init__
+    self.d=mjw.put_data(cpu_m,cpu_d,nworld=nworld,nconmax=contact_capacity,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/mujoco_warp/_src/diff.py", line 200, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/mujoco_warp/_src/io.py", line 2759, in put_data
+    d_kwargs[f.name] = _create_array(val, f.type, sizes)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/mujoco_warp/_src/io.py", line 70, in _create_array
+    array = wp.array(data, dtype=spec.dtype, shape=shape)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/types.py", line 3578, in __init__
+    self._init_from_data(data, dtype, shape, device, copy, pinned)
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/types.py", line 3945, in _init_from_data
+    self._init_new(dtype, shape, None, device, pinned)
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/types.py", line 4065, in _init_new
+    ptr = allocator.allocate(capacity)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/.venv-physical-parcel/lib/python3.12/site-packages/warp/_src/context.py", line 5558, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 72089600 bytes on device 'cuda:0'

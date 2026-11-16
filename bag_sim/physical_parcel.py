@@ -14,6 +14,7 @@ import mujoco
 import numpy as np
 
 from .bag_model import _topology, dihedrals
+from .parcel_contents import mass_properties, rotation_matrix, inertia_xml
 from .legacy.contents import normalize_contents
 from .wrap import triangle_box_intersections, winding_number, wrap_generic
 
@@ -62,6 +63,11 @@ class Config:
     payload_mass: float = 0.3  # kg
     payload_com: tuple = (0.0, 0.0, 0.0)  # rigid mode only, local m
     payload_inertia: tuple | None = None  # rigid mode, kg m^2
+    payload_shape: str = "box"
+    payload_euler: tuple = (0., 0., 0.)
+    payload_offset: tuple = (0., 0., 0.)
+    density_gradient: tuple = (0., 0., 0.)
+    payload_friction: float | None = None
     mode: str = "rigid"
     areal_mass: float = 0.12  # kg/m^2, engineering setting
     membrane: float = 1000.0  # E*t [N/m]
@@ -87,10 +93,20 @@ class Config:
     probe_shape: str = "sphere"
 
     def __post_init__(self):
+        mass_properties(self.payload_shape, self.payload_size, self.payload_mass, self.density_gradient)
+        if self.mode != "rigid" and (self.payload_shape != "box" or any(self.density_gradient)):
+            raise ValueError("segmented modes require boxes with uniform density")
+        if self.payload_friction is not None and (not math.isfinite(self.payload_friction) or self.payload_friction < 0):
+            raise ValueError("invalid payload_friction")
+        if any(self.density_gradient) and (any(self.payload_com) or self.payload_inertia is not None):
+            raise ValueError("density gradient and explicit mass properties are mutually exclusive")
+        if self.payload_shape != "box" and (any(self.payload_com) or self.payload_inertia is not None):
+            raise ValueError("non-box mass properties are derived from geometry and density gradient")
         if self.mode not in ("rigid", "bendable", "compressible"):
             raise ValueError("mode must be rigid, bendable or compressible")
         for name, length in (("bag_size", 2), ("payload_size", 3), ("payload_com", 3),
-                             ("center", 2), ("gravity", 3)):
+                             ("center", 2), ("gravity", 3), ("payload_euler", 3),
+                             ("payload_offset", 3)):
             value = np.asarray(getattr(self, name), dtype=float)
             if value.shape != (length,) or not np.isfinite(value).all():
                 raise ValueError(f"{name} needs {length} finite values")
@@ -145,13 +161,15 @@ def load_envelope(cfg):
         raise ValueError("degenerate reference triangles")
     masses = np.zeros(len(reference))
     np.add.at(masses, faces.ravel(), np.repeat(area * cfg.areal_mass / 3, 3))
-    item = normalize_contents([dict(shape="box", size_m=list(cfg.payload_size),
+    rotation = rotation_matrix(cfg.payload_euler)
+    enclosing_size = 2 * (np.abs(rotation) @ (np.asarray(cfg.payload_size)/2) + np.abs(cfg.payload_offset))
+    item = normalize_contents([dict(shape="box", size_m=list(enclosing_size),
                                     mass_kg=cfg.payload_mass)])[0]
     current, preparation = wrap_generic(reference, reference.copy(), faces, panels,
                                          [0], [3], item, cfg.radius, box_face_clearance=True)
     if preparation["maximum_edge_strain"] > 0.05:
         raise ValueError(f"initial film strain exceeds 5%: {preparation}")
-    half = np.asarray(cfg.payload_size) / 2
+    half = enclosing_size / 2
     corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]) * half
     winding = winding_number(current, faces, corners + item["position"])
     intersections = triangle_box_intersections(current, faces, half, item["position"])
@@ -165,7 +183,7 @@ def load_envelope(cfg):
     item["position"] += shift
     lengths = np.linalg.norm(reference[unique[:, 1]] - reference[unique[:, 0]], axis=1)
     return dict(reference=reference, current=current, faces=faces, panels=panels,
-                edges=unique, masses=masses, payload_origin=item["position"],
+                edges=unique, masses=masses, payload_origin=item["position"] + cfg.payload_offset,
                 metadata=dict(source=str(path.relative_to(HERE.parent)),
                               source_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                               vertices=len(reference), triangles=len(faces), edges=len(unique),
@@ -187,9 +205,15 @@ def payload_xml(cfg, origin):
     output = []
     assets = []
     corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
+    mu = cfg.friction if cfg.payload_friction is None else cfg.payload_friction
     for index in range(count):
         pos = np.array(origin) + [-length / 2 + segment[0] / 2, 0, 0] if index == 0 else [segment[0], 0, 0]
-        output.append(f'<body name="payload_{index}" pos="{vec(pos)}">')
+        quat = np.empty(4)
+        mujoco.mju_mat2Quat(quat, rotation_matrix(cfg.payload_euler).ravel())
+        orientation = f' quat="{vec(quat)}"' if index == 0 else ""
+        if index == 0:
+            pos = np.array(origin) + rotation_matrix(cfg.payload_euler) @ np.array([-length / 2 + segment[0] / 2, 0, 0])
+        output.append(f'<body name="payload_{index}" pos="{vec(pos)}"{orientation}>')
         if index == 0:
             output.append('<freejoint name="payload_free"/>')
         else:
@@ -205,9 +229,20 @@ def payload_xml(cfg, origin):
         # The 4.0.1 box/triangle primitive misses edge/face crossings. An exact
         # eight-vertex box uses the complete native convex collision path.
         assets.append(f'<mesh name="payload_box_{index}" vertex="{vec(corners * core_size/2)}"/>')
-        output.append(f'<inertial pos="{vec(com)}" mass="{core_mass}" diaginertia="{vec(inertia)}"/>')
-        output.append(f'<geom name="payload_geom_{index}" type="mesh" pos="0 0 {core_z}" '
-                      f'mesh="payload_box_{index}" contype="8" conaffinity="2" rgba=".85 .50 .20 1"/>')
+        if count == 1 and (cfg.payload_shape != "box" or any(cfg.density_gradient)):
+            props = mass_properties(cfg.payload_shape, cfg.payload_size, core_mass, cfg.density_gradient)
+            output.append(f'<inertial pos="{vec(props["com"])}" mass="{core_mass}" fullinertia="{vec(inertia_xml(props["inertia"]))}"/>')
+        else:
+            output.append(f'<inertial pos="{vec(com)}" mass="{core_mass}" diaginertia="{vec(inertia)}"/>')
+        if cfg.payload_shape == "box":
+            geometry = f'type="mesh" mesh="payload_box_{index}"'
+        elif cfg.payload_shape == "sphere":
+            geometry = f'type="sphere" size="{width/2}"'
+        else:
+            straight = length if cfg.payload_shape == "cylinder" else length-width
+            geometry = f'type="{cfg.payload_shape}" size="{width/2} {straight/2}" quat=".7071067811865476 0 .7071067811865476 0"'
+        output.append(f'<geom name="payload_geom_{index}" {geometry} pos="0 0 {core_z}" '
+                      f'friction="{mu} .005 .0001" contype="8" conaffinity="2" rgba=".85 .50 .20 1"/>')
         if compressible:
             plate_size = np.array([segment[0], width, min(0.002, height * 0.1)])
             assets.append(f'<mesh name="plate_box_{index}" vertex="{vec(corners * plate_size/2)}"/>')
@@ -218,7 +253,7 @@ def payload_xml(cfg, origin):
                           f'<inertial pos="0 0 0" mass="{mass*.1}" '
                           f'diaginertia="{vec(box_inertia(mass*.1,plate_size))}"/>'
                           f'<geom name="plate_geom_{index}" type="mesh" mesh="plate_box_{index}" '
-                          'contype="8" conaffinity="2" rgba=".90 .65 .25 1"/></body>')
+                          f'friction="{mu} .005 .0001" contype="8" conaffinity="2" rgba=".90 .65 .25 1"/></body>')
     output.extend('</body>' for _ in range(count))
     return "\n".join(assets), "\n".join(output)
 
@@ -287,7 +322,11 @@ class Parcel:
         self.compression_names = [self.m.joint(j).name for j in self.compression_joints]
         self.metadata = dict(config=asdict(cfg), geometry=film["metadata"],
                              nq=self.m.nq, nv=self.m.nv, neq=self.m.neq,
-                             payload_collision="native convex mesh, exact eight-vertex boxes",
+                             payload_collision="native convex mesh, exact eight-vertex boxes" if cfg.payload_shape == "box" else f"native {cfg.payload_shape}",
+                             payload_components=[dict(body=self.m.body(int(b)).name,
+                                mass_kg=float(self.m.body_mass[b]),com_local_m=self.m.body_ipos[b].tolist(),
+                                principal_inertia_kg_m2=self.m.body_inertia[b].tolist(),
+                                principal_quaternion=self.m.body_iquat[b].tolist()) for b in self.payload_bodies],
                              bending="reference dihedral energy, existing bag_model gradient",
                              compression_axis="segment-local -z")
 

@@ -1,0 +1,36 @@
+test_density_gradient_inertia_matches_volume_integral (test_physical_parcel_randomization.RandomizationTests.test_density_gradient_inertia_matches_volume_integral) ... ok
+test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) ... 
+  test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='cylinder', mode='rigid') ... FAIL
+  test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='box', mode='bendable') ... FAIL
+  test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='box', mode='compressible') ... FAIL
+test_invalid_shapes_and_density_are_rejected (test_physical_parcel_randomization.RandomizationTests.test_invalid_shapes_and_density_are_rejected) ... ok
+test_material_overrides_and_seed_are_applied (test_physical_parcel_randomization.RandomizationTests.test_material_overrides_and_seed_are_applied) ... ok
+
+======================================================================
+FAIL: test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='cylinder', mode='rigid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/test_physical_parcel_randomization.py", line 38, in test_each_shape_and_mode_initializes_without_geometric_penetration
+    self.assertLessEqual(geom['geometric_depth_upper_m'],.001)
+AssertionError: 0.002342874494662968 not less than or equal to 0.001
+
+======================================================================
+FAIL: test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='box', mode='bendable')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/test_physical_parcel_randomization.py", line 38, in test_each_shape_and_mode_initializes_without_geometric_penetration
+    self.assertLessEqual(geom['geometric_depth_upper_m'],.001)
+AssertionError: 0.0028249397246852895 not less than or equal to 0.001
+
+======================================================================
+FAIL: test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='box', mode='compressible')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/test_physical_parcel_randomization.py", line 38, in test_each_shape_and_mode_initializes_without_geometric_penetration
+    self.assertLessEqual(geom['geometric_depth_upper_m'],.001)
+AssertionError: 0.0019092485502828957 not less than or equal to 0.001
+
+----------------------------------------------------------------------
+Ran 4 tests in 3.132s
+
+FAILED (failures=3)

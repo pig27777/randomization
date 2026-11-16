@@ -12,6 +12,14 @@
 
 材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。现有侧抓存在接触预算超限，顶面搓起及气泡袋抓取记录为失败。物理验证状态见 [主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) 与 [分类视频](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4)。
 
+### 完整YAM随机内容物与GPU（2026-11-17，ubun）
+
+在上述142节点/280面基线上补充刚体box/sphere/cylinder/capsule，质量、线性正密度梯度COM及完整惯量由实际几何解析计算；可弯曲/可压缩仍沿用三段盒体。袋尺寸、材料和内容物几何/姿态按编译组随机化，E/t/rho/nu关联膜刚度、弯曲与面密度；组内GPU独立质量比例、摩擦及适用柔性参数。完整YAM及自定义弯曲/压缩力进入同一GPU场景，公共控制、驱动力限与判定不改。实现入口见`parcel_contents.py`、`physical_parcel.py`、`physical_parcel_gpu.py`，测试入口在[test/bag_model](../test/bag_model/README.md)。
+
+18组中15组通过0.5s准备；167次实际静置袋面采样接受39次。9次完整协议尝试成功0/9，未取得有载保持。纸袋胶囊实际角部闭合接触的GPU短窗口最大已测有效8192环境，32716.5环境步/s、250.394ms/整批物理步、每环境实时率0.000399，显存30520MiB；dt=100µs、100步≈10ms、3次重复。10240及更大已测执行档在运行临时分配失败；独立仅加载32768通过、40960失败。混合9状态/7模板的数值有效执行23040环境、15821.6环境步/s，未通过整批几何；仅加载34560通过、36864失败。精确边界未穷尽。该容量对应每环境512接触/2048约束缓冲和本材料/状态，不能外推为成功抓取或长期承重容量。
+
+各环境参数与实际接触摩擦均有GPU回读。原生priority覆盖部分低优先级摩擦采样，PE可压缩等状态仍有外露；混合数值吞吐与物理有效性分列。完整闭环包含CPU控制/IK及逐步状态回传，速度另报。详见[本轮配置、结果、复现与三类失败视频](../test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/README.md)、[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)与[任务检查](../reports/physical-parcel-yam-gpu-test.md)。
+
 ## 历史后端说明（2026-11-02）
 
 当时状态为Newton后端第一阶段完成，第二阶段（塑性/记忆/折痕）未开始。

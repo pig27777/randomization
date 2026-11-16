@@ -1,0 +1,467 @@
+{
+  "machine": "ubun",
+  "compile_geometry_material_groups": 18,
+  "compile_cpu_initialization_s": 6.087896646004083,
+  "preparation": {
+    "passed": 0,
+    "total": 18,
+    "scene_and_initial_ik_s": 95.21416104398668
+  },
+  "sampling": {
+    "top": {
+      "sampled": 47,
+      "accepted": 12
+    },
+    "edge": {
+      "sampled": 56,
+      "accepted": 8
+    },
+    "corner": {
+      "sampled": 53,
+      "accepted": 9
+    },
+    "side": {
+      "sampled": 70,
+      "accepted": 2
+    }
+  },
+  "rejections": {
+    "YAM initial pose unreachable": 175,
+    "initial film contact penetration exceeds 1 mm": 20
+  },
+  "trials": [
+    {
+      "index": 0,
+      "group": 0,
+      "region": "top",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r1/trials/trial-0-kraft-box-top",
+      "outcome": "grasp_fail",
+      "phase": "open",
+      "wall_s": 296.8653685550016,
+      "sim_s": 11.068699999987542,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.17993116100972414,
+          0.0702808676557452,
+          0.19743954870544156
+        ],
+        "first_contact_tip_mid_m": [
+          -0.1631723252513203,
+          0.06975080595901834,
+          0.26712384849846965
+        ],
+        "first_contact_time_s": 0.7600999999999326,
+        "closest_tip_distance_to_initial_sample_m": 0.060403275309528166
+      },
+      "profile": "kraft",
+      "shape": "box",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": true,
+      "stages": [
+        "approach",
+        "carry",
+        "carry_hold",
+        "close",
+        "lift",
+        "lift_hold",
+        "lower",
+        "open",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.010195593800658875,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 2.8877413738833004,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0,
+      "timings": {
+        "cpu_command_s": 2.727078138908837,
+        "cpu_ik_s": 0.2988404559364426,
+        "cpu_geometry_check_s": 0.6546894490638806,
+        "cpu_feedback_s": 96.01504478193965,
+        "physical_step_s": 190.65724030849015
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 1,
+      "group": 9,
+      "region": "edge",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r1/trials/trial-1",
+      "outcome": "sim_fail",
+      "phase": "settle",
+      "wall_s": 0.9345018839994736,
+      "sim_s": 0.04010000000000012,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.06201672064489371,
+          -0.04729496965584106,
+          0.1719361784436838
+        ],
+        "first_contact_tip_mid_m": null,
+        "first_contact_time_s": null,
+        "closest_tip_distance_to_initial_sample_m": null
+      },
+      "profile": "pe",
+      "shape": "capsule",
+      "mode": "rigid",
+      "reason": "film/payload geometry exceeds 1 mm or exposes a payload corner",
+      "motion_completed": false,
+      "stages": [
+        "settle"
+      ],
+      "grasp_reached": false,
+      "completed_protocol_attempt": false,
+      "success": false,
+      "peak_lift_m": -9.810000001220232e-08,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.3627457921659102,
+      "exposed_samples": 1,
+      "peak_geometry_depth_m": 0.0012844170482668338,
+      "timings": {
+        "cpu_command_s": 0.009822059044381604,
+        "cpu_ik_s": 0.00027589099772740155,
+        "cpu_geometry_check_s": 0.01994077500057756,
+        "cpu_feedback_s": 0.07076302798304823,
+        "physical_step_s": 0.40217641202616505
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 2,
+      "group": 17,
+      "region": "edge",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r1/trials/trial-2",
+      "outcome": "compute_limit",
+      "phase": "lower",
+      "wall_s": 1800.4697588150011,
+      "sim_s": 14.492494583129883,
+      "engine": "GPU physics + CPU shared controller",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.0864039161286083,
+          0.006700904389347416,
+          0.1688154948039377
+        ],
+        "first_contact_tip_mid_m": [
+          -0.15691194510674294,
+          -0.0016300100626015727,
+          0.010098253828797447
+        ],
+        "first_contact_time_s": 5.660516738891602,
+        "closest_tip_distance_to_initial_sample_m": 0.0015658150977554037
+      },
+      "profile": "bubble",
+      "shape": "box",
+      "mode": "compressible",
+      "reason": "wall budget reached; incomplete trial",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "carry",
+        "carry_hold",
+        "close",
+        "lift",
+        "lift_hold",
+        "lower",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": false,
+      "success": false,
+      "peak_lift_m": 0.13128154654778024,
+      "suspended_samples": 1,
+      "peak_penetration_mm": 1.7841467633843422,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0,
+      "timings": {
+        "cpu_command_s": 3.7884389241335157,
+        "cpu_ik_s": 0.5761408349935664,
+        "cpu_geometry_check_s": 2.7830695049742644,
+        "cpu_feedback_s": 78.15738331555985,
+        "physical_step_s": 1700.2615749056204
+      },
+      "gpu_timing": {
+        "setup_s": 6.541968598001404,
+        "upload_control_s": 9.823621358693345,
+        "physics_s": 1232.3731346854001,
+        "download_s": 454.18691145954654,
+        "steps": 144801
+      }
+    },
+    {
+      "index": 3,
+      "group": 1,
+      "region": "corner",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r1/trials/trial-3",
+      "outcome": "grasp_fail",
+      "phase": "open",
+      "wall_s": 2182.953679862003,
+      "sim_s": 12.479965209960938,
+      "engine": "GPU physics + CPU shared controller",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.10327034369147887,
+          -0.06411292188794393,
+          0.170491382194076
+        ],
+        "first_contact_tip_mid_m": [
+          -0.10615412675947206,
+          -0.06255178410497,
+          0.16569130157901368
+        ],
+        "first_contact_time_s": 2.300011157989502,
+        "closest_tip_distance_to_initial_sample_m": 0.0020046726198701447
+      },
+      "profile": "kraft",
+      "shape": "sphere",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": true,
+      "stages": [
+        "approach",
+        "carry",
+        "carry_hold",
+        "close",
+        "lift",
+        "lift_hold",
+        "lower",
+        "open",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.0036750856931024867,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 1.416749320924282,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.00024999997827625047,
+      "timings": {
+        "cpu_command_s": 3.1353657917024975,
+        "cpu_ik_s": 0.270799982961762,
+        "cpu_geometry_check_s": 4.754162440025539,
+        "cpu_feedback_s": 29.369576429129665,
+        "physical_step_s": 2135.543114887554
+      },
+      "gpu_timing": {
+        "setup_s": 1.3501815689996874,
+        "setup_components": {
+          "cpu_parcel_compile_s": 5.360016075428575e-07,
+          "model_upload_s": 0.029726403998211026,
+          "data_upload_allocation_s": 0.02925621299800696,
+          "custom_arrays_upload_s": 0.0005609530016954523,
+          "first_reset_and_kernel_compile_s": 0.13272773800053983
+        },
+        "upload_control_s": 8.176801830508339,
+        "physics_s": 1744.1213130710566,
+        "download_s": 379.8299987887949,
+        "steps": 124703
+      }
+    },
+    {
+      "index": 4,
+      "group": 10,
+      "region": "top",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r1/trials/trial-4",
+      "outcome": "grasp_fail",
+      "phase": "open",
+      "wall_s": 255.28388742400057,
+      "sim_s": 12.765199999983588,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.1377535345443819,
+          -0.02544436159234879,
+          0.17432686610025433
+        ],
+        "first_contact_tip_mid_m": [
+          -0.14112031463955613,
+          -0.02460771777336824,
+          0.156887392661707
+        ],
+        "first_contact_time_s": 2.540100000000936,
+        "closest_tip_distance_to_initial_sample_m": 0.0014852714034060256
+      },
+      "profile": "pe",
+      "shape": "box",
+      "mode": "bendable",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": true,
+      "stages": [
+        "approach",
+        "carry",
+        "carry_hold",
+        "close",
+        "lift",
+        "lift_hold",
+        "lower",
+        "open",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.004332041727404229,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.4747182732255215,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0,
+      "timings": {
+        "cpu_command_s": 2.969692825459788,
+        "cpu_ik_s": 0.1765854830191529,
+        "cpu_geometry_check_s": 1.3908635950137977,
+        "cpu_feedback_s": 47.38968561754882,
+        "physical_step_s": 196.1748440162446
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 5,
+      "group": 14,
+      "region": "top",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r1/trials/trial-5",
+      "outcome": "grasp_fail",
+      "phase": "open",
+      "wall_s": 304.0552235590003,
+      "sim_s": 12.882599999983315,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.28007139137895887,
+          0.06565596925796048,
+          0.19454795339140718
+        ],
+        "first_contact_tip_mid_m": [
+          -0.28205618471895405,
+          0.06560138650472479,
+          0.18328818662746943
+        ],
+        "first_contact_time_s": 2.4201000000006827,
+        "closest_tip_distance_to_initial_sample_m": 0.0011248187743744906
+      },
+      "profile": "bubble",
+      "shape": "cylinder",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": true,
+      "stages": [
+        "approach",
+        "carry",
+        "carry_hold",
+        "close",
+        "lift",
+        "lift_hold",
+        "lower",
+        "open",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.0038030698681973674,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.5065676375359083,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0002499980942966243,
+      "timings": {
+        "cpu_command_s": 3.097976057742926,
+        "cpu_ik_s": 0.23250788701625424,
+        "cpu_geometry_check_s": 3.8340257149720856,
+        "cpu_feedback_s": 62.2996386841769,
+        "physical_step_s": 227.06116766863124
+      },
+      "gpu_timing": null
+    }
+  ],
+  "trial_rates": {
+    "CPU shared full protocol": {
+      "trials": 4,
+      "wall_s": 857.138981422002,
+      "trials_per_s": 0.004666687767908958,
+      "grasp_attempts": 3,
+      "grasp_attempts_per_s": 0.0035000158259317184,
+      "completed_protocol_attempts": 3,
+      "completed_protocol_attempts_per_s": 0.0035000158259317184,
+      "successful_transfers": 0,
+      "success_rate": 0.0,
+      "outcomes": {
+        "grasp_fail": 3,
+        "sim_fail": 1
+      }
+    },
+    "GPU physics + CPU shared controller": {
+      "trials": 2,
+      "wall_s": 3983.423438677004,
+      "trials_per_s": 0.000502080692848524,
+      "grasp_attempts": 2,
+      "grasp_attempts_per_s": 0.000502080692848524,
+      "completed_protocol_attempts": 1,
+      "completed_protocol_attempts_per_s": 0.000251040346424262,
+      "successful_transfers": 0,
+      "success_rate": 0.0,
+      "outcomes": {
+        "compute_limit": 1,
+        "grasp_fail": 1
+      }
+    }
+  },
+  "gpu": [],
+  "mixed_gpu": [],
+  "trial_batches": [
+    {
+      "batch": 0,
+      "indices": [
+        0,
+        1,
+        2
+      ],
+      "wall_s": 2098.269629254002,
+      "successes": 0
+    },
+    {
+      "batch": 1,
+      "indices": [
+        3,
+        4,
+        5
+      ],
+      "wall_s": 2742.2927908450038,
+      "successes": 0
+    },
+    {
+      "batch": 2,
+      "indices": [],
+      "wall_s": 0,
+      "successes": 0
+    }
+  ],
+  "capacity": {
+    "max_loaded_worlds": 0,
+    "max_finite_zero_overflow_worlds": 0,
+    "max_numerically_valid_worlds": 0,
+    "max_physically_valid_worlds": 0,
+    "contact_loaded_max_physically_valid_worlds": 0,
+    "loaded_grasp_max_physically_valid_worlds": null,
+    "bearing_hold_measured": false,
+    "mixed": {
+      "max_complete_loaded_worlds": 0,
+      "max_numerically_valid_worlds": 0,
+      "max_physically_valid_worlds": 0
+    },
+    "measured": false
+  },
+  "status": "halted_before_capacity",
+  "distinct_executed_parameter_groups": 6,
+  "cpu_trial_timings_s": {
+    "cpu_command_s": 15.728373796991946,
+    "cpu_ik_s": 1.5551505349249055,
+    "cpu_geometry_check_s": 13.436751479050145,
+    "cpu_feedback_s": 313.30209185633794
+  }
+}

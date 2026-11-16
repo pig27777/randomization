@@ -1,0 +1,2091 @@
+{
+  "machine": "ubun",
+  "compile_geometry_material_groups": 18,
+  "compile_cpu_initialization_s": 6.045888569999079,
+  "preparation": {
+    "passed": 15,
+    "total": 18,
+    "scene_and_initial_ik_s": 68.37004274498759
+  },
+  "sampling": {
+    "top": {
+      "sampled": 42,
+      "accepted": 11
+    },
+    "edge": {
+      "sampled": 32,
+      "accepted": 12
+    },
+    "corner": {
+      "sampled": 45,
+      "accepted": 9
+    },
+    "side": {
+      "sampled": 48,
+      "accepted": 7
+    }
+  },
+  "rejections": {
+    "initial film contact penetration exceeds 1 mm": 22,
+    "YAM initial pose unreachable": 106
+  },
+  "trials": [
+    {
+      "index": 0,
+      "group": 3,
+      "region": "side",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-0",
+      "outcome": "grasp_fail",
+      "phase": "lift",
+      "wall_s": 726.1345931040014,
+      "sim_s": 5.613553047180176,
+      "engine": "GPU physics + CPU shared controller",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.10988299986982075,
+          -0.016135136447627707,
+          0.1764091166341479
+        ],
+        "first_contact_tip_mid_m": [
+          -0.08396248376618393,
+          -0.04447029878376322,
+          0.1865185027590029
+        ],
+        "first_contact_time_s": 1.5002365112304688,
+        "closest_tip_distance_to_initial_sample_m": 0.03940696610976634
+      },
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "close",
+        "lift",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.0008162457208458485,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.15670806169509888,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0005112266981668152,
+      "timings": {
+        "cpu_command_s": 1.1930111822694016,
+        "cpu_ik_s": 0.05713594604458194,
+        "cpu_geometry_check_s": 3.786691067962238,
+        "cpu_feedback_s": 11.758980623162643,
+        "physical_step_s": 704.140266615017
+      },
+      "gpu_timing": {
+        "setup_s": 1.9996462800008885,
+        "setup_components": {
+          "cpu_parcel_compile_s": 2.3199754650704563e-07,
+          "model_upload_s": 0.029597240998555208,
+          "data_upload_allocation_s": 0.02893482400031644,
+          "custom_arrays_upload_s": 0.000554976002604235,
+          "first_reset_and_kernel_compile_s": 0.66689729099744
+        },
+        "upload_control_s": 1.7178166663507,
+        "physics_s": 541.3968971653012,
+        "download_s": 159.64444621153234,
+        "steps": 56132
+      }
+    },
+    {
+      "index": 1,
+      "group": 6,
+      "region": "top",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-1",
+      "outcome": "sim_fail",
+      "phase": "approach",
+      "wall_s": 1173.7907543999972,
+      "sim_s": 2.26005220413208,
+      "engine": "GPU physics + CPU shared controller",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.1580144506910324,
+          0.0019509660593915567,
+          0.1629853639960416
+        ],
+        "first_contact_tip_mid_m": [
+          -0.1586829289034375,
+          0.0030837013868260828,
+          0.16034713602669298
+        ],
+        "first_contact_time_s": 2.240072727203369,
+        "closest_tip_distance_to_initial_sample_m": 0.001381822790059191
+      },
+      "profile": "pe",
+      "shape": "box",
+      "mode": "rigid",
+      "reason": "film/payload geometry exceeds 1 mm or exposes a payload corner",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "settle"
+      ],
+      "grasp_reached": false,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 1.2790682558105892e-06,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.3397977561689913,
+      "exposed_samples": 1,
+      "peak_geometry_depth_m": 3.4940883686385285e-05,
+      "timings": {
+        "cpu_command_s": 0.5487999680335633,
+        "cpu_ik_s": 0.029358854961174075,
+        "cpu_geometry_check_s": 0.1460106540216657,
+        "cpu_feedback_s": 12.824953999108402,
+        "physical_step_s": 1156.8828928705734
+      },
+      "gpu_timing": {
+        "setup_s": 1.3919637979997788,
+        "setup_components": {
+          "cpu_parcel_compile_s": 2.2300082491710782e-07,
+          "model_upload_s": 0.030487403000734048,
+          "data_upload_allocation_s": 0.032574910001130775,
+          "custom_arrays_upload_s": 0.0005605549995379988,
+          "first_reset_and_kernel_compile_s": 0.13771786100187455
+        },
+        "upload_control_s": 0.7305753977234417,
+        "physics_s": 1085.917669914019,
+        "download_s": 69.71971009582921,
+        "steps": 22601
+      }
+    },
+    {
+      "index": 2,
+      "group": 13,
+      "region": "top",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-2",
+      "outcome": "grasp_fail",
+      "phase": "lift",
+      "wall_s": 662.4351062519963,
+      "sim_s": 5.985157012939453,
+      "engine": "GPU physics + CPU shared controller",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.23243512610076694,
+          -0.010813705834918346,
+          0.19508668960651068
+        ],
+        "first_contact_tip_mid_m": [
+          -0.23290592904934665,
+          -0.009665885333543657,
+          0.19557491639414445
+        ],
+        "first_contact_time_s": 2.1801342964172363,
+        "closest_tip_distance_to_initial_sample_m": 0.0013332339314353582
+      },
+      "profile": "bubble",
+      "shape": "sphere",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "close",
+        "lift",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 7.519905642730529e-05,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.1746942289173603,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.00024998548936311284,
+      "timings": {
+        "cpu_command_s": 1.298955684673274,
+        "cpu_ik_s": 0.06211825606806087,
+        "cpu_geometry_check_s": 1.9893373490631348,
+        "cpu_feedback_s": 25.791009137352376,
+        "physical_step_s": 628.3716538480512
+      },
+      "gpu_timing": {
+        "setup_s": 1.3341992080022465,
+        "setup_components": {
+          "cpu_parcel_compile_s": 1.7899947124533355e-07,
+          "model_upload_s": 0.0311436150004738,
+          "data_upload_allocation_s": 0.031616518997907406,
+          "custom_arrays_upload_s": 0.0005710589975933544,
+          "first_reset_and_kernel_compile_s": 0.1381262830000196
+        },
+        "upload_control_s": 1.8520618884722353,
+        "physics_s": 446.6848703946125,
+        "download_s": 178.36924472182363,
+        "steps": 59843
+      }
+    },
+    {
+      "index": 3,
+      "group": 3,
+      "region": "edge",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-3",
+      "outcome": "grasp_fail",
+      "phase": "lift",
+      "wall_s": 118.7934101849969,
+      "sim_s": 6.460299999998282,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.08858161453383488,
+          0.07846121251219731,
+          0.1737674295602779
+        ],
+        "first_contact_tip_mid_m": [
+          -0.08911630235876654,
+          0.07934179427640439,
+          0.17147537102754484
+        ],
+        "first_contact_time_s": 2.240100000000303,
+        "closest_tip_distance_to_initial_sample_m": 0.0013362082309382013
+      },
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "close",
+        "lift",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.00622970024927097,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.16309028220397354,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0005212843117178353,
+      "timings": {
+        "cpu_command_s": 1.522290013905149,
+        "cpu_ik_s": 0.06154436098586302,
+        "cpu_geometry_check_s": 4.188739506920683,
+        "cpu_feedback_s": 18.697534477949375,
+        "physical_step_s": 90.59263045930129
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 4,
+      "group": 10,
+      "region": "corner",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-4",
+      "outcome": "grasp_fail",
+      "phase": "approach",
+      "wall_s": 311.41019426099956,
+      "sim_s": 8.300399999993994,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.062303760545409814,
+          -0.06951039928178741,
+          0.1561824890364215
+        ],
+        "first_contact_tip_mid_m": [
+          -0.06280430086818517,
+          -0.06768356902327903,
+          0.15440554236017012
+        ],
+        "first_contact_time_s": 2.2201000000002606,
+        "closest_tip_distance_to_initial_sample_m": 0.0018643518936696493
+      },
+      "profile": "pe",
+      "shape": "box",
+      "mode": "bendable",
+      "reason": "no surface contact/approach timeout",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "settle"
+      ],
+      "grasp_reached": false,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 3.976726955512433e-07,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.2802237918277664,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0,
+      "timings": {
+        "cpu_command_s": 2.0426864070250303,
+        "cpu_ik_s": 0.09816699502698611,
+        "cpu_geometry_check_s": 0.904153520030377,
+        "cpu_feedback_s": 76.8451443679296,
+        "physical_step_s": 226.32731216860702
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 5,
+      "group": 14,
+      "region": "edge",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-5",
+      "outcome": "grasp_fail",
+      "phase": "approach",
+      "wall_s": 232.86855150100018,
+      "sim_s": 8.300399999993994,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.12204147584947567,
+          0.09328456240089548,
+          0.16936480821260286
+        ],
+        "first_contact_tip_mid_m": [
+          -0.12280185439109853,
+          0.09365784820655015,
+          0.1649644816663444
+        ],
+        "first_contact_time_s": 2.2801000000003873,
+        "closest_tip_distance_to_initial_sample_m": 0.0013602605883124889
+      },
+      "profile": "bubble",
+      "shape": "cylinder",
+      "mode": "rigid",
+      "reason": "no surface contact/approach timeout",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "settle"
+      ],
+      "grasp_reached": false,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 5.585677924468957e-06,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.6806928019822704,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0002499982707493474,
+      "timings": {
+        "cpu_command_s": 2.0610572901932755,
+        "cpu_ik_s": 0.09832285103038885,
+        "cpu_geometry_check_s": 2.423745995038189,
+        "cpu_feedback_s": 62.32863077560614,
+        "physical_step_s": 161.17092380384565
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 6,
+      "group": 3,
+      "region": "corner",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-6",
+      "outcome": "grasp_fail",
+      "phase": "lift",
+      "wall_s": 115.01512787200045,
+      "sim_s": 6.164599999998972,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.1101212190464295,
+          -0.0541056890505044,
+          0.17745821640787318
+        ],
+        "first_contact_tip_mid_m": [
+          -0.11096243248069135,
+          -0.05276092048382887,
+          0.17899529175937945
+        ],
+        "first_contact_time_s": 2.160100000000134,
+        "closest_tip_distance_to_initial_sample_m": 0.0014735273383565714
+      },
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "close",
+        "lift",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.0026240286783163203,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.21311447327818756,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0005180713067972009,
+      "timings": {
+        "cpu_command_s": 1.419530121522257,
+        "cpu_ik_s": 0.057605742949817795,
+        "cpu_geometry_check_s": 4.03379368304013,
+        "cpu_feedback_s": 18.09549825567956,
+        "physical_step_s": 87.72319239179342
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 7,
+      "group": 11,
+      "region": "top",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-7",
+      "outcome": "grasp_fail",
+      "phase": "lift",
+      "wall_s": 310.04035267600557,
+      "sim_s": 7.697599999995399,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.15553103120562503,
+          0.047496151214422674,
+          0.16972248837942738
+        ],
+        "first_contact_tip_mid_m": [
+          -0.15629926492101714,
+          0.04867600164543491,
+          0.16829362428041778
+        ],
+        "first_contact_time_s": 2.2201000000002606,
+        "closest_tip_distance_to_initial_sample_m": 0.001303848518400422
+      },
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "close",
+        "lift",
+        "settle"
+      ],
+      "grasp_reached": true,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 0.0003452662673704421,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 0.35012352463202295,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0,
+      "timings": {
+        "cpu_command_s": 1.8162637750865542,
+        "cpu_ik_s": 0.07562397199944826,
+        "cpu_geometry_check_s": 1.4074039890474523,
+        "cpu_feedback_s": 59.414092939099646,
+        "physical_step_s": 242.01245524984552
+      },
+      "gpu_timing": null
+    },
+    {
+      "index": 8,
+      "group": 17,
+      "region": "edge",
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/trials/trial-8",
+      "outcome": "grasp_fail",
+      "phase": "approach",
+      "wall_s": 218.647225094006,
+      "sim_s": 8.300399999993994,
+      "engine": "CPU shared full protocol",
+      "actual_execution": {
+        "sampled_point_m": [
+          -0.09316137507895281,
+          -0.007476002064693391,
+          0.15748895572445354
+        ],
+        "first_contact_tip_mid_m": [
+          -0.09172678450953325,
+          -0.005750025030098537,
+          0.15932367712962237
+        ],
+        "first_contact_time_s": 2.140100000000092,
+        "closest_tip_distance_to_initial_sample_m": 0.002110276885068801
+      },
+      "profile": "bubble",
+      "shape": "box",
+      "mode": "compressible",
+      "reason": "no surface contact/approach timeout",
+      "motion_completed": false,
+      "stages": [
+        "approach",
+        "settle"
+      ],
+      "grasp_reached": false,
+      "completed_protocol_attempt": true,
+      "success": false,
+      "peak_lift_m": 2.7809474240109155e-05,
+      "suspended_samples": 0,
+      "peak_penetration_mm": 1.1143000140428996,
+      "exposed_samples": 0,
+      "peak_geometry_depth_m": 0.0,
+      "timings": {
+        "cpu_command_s": 2.069777254102519,
+        "cpu_ik_s": 0.09860311297234148,
+        "cpu_geometry_check_s": 1.5223976729685091,
+        "cpu_feedback_s": 66.32448710388417,
+        "physical_step_s": 143.91011943307967
+      },
+      "gpu_timing": null
+    }
+  ],
+  "trial_rates": {
+    "GPU physics + CPU shared controller": {
+      "trials": 3,
+      "wall_s": 2562.360453755995,
+      "trials_per_s": 0.0011707954654086618,
+      "grasp_attempts": 2,
+      "grasp_attempts_per_s": 0.0007805303102724412,
+      "completed_protocol_attempts": 3,
+      "completed_protocol_attempts_per_s": 0.0011707954654086618,
+      "successful_transfers": 0,
+      "success_rate": 0.0,
+      "outcomes": {
+        "grasp_fail": 2,
+        "sim_fail": 1
+      }
+    },
+    "CPU shared full protocol": {
+      "trials": 6,
+      "wall_s": 1306.7748615890087,
+      "trials_per_s": 0.004591456551822658,
+      "grasp_attempts": 3,
+      "grasp_attempts_per_s": 0.002295728275911329,
+      "completed_protocol_attempts": 6,
+      "completed_protocol_attempts_per_s": 0.004591456551822658,
+      "successful_transfers": 0,
+      "success_rate": 0.0,
+      "outcomes": {
+        "grasp_fail": 6
+      }
+    }
+  },
+  "gpu": [
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n1",
+      "worlds": 1,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 25.64309716275031,
+      "batch_step_ms": 38.996849469986046,
+      "per_environment_realtime": 0.002564309716275031,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 8.222904205322266,
+      "peak_contacts": 87,
+      "peak_iterations": 23,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.44550860700110206,
+      "capture_compile_s": 0.9253976319960202,
+      "reset_s": [
+        0.09155713599466253,
+        0.0899619280025945,
+        0.09026152399746934
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n1024",
+      "worlds": 1024,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 7100.340994374999,
+      "batch_step_ms": 144.2184256800101,
+      "per_environment_realtime": 0.0006933926752319335,
+      "device_memory_MiB": 5210,
+      "mempool_peak_MiB": 3616.6389751434326,
+      "peak_contacts": 80366,
+      "peak_iterations": 31,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.95080394300021,
+      "capture_compile_s": 1.7709638129963423,
+      "reset_s": [
+        0.15931358299712883,
+        0.1836445810040459,
+        0.18344524900021497
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n128",
+      "worlds": 128,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 1933.9788452198454,
+      "batch_step_ms": 66.1847984099586,
+      "per_environment_realtime": 0.0015109209728280044,
+      "device_memory_MiB": 2042,
+      "mempool_peak_MiB": 456.1885356903076,
+      "peak_contacts": 10130,
+      "peak_iterations": 33,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.4807776140005444,
+      "capture_compile_s": 1.673617802996887,
+      "reset_s": [
+        0.09256112000002759,
+        0.09139046600466827,
+        0.09166950499638915
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n2048",
+      "worlds": 2048,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 7935.721613108737,
+      "batch_step_ms": 258.0735690900474,
+      "per_environment_realtime": 0.00038748640689007506,
+      "device_memory_MiB": 8826,
+      "mempool_peak_MiB": 7228.582334518433,
+      "peak_contacts": 160507,
+      "peak_iterations": 34,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 1.3589278720028233,
+      "capture_compile_s": 1.8921906940013287,
+      "reset_s": [
+        0.16407482499926118,
+        0.1878038880022359,
+        0.18784929999674205
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n32",
+      "worlds": 32,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 552.7663127673808,
+      "batch_step_ms": 57.8906479300349,
+      "per_environment_realtime": 0.0017273947273980651,
+      "device_memory_MiB": 1690,
+      "mempool_peak_MiB": 117.56884574890137,
+      "peak_contacts": 2464,
+      "peak_iterations": 31,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.4538582780005527,
+      "capture_compile_s": 1.6801312009993126,
+      "reset_s": [
+        0.09416181800042978,
+        0.09497151899995515,
+        0.1022198579958058
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n512",
+      "worlds": 512,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 5093.004555330265,
+      "batch_step_ms": 100.53004948997113,
+      "per_environment_realtime": 0.0009947274522129424,
+      "device_memory_MiB": 3386,
+      "mempool_peak_MiB": 1810.6672954559326,
+      "peak_contacts": 40380,
+      "peak_iterations": 34,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.7163785859956988,
+      "capture_compile_s": 1.7389240319971577,
+      "reset_s": [
+        0.15707201099576196,
+        0.18117916499613784,
+        0.1810641999982181
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 155.08716398670458,
+      "batch_step_ms": 51.583895110015874,
+      "per_environment_realtime": 0.0019385895498338073,
+      "device_memory_MiB": 1626,
+      "mempool_peak_MiB": 32.913923263549805,
+      "peak_contacts": 629,
+      "peak_iterations": 27,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.44364138200035086,
+      "capture_compile_s": 0.9924911269990844,
+      "reset_s": [
+        0.09284241600107634,
+        0.09214262700697873,
+        0.09214409300329862
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n1",
+      "worlds": 1,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 92.67770410608352,
+      "batch_step_ms": 10.790081710001687,
+      "per_environment_realtime": 0.009267770410608353,
+      "device_memory_MiB": 1590,
+      "mempool_peak_MiB": 8.158299446105957,
+      "peak_contacts": 18,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.41312772200035397,
+      "capture_compile_s": 0.9283665499970084,
+      "reset_s": [
+        0.08866133199626347,
+        0.0875930519978283,
+        0.09289880500000436
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n1024",
+      "worlds": 1024,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 25117.65254398972,
+      "batch_step_ms": 40.76814097999886,
+      "per_environment_realtime": 0.0024528957562489962,
+      "device_memory_MiB": 5176,
+      "mempool_peak_MiB": 3610.232913017273,
+      "peak_contacts": 17449,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.788696837000316,
+      "capture_compile_s": 0.95160111199948,
+      "reset_s": [
+        0.16652790600346634,
+        0.19150253599946154,
+        0.19147645000339253
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n128",
+      "worlds": 128,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 7843.420132268525,
+      "batch_step_ms": 16.31941141000425,
+      "per_environment_realtime": 0.006127671978334785,
+      "device_memory_MiB": 2040,
+      "mempool_peak_MiB": 455.33667278289795,
+      "peak_contacts": 2180,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.44167640399973607,
+      "capture_compile_s": 0.9372913659972255,
+      "reset_s": [
+        0.08870863299671328,
+        0.08759643899975345,
+        0.08760337199782953
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n2048",
+      "worlds": 2048,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 27669.016442617678,
+      "batch_step_ms": 74.01780993001012,
+      "per_environment_realtime": 0.0013510261934871913,
+      "device_memory_MiB": 8792,
+      "mempool_peak_MiB": 7215.828616142273,
+      "peak_contacts": 34894,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 1.0572780910006259,
+      "capture_compile_s": 0.9691731080019963,
+      "reset_s": [
+        0.16955544899974484,
+        0.19381471400265582,
+        0.19285133999801474
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n32",
+      "worlds": 32,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 2150.129771555025,
+      "batch_step_ms": 14.882822619983926,
+      "per_environment_realtime": 0.006719155536109454,
+      "device_memory_MiB": 1688,
+      "mempool_peak_MiB": 117.3120756149292,
+      "peak_contacts": 549,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.43256657799793174,
+      "capture_compile_s": 0.9239552340004593,
+      "reset_s": [
+        0.08866339700034587,
+        0.08721987399621867,
+        0.08934950499678962
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n4096",
+      "worlds": 4096,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 29903.569043941337,
+      "batch_step_ms": 136.97361655998975,
+      "per_environment_realtime": 0.000730067603611849,
+      "device_memory_MiB": 16024,
+      "mempool_peak_MiB": 14427.020022392273,
+      "peak_contacts": 69820,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 1.7034973909976543,
+      "capture_compile_s": 1.79965728699608,
+      "reset_s": [
+        0.17652517600072315,
+        0.1991768379957648,
+        0.20261268500325968
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n512",
+      "worlds": 512,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 19068.174468781577,
+      "batch_step_ms": 26.85102345996711,
+      "per_environment_realtime": 0.003724252825933902,
+      "device_memory_MiB": 3384,
+      "mempool_peak_MiB": 1807.435061454773,
+      "peak_contacts": 8743,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.6386117529982585,
+      "capture_compile_s": 0.9495556010006112,
+      "reset_s": [
+        0.1636588399996981,
+        0.1889647589996457,
+        0.18898392200208036
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 607.6172699501204,
+      "batch_step_ms": 13.166182720015058,
+      "per_environment_realtime": 0.007595215874376505,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 138,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4119489660006366,
+      "capture_compile_s": 0.9461381479995907,
+      "reset_s": [
+        0.08925098499457818,
+        0.08695204900141107,
+        0.08782534900092287
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/capacity-trial-6-group-3-close-n8192",
+      "worlds": 8192,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 32716.490462515103,
+      "batch_step_ms": 250.39360531001876,
+      "per_environment_realtime": 0.00039937122146624886,
+      "device_memory_MiB": 30520,
+      "mempool_peak_MiB": 28849.402834892273,
+      "peak_contacts": 139629,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 3.067919601002359,
+      "capture_compile_s": 1.9547370309956023,
+      "reset_s": [
+        0.19324164700083202,
+        0.21911887999885948,
+        0.2166963060008129
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-10-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "bendable",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 147.0842177818217,
+      "batch_step_ms": 54.390607780005666,
+      "per_environment_realtime": 0.0018385527222727716,
+      "device_memory_MiB": 1622,
+      "mempool_peak_MiB": 32.84858417510986,
+      "peak_contacts": 764,
+      "peak_iterations": 28,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.48380989499855787,
+      "capture_compile_s": 2.9667913590019452,
+      "reset_s": [
+        0.0728976330065052,
+        0.07230992000404513,
+        0.07187968899961561
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-11-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 152.56688229854217,
+      "batch_step_ms": 52.43601939997461,
+      "per_environment_realtime": 0.001907086028731777,
+      "device_memory_MiB": 1626,
+      "mempool_peak_MiB": 32.913923263549805,
+      "peak_contacts": 544,
+      "peak_iterations": 30,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.4570559600033448,
+      "capture_compile_s": 0.9772946529992623,
+      "reset_s": [
+        0.0942734050040599,
+        0.09203103499748977,
+        0.10456199899635976
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-11-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 158.0839637731033,
+      "batch_step_ms": 50.60601853001572,
+      "per_environment_realtime": 0.0019760495471637914,
+      "device_memory_MiB": 1626,
+      "mempool_peak_MiB": 32.913923263549805,
+      "peak_contacts": 676,
+      "peak_iterations": 26,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.4464687959989533,
+      "capture_compile_s": 0.9456430719947093,
+      "reset_s": [
+        0.09235236200038344,
+        0.09108205299708061,
+        0.09066314800293185
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-11-lift-n8",
+      "worlds": 8,
+      "phase": "lift",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 157.04434905855788,
+      "batch_step_ms": 50.94102429000486,
+      "per_environment_realtime": 0.0019630543632319737,
+      "device_memory_MiB": 1626,
+      "mempool_peak_MiB": 32.913923263549805,
+      "peak_contacts": 594,
+      "peak_iterations": 31,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.44922192500234814,
+      "capture_compile_s": 0.9584498549957061,
+      "reset_s": [
+        0.0940505159960594,
+        0.09312025099643506,
+        0.09253898300084984
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-13-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "bubble",
+      "shape": "sphere",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 723.9440529169042,
+      "batch_step_ms": 11.050577690039063,
+      "per_environment_realtime": 0.009049300661461302,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 319,
+      "peak_iterations": 7,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.41275179200601997,
+      "capture_compile_s": 0.8895210639966535,
+      "reset_s": [
+        0.08819893599866191,
+        0.08815124499960802,
+        0.08771774399792776
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-13-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "bubble",
+      "shape": "sphere",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 941.7072777440306,
+      "batch_step_ms": 8.495208849999472,
+      "per_environment_realtime": 0.011771340971800383,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 518,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.41428866099886363,
+      "capture_compile_s": 0.9111177509985282,
+      "reset_s": [
+        0.09026135299791349,
+        0.08937660599622177,
+        0.08896060600091005
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-13-lift-n8",
+      "worlds": 8,
+      "phase": "lift",
+      "profile": "bubble",
+      "shape": "sphere",
+      "mode": "rigid",
+      "loaded": false,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": false,
+      "final_finger_load_fraction_min": 0.0,
+      "eps": 926.0787707212207,
+      "batch_step_ms": 8.6385740100377,
+      "per_environment_realtime": 0.01157598463401526,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 534,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4119426580000436,
+      "capture_compile_s": 0.9061787919999915,
+      "reset_s": [
+        0.08928610300063156,
+        0.08856062700215261,
+        0.08836481300386367
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-14-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "bubble",
+      "shape": "cylinder",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 674.5124817467151,
+      "batch_step_ms": 11.860418030046276,
+      "per_environment_realtime": 0.00843140602183394,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 422,
+      "peak_iterations": 9,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.42979112199827796,
+      "capture_compile_s": 0.904727670000284,
+      "reset_s": [
+        0.0892135359972599,
+        0.08766948300035438,
+        0.08810032199835405
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-17-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "bubble",
+      "shape": "box",
+      "mode": "compressible",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 461.18890509356396,
+      "batch_step_ms": 17.34647106997727,
+      "per_environment_realtime": 0.00576486131366955,
+      "device_memory_MiB": 1626,
+      "mempool_peak_MiB": 32.913923263549805,
+      "peak_contacts": 627,
+      "peak_iterations": 7,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.4711308240002836,
+      "capture_compile_s": 0.922713214000396,
+      "reset_s": [
+        0.09316009000031045,
+        0.09214054600306554,
+        0.09218225999939023
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-3-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 672.5057753980923,
+      "batch_step_ms": 11.895808620029129,
+      "per_environment_realtime": 0.008406322192476154,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 86,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.5258994660034659,
+      "capture_compile_s": 1.6426276700003655,
+      "reset_s": [
+        0.09076397199532948,
+        0.09040323299996089,
+        0.08993407899833983
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-3-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": false,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": false,
+      "final_finger_load_fraction_min": 0.0,
+      "eps": 941.899804199972,
+      "batch_step_ms": 8.493472410045797,
+      "per_environment_realtime": 0.01177374755249965,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 72,
+      "peak_iterations": 3,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4125759050002671,
+      "capture_compile_s": 0.9040561709989561,
+      "reset_s": [
+        0.08844591399974888,
+        0.08752874399942812,
+        0.0879003969967016
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-3-lift-n8",
+      "worlds": 8,
+      "phase": "lift",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": false,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": false,
+      "final_finger_load_fraction_min": 0.0,
+      "eps": 616.6031113518231,
+      "batch_step_ms": 12.974310140052694,
+      "per_environment_realtime": 0.00770753889189779,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 105,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4047598500037566,
+      "capture_compile_s": 0.9220733889960684,
+      "reset_s": [
+        0.08880116399814142,
+        0.0877508929988835,
+        0.08730031799495919
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/group-6-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "pe",
+      "shape": "box",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": false,
+      "final_finger_load_fraction_min": 0.875,
+      "eps": 167.70183067297808,
+      "batch_step_ms": 47.703713000009884,
+      "per_environment_realtime": 0.002096272883412226,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 682,
+      "peak_iterations": 32,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": false,
+      "upload_reset_s": 0.42324285799986683,
+      "capture_compile_s": 0.9672527939983411,
+      "reset_s": [
+        0.0901807589980308,
+        0.08789414499915438,
+        0.08830466400104342
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/trial-3-group-3-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 635.5048959297845,
+      "batch_step_ms": 12.588415999998688,
+      "per_environment_realtime": 0.007943811199122306,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 95,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.5172588900022674,
+      "capture_compile_s": 0.916751976001251,
+      "reset_s": [
+        0.08948372599843424,
+        0.08818981100193923,
+        0.09065896999527467
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/trial-3-group-3-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 556.0073779638791,
+      "batch_step_ms": 14.388298279955052,
+      "per_environment_realtime": 0.006950092224548489,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 120,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4245363749942044,
+      "capture_compile_s": 0.9218013760037138,
+      "reset_s": [
+        0.08882865800114814,
+        0.0873244720060029,
+        0.08780635600123787
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/trial-3-group-3-lift-n8",
+      "worlds": 8,
+      "phase": "lift",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 641.6285137350276,
+      "batch_step_ms": 12.468273820049944,
+      "per_environment_realtime": 0.008020356421687844,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 104,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4179524030041648,
+      "capture_compile_s": 0.9197418330004439,
+      "reset_s": [
+        0.0889938379987143,
+        0.08826157399744261,
+        0.08725071299704723
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/trial-6-group-3-approach-n8",
+      "worlds": 8,
+      "phase": "approach",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 783.856004299716,
+      "batch_step_ms": 10.205956140052876,
+      "per_environment_realtime": 0.00979820005374645,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 88,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.43137447400658857,
+      "capture_compile_s": 0.9138147549965652,
+      "reset_s": [
+        0.08837875299650477,
+        0.08765868400223553,
+        0.08730122800625395
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/trial-6-group-3-close-n8",
+      "worlds": 8,
+      "phase": "close",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 603.542196392278,
+      "batch_step_ms": 13.25507984001888,
+      "per_environment_realtime": 0.007544277454903475,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 137,
+      "peak_iterations": 5,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.41342329799954314,
+      "capture_compile_s": 0.9103421729960246,
+      "reset_s": [
+        0.08993901799840387,
+        0.08839306599838892,
+        0.0890492219987209
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/gpu/trial-6-group-3-lift-n8",
+      "worlds": 8,
+      "phase": "lift",
+      "profile": "kraft",
+      "shape": "capsule",
+      "mode": "rigid",
+      "loaded": true,
+      "load_bearing": false,
+      "contact_load_preserved_at_window_end": true,
+      "final_finger_load_fraction_min": 1.0,
+      "eps": 547.8604859840176,
+      "batch_step_ms": 14.602257700025802,
+      "per_environment_realtime": 0.006848256074800221,
+      "device_memory_MiB": 1592,
+      "mempool_peak_MiB": 32.80592632293701,
+      "peak_contacts": 112,
+      "peak_iterations": 6,
+      "overflow_worlds": 0,
+      "nonfinite_worlds": 0,
+      "finite_zero_overflow": true,
+      "numerically_valid": true,
+      "physically_valid": true,
+      "upload_reset_s": 0.4150956279991078,
+      "capture_compile_s": 0.9398997070020414,
+      "reset_s": [
+        0.0890115210058866,
+        0.08760930299467873,
+        0.08778767199692084
+      ],
+      "simulated_seconds": [
+        0.009999990463256836,
+        0.009999990463256836
+      ],
+      "repeats": 3
+    }
+  ],
+  "mixed_gpu": [
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-1",
+      "groups": 9,
+      "worlds": 9,
+      "worlds_per_group": 1,
+      "eps": 50.8068821631173,
+      "geometry_checked_worlds_per_group": 1,
+      "geometry_all_worlds_checked": true,
+      "batch_step_ms": 177.14135599002475,
+      "per_environment_realtime": 0.0005645209129235255,
+      "device_memory_MiB": 1714,
+      "mempool_peak_MiB": 52.09346008300781,
+      "peak_contacts": 459,
+      "peak_iterations": 27,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-1024",
+      "groups": 9,
+      "worlds": 9216,
+      "worlds_per_group": 1024,
+      "eps": 13585.478607311212,
+      "geometry_checked_worlds_per_group": 1024,
+      "geometry_all_worlds_checked": true,
+      "batch_step_ms": 678.3713895099936,
+      "per_environment_realtime": 0.00014741187724947062,
+      "device_memory_MiB": 12156,
+      "mempool_peak_MiB": 10507.508218765259,
+      "peak_contacts": 462441,
+      "peak_iterations": 34,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-128",
+      "groups": 9,
+      "worlds": 1152,
+      "worlds_per_group": 128,
+      "eps": 3892.176417483285,
+      "geometry_checked_worlds_per_group": 128,
+      "geometry_all_worlds_checked": true,
+      "batch_step_ms": 295.97836182998435,
+      "per_environment_realtime": 0.0003378625362398685,
+      "device_memory_MiB": 3004,
+      "mempool_peak_MiB": 1350.0851230621338,
+      "peak_contacts": 57902,
+      "peak_iterations": 33,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-2048",
+      "groups": 9,
+      "worlds": 18432,
+      "worlds_per_group": 2048,
+      "eps": 14753.138826322109,
+      "geometry_checked_worlds_per_group": 8,
+      "geometry_all_worlds_checked": false,
+      "batch_step_ms": 1249.3612523400225,
+      "per_environment_realtime": 8.004090075044548e-05,
+      "device_memory_MiB": 22620,
+      "mempool_peak_MiB": 20973.13419532776,
+      "peak_contacts": 924280,
+      "peak_iterations": 37,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-32",
+      "groups": 9,
+      "worlds": 288,
+      "worlds_per_group": 32,
+      "eps": 1095.5372411425772,
+      "geometry_checked_worlds_per_group": 32,
+      "geometry_all_worlds_checked": true,
+      "batch_step_ms": 262.88471919004223,
+      "per_environment_realtime": 0.00038039487539672824,
+      "device_memory_MiB": 2008,
+      "mempool_peak_MiB": 368.93222999572754,
+      "peak_contacts": 14546,
+      "peak_iterations": 33,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-512",
+      "groups": 9,
+      "worlds": 4608,
+      "worlds_per_group": 512,
+      "eps": 9890.72226978958,
+      "geometry_checked_worlds_per_group": 512,
+      "geometry_all_worlds_checked": true,
+      "batch_step_ms": 465.891152769982,
+      "per_environment_realtime": 0.00021464241036869746,
+      "device_memory_MiB": 6908,
+      "mempool_peak_MiB": 5274.694742202759,
+      "peak_contacts": 231157,
+      "peak_iterations": 34,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-per-group-8",
+      "groups": 9,
+      "worlds": 72,
+      "worlds_per_group": 8,
+      "eps": 309.46250172034513,
+      "geometry_checked_worlds_per_group": 8,
+      "geometry_all_worlds_checked": true,
+      "batch_step_ms": 232.66146818998095,
+      "per_environment_realtime": 0.000429809030167146,
+      "device_memory_MiB": 1784,
+      "mempool_peak_MiB": 123.64425086975098,
+      "peak_contacts": 3581,
+      "peak_iterations": 28,
+      "numerically_valid": true,
+      "physically_valid": false
+    },
+    {
+      "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/mixed/mixed-refine-per-group-2560",
+      "groups": 9,
+      "worlds": 23040,
+      "worlds_per_group": 2560,
+      "eps": 15821.586937144295,
+      "geometry_checked_worlds_per_group": 8,
+      "geometry_all_worlds_checked": false,
+      "batch_step_ms": 1456.2382453500322,
+      "per_environment_realtime": 6.867008219246657e-05,
+      "device_memory_MiB": 27868,
+      "mempool_peak_MiB": 26205.94669532776,
+      "peak_contacts": 1155668,
+      "peak_iterations": 37,
+      "numerically_valid": true,
+      "physically_valid": false
+    }
+  ],
+  "trial_batches": [
+    {
+      "batch": 0,
+      "indices": [
+        0,
+        1,
+        2
+      ],
+      "wall_s": 2562.360453755995,
+      "successes": 0
+    },
+    {
+      "batch": 1,
+      "indices": [
+        3,
+        4,
+        5
+      ],
+      "wall_s": 663.0721559469966,
+      "successes": 0
+    },
+    {
+      "batch": 2,
+      "indices": [
+        6,
+        7,
+        8
+      ],
+      "wall_s": 643.702705642012,
+      "successes": 0
+    }
+  ],
+  "capacity": {
+    "max_loaded_worlds": 32768,
+    "max_finite_zero_overflow_worlds": 8192,
+    "max_numerically_valid_worlds": 8192,
+    "max_physically_valid_worlds": 8192,
+    "contact_loaded_max_physically_valid_worlds": 8192,
+    "loaded_grasp_max_physically_valid_worlds": null,
+    "bearing_hold_measured": false,
+    "mixed": {
+      "max_complete_loaded_worlds": 34560,
+      "max_numerically_valid_worlds": 23040,
+      "max_physically_valid_worlds": 0
+    },
+    "measured": true
+  },
+  "load_only_capacity": {
+    "single": {
+      "max_loaded_count": 32768,
+      "smallest_failed_count": 40960,
+      "max_loaded_worlds": 32768,
+      "smallest_failed_worlds": 40960,
+      "measurements": [
+        {
+          "count": 16384,
+          "worlds": 16384,
+          "returncode": 0,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/single-16384"
+        },
+        {
+          "count": 32768,
+          "worlds": 32768,
+          "returncode": 0,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/single-32768"
+        },
+        {
+          "count": 65536,
+          "worlds": 65536,
+          "returncode": 1,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/single-65536"
+        },
+        {
+          "count": 49152,
+          "worlds": 49152,
+          "returncode": 1,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/single-49152"
+        },
+        {
+          "count": 40960,
+          "worlds": 40960,
+          "returncode": 1,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/single-40960"
+        }
+      ]
+    },
+    "mixed": {
+      "max_loaded_count": 3840,
+      "smallest_failed_count": 4096,
+      "max_loaded_worlds": 34560,
+      "smallest_failed_worlds": 36864,
+      "measurements": [
+        {
+          "count": 3072,
+          "worlds": 27648,
+          "returncode": 0,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/mixed-3072"
+        },
+        {
+          "count": 4096,
+          "worlds": 36864,
+          "returncode": 1,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/mixed-4096"
+        },
+        {
+          "count": 3584,
+          "worlds": 32256,
+          "returncode": 0,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/mixed-3584"
+        },
+        {
+          "count": 3840,
+          "worlds": 34560,
+          "returncode": 0,
+          "path": "test/runs/2026-11-16/bag/yam-gpu-randomized-ubun-r2/load-only/mixed-3840"
+        }
+      ]
+    }
+  },
+  "status": "recorded",
+  "distinct_executed_parameter_groups": 7,
+  "cpu_trial_timings_s": {
+    "cpu_command_s": 13.972371696811024,
+    "cpu_ik_s": 0.6384800920386624,
+    "cpu_geometry_check_s": 20.40227343809238,
+    "cpu_feedback_s": 352.0803316797719
+  }
+}

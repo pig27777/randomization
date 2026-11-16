@@ -19,6 +19,7 @@
 | 统一YAM平台的侧面捏取适配器（v1.3本体＋松弛绳＋夹持规则），需要平台的可选接近方向，尚未运行 | `side_pinch_adapter.py`、`test_side_pinch_adapter.py` |
 | 自动回归 | `test_*.py` |
 | 既有双膜片纯接触原型，MuJoCo/MJWarp4.0.1 | `physical_parcel_checks.py`、`physical_parcel_benchmark.py`、`physical_parcel_yam.py`；结果见 [主题报告](PHYSICAL_PARCEL_REPORT.md) |
+| 随机内容物、实际袋面抓取与完整YAM GPU容量 | `physical_parcel_randomization.py`、`physical_parcel_yam_benchmark.py`、`run_physical_parcel_gpu_suite.py`；混合驻留 `physical_parcel_mixed_gpu.py`，汇总/分类视频 `summarize_physical_parcel_gpu.py`、`render_physical_parcel_gpu_results.py` |
 
 `deadline_watch.py` 是旧 F6/F7 批次的期限看守，只服务其历史 manifest，不能作为新实验的通用启动器。旧脚本里的期限、阈值和动作不因目录整理而改变。
 

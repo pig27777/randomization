@@ -1,0 +1,169 @@
+{
+  "config": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.3843450005809963,
+      0.28714028024835814
+    ],
+    "payload_size": [
+      0.08895351191921261,
+      0.05408295819915284,
+      0.017729053905118617
+    ],
+    "payload_mass": 0.07016890271885855,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "payload_shape": "box",
+    "payload_euler": [
+      0.11105627012197475,
+      0.011497136434582417,
+      -2.1944731293572426
+    ],
+    "payload_offset": [
+      0.011471098001621122,
+      0.009571145326145052,
+      -0.0006718322904371461
+    ],
+    "density_gradient": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_friction": 0.5536307975504784,
+    "mode": "bendable",
+    "areal_mass": 0.06988717568937035,
+    "membrane": 1744.8521532781874,
+    "poisson": 0.33483468833694435,
+    "bending": 9.344033936003715e-07,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.5807846211365449,
+    "material_thickness": 7.553653309412812e-05,
+    "rayleigh": 0.0004882428782127192,
+    "radius": 0.00025,
+    "friction": 0.5691836986092171,
+    "joint_stiffness": 0.027412819389573715,
+    "joint_damping": 0.00039805284707174394,
+    "compression_k1": 2007.4911103722984,
+    "compression_k2": 1959789.8524201342,
+    "compression_damping": 2.737279661698307,
+    "timestep": 0.0001,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      -0.25,
+      0.04
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere"
+  },
+  "geometry": {
+    "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+    "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+    "vertices": 142,
+    "triangles": 280,
+    "edges": 420,
+    "reference_area_m2": 0.22072186235776525,
+    "film_mass_kg": 0.015425627573082166,
+    "min_reference_edge_m": 0.03843450005809962,
+    "max_reference_edge_m": 0.05621258292614231,
+    "preparation": {
+      "maximum_edge_strain": 0.007435000778199585,
+      "minimum_wall_gap_m": 0.006310312660325949,
+      "method": "generic front/back plateau + projections + wall gap",
+      "box_face_clearance": true,
+      "payload_intersecting_triangles": 0,
+      "payload_corner_winding": [
+        0.9999999999999994,
+        1.0000000000000009,
+        1.0,
+        1.0000000000000007,
+        1.0000000000000002,
+        1.0000000000000007,
+        1.0000000000000002,
+        0.9999999999999994
+      ]
+    }
+  },
+  "nq": 435,
+  "nv": 434,
+  "neq": 0,
+  "payload_collision": "native convex mesh, exact eight-vertex boxes",
+  "payload_components": [
+    {
+      "body": "payload_0",
+      "mass_kg": 0.023389634239619515,
+      "com_local_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "principal_inertia_kg_m2": [
+        6.313809015588665e-06,
+        2.3263160107323336e-06,
+        7.414822578590588e-06
+      ],
+      "principal_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body": "payload_1",
+      "mass_kg": 0.023389634239619515,
+      "com_local_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "principal_inertia_kg_m2": [
+        6.313809015588665e-06,
+        2.3263160107323336e-06,
+        7.414822578590588e-06
+      ],
+      "principal_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body": "payload_2",
+      "mass_kg": 0.023389634239619515,
+      "com_local_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "principal_inertia_kg_m2": [
+        6.313809015588665e-06,
+        2.3263160107323336e-06,
+        7.414822578590588e-06
+      ],
+      "principal_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "bending": "reference dihedral energy, existing bag_model gradient",
+  "compression_axis": "segment-local -z",
+  "bag_profile": {
+    "name": "pe",
+    "source_sha256": "8c5207c4e60ff392aa523763fdc6bc8d66e87f0ef39f0e907390fa71d67acc3d",
+    "cushion": false
+  }
+}

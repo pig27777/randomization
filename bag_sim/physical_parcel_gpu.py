@@ -4,6 +4,7 @@ One Batch owns one fixed reference/material group. reset() changes supported
 per-world parameters and state without recompiling MJCF or changing topology.
 """
 from dataclasses import fields
+import time
 import numpy as np
 import mujoco_warp as mjw
 import warp as wp
@@ -88,13 +89,13 @@ def configure(seed: int, episode: int, randomize: bool,
               base_k: wp.array(dtype=float), base_damping: wp.array(dtype=float),
               mass: wp.array2d(dtype=float), inertia: wp.array2d(dtype=wp.vec3),
               stiffness: wp.array2d(dtype=float), damping: wp.array2d(dtype=float),
-              friction: wp.array2d(dtype=wp.vec3), base_mu: float,
+              friction: wp.array2d(dtype=wp.vec3), base_mu: float, base_table_mu: float,
               parameters: wp.array2d(dtype=float)):
     world=wp.tid()
     rng=wp.rand_init(seed,world+episode*parameters.shape[0])
     scale=float(1.0)
     payload_mu=base_mu
-    table_mu=base_mu
+    table_mu=base_table_mu
     kscale=float(1.0)
     dscale=float(1.0)
     cscale=float(1.0)
@@ -152,7 +153,7 @@ def contact_health(nacon: wp.array(dtype=int), worldid: wp.array(dtype=int), dis
 
 class Batch:
     def __init__(self, nworld, cfg=Config(), *, seed=7, randomize=True, device="cuda:0",
-                 contact_capacity=256, constraint_capacity=1024):
+                 contact_capacity=256, constraint_capacity=1024, parcel=None, model=None, data=None):
         if not isinstance(nworld,int) or nworld<1:
             raise ValueError("nworld must be a positive integer")
         self.nworld=nworld
@@ -160,57 +161,88 @@ class Batch:
         self.seed=seed
         self.randomize=randomize
         self.device=device
-        self.parcel=Parcel(cfg)
+        started=time.perf_counter()
+        self.parcel=Parcel(cfg) if parcel is None else parcel
+        self.setup_timing=dict(cpu_parcel_compile_s=time.perf_counter()-started)
         p=self.parcel
+        cpu_m = p.m if model is None else model
+        cpu_d = p.d if data is None else data
+        self.cpu_model, self.cpu_data = cpu_m, cpu_d
         self.episode=0
         with wp.ScopedDevice(device):
             # Mass/inertia changes also require per-world set_const outputs.
             sizes={field.name:nworld for field in fields(mjw.Model)
                    if getattr(field.type,'shape',())[0:1]==('*',)}
-            self.m=mjw.put_model(p.m,batch_sizes=sizes)
-            self.d=mjw.put_data(p.m,p.d,nworld=nworld,nconmax=contact_capacity,
+            begin=time.perf_counter()
+            self.m=mjw.put_model(cpu_m,batch_sizes=sizes)
+            wp.synchronize()
+            self.setup_timing['model_upload_s']=time.perf_counter()-begin
+            begin=time.perf_counter()
+            self.d=mjw.put_data(cpu_m,cpu_d,nworld=nworld,nconmax=contact_capacity,
                                 naconmax=contact_capacity*nworld,njmax=constraint_capacity)
+            wp.synchronize()
+            self.setup_timing['data_upload_allocation_s']=time.perf_counter()-begin
+            begin=time.perf_counter()
             self.hinges=wp.array(p.hinges,dtype=wp.vec4i)
             self.rest=wp.array(p.rest_angles,dtype=float)
             self.k=wp.array(p.hinge_stiffness,dtype=float)
             self.c=wp.array(p.hinge_damping,dtype=float)
             self.dofs=wp.array(p.film_dofs[:,0],dtype=int)
-            self.cq=wp.array(p.m.jnt_qposadr[p.compression_joints],dtype=int)
-            self.cv=wp.array(p.m.jnt_dofadr[p.compression_joints],dtype=int)
-            self.initial=wp.array(p.d.qpos,dtype=float)
+            self.cq=wp.array(cpu_m.jnt_qposadr[p.compression_joints],dtype=int)
+            self.cv=wp.array(cpu_m.jnt_dofadr[p.compression_joints],dtype=int)
+            self.initial=wp.array(cpu_d.qpos,dtype=float)
+            self.initial_velocity=wp.array(cpu_d.qvel,dtype=float)
+            self.initial_control=wp.array(cpu_d.ctrl,dtype=float)
             self.payload_bodies=wp.array(p.payload_bodies,dtype=int)
-            self.payload_geoms=wp.array([g for g in range(p.m.ngeom) if p.m.geom_bodyid[g] in p.payload_bodies],dtype=int)
-            joints=np.array([j for j in range(p.m.njnt) if p.m.joint(j).name.startswith('bend_')],dtype=int)
+            self.payload_geoms=wp.array([g for g in range(cpu_m.ngeom) if cpu_m.geom_bodyid[g] in p.payload_bodies],dtype=int)
+            joints=np.array([j for j in range(cpu_m.njnt) if cpu_m.joint(j).name.startswith('bend_')],dtype=int)
             self.bend_joints=wp.array(joints,dtype=int)
-            self.bend_dofs=wp.array(p.m.jnt_dofadr[joints],dtype=int)
-            self.base_mass=wp.array(p.m.body_mass,dtype=float)
-            self.base_inertia=wp.array(p.m.body_inertia,dtype=wp.vec3)
-            self.base_k=wp.array(p.m.jnt_stiffness,dtype=float)
-            self.base_damping=wp.array(p.m.dof_damping,dtype=float)
+            self.bend_dofs=wp.array(cpu_m.jnt_dofadr[joints],dtype=int)
+            self.base_mass=wp.array(cpu_m.body_mass,dtype=float)
+            self.base_inertia=wp.array(cpu_m.body_inertia,dtype=wp.vec3)
+            self.base_k=wp.array(cpu_m.jnt_stiffness,dtype=float)
+            self.base_damping=wp.array(cpu_m.dof_damping,dtype=float)
             self.parameters=wp.zeros((nworld,6),dtype=float)
             self.bits=wp.zeros(nworld,dtype=int)
             self.invalid=wp.zeros(nworld,dtype=int)
             self.peak_iterations=wp.zeros(nworld,dtype=int)
             self.contact_counts=wp.zeros(nworld,dtype=int)
             self.peak_penetration=wp.zeros(nworld,dtype=float)
+            wp.synchronize()
+            self.setup_timing['custom_arrays_upload_s']=time.perf_counter()-begin
+            begin=time.perf_counter()
             self.reset()
+            wp.synchronize()
+            self.setup_timing['first_reset_and_kernel_compile_s']=time.perf_counter()-begin
 
-    def reset(self, *, initial_qpos=None):
+    def reset(self, *, initial_qpos=None, initial_qvel=None, initial_ctrl=None):
         with wp.ScopedDevice(self.device):
+            # Clear native contacts, overflow and solver caches as well as state.
+            mjw.reset_data(self.m,self.d)
             if initial_qpos is not None:
                 value=np.asarray(initial_qpos)
-                if value.shape!=(self.parcel.m.nq,) or not np.isfinite(value).all():
+                if value.shape!=(self.cpu_model.nq,) or not np.isfinite(value).all():
                     raise ValueError("initial_qpos has an invalid shape or nonfinite values")
                 self.initial.assign(value)
             wp.launch(reset_state,self.d.qpos.shape,[self.initial,self.d.qpos])
-            self.d.qvel.zero_()
+            for value, target, count in ((initial_qvel,self.initial_velocity,self.cpu_model.nv),
+                                         (initial_ctrl,self.initial_control,self.cpu_model.nu)):
+                if value is not None:
+                    value=np.asarray(value)
+                    if value.shape!=(count,) or not np.isfinite(value).all():
+                        raise ValueError("reset state has invalid dimensions or nonfinite values")
+                    target.assign(value)
+            wp.launch(reset_state,self.d.qvel.shape,[self.initial_velocity,self.d.qvel])
+            if self.cpu_model.nu:
+                wp.launch(reset_state,self.d.ctrl.shape,[self.initial_control,self.d.ctrl])
             self.d.qacc_warmstart.zero_()
             self.d.time.zero_()
             wp.launch(configure,self.nworld,[self.seed,self.episode,self.randomize,
                       self.payload_bodies,self.payload_geoms,self.bend_joints,self.bend_dofs,
-                      self.parcel.m.geom('table').id,self.base_mass,self.base_inertia,self.base_k,self.base_damping,
+                      self.cpu_model.geom('table').id,self.base_mass,self.base_inertia,self.base_k,self.base_damping,
                       self.m.body_mass,self.m.body_inertia,self.m.jnt_stiffness,self.m.dof_damping,
-                      self.m.geom_friction,self.cfg.friction,self.parameters])
+                      self.m.geom_friction,float(self.cpu_model.geom_friction[int(self.payload_geoms.numpy()[0]),0]),
+                      float(self.cpu_model.geom_friction[self.cpu_model.geom('table').id,0]),self.parameters])
             mjw.set_const(self.m,self.d)
             self.bits.zero_()
             self.invalid.zero_()

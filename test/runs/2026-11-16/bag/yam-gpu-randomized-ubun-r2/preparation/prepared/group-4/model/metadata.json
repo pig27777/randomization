@@ -1,0 +1,169 @@
+{
+  "config": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.31981339542417075,
+      0.2351480119365979
+    ],
+    "payload_size": [
+      0.11763487524016086,
+      0.056564477006928265,
+      0.022837699189517176
+    ],
+    "payload_mass": 0.018677502447603623,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "payload_shape": "box",
+    "payload_euler": [
+      0.11465327008220033,
+      0.06901394251415882,
+      0.9606914227933823
+    ],
+    "payload_offset": [
+      0.0011736090646181224,
+      -0.011237349609750875,
+      0.0008050344755718497
+    ],
+    "density_gradient": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_friction": 0.6975670959757633,
+    "mode": "bendable",
+    "areal_mass": 0.13518025621138627,
+    "membrane": 416114.11201807193,
+    "poisson": 0.30483282216614876,
+    "bending": 0.0011667686377958692,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.45232465820669937,
+    "material_thickness": 0.00017470238739441792,
+    "rayleigh": 0.0004732698316475748,
+    "radius": 0.00035,
+    "friction": 0.5176329335993353,
+    "joint_stiffness": 0.030041056645181172,
+    "joint_damping": 0.0002075844438141327,
+    "compression_k1": 1989.723130743816,
+    "compression_k2": 1937821.8707241795,
+    "compression_damping": 0.7300474853694672,
+    "timestep": 0.0001,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      -0.25,
+      0.04
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere"
+  },
+  "geometry": {
+    "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+    "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+    "vertices": 142,
+    "triangles": 280,
+    "edges": 420,
+    "reference_area_m2": 0.1504069682493736,
+    "film_mass_kg": 0.02033205250392816,
+    "min_reference_edge_m": 0.03198133954241705,
+    "max_reference_edge_m": 0.046381753402357,
+    "preparation": {
+      "maximum_edge_strain": 0.02374922070589469,
+      "minimum_wall_gap_m": 0.010645606440867431,
+      "method": "generic front/back plateau + projections + wall gap",
+      "box_face_clearance": true,
+      "payload_intersecting_triangles": 0,
+      "payload_corner_winding": [
+        1.0,
+        1.0,
+        1.0,
+        1.0000000000000002,
+        1.0,
+        1.0,
+        1.0000000000000002,
+        1.0
+      ]
+    }
+  },
+  "nq": 435,
+  "nv": 434,
+  "neq": 0,
+  "payload_collision": "native convex mesh, exact eight-vertex boxes",
+  "payload_components": [
+    {
+      "body": "payload_0",
+      "mass_kg": 0.006225834149201207,
+      "com_local_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "principal_inertia_kg_m2": [
+        1.9305795799868962e-06,
+        1.0683075075904703e-06,
+        2.4576955545166655e-06
+      ],
+      "principal_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body": "payload_1",
+      "mass_kg": 0.006225834149201207,
+      "com_local_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "principal_inertia_kg_m2": [
+        1.9305795799868962e-06,
+        1.0683075075904703e-06,
+        2.4576955545166655e-06
+      ],
+      "principal_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "body": "payload_2",
+      "mass_kg": 0.006225834149201207,
+      "com_local_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "principal_inertia_kg_m2": [
+        1.9305795799868962e-06,
+        1.0683075075904703e-06,
+        2.4576955545166655e-06
+      ],
+      "principal_quaternion": [
+        1.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "bending": "reference dihedral energy, existing bag_model gradient",
+  "compression_axis": "segment-local -z",
+  "bag_profile": {
+    "name": "kraft",
+    "source_sha256": "2666250a21b59fdc3630c06a1186daca74945edae46009c398f786c250996a70",
+    "cushion": false
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-16T22:04:01.788132+08:00",
+  "machine": "ubun",
+  "seed": 20261116,
+  "geometry": "geometry/kraft_edge_sealed_35.npz",
+  "surface_regions": [
+    "top",
+    "edge",
+    "corner",
+    "side"
+  ],
+  "profiles": [
+    "kraft",
+    "pe",
+    "bubble"
+  ],
+  "archetypes": [
+    "rigid-box",
+    "rigid-sphere",
+    "rigid-cylinder",
+    "rigid-capsule",
+    "bendable-box",
+    "compressible-box"
+  ],
+  "small_trials": 9,
+  "timing_repeats": 3,
+  "worlds": [
+    1,
+    8,
+    32,
+    128,
+    512,
+    1024,
+    2048,
+    4096,
+    8192
+  ],
+  "geometry_tolerance_m": 0.001,
+  "finite_required": true,
+  "overflow_required": 0,
+  "notes": "Geometry/material compilation groups explicitly recorded. Stop geometric growth at first memory boundary, then at most two refinements. Preserve original shared protocol and drive limits."
+}

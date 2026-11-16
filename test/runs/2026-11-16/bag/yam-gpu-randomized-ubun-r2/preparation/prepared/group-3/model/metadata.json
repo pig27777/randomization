@@ -1,0 +1,129 @@
+{
+  "config": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.3351240552802553,
+      0.23843549057309454
+    ],
+    "payload_size": [
+      0.10305851846097146,
+      0.03953629504753294,
+      0.03953629504753294
+    ],
+    "payload_mass": 0.03405935643027601,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "payload_shape": "capsule",
+    "payload_euler": [
+      -0.024244526751438414,
+      -0.018836363814183105,
+      -0.20477462590660833
+    ],
+    "payload_offset": [
+      0.008960675086371963,
+      -0.0002197412769001858,
+      0.0008458067547110265
+    ],
+    "density_gradient": [
+      -0.0005122642717535209,
+      0.06799570760333398,
+      0.16320426741639799
+    ],
+    "payload_friction": 0.3620596964783168,
+    "mode": "rigid",
+    "areal_mass": 0.09166027372180448,
+    "membrane": 409256.0917743829,
+    "poisson": 0.28452122195241436,
+    "bending": 0.0004155967770682982,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.5415986005310721,
+    "material_thickness": 0.00010582740633803161,
+    "rayleigh": 0.00037435004765876915,
+    "radius": 0.00035,
+    "friction": 0.6452396240623481,
+    "joint_stiffness": 0.06514541452828612,
+    "joint_damping": 0.0009605713444530309,
+    "compression_k1": 756.7116646976023,
+    "compression_k2": 355833.3811266216,
+    "compression_damping": 1.253052980404764,
+    "timestep": 0.0001,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      -0.25,
+      0.04
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere"
+  },
+  "geometry": {
+    "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+    "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+    "vertices": 142,
+    "triangles": 280,
+    "edges": 420,
+    "reference_area_m2": 0.15981093704718508,
+    "film_mass_kg": 0.014648314233483044,
+    "min_reference_edge_m": 0.03351240552802548,
+    "max_reference_edge_m": 0.04778405251312974,
+    "preparation": {
+      "maximum_edge_strain": 0.018486582948270658,
+      "minimum_wall_gap_m": 0.01362985039891703,
+      "method": "generic front/back plateau + projections + wall gap",
+      "box_face_clearance": true,
+      "payload_intersecting_triangles": 0,
+      "payload_corner_winding": [
+        1.0,
+        1.0,
+        1.0000000000000002,
+        1.0000000000000002,
+        1.0000000000000002,
+        1.0,
+        1.0,
+        1.0000000000000002
+      ]
+    }
+  },
+  "nq": 433,
+  "nv": 432,
+  "neq": 0,
+  "payload_collision": "native capsule",
+  "payload_components": [
+    {
+      "body": "payload_0",
+      "mass_kg": 0.03405935643027601,
+      "com_local_m": [
+        -6.9040164859245295e-06,
+        0.0003163284887937235,
+        0.000759256151545433
+      ],
+      "principal_inertia_kg_m2": [
+        2.678591441310405e-05,
+        2.6762872111702373e-05,
+        6.241498114918577e-06
+      ],
+      "principal_quaternion": [
+        0.13866340849471703,
+        0.69337417891253,
+        0.13866471392311752,
+        0.6933807065924363
+      ]
+    }
+  ],
+  "bending": "reference dihedral energy, existing bag_model gradient",
+  "compression_axis": "segment-local -z",
+  "bag_profile": {
+    "name": "kraft",
+    "source_sha256": "2666250a21b59fdc3630c06a1186daca74945edae46009c398f786c250996a70",
+    "cushion": false
+  }
+}

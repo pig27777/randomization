@@ -1,0 +1,46 @@
+test_bending_internal_force_and_torque (test_physical_parcel.PhysicalParcelTests.test_bending_internal_force_and_torque) ... ok
+test_close_side_start_rejects_initial_robot_overlap (test_physical_parcel.PhysicalParcelTests.test_close_side_start_rejects_initial_robot_overlap) ... ok
+test_edge_sealed_variant_has_shared_outer_perimeter (test_physical_parcel.PhysicalParcelTests.test_edge_sealed_variant_has_shared_outer_perimeter) ... ok
+test_existing_topology_and_positive_mass (test_physical_parcel.PhysicalParcelTests.test_existing_topology_and_positive_mass) ... ok
+test_forward_matches_step_reactions_without_advancing (test_physical_parcel.PhysicalParcelTests.test_forward_matches_step_reactions_without_advancing) ... ok
+test_initial_triangles_enclose_payload (test_physical_parcel.PhysicalParcelTests.test_initial_triangles_enclose_payload) ... ok
+test_material_parameters_are_correlated (test_physical_parcel.PhysicalParcelTests.test_material_parameters_are_correlated) ... ok
+test_payload_convex_shape_and_triangle_face_contact (test_physical_parcel.PhysicalParcelTests.test_payload_convex_shape_and_triangle_face_contact) ... WARNING: flex 'crossing_triangle' is not rigid and has no equality constraints or passive forces
+Element name 'crossing_triangle', id 0
+
+ok
+test_payload_mass_and_torque (test_physical_parcel.PhysicalParcelTests.test_payload_mass_and_torque) ... ok
+test_prepared_state_roundtrip_preserves_parcel_state (test_physical_parcel.PhysicalParcelTests.test_prepared_state_roundtrip_preserves_parcel_state) ... ok
+test_raised_side_grasp_initial_state (test_physical_parcel.PhysicalParcelTests.test_raised_side_grasp_initial_state) ... ok
+test_reference_geometry_is_independent (test_physical_parcel.PhysicalParcelTests.test_reference_geometry_is_independent) ... ok
+test_side_grasp_config_validation (test_physical_parcel.PhysicalParcelTests.test_side_grasp_config_validation) ... ok
+test_triangle_crossing_is_detected_with_exterior_vertices (test_physical_parcel.PhysicalParcelTests.test_triangle_crossing_is_detected_with_exterior_vertices) ... ok
+test_unilateral_compression (test_physical_parcel.PhysicalParcelTests.test_unilateral_compression) ... ok
+test_unresolved_bending_step_is_rejected (test_physical_parcel.PhysicalParcelTests.test_unresolved_bending_step_is_rejected) ... ok
+test_density_gradient_inertia_matches_volume_integral (test_physical_parcel_randomization.RandomizationTests.test_density_gradient_inertia_matches_volume_integral) ... ok
+test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) ... 
+  test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='box', mode='compressible') ... ERROR
+test_invalid_shapes_and_density_are_rejected (test_physical_parcel_randomization.RandomizationTests.test_invalid_shapes_and_density_are_rejected) ... ok
+test_material_overrides_and_seed_are_applied (test_physical_parcel_randomization.RandomizationTests.test_material_overrides_and_seed_are_applied) ... ok
+
+======================================================================
+ERROR: test_each_shape_and_mode_initializes_without_geometric_penetration (test_physical_parcel_randomization.RandomizationTests.test_each_shape_and_mode_initializes_without_geometric_penetration) (shape='box', mode='compressible')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/test_physical_parcel_randomization.py", line 31, in test_each_shape_and_mode_initializes_without_geometric_penetration
+    p,_=parcel_world(cfg)
+        ^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/test/bag_model/physical_parcel_yam.py", line 160, in parcel_world
+    p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/bag_sim/physical_parcel.py", line 272, in __init__
+    self.envelope = load_envelope(cfg)
+                    ^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-latest/bag_sim/physical_parcel.py", line 169, in load_envelope
+    raise ValueError(f"initial film strain exceeds 5%: {preparation}")
+ValueError: initial film strain exceeds 5%: {'maximum_edge_strain': 0.05718183468417204, 'minimum_wall_gap_m': 0.027977379130144805, 'method': 'generic front/back plateau + projections + wall gap', 'box_face_clearance': True}
+
+----------------------------------------------------------------------
+Ran 20 tests in 8.015s
+
+FAILED (errors=1)
