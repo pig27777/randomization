@@ -15,7 +15,7 @@ import numpy as np
 
 from .bag_model import _topology, dihedrals
 from .legacy.contents import normalize_contents
-from .wrap import wrap_generic
+from .wrap import triangle_box_intersections, winding_number, wrap_generic
 
 HERE = Path(__file__).resolve().parent
 
@@ -129,9 +129,17 @@ def load_envelope(cfg):
     item = normalize_contents([dict(shape="box", size_m=list(cfg.payload_size),
                                     mass_kg=cfg.payload_mass)])[0]
     current, preparation = wrap_generic(reference, reference.copy(), faces, panels,
-                                         [0], [3], item, cfg.radius)
+                                         [0], [3], item, cfg.radius, box_face_clearance=True)
     if preparation["maximum_edge_strain"] > 0.05:
         raise ValueError(f"initial film strain exceeds 5%: {preparation}")
+    half = np.asarray(cfg.payload_size) / 2
+    corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]) * half
+    winding = winding_number(current, faces, corners + item["position"])
+    intersections = triangle_box_intersections(current, faces, half, item["position"])
+    preparation.update(payload_intersecting_triangles=int(intersections.sum()),
+                       payload_corner_winding=winding.tolist())
+    if intersections.any() or np.any(np.abs(winding) < 0.5):
+        raise ValueError(f"initial film does not enclose the payload without intersection: {preparation}")
     shift = np.array([*cfg.center, 0.0])
     reference += shift
     current += shift
@@ -158,6 +166,8 @@ def payload_xml(cfg, origin):
     segment = np.array([length / count, width, height])
     mass = cfg.payload_mass / count
     output = []
+    assets = []
+    corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
     for index in range(count):
         pos = np.array(origin) + [-length / 2 + segment[0] / 2, 0, 0] if index == 0 else [segment[0], 0, 0]
         output.append(f'<body name="payload_{index}" pos="{vec(pos)}">')
@@ -173,21 +183,25 @@ def payload_xml(cfg, origin):
         core_z = -0.35 * height if compressible else 0.0
         inertia = cfg.payload_inertia if cfg.payload_inertia is not None else box_inertia(core_mass, core_size)
         com = cfg.payload_com if count == 1 else (0, 0, core_z)
+        # The 4.0.1 box/triangle primitive misses edge/face crossings. An exact
+        # eight-vertex box uses the complete native convex collision path.
+        assets.append(f'<mesh name="payload_box_{index}" vertex="{vec(corners * core_size/2)}"/>')
         output.append(f'<inertial pos="{vec(com)}" mass="{core_mass}" diaginertia="{vec(inertia)}"/>')
-        output.append(f'<geom name="payload_geom_{index}" type="box" pos="0 0 {core_z}" '
-                      f'size="{vec(core_size/2)}" contype="8" conaffinity="2" rgba=".85 .50 .20 1"/>')
+        output.append(f'<geom name="payload_geom_{index}" type="mesh" pos="0 0 {core_z}" '
+                      f'mesh="payload_box_{index}" contype="8" conaffinity="2" rgba=".85 .50 .20 1"/>')
         if compressible:
             plate_size = np.array([segment[0], width, min(0.002, height * 0.1)])
+            assets.append(f'<mesh name="plate_box_{index}" vertex="{vec(corners * plate_size/2)}"/>')
             output.append(f'<body name="plate_{index}" pos="0 0 {(height-plate_size[2])/2}">'
                           f'<joint name="compression_{index}" type="slide" axis="0 0 -1" '
                           f'range="0 {height*0.5-plate_size[2]}" solreflimit="{cfg.contact_time} 1" '
                           'solimplimit=".999 .999 .001"/>'
                           f'<inertial pos="0 0 0" mass="{mass*.1}" '
                           f'diaginertia="{vec(box_inertia(mass*.1,plate_size))}"/>'
-                          f'<geom name="plate_geom_{index}" type="box" size="{vec(plate_size/2)}" '
+                          f'<geom name="plate_geom_{index}" type="mesh" mesh="plate_box_{index}" '
                           'contype="8" conaffinity="2" rgba=".90 .65 .25 1"/></body>')
     output.extend('</body>' for _ in range(count))
-    return "\n".join(output)
+    return "\n".join(assets), "\n".join(output)
 
 
 def compression_force(delta, velocity, cfg):
@@ -215,6 +229,7 @@ class Parcel:
         if cfg.timestep * omega_bound > 0.2:
             raise ValueError(f"timestep does not resolve explicit film bending; use <= {0.2/omega_bound:.6g} s")
         thickness = cfg.material_thickness
+        payload_assets, payload_bodies = payload_xml(cfg, film['payload_origin'])
         probe_size = {"sphere": ".01", "box": ".01 .01 .01", "capsule": ".006 .01"}[cfg.probe_shape]
         self.xml = f'''<mujoco model="physical_parcel">
           <compiler angle="radian"/>
@@ -223,6 +238,7 @@ class Parcel:
             gravity="{vec(cfg.gravity)}"><flag energy="enable"/></option>
           <default><joint damping="0"/><geom condim="3" friction="{cfg.friction} .005 .0001"
             priority="1" solref="{cfg.contact_time} 1" solimp=".999 .999 .001"/></default>
+          <asset>{payload_assets}</asset>
           <worldbody><light pos="0 0 2"/>
             <geom name="table" type="plane" size="1 1 .05" contype="1" conaffinity="2"/>
             <flexcomp name="bag" type="direct" dim="2" point="{vec(film['reference'])}"
@@ -234,7 +250,7 @@ class Parcel:
                 friction="{cfg.friction} .005 .0001" solref="{cfg.contact_time} 1"
                 solimp=".999 .999 .001" selfcollide="{'auto' if cfg.self_collision else 'none'}"/>
             </flexcomp>
-            {payload_xml(cfg,film['payload_origin'])}
+            {payload_bodies}
             <body name="contact_probe" mocap="true" pos="0 0 1">
               <geom name="contact_probe" type="{cfg.probe_shape}" size="{probe_size}"
                 contype="4" conaffinity="2" rgba=".2 .6 .8 1"/>
@@ -252,6 +268,7 @@ class Parcel:
         self.compression_names = [self.m.joint(j).name for j in self.compression_joints]
         self.metadata = dict(config=asdict(cfg), geometry=film["metadata"],
                              nq=self.m.nq, nv=self.m.nv, neq=self.m.neq,
+                             payload_collision="native convex mesh, exact eight-vertex boxes",
                              bending="reference dihedral energy, existing bag_model gradient",
                              compression_axis="segment-local -z")
 
@@ -309,9 +326,9 @@ class Parcel:
         data = self.d if data is None else data
         mujoco.mj_step1(model, data)
         self.apply_internal(model, data, node_dofs)
-        mujoco.mj_fwdActuation(model, data)
-        mujoco.mj_fwdAcceleration(model, data)
-        mujoco.mj_fwdConstraint(model, data)
+        # The complete acceleration stage also refreshes the discrete effective
+        # metric and constraint references before solving contact reactions.
+        mujoco.mj_forwardSkip(model, data, mujoco.mjtStage.mjSTAGE_VEL, 1)
 
     def com(self):
         return np.average(self.d.xipos[self.payload_bodies], axis=0,

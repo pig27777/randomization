@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / "experience")]
 from bag_sim.physical_parcel import Config as ParcelConfig, Parcel  # noqa: E402
 from yam_platform.protocol import MuJoCoSim, TrialConfig, attach_robot, measure_contacts  # noqa: E402
+from physical_parcel_checks import film_payload_geometry  # noqa: E402
 
 
 @dataclass
@@ -101,7 +102,12 @@ def check_state(sim):
     finite = np.isfinite(sim.d.qpos).all() and np.isfinite(sim.d.qvel).all()
     warning = int(sim.d.warning.number.sum())
     reason = "nonfinite state" if not finite else "native warning" if warning else None
-    return reason, dict(finite=bool(finite), warnings=warning)
+    if reason:
+        return reason, dict(finite=bool(finite), warnings=warning)
+    geometry = film_payload_geometry(sim.m, sim.d, sim.parcel.envelope["faces"])
+    if geometry["geometric_depth_upper_m"] > .001 or geometry["outside_corners"]:
+        reason = "film/payload geometry exceeds 1 mm or exposes a payload corner"
+    return reason, dict(finite=bool(finite), warnings=warning, payload_geometry=geometry)
 
 
 def dimensions(sim):
@@ -120,7 +126,7 @@ def summarize(trace):
 def source_files():
     return {name: ROOT / path for name, path in dict(
         parcel_model="bag_sim/physical_parcel.py", parcel_material="bag_sim/bag_model.py",
-        parcel_wrap="bag_sim/wrap.py").items()}
+        parcel_wrap="bag_sim/wrap.py", parcel_geometry_check="test/bag_model/physical_parcel_checks.py").items()}
 
 
 def save_model(sim, output):

@@ -3,6 +3,7 @@ from dataclasses import replace
 from pathlib import Path
 import sys
 import unittest
+from xml.etree import ElementTree as ET
 
 import mujoco
 import numpy as np
@@ -12,6 +13,7 @@ sys.path.insert(0, str(ROOT))
 import contents  # noqa: E402,F401  (package import must coexist with legacy helpers)
 from bag_sim.physical_parcel import Config, Parcel, material_parameters, compression_force  # noqa: E402
 from bag_sim.bag_model import dihedrals  # noqa: E402
+from bag_sim.wrap import triangle_box_intersections, winding_number  # noqa: E402
 
 
 class PhysicalParcelTests(unittest.TestCase):
@@ -34,6 +36,59 @@ class PhysicalParcelTests(unittest.TestCase):
         rest = mujoco.MjData(p.m)
         p.forward(p.m, rest)
         self.assertLess(np.max(abs(rest.qfrc_passive)), 1e-7)
+
+    def test_initial_triangles_enclose_payload(self):
+        p = self.parcel
+        e = p.envelope
+        half = np.asarray(p.cfg.payload_size) / 2
+        self.assertFalse(triangle_box_intersections(e['current'], e['faces'], half,
+                                                   e['payload_origin']).any())
+        corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]) * half
+        winding = winding_number(e['current'], e['faces'], corners + e['payload_origin'])
+        np.testing.assert_allclose(abs(winding), 1, atol=1e-10)
+        self.assertLessEqual(e['metadata']['preparation']['maximum_edge_strain'], .05)
+
+    def test_triangle_crossing_is_detected_with_exterior_vertices(self):
+        vertices = np.array([[-2., -2., 0.], [2., -2., 0.], [0., 2., 0.]])
+        faces = np.array([[0, 1, 2]])
+        self.assertTrue(np.all(np.max(abs(vertices), axis=1) > 1))
+        self.assertTrue(triangle_box_intersections(vertices, faces, np.ones(3), np.zeros(3))[0])
+        self.assertFalse(triangle_box_intersections(vertices + [0, 0, 2], faces,
+                                                    np.ones(3), np.zeros(3))[0])
+
+    def test_forward_matches_step_reactions_without_advancing(self):
+        p = Parcel()
+        p.d.qpos[p.film_dofs[:, 2]] -= .0004
+        before = p.d.qpos.copy()
+        p.forward()
+        support = p.contacts()['table_support_N']
+        self.assertTrue(np.isfinite(support))
+        self.assertGreater(support, 0)
+        np.testing.assert_array_equal(p.d.qpos, before)
+        self.assertEqual(p.d.time, 0)
+        p.step()
+        self.assertAlmostEqual(p.contacts()['table_support_N'], support, places=8)
+
+    def test_payload_convex_shape_and_triangle_face_contact(self):
+        p = self.parcel
+        g = p.m.geom('payload_geom_0').id
+        self.assertEqual(p.m.geom_type[g], mujoco.mjtGeom.mjGEOM_MESH)
+        signs = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
+        world = (signs * p.m.geom_size[g]) @ p.d.geom_xmat[g].reshape(3, 3).T + p.d.geom_xpos[g]
+        np.testing.assert_allclose(world.max(0) - world.min(0), p.cfg.payload_size, atol=1e-8)
+        root = ET.Element('mujoco')
+        root.append(ET.fromstring(p.xml).find('asset'))
+        body = ET.SubElement(root, 'worldbody')
+        ET.SubElement(body, 'geom', type='mesh', mesh='payload_box_0', contype='8', conaffinity='2')
+        triangle = ET.SubElement(body, 'flexcomp', name='crossing_triangle', type='direct', dim='2',
+                                 point='-.08 -.06 .01 .08 -.06 .01 0 .08 .01',
+                                 element='0 1 2', mass='.01', radius='.0005')
+        ET.SubElement(triangle, 'contact', contype='2', conaffinity='8')
+        model = mujoco.MjModel.from_xml_string(ET.tostring(root, encoding='unicode'))
+        data = mujoco.MjData(model)
+        mujoco.mj_forward(model, data)
+        self.assertGreater(data.ncon, 0)
+        self.assertLess(min(contact.dist for contact in data.contact), -.005)
 
     def test_bending_internal_force_and_torque(self):
         p = self.parcel

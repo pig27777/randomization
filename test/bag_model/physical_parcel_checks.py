@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from bag_sim.physical_parcel import Config, Parcel, compression_force  # noqa: E402
 from bag_sim.bag_model import dihedrals  # noqa: E402
+from bag_sim.wrap import triangle_box_intersections, winding_number  # noqa: E402
 
 
 def serial(value):
@@ -26,7 +27,49 @@ def serial(value):
     raise TypeError(type(value).__name__)
 
 
-def simulate(parcel, seconds, drive=None):
+def film_payload_geometry(m, d, faces):
+    """Audit full triangles independently of the native contact candidate list."""
+    vertices = d.flexvert_xpos.copy()
+    weights = np.array([[i/16, j/16, 1-(i+j)/16] for i in range(17) for j in range(17-i)])
+    signs = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
+    rows = []
+    for geom in range(m.ngeom):
+        name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, geom) or ""
+        if not name.startswith(("payload_geom_", "plate_geom_")):
+            continue
+        center, half = d.geom_xpos[geom], m.geom_size[geom]
+        rotation = d.geom_xmat[geom].reshape(3, 3)
+        intersecting = triangle_box_intersections(vertices, faces, half, center, rotation)
+        winding = winding_number(vertices, faces, (signs * half) @ rotation.T + center)
+        depth = 0.0
+        depth_upper = 0.0
+        if intersecting.any():
+            points = np.einsum("sk,tkj->tsj", weights, vertices[faces[intersecting]])
+            q = np.abs((points - center) @ rotation) - half
+            sdf = np.linalg.norm(np.maximum(q, 0), axis=2) + np.minimum(q.max(axis=2), 0)
+            depth = float(max(0, -sdf.min()))
+            # Intersect successively inset boxes to bound the deepest surface
+            # point. This catches narrow intersections between lattice samples.
+            lower, depth_upper = 0.0, float(half.min())
+            for _ in range(25):
+                middle = (lower + depth_upper) / 2
+                inside = triangle_box_intersections(vertices, faces[intersecting],
+                                                    half - middle, center, rotation)
+                if inside.any():
+                    lower = middle
+                else:
+                    depth_upper = middle
+        rows.append(dict(geom=name, intersecting_triangles=int(intersecting.sum()),
+                         outside_corners=int(np.sum(np.abs(winding) < .5)),
+                         corner_winding=winding.tolist(), sampled_depth_m=depth,
+                         geometric_depth_upper_m=depth_upper))
+    return dict(intersecting_triangles=sum(row["intersecting_triangles"] for row in rows),
+                outside_corners=sum(row["outside_corners"] for row in rows),
+                sampled_depth_m=max(row["sampled_depth_m"] for row in rows),
+                geometric_depth_upper_m=max(row["geometric_depth_upper_m"] for row in rows), boxes=rows)
+
+
+def simulate(parcel, seconds, drive=None, check_geometry=False):
     trace = []
     stride = max(1, round(0.01 / parcel.cfg.timestep))
     peak = 0.0
@@ -43,6 +86,8 @@ def simulate(parcel, seconds, drive=None):
             trace.append(dict(time_s=float(parcel.d.time), com=parcel.com().copy(),
                               energy_native=parcel.d.energy.copy(), bending_energy_J=parcel.bending_energy(),
                               warning=parcel.d.warning.number.copy(), **forces))
+            if check_geometry:
+                trace[-1]["geometry"] = film_payload_geometry(parcel.m, parcel.d, parcel.envelope["faces"])
     return trace, peak
 
 
@@ -67,7 +112,15 @@ def support(cfg, output):
     p = Parcel(cfg)
     p.save(output)
     start = time.perf_counter()
-    trace, peak = simulate(p, 0.3)
+    initial_geometry = film_payload_geometry(p.m, p.d, p.envelope["faces"])
+    trace, peak = simulate(p, 0.3, check_geometry=True)
+    p.forward()
+    final_geometry = film_payload_geometry(p.m, p.d, p.envelope["faces"])
+    geometry = [initial_geometry, *[row["geometry"] for row in trace], final_geometry]
+    max_intersections = max(row["intersecting_triangles"] for row in geometry)
+    max_outside = max(row["outside_corners"] for row in geometry)
+    sampled_depth = max(row["sampled_depth_m"] for row in geometry)
+    depth_upper = max(row["geometric_depth_upper_m"] for row in geometry)
     late = [row for row in trace if row["time_s"] >= 0.2]
     weight = (cfg.payload_mass + p.envelope["masses"].sum()) * 9.81
     mean = float(np.mean([row["table_support_N"] for row in late]))
@@ -77,9 +130,14 @@ def support(cfg, output):
     error = abs(mean - weight) / weight
     np.savez_compressed(output / "final_state.npz", qpos=p.d.qpos, qvel=p.d.qvel)
     (output / "trace.json").write_text(json.dumps(trace, default=serial, indent=2))
-    return dict(passed=bool(error <= 0.05 and penetration <= .001 and bypass == 0 and warnings == 0),
+    return dict(passed=bool(error <= 0.05 and penetration <= .001 and bypass == 0 and warnings == 0
+                            and depth_upper <= .001 and max_outside == 0),
                 support_N=mean, expected_weight_N=weight, relative_balance_error=error,
                 late_peak_penetration_m=penetration, startup_peak_penetration_m=peak,
+                initial_geometry=initial_geometry, final_geometry=final_geometry,
+                max_intersecting_triangles=max_intersections, max_outside_corners=max_outside,
+                peak_sampled_geometric_depth_m=sampled_depth,
+                peak_geometric_depth_upper_m=depth_upper,
                 payload_table_contacts=bypass, warnings=warnings, wall_s=time.perf_counter()-start)
 
 

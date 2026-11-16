@@ -256,4 +256,6 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
 
 新增 `physical_parcel.py` 与 `physical_parcel_gpu.py`，复用 `geometry/kraft_coarse_35.npz`，分开参考材料构型与包裹状态，提供单刚体、三段弯曲及厚度向压缩入口。环境为项目内 MuJoCo/MJWarp4.0.1。当前材料采用未实物标定的薄膜预设，默认25 μs。
 
-底膜支撑和膜节点外力提拉完成。捕获夹具尚未记录到指尖反力，默认步长角动量检查超标，整体物理验收尚未通过。GPU最大已测8192环境、9032.73环境步/s，9216 Graph创建OOM，计时每轮仅1.25 ms仿真。用户要求停止测试，本轮已结束。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-test.md)。
+首轮在用户要求停止后交付报告，随后追加YAM录像。几何复核发现旧初态和受压膜面穿透，已修正三角面初始化、MuJoCo4反力刷新，并将内容物接触改为同形八顶点凸mesh。11项回归和0.3秒静置通过。YAM真实运行到4.46855秒lift阶段，双侧指尖接触丢失而grasp_fail，224次20 ms采样中内容物—膜面相交为0。整体物理验收尚未通过。
+
+旧构型与box路径的GPU最大已测8192环境、9032.73环境步/s，9216 Graph创建OOM，每轮仅1.25 ms仿真；当前凸mesh版本的速度与容量尚未重测。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [首轮检查](../reports/physical-parcel-test.md) · [录像与穿透修复检查](../reports/physical-parcel-yam-video-test.md)。

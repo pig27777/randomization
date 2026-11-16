@@ -1,8 +1,10 @@
 # 既有双膜片袋的纯接触包裹模型
 
-最近整理时间为2026-11-15 17:01（Asia/Taipei）。用户要求停止测试并交付报告，本轮结束。已建立MuJoCo/MJWarp 4.0.1原型，整体物理验收尚未通过。
+最近更新时间为2026-11-16 14:07（Asia/Taipei）。首轮测试在用户要求停止后交付报告，随后按要求追加YAM录像及穿透修复。已建立MuJoCo/MJWarp4.0.1原型，整体物理验收尚未通过。
 
-最大实际完成短窗口检查的规模为8192环境，9216环境在CUDA Graph执行实例创建阶段显存不足。原生接触捕获与完整机械臂抓取尚未验证成功，默认25 μs步长的角动量检查超出本轮1%标准。
+最大实际完成短窗口检查的规模为8192环境，9216环境在CUDA Graph执行实例创建阶段显存不足。原生接触捕获与完整机械臂抓取尚未验证成功，默认25 μs步长的角动量检查超出首轮1%标准。修复后YAM已实际执行到lift，因双侧指尖接触丢失超过50 ms而grasp_fail。
+
+**后续几何复核（用户指出录像画面穿透）**发现此前接触距离没有覆盖全部膜面几何相交。初始膜面采样切入盒子1.2539 mm，40个三角形相交，8个盒角均在包络外；旧0.3秒静置状态采样相交深度达4.1559 mm。原支撑力数值仅保留为力读数记录，几何防穿透通过结论撤回。8192环境速度对应旧初始化工作负载。旧录像已停止。后续已修复初态、反力刷新及box专用碰撞漏检，当前YAM结果与视频见文末。
 
 ## Phase 0 审计与本轮计划
 
@@ -224,7 +226,7 @@ flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B \
 
 flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B \
   test/bag_model/physical_parcel_benchmark.py --worlds 1 32 128 512 --steps 50 --repeats 3 \
-  --initial-state test/runs/2026-11-15/bag/physical-parcel-mj4-support-r1/support/final_state.npz \
+  --initial-state test/runs/2026-11-16/bag/physical-parcel-mj4-face-clearance-r3/support/final_state.npz \
   --output <新目录>
 
 flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B \
@@ -247,3 +249,58 @@ PYTHONPATH=test/bag_model:experience:. flock /tmp/claude-gpu.lock \
 - [1至512测速](../runs/2026-11-15/bag/physical-parcel-mj4-gpu-batch-r1/summary.json)、[1024至4096](../runs/2026-11-15/bag/physical-parcel-mj4-gpu-capacity-r1/summary.json)、[8192](../runs/2026-11-15/bag/physical-parcel-mj4-gpu-capacity-r2/summary.json)、[9216 OOM](../runs/2026-11-15/bag/physical-parcel-mj4-gpu-capacity-r3/failure.json)
 
 早期部分运行只记录源码哈希，后续运行同时保存source快照；YAM入口另保存共享平台源码和机器人资产指纹。各轮结论仅对应该轮记录的配置与源码。
+
+## 用户追加的YAM录像（2026-11-15）
+
+用户在收尾后要求观看本版YAM抓取视频。本轮录制一次真实抓取尝试，复用统一YAM平台与当前双膜片适配器，dt=25 μs、单刚体0.3 kg、bag350×250 mm、pinch_coeff=0、原10 N夹紧目标、原阶段及判据。一次连续运行至平台结果确定，完整保存qpos与关节/接触记录。该录像沿用当前原型的已知限制。
+
+运行目录为 `test/runs/2026-11-15/bag/physical-parcel-mj4-yam-video-r1/trial/`。CPU动力学持共享锁，随后通过共享CPU Mesa渲染器回放，20fps、1倍速、整机与近景并排。编码使用本机已有FFmpeg，图像标签按本机编码能力处理。交付前核对真实停止原因、时长及视频画面。
+
+### 几何穿透修复计划
+
+问题来自包裹初始化只投影顶点，未约束顶点之间的三角面。先在同一存档拓扑、相同参考材料和内容物上修正初始构型，加入膜面与盒体的几何分离及角点包含检查。初态应无三角面进入盒体，8角点在封闭包络内，最大初始边应变维持≤5%。随后仅做单场景短静置，检查几何相交是否重新出现，接触距离阈值仍为1 mm。通过才重新录制一次同协议YAM尝试，失败则保留实际证据并继续定位。
+
+静置复核r1的初态无相交，8角点均在袋内，最大初始边应变0.4861%。0.3秒内盒角始终在袋内，启动20–30 ms附近出现短暂膜面软接触重叠，16等分重心采样最大0.4372 mm，末态无相交。该轮支撑读数0或NaN来自测量刷新遗漏MuJoCo4离散有效度量与约束参考阶段。完整`step2`同状态读到3.1964 N，手工刷新把反力清零。已改用`mj_forwardSkip(..., mjSTAGE_VEL, ...)`完成加速度阶段，保留自定义被动力且不推进状态。这项修复也进入YAM采样刷新。[4.0.1前向流水源码](https://github.com/google-deepmind/mujoco/blob/4.0.1/src/engine/engine_forward.c)
+
+复核r2沿用一次0.3秒静置、10 ms几何采样与1 mm接触预算。初态仍要求零几何相交、8角点全部在袋内、应变≤5%。动态同时记录相交数量、角点包含和几何深度，几何深度用逐步内缩盒体的分离轴相交二分给出上界，避免有限采样漏掉尖窄区域。动态通过要求几何深度上界≤1 mm、盒角始终在袋内、支撑误差≤5%、原生接触距离≤1 mm、无警告与裸物—桌面接触。该几何门槛加入本模型YAM健康检查，超限会保留轨迹并停止。
+
+### 修复后录像计划（2026-11-16 13:40，Asia/Taipei）
+
+用户要求继续。机器ubun，静置复核r2已通过，支撑3.20014 N、平衡误差0.1618%，10 ms采样几何深度上界最大0.5264 mm，8角点均在袋内，末态零相交、无警告，10项单元检查通过。运行一次YAM，路径为 `test/runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r2/`，其余机械臂协议、dt、夹紧目标与物理配置沿用上轮计划。运行到共享平台给出结果或几何健康检查停止，随后回放实际轨迹。若抓取失败，视频和报告保留失败原因。
+
+启动命令如下。
+
+```sh
+PYTHONPATH=test/bag_model:experience:. flock /tmp/claude-gpu.lock \
+  .venv-physical-parcel/bin/python -u -B \
+  test/runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r2/record.py
+```
+
+### 受压相交定位与同形凸体检查计划（2026-11-16）
+
+修复后YAM r2在approach、2.220025秒触发几何停止。13面相交，深度上界3.81558 mm，所有膜顶点仍在盒外，8盒角仍在袋内。原生接触最大距离仅0.2621 mm，当前候选点未覆盖膜面实际相交。4.0.1 `boxTriangle` 专用碰撞路径检查膜顶点与盒角到三角面的距离，缺少完整边—面穿越处理。[上游源码](https://github.com/google-deepmind/mujoco/blob/4.0.1/src/engine/engine_collision_flex.c#L51)
+
+先对同一失败qpos做一次静态碰撞对照，保持盒体形状、质量、惯量与全部膜节点，比较原生box与八顶点同形凸mesh的碰撞候选，检查原始漏碰面是否补全。只有同形表面一致且漏碰面产生有效反力，才将内容物接触切到原生通用凸碰撞路径，再做一次0.3秒静置与一次共享YAM录像。相交阈值、机器人动作和膜参考网格沿用原值。
+
+同形凸mesh静态对照完成，原box漏掉相交面113与224，凸mesh对13个相交面均生成接触，最大原生穿透读数5.0883 mm。编译后的nq均615，几何旋转后的实际盒体尺寸一致。内容物与压板现使用八顶点同形凸mesh，形状、显式质量/惯量、膜拓扑与材料保持该配置定义。新回归检查盒体尺寸与“全部膜顶点在盒外、三角面穿盒”的接触。一开始该小夹具缺少flexcomp名称，修正后11/11通过。
+
+凸mesh静置r3一次0.3秒通过，10 ms采样全程零膜面相交、零角点外露，支撑3.20137 N，误差0.2001%，原生接触启动峰值0.2562 mm、警告0。新录像r3采用同一配置，墙钟上限设7200秒，允许CPU完整执行单次协议，仿真上限仍30秒。动力学不以录像墙钟时间作吞吐结论。目录为 `test/runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/`，启动同r2命令替换路径为r3。
+
+### 最终录像结果（2026-11-16，ubun）
+
+凸mesh YAM r3于仿真4.46855秒、lift阶段结束，结果为`grasp_fail`，原因为双侧指尖接触丢失超过50 ms，内容物留在桌面。墙钟729.29秒，224次20 ms采样，膜面—内容物几何相交和角点外露均0。原生全接触穿透峰值0.25624 mm、平均夹紧力滤波峰值0.84081 N、最大跟踪误差6.88243 mm。指尖实际单侧法向力采样峰值分别1.23506 N与0.57642 N。本轮未实现稳定摩擦承载。
+
+[真实尝试视频](../runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/yam-attempt.mp4)为CPU MuJoCo4.0.1轨迹，Mesa llvmpipe回放，20fps、90帧、4.5秒、1倍速、1280×480双视角。源状态间隔20 ms，画面线性插值。已完整解码并查看首帧和合爪末帧。本机已有编码器缺少drawtext，专用入口省略共享通用3D标签。膜透明度为模型定义的0.8。
+
+穿透来自两处缺陷。旧包裹初始化遗漏三角面约束，受压时box—triangle专用碰撞又漏掉边—面穿越。修复采用三角面分离初始化和同形八顶点凸mesh盒体接触，新增几何检查与碰撞回归。11项单元检查通过，凸mesh静置r3通过。动态结论限于采样时刻和这一配置。当前凸mesh版本的GPU吞吐/容量、其他材料与长期抓取尚未复验，旧8192环境数据对应旧构型和box路径。
+
+- [最终结果与阶段](../runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/trial/result.json) · [视频检查](../runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/video-verification.json)
+- [原生box失败录像](../runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r2/yam-attempt.mp4) · [同状态碰撞对照](../runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r2/collider-diagnosis.json)
+- [凸mesh静置结果](../runs/2026-11-16/bag/physical-parcel-mj4-face-clearance-r3/support.json) · [11项单元日志](../runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r2/unit-checks.log)
+
+录像入口如下，正式运行使用新的输出目录。
+
+```sh
+.venv-physical-parcel/bin/python -B test/bag_model/render_physical_parcel_video.py \
+  <YAM运行目录> <新MP4路径> --ffmpeg <本机已有FFmpeg绝对路径>
+```

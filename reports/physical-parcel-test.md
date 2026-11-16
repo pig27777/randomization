@@ -2,6 +2,8 @@
 
 最近整理时间为2026-11-15 17:01（Asia/Taipei），机器ubun。用户要求停止测试，本轮结束，整体物理验收尚未通过。
 
+**后续复核更正** 用户指出画面穿透后，整面几何检查发现旧初始化有盒角外露和真实相交。下文支撑与GPU数据保留为旧构型记录，原几何防穿透通过结论撤回。初始化、反力测量刷新及录像的后续结果见 [YAM录像检查报告](physical-parcel-yam-video-test.md)。
+
 ## 范围与结果
 
 - 复用原 `kraft_coarse_35.npz`，200顶点、396三角形，建立MuJoCo/MJWarp 4.0.1原型。源码入口为 [physical_parcel.py](../bag_sim/physical_parcel.py) 和 [physical_parcel_gpu.py](../bag_sim/physical_parcel_gpu.py)。

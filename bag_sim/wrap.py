@@ -32,7 +32,32 @@ def open_pairs(q, pairs, gap):
     q[b, 2] -= .5 * deficit
 
 
-def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radius, iterations=1600, wall_gap=None):
+def triangle_box_intersections(vertices, faces, half_size, center, rotation=None):
+    """Return triangles entering a box interior using the 13 separating axes.
+
+    Rotation maps box-local coordinates to world coordinates. Boundary-only
+    contact is excluded, with a 1e-12 m numerical tolerance on normalized axes.
+    """
+    local = np.asarray(vertices) - center
+    if rotation is not None:
+        local = local @ rotation
+    triangles = local[faces]
+    edges = np.roll(triangles, -1, axis=1) - triangles
+    normal = np.cross(edges[:, 0], edges[:, 1])
+    cross_axes = np.cross(edges[:, :, None, :], np.eye(3)[None, None, :, :])
+    axes = np.concatenate((np.broadcast_to(np.eye(3), (len(faces), 3, 3)),
+                           normal[:, None], cross_axes.reshape(-1, 9, 3)), axis=1)
+    lengths = np.linalg.norm(axes, axis=2)
+    axes /= np.maximum(lengths[:, :, None], 1e-30)
+    projection = np.einsum("tvc,tac->tva", triangles, axes)
+    extent = np.abs(axes) @ np.asarray(half_size)
+    separated = ((projection.min(axis=1) >= extent - 1e-12)
+                 | (projection.max(axis=1) <= -extent + 1e-12))
+    return ~np.any(separated & (lengths > 1e-14), axis=1)
+
+
+def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radius, iterations=1600, wall_gap=None,
+                 box_face_clearance=False):
     """Open any front/back bag around one content, as initialization.py does for the bubble mailer.
 
     Front-group vertices rise and back-group vertices drop by a plateau profile over the content,
@@ -48,6 +73,9 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
     else:
         from initialization import edge_colors
         from contents import signed_distance
+
+    if box_face_clearance and item["shape"] != "box":
+        raise ValueError("box-face initialization requires a box payload")
 
     q = start.copy()
     front = np.unique(faces[np.isin(panel_ids, front_ids)])
@@ -84,6 +112,19 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
             q[b] -= correction
         distance, normal = signed_distance(q, item)
         q += np.maximum(radius + .0003 - distance, 0)[:, None] * normal
+        if box_face_clearance:
+            # A triangle can cut a box corner while all three vertices stay
+            # outside. Keep every overlapping top/bottom triangle on its
+            # exterior side, then let edge projection redistribute the slack.
+            local = (q - item["position"]) @ item["rotation"]
+            half = item["half_size"]
+            triangles = local[faces]
+            overlap = np.all(triangles[:, :, :2].max(axis=1) >= -half[:2] - radius, axis=1)
+            overlap &= np.all(triangles[:, :, :2].min(axis=1) <= half[:2] + radius, axis=1)
+            for panels, sign in ((front_ids, 1), (back_ids, -1)):
+                ids = np.unique(faces[overlap & np.isin(panel_ids, panels)])
+                local[ids, 2] = sign * np.maximum(sign * local[ids, 2], half[2] + radius + .0003)
+            q = local @ item["rotation"].T + item["position"]
         open_pairs(q, pairs, wall_gap)
         q[:, 2] = np.maximum(q[:, 2], floor)
     # Rest the lowest node just above the table, and move the content with it.
@@ -93,7 +134,8 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
     strain = np.linalg.norm(q[edges[:, 1]] - q[edges[:, 0]], axis=1) / lengths - 1
     gaps = q[pairs[:, 0], 2] - q[pairs[:, 1], 2] if len(pairs) else np.array([np.inf])
     return q, dict(maximum_edge_strain=float(np.abs(strain).max()), minimum_wall_gap_m=float(gaps.min()),
-                   method="generic front/back plateau + projections + wall gap")
+                   method="generic front/back plateau + projections + wall gap",
+                   box_face_clearance=box_face_clearance)
 
 
 def winding_number(v, f, pts):

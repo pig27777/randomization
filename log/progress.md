@@ -581,3 +581,10 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 最大已测8192环境，9032.73环境步/s、29400 MiB，9216 Graph创建OOM；每轮50步仅1.25 ms。
 - 捕获未通过，默认25 μs角动量漂移4.281%；6.25 μs复核0.7301%，完整抓取尚未验证。
 - [主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-test.md)。
+
+
+### 2026-11-16 双膜片YAM录像与穿透修复（ubun）
+
+- 修复初态三角面穿盒、MuJoCo4反力刷新及box专用碰撞漏检，内容物改用同形凸mesh接触；11项回归、0.3秒静置通过。
+- YAM执行到4.46855秒lift，双侧指尖接触丢失而grasp_fail，224次20 ms采样内容物—膜面相交0；已导出4.5秒实际视频。
+- 当前凸mesh配置GPU吞吐/容量未重测，旧8192环境数据对应旧构型。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-yam-video-test.md)。
