@@ -8,3 +8,12 @@
 | 最外缘封口双膜片，三档E/厚度，统一三段内容物 | ubun，CPU；三档完整顶面动作已录至松爪，均在起抬时抓取失败；4段视频完整解码通过 | [主题报告](../../bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../../../reports/physical-parcel-top-parameter-video-test.md) · [原停止r1](bag/physical-parcel-top-parameters-r1/) · [完整动作r2](bag/physical-parcel-top-parameters-r2/) |
 
 启动命令、配置与源码快照在各运行目录，录像复用统一YAM平台。动态相交深度与角点包含独立于原生接触点记录，方法和停止标准见主题报告。
+
+
+## rub-contact-e1-r1：Rub-to-Pinch接触审计
+
+- 对象/版本：袋装包裹physical_parcel，ac0a963a，142节点外缘封口基线；200节点存档作为待运行E1对照。机器ubun，2026-11-16（CST，最近时间见manifest），MuJoCo/MJWarp4.0.1。
+- 问题/标准/配置：见[主题报告本轮计划](../../bag_model/PHYSICAL_PARCEL_REPORT.md#rub-to-pinch-phase-0--e12026-11-16ubun)；每配置一次，保持原材料和拓扑。
+- 已执行：644帧存档运动学与几何复算、两份Python语法检查、20步CPU短入口。**Phase0审计完成，E1正式动力学受共享锁阻塞，未验证。**
+- 命令、机器与源码指纹：[运行目录](bag/rub-contact-e1-r1/)、[manifest](bag/rub-contact-e1-r1/manifest.json)、[待执行E1命令](bag/rub-contact-e1-r1/planned-commands.json)。
+- 报告：[主题报告](../../bag_model/PHYSICAL_PARCEL_REPORT.md)、[任务检查](../../../reports/rub-contact-e1-test.md)。

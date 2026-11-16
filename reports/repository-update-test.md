@@ -22,3 +22,10 @@
 - 全量 `git diff --cached --check` 返回 2，共 6,167 处行尾空格，全部位于 `test/runs/` 下的 57 个历史实验快照文件。按归档约定保留原样；详细输出位于本机 `/tmp/random-repository-update-diff-check.txt`。
 - 待提交共 2,160 个路径，最大文件为 `test/runs/2026-11-16/bag/physical-parcel-mj4-yam-raised-side-r4/trial/model.mjb`，18,156,149 字节；本地原有待推送提交的新增对象均小于 50 MiB。
 - 本轮完成提交前静态检查，物理仿真、功能测试、GPU 实验及测速未重跑。提交后通过 `git push origin main` 上传，以 `git ls-remote origin refs/heads/main` 与本地 `HEAD` 一致作为交付验收条件。
+
+
+## 2026-11-16 22:40 CST 本地更新（ubun）
+
+- 用户要求以远端最新为准，不保留本地旧改动。main由08095d31快进至ac0a963a84b55a3c80d649e6e5073c0789431030，与origin/main一致。
+- 初次拉取被未提交改动阻止；保存后拉取成功，恢复时产生的两处文档冲突按用户最新要求取消，以远端为准。仅清除本次恢复的、且远端未跟踪的910个文件，未清理忽略目录及环境。
+- 更新后git status --short为空，git rev-parse HEAD与origin/main一致。没有运行与更新无关的功能测试。随后新增的诊断报告和代码属于继续执行的Phase 0/E1任务。
