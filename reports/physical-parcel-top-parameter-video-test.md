@@ -26,3 +26,7 @@
 采样膜—内容物及支撑几何深度0、角点外露0、数值警告0、状态有限。三组抓起指标均未通过，机械臂跟踪峰值169–170 mm，夹紧滤波峰值约0.68–0.73 N。材料采用工程预设，未做实物标定。同步对照末尾最多定格0.05秒，视频状态由20 ms轨迹采样插值。
 
 [主题报告与复现入口](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [原提前停止记录](../test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/) · [完整录像与证据](../test/runs/2026-11-16/bag/physical-parcel-top-parameters-r2/) · [解码记录](../test/runs/2026-11-16/bag/physical-parcel-top-parameters-r2/video-verification.json)
+
+## 仓库同步
+
+代码、录像与报告已本地提交。推送受环境阻塞，仓库配置的GitHub CLI凭据程序已不存在，现有登录配置及进程均未提供可用令牌。未修改全局Git配置。视频可直接从本地路径查看。
