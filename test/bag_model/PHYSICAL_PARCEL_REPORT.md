@@ -444,3 +444,21 @@ PYTHONPATH=test/bag_model:experience:. flock /tmp/claude-gpu.lock \
   --output <新的随机化录像目录> --seed 20261116 \
   --ffmpeg /home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2
 ```
+
+## 按袋型分类的视频修订（2026-11-16）
+
+### 本轮计划
+
+用户要求移除画面参数，按纸袋、塑料薄膜袋、气泡信封袋分类。塑料薄膜袋复用刚完成的两条真实轨迹，仅从无字原片重新标袋型；纸袋与气泡信封袋各补录一次侧抓。两次新配置继续随机化袋尺寸、摩擦、阻尼及内容物尺寸/质量，气泡袋采用可压缩内容物。复用现有kraft/pe/bubble材料档案，纸袋为高膜刚度与高弯曲刚度，气泡袋为较厚等效壁及已有cushion_contact接触律和气泡纹理，完整封口拓扑沿用最外缘版本。气泡壁为未标定的等效缓冲模型。
+
+只做两次所需0.5秒准备与最多8秒录像，dt200 μs已通过这两种网格的弯曲分辨入口；沿用几何1 mm健康检查及用户授权的35 cm抬升、单轨5 mm闭合余量。若失败，保存失败画面和结果。最终类别标题无参数数字，仍标实际抓取结果，并包含塑料薄膜袋顶面搓起尝试。输出 `physical-parcel-category-video-r1/`，机器ubun，CPU运行持共享锁。新增两种入口已编译，使用已有纹理资源。
+
+### 本轮结果（20:33更新）
+
+新增纸袋和气泡信封各一次准备、一次录像，均完成，无新增角度扫描。纸袋最高抬升21.92 cm，8秒窗口止于lift，incomplete；原生接触峰值1.6076 mm超出1 mm预算。气泡信封于4.4786秒lift指尖接触丢失，grasp_fail，未抓起，原生接触峰值0.8305 mm。两组膜—内容物/支撑的20 ms采样几何深度0、角点外露0、警告0。材料为弹性壳工程预设，气泡壁采用已有等效黏性缓冲接触律，其力—压缩关系尚未标定。
+
+塑料薄膜袋两段复用上轮原始轨迹及无字原片，保持实际结果。四段现已统一只标袋型、抓取方式和结果，无参数数值。连续视频约27.75秒，1280×534、20fps、1倍速，各段与连续视频完整解码通过，已检查纸袋悬挂帧和气泡信封抓取帧。用户要求现有视频时已先交付三个已完成片段，随后交付三类连续视频。
+
+[三类连续视频](../runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4) · [配置和复用来源](../runs/2026-11-16/bag/physical-parcel-category-video-r1/cases.json) · [结果](../runs/2026-11-16/bag/physical-parcel-category-video-r1/summary.json) · [检查记录](../runs/2026-11-16/bag/physical-parcel-category-video-r1/verification.json)
+
+复现分类版使用同一录像入口，增加 `--reuse-film-run test/runs/2026-11-16/bag/physical-parcel-edge-sealed-randomized-r1`，输出指向新目录。当前入口默认生成分类标题。原数值标题版的入口源码已保存在该轮 `driver_source.py`。代码与结果已本机保存，GitHub推送因现有凭据助手路径失效而受阻。

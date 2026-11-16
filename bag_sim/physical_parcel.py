@@ -35,6 +35,25 @@ def material_parameters(young_pa, thickness_m, density_kg_m3, poisson=0.3):
                 material_thickness=thickness_m, poisson=poisson)
 
 
+def parcel_profile(name):
+    """Effective shell settings for the existing paper, film and bubble profiles."""
+    if name not in ("kraft", "pe", "bubble"):
+        raise ValueError("parcel profile must be kraft, pe or bubble")
+    profile = json.loads((HERE / "profiles" / f"{name}.json").read_text())
+    parameters = profile["params"]
+    if name == "pe":
+        shell = material_parameters(2e7, .00006, 920.)
+    else:
+        thickness = parameters["membrane_thickness_m"]
+        shell = dict(membrane=parameters["young_pa"] * thickness,
+                     bending=parameters["bending_rigidity_nm"],
+                     material_thickness=thickness, areal_mass=.13 if name == "bubble" else .12)
+    shell["radius"] = parameters["collision_radius_m"]
+    return dict(shell=shell, texture=HERE / profile["texture"],
+                cushion=parameters if parameters.get("cushion") else None,
+                source_sha256=hashlib.sha256((HERE / "profiles" / f"{name}.json").read_bytes()).hexdigest())
+
+
 @dataclass(frozen=True)
 class Config:
     geometry: str = "geometry/kraft_coarse_35.npz"

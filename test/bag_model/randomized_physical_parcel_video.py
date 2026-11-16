@@ -1,4 +1,4 @@
-"""Record two seeded parcel variants with the shared side and top YAM grasps.
+"""Record paper, film and bubble parcel categories with shared YAM grasps.
 
 Run this driver in an existing Pillow environment and select the MuJoCo Python
 with --python. Dynamics, preparation and rendering use the existing entry points.
@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--ffmpeg", type=Path, required=True)
     parser.add_argument("--python", type=Path, default=ROOT / ".venv-physical-parcel/bin/python")
     parser.add_argument("--seed", type=int, default=20261116)
+    parser.add_argument("--reuse-film-run", type=Path)
     parser.add_argument("--font", type=Path, default=Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"))
     args = parser.parse_args()
     output = args.output.resolve()
@@ -34,32 +35,43 @@ def main():
     (output / "driver_source.py").write_bytes(Path(__file__).read_bytes())
     rng = random.Random(args.seed)
     cases = []
-    for number, (grasp, mode) in enumerate((("side", "rigid"), ("top", "bendable")), 1):
-        folder = output / f"case-{number}-{grasp}"
+    variants = (("kraft", "纸袋", "side", "rigid"),
+                ("pe", "塑料薄膜袋", "side", "rigid"),
+                ("pe", "塑料薄膜袋", "top", "bendable"),
+                ("bubble", "气泡信封袋", "side", "compressible"))
+    for number, (profile, title, grasp, mode) in enumerate(variants, 1):
+        folder = output / f"case-{number}-{profile}-{grasp}"
         folder.mkdir()
+        if profile == "pe" and args.reuse_film_run is not None:
+            reused = args.reuse_film_run.resolve() / ("case-1-side" if grasp == "side" else "case-2-top")
+            cfg = json.loads((reused / "config.json").read_text())
+            (folder / "config.json").write_text(json.dumps(cfg, indent=2))
+            cases.append(dict(number=number, grasp=grasp, mode=mode, config=cfg, folder=str(folder),
+                              title=title, reused_from=str(reused)))
+            continue
         cfg = dict(geometry="geometry/kraft_edge_sealed_35.npz", mode=mode,
             bag_size=[rng.uniform(.32, .38), rng.uniform(.23, .27)],
-            material=dict(young_pa=rng.uniform(4e6, 10e6), thickness_m=rng.uniform(.0001, .0002),
-                          density_kg_m3=rng.uniform(700, 1000)),
+            bag_profile=profile,
             friction=rng.uniform(.35, .65), bend_damping_ratio=rng.uniform(.4, .8),
             rayleigh=rng.uniform(.0003, .0008),
             payload_size=[rng.uniform(.10, .145), rng.uniform(.065, .095), rng.uniform(.02, .04)],
             payload_mass=rng.uniform(.12, .35), joint_stiffness=rng.uniform(.03, .15),
-            dt=.0001, contact_time=.001, pinch_coeff=0., support_height=.15,
-            lift_height=.35, gripper_overtravel=.005, simulation_seconds=10., wall_limit=3600.,
+            dt=.0002, contact_time=.001, pinch_coeff=0., support_height=.15,
+            lift_height=.35, gripper_overtravel=.005, simulation_seconds=8., wall_limit=3600.,
             grasp_face=grasp, yaw=90. if grasp == "side" else 0., tilt=15. if grasp == "side" else 0.,
             side_start_distance=.08, side_height_offset=0.,
             initial_state=str(folder / "preparation/initial_state.npz"))
         (folder / "config.json").write_text(json.dumps(cfg, indent=2))
-        cases.append(dict(number=number, grasp=grasp, mode=mode, config=cfg, folder=str(folder)))
+        cases.append(dict(number=number, grasp=grasp, mode=mode, config=cfg, folder=str(folder), title=title))
     (output / "cases.json").write_text(json.dumps(dict(seed=args.seed, cases=cases,
-        sampling="independent uniform bag/content parameters; one rigid side grasp and one bendable top grasp",
-        material="Et, D and areal mass derived together from E, thickness, density; engineering presets"), indent=2))
+        sampling="random bag size/contact/damping and content dimensions/mass; selected category and grasp coverage",
+        material="existing kraft/pe/bubble engineering profiles; film recordings may be reused"), indent=2))
 
     clips = []
     summaries = []
     for case in cases:
         folder, cfg = Path(case["folder"]), case["config"]
+        source = Path(case.get("reused_from", folder))
         preparation = dict(cfg)
         preparation.pop("initial_state")
         commands = [
@@ -71,11 +83,12 @@ def main():
              folder / "recording/trial", folder / "raw.mp4", "--ffmpeg", args.ffmpeg],
         ]
         (folder / "commands.json").write_text(json.dumps([[str(v) for v in row] for row in commands], indent=2))
-        for label, arguments in zip(("prepare", "record", "render"), commands):
-            print(f"case {case['number']} {case['grasp']}: {label}", flush=True)
-            command(arguments, folder / f"{label}.log")
-        result = json.loads((folder / "recording/trial/result.json").read_text())
-        trace = json.loads((folder / "recording/trial/trace.json").read_text())
+        if "reused_from" not in case:
+            for label, arguments in zip(("prepare", "record", "render"), commands):
+                print(f"case {case['number']} {case['title']}: {label}", flush=True)
+                command(arguments, folder / f"{label}.log")
+        result = json.loads((source / "recording/trial/result.json").read_text())
+        trace = json.loads((source / "recording/trial/trace.json").read_text())
         lifted = max(row["com"][2] - result["initial_com"][2] for row in trace)
         hanging = [row for row in trace if row["support_N"] < .05 and row["com"][2]-result["initial_com"][2] >= .05]
         summary = dict(number=case["number"], grasp=case["grasp"], mode=case["mode"],
@@ -84,28 +97,21 @@ def main():
                        peak_penetration_mm=result["peaks"]["penetration_mm"],
                        simulation_s=result["sim_time_s"], wall_s=result["wall_s"])
         summaries.append(summary)
-        material = cfg["material"]
-        bag = " × ".join(f"{v*100:.1f}" for v in cfg["bag_size"])
-        payload = " × ".join(f"{v*100:.1f}" for v in cfg["payload_size"])
-        mode_label = "刚体" if case["mode"] == "rigid" else f"可弯曲，铰链 {cfg['joint_stiffness']:.3f} N·m/rad"
         phase_label = "侧抓" if case["grasp"] == "side" else "顶面搓起"
         outcome_label = {"grasp_fail": "抓取失败", "drop": "滑落", "incomplete": "录制窗口结束", "success": "完成搬运"}.get(result["outcome"], result["outcome"])
-        lines = [f"随机组 {case['number']} · {phase_label} · CPU 1倍速 · 种子 {args.seed}",
-            f"袋子 {bag} cm  |  E {material['young_pa']/1e6:.2f} MPa  |  厚度 {material['thickness_m']*1e6:.0f} μm  |  摩擦 {cfg['friction']:.2f}  |  弯曲阻尼 {cfg['bend_damping_ratio']:.2f}",
-            f"内部物体 {payload} cm  |  {cfg['payload_mass']*1000:.0f} g  |  {mode_label}",
-            f"实际最高抬升 {max(0.,lifted)*100:.1f} cm  |  {outcome_label}"]
-        header = Image.new("RGB", (1280, 120), "#141920")
+        lines = [f"{case['title']} · {phase_label}尝试 · {outcome_label}"]
+        header = Image.new("RGB", (1280, 54), "#141920")
         draw = ImageDraw.Draw(header)
-        font = ImageFont.truetype(str(args.font), 22)
+        font = ImageFont.truetype(str(args.font), 28)
         for index, line in enumerate(lines):
-            draw.text((16, 3+29*index), line, font=font, fill="#84d3e6" if index == 0 else "#eef1f4")
-        header.save(folder / "parameters.png")
-        render = json.loads((folder / "raw_render.json").read_text())
+            draw.text((16, 7), line, font=font, fill="#eef1f4")
+        header.save(folder / "category.png")
+        render = json.loads((source / "raw_render.json").read_text())
         duration = render["frames"] / render["fps"]
         clip = folder / f"{case['grasp']}-randomized.mp4"
-        command([args.ffmpeg, "-hide_banner", "-loglevel", "error", "-i", folder / "raw.mp4",
-            "-loop", "1", "-i", folder / "parameters.png", "-filter_complex",
-            "[0:v]pad=iw:ih+120:0:120:black[v];[v][1:v]overlay=0:0", "-t", duration,
+        command([args.ffmpeg, "-hide_banner", "-loglevel", "error", "-i", source / "raw.mp4",
+            "-loop", "1", "-i", folder / "category.png", "-filter_complex",
+            "[0:v]pad=iw:ih+54:0:54:black[v];[v][1:v]overlay=0:0", "-t", duration,
             "-c:v", "libx264", "-preset", "fast", "-crf", "22", "-pix_fmt", "yuv420p",
             "-movflags", "+faststart", clip], folder / "caption.log")
         command([args.ffmpeg, "-hide_banner", "-loglevel", "error", "-i", clip, "-f", "null", "-"], folder / "decode.log")
@@ -113,8 +119,10 @@ def main():
         (output / "summary.json").write_text(json.dumps(dict(seed=args.seed, cases=summaries), indent=2))
 
     video = output / "randomized-bag-and-contents.mp4"
-    command([args.ffmpeg, "-hide_banner", "-loglevel", "error", "-i", clips[0], "-i", clips[1],
-        "-filter_complex", "[0:v][1:v]concat=n=2:v=1:a=0[v]", "-map", "[v]",
+    inputs = [argument for clip in clips for argument in ("-i", clip)]
+    streams = "".join(f"[{index}:v]" for index in range(len(clips)))
+    command([args.ffmpeg, "-hide_banner", "-loglevel", "error", *inputs,
+        "-filter_complex", f"{streams}concat=n={len(clips)}:v=1:a=0[v]", "-map", "[v]",
         "-c:v", "libx264", "-preset", "fast", "-crf", "22", "-pix_fmt", "yuv420p",
         "-movflags", "+faststart", video], output / "combine.log")
     command([args.ffmpeg, "-hide_banner", "-loglevel", "error", "-i", video, "-f", "null", "-"], output / "decode.log")

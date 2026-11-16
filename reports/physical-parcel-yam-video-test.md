@@ -46,3 +46,11 @@ Mesa llvmpipe回放视频为20fps、90帧、4.5秒、1倍速、1280×480双视�
 视频包含袋与内部物体参数、最高实际抬升及真实结果。两段及连续视频均已用FFmpeg完整解码，退出0，并查看侧抓悬挂和顶抓末帧。1280×600、20fps、1倍速，连续视频约15.15秒。`git diff --check`通过。本轮按用户要求控制为两次录制，实际配置和命令保存在同一运行目录。
 
 [随机化连续视频](../test/runs/2026-11-16/bag/physical-parcel-edge-sealed-randomized-r1/randomized-bag-and-contents.mp4) · [顶面单段](../test/runs/2026-11-16/bag/physical-parcel-edge-sealed-randomized-r1/case-2-top/top-randomized.mp4) · [视频与几何检查](../test/runs/2026-11-16/bag/physical-parcel-edge-sealed-randomized-r1/verification.json)
+
+## 分类标题修订（2026-11-16 20:33）
+
+按用户要求改为纸袋、塑料薄膜袋、气泡信封袋，去掉画面参数数值。塑料薄膜袋复用上轮两条轨迹，另补录纸袋、气泡信封各一次侧抓，0.5秒准备均通过，沿用共享平台、授权行程及原几何门槛。纸袋采用kraft弹性/弯曲预设与纹理，最高抬升21.92 cm；气泡信封采用较厚等效壁、既有cushion_contact和纹理，未抓起。气泡缓冲关系尚未标定。
+
+新增两轮膜—盒体/支撑采样几何深度均0、角点外露0、警告0。纸袋原生接触峰值1.6076 mm超预算，气泡信封0.8305 mm。四段及合成视频完整解码通过，检查纸袋悬挂和气泡信封帧，标题只有类别、动作及结果。连续视频约27.75秒，1280×534、20fps、1倍速。整体物理验收仍未通过。GitHub推送受既有凭据助手路径失效阻止，本机文件与提交保留。
+
+[三类视频](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4) · [本轮检查](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/verification.json) · [配置与来源](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/cases.json)

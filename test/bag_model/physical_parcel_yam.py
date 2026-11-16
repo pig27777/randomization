@@ -11,7 +11,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / "experience")]
-from bag_sim.physical_parcel import Config as ParcelConfig, Parcel, material_parameters, vec  # noqa: E402
+from bag_sim.physical_parcel import Config as ParcelConfig, Parcel, material_parameters, parcel_profile, vec  # noqa: E402
+from bag_sim.bag_model import cushion_contact  # noqa: E402
 from yam_platform.protocol import MuJoCoSim, TrialConfig, attach_robot, measure_contacts  # noqa: E402
 from physical_parcel_checks import film_box_geometry, film_payload_geometry  # noqa: E402
 
@@ -36,6 +37,7 @@ class Config(TrialConfig):
     bend_damping_ratio: float = 0.1
     rayleigh: float = 1e-4
     material: dict | None = None
+    bag_profile: str | None = None
     friction: float = .45
     compression_k1: float = 800.
     compression_k2: float = 20000.
@@ -118,6 +120,9 @@ def compile_yam_model(parcel, built, xml):
 
 def parcel_world(cfg):
     material = material_parameters(**cfg.material) if cfg.material is not None else {}
+    profile = parcel_profile(cfg.bag_profile) if cfg.bag_profile is not None else None
+    if profile is not None:
+        material.update(profile["shell"])
     p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
         payload_size=tuple(cfg.payload_size), payload_mass=cfg.payload_mass,
         joint_stiffness=cfg.joint_stiffness, center=(-0.25, 0.04),
@@ -127,6 +132,24 @@ def parcel_world(cfg):
         compression_k2=cfg.compression_k2, compression_damping=cfg.compression_damping,
         **material))
     root = ET.fromstring(p.xml)
+    if profile is not None:
+        asset = root.find("asset")
+        ET.SubElement(asset, "texture", name="bag_texture", type="2d", file=str(profile["texture"]))
+        ET.SubElement(asset, "material", name="bag_material", texture="bag_texture", rgba="1 1 1 1",
+                      specular=".05", shininess=".1")
+        film = root.find(".//flexcomp[@name='bag']")
+        film.set("material", "bag_material")
+        film.set("rgba", "1 1 1 .65" if cfg.bag_profile == "pe" else "1 1 1 1")
+        reference = p.envelope["reference"][:, :2]
+        film.set("texcoord", vec((reference-reference.min(0)) / np.ptp(reference, axis=0)))
+        if profile["cushion"] is not None:
+            solref, solimp = cushion_contact(profile["cushion"], p.cfg.areal_mass)
+            contact = film.find("contact")
+            contact.set("priority", "2")
+            contact.set("solref", vec(solref))
+            contact.set("solimp", vec(solimp))
+        p.metadata["bag_profile"] = dict(name=cfg.bag_profile, source_sha256=profile["source_sha256"],
+                                         cushion=profile["cushion"] is not None)
     world = root.find("worldbody")
     world.remove(root.find(".//body[@name='contact_probe']"))
     if cfg.support_height:
