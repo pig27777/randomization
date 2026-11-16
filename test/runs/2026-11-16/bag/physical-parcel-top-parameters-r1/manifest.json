@@ -1,0 +1,249 @@
+{
+  "started": "2026-11-16T20:18:34.468131+08:00",
+  "machine": "ubun",
+  "cases": [
+    {
+      "name": "thin-soft",
+      "label": "薄软",
+      "config": {
+        "geometry": "geometry/kraft_edge_sealed_35.npz",
+        "mode": "bendable",
+        "bag_size": [
+          0.33469816367185656,
+          0.25083987636480076
+        ],
+        "material": {
+          "young_pa": 4000000.0,
+          "thickness_m": 0.0001,
+          "density_kg_m3": 850.0
+        },
+        "friction": 0.55,
+        "bend_damping_ratio": 0.6,
+        "rayleigh": 0.0005,
+        "payload_size": [
+          0.12058723113637387,
+          0.0686773183453275,
+          0.029322452977014482
+        ],
+        "payload_mass": 0.16711485499377968,
+        "joint_stiffness": 0.057340079083901555,
+        "dt": 0.0001,
+        "contact_time": 0.001,
+        "pinch_coeff": 0.0,
+        "support_height": 0.15,
+        "lift_height": 0.35,
+        "gripper_overtravel": 0.005,
+        "simulation_seconds": 18.0,
+        "wall_limit": 3600.0,
+        "grasp_face": "top",
+        "yaw": 0.0,
+        "tilt": 0.0,
+        "side_start_distance": 0.08,
+        "side_height_offset": 0.0,
+        "initial_state": "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft/preparation/initial_state.npz"
+      },
+      "folder": "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft",
+      "commands": [
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-u",
+          "-B",
+          "test/bag_model/prepare_physical_parcel.py",
+          "--output",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft/preparation",
+          "--seconds",
+          ".5",
+          "--model-options",
+          "{\"geometry\": \"geometry/kraft_edge_sealed_35.npz\", \"mode\": \"bendable\", \"bag_size\": [0.33469816367185656, 0.25083987636480076], \"material\": {\"young_pa\": 4000000.0, \"thickness_m\": 0.0001, \"density_kg_m3\": 850.0}, \"friction\": 0.55, \"bend_damping_ratio\": 0.6, \"rayleigh\": 0.0005, \"payload_size\": [0.12058723113637387, 0.0686773183453275, 0.029322452977014482], \"payload_mass\": 0.16711485499377968, \"joint_stiffness\": 0.057340079083901555, \"dt\": 0.0001, \"contact_time\": 0.001, \"pinch_coeff\": 0.0, \"support_height\": 0.15, \"lift_height\": 0.35, \"gripper_overtravel\": 0.005, \"simulation_seconds\": 18.0, \"wall_limit\": 3600.0, \"grasp_face\": \"top\", \"yaw\": 0.0, \"tilt\": 0.0, \"side_start_distance\": 0.08, \"side_height_offset\": 0.0}"
+        ],
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-u",
+          "-B",
+          "test/bag_model/record_physical_parcel.py",
+          "--config",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft/config.json",
+          "--output",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft/recording"
+        ],
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-B",
+          "test/bag_model/render_physical_parcel_video.py",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft/recording/trial",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thin-soft/raw.mp4",
+          "--ffmpeg",
+          "/home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
+        ]
+      ],
+      "derived": {
+        "membrane_N_m": 400.0,
+        "bending_Nm": 3.6630036630036635e-07,
+        "areal_mass_kg_m2": 0.085
+      }
+    },
+    {
+      "name": "medium",
+      "label": "中等",
+      "config": {
+        "geometry": "geometry/kraft_edge_sealed_35.npz",
+        "mode": "bendable",
+        "bag_size": [
+          0.33469816367185656,
+          0.25083987636480076
+        ],
+        "material": {
+          "young_pa": 7000000.0,
+          "thickness_m": 0.00015,
+          "density_kg_m3": 850.0
+        },
+        "friction": 0.55,
+        "bend_damping_ratio": 0.6,
+        "rayleigh": 0.0005,
+        "payload_size": [
+          0.12058723113637387,
+          0.0686773183453275,
+          0.029322452977014482
+        ],
+        "payload_mass": 0.16711485499377968,
+        "joint_stiffness": 0.057340079083901555,
+        "dt": 0.0001,
+        "contact_time": 0.001,
+        "pinch_coeff": 0.0,
+        "support_height": 0.15,
+        "lift_height": 0.35,
+        "gripper_overtravel": 0.005,
+        "simulation_seconds": 18.0,
+        "wall_limit": 3600.0,
+        "grasp_face": "top",
+        "yaw": 0.0,
+        "tilt": 0.0,
+        "side_start_distance": 0.08,
+        "side_height_offset": 0.0,
+        "initial_state": "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium/preparation/initial_state.npz"
+      },
+      "folder": "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium",
+      "commands": [
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-u",
+          "-B",
+          "test/bag_model/prepare_physical_parcel.py",
+          "--output",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium/preparation",
+          "--seconds",
+          ".5",
+          "--model-options",
+          "{\"geometry\": \"geometry/kraft_edge_sealed_35.npz\", \"mode\": \"bendable\", \"bag_size\": [0.33469816367185656, 0.25083987636480076], \"material\": {\"young_pa\": 7000000.0, \"thickness_m\": 0.00015, \"density_kg_m3\": 850.0}, \"friction\": 0.55, \"bend_damping_ratio\": 0.6, \"rayleigh\": 0.0005, \"payload_size\": [0.12058723113637387, 0.0686773183453275, 0.029322452977014482], \"payload_mass\": 0.16711485499377968, \"joint_stiffness\": 0.057340079083901555, \"dt\": 0.0001, \"contact_time\": 0.001, \"pinch_coeff\": 0.0, \"support_height\": 0.15, \"lift_height\": 0.35, \"gripper_overtravel\": 0.005, \"simulation_seconds\": 18.0, \"wall_limit\": 3600.0, \"grasp_face\": \"top\", \"yaw\": 0.0, \"tilt\": 0.0, \"side_start_distance\": 0.08, \"side_height_offset\": 0.0}"
+        ],
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-u",
+          "-B",
+          "test/bag_model/record_physical_parcel.py",
+          "--config",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium/config.json",
+          "--output",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium/recording"
+        ],
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-B",
+          "test/bag_model/render_physical_parcel_video.py",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium/recording/trial",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/medium/raw.mp4",
+          "--ffmpeg",
+          "/home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
+        ]
+      ],
+      "derived": {
+        "membrane_N_m": 1050.0,
+        "bending_Nm": 2.163461538461538e-06,
+        "areal_mass_kg_m2": 0.1275
+      }
+    },
+    {
+      "name": "thick-stiff",
+      "label": "厚硬",
+      "config": {
+        "geometry": "geometry/kraft_edge_sealed_35.npz",
+        "mode": "bendable",
+        "bag_size": [
+          0.33469816367185656,
+          0.25083987636480076
+        ],
+        "material": {
+          "young_pa": 10000000.0,
+          "thickness_m": 0.0002,
+          "density_kg_m3": 850.0
+        },
+        "friction": 0.55,
+        "bend_damping_ratio": 0.6,
+        "rayleigh": 0.0005,
+        "payload_size": [
+          0.12058723113637387,
+          0.0686773183453275,
+          0.029322452977014482
+        ],
+        "payload_mass": 0.16711485499377968,
+        "joint_stiffness": 0.057340079083901555,
+        "dt": 0.0001,
+        "contact_time": 0.001,
+        "pinch_coeff": 0.0,
+        "support_height": 0.15,
+        "lift_height": 0.35,
+        "gripper_overtravel": 0.005,
+        "simulation_seconds": 18.0,
+        "wall_limit": 3600.0,
+        "grasp_face": "top",
+        "yaw": 0.0,
+        "tilt": 0.0,
+        "side_start_distance": 0.08,
+        "side_height_offset": 0.0,
+        "initial_state": "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff/preparation/initial_state.npz"
+      },
+      "folder": "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff",
+      "commands": [
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-u",
+          "-B",
+          "test/bag_model/prepare_physical_parcel.py",
+          "--output",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff/preparation",
+          "--seconds",
+          ".5",
+          "--model-options",
+          "{\"geometry\": \"geometry/kraft_edge_sealed_35.npz\", \"mode\": \"bendable\", \"bag_size\": [0.33469816367185656, 0.25083987636480076], \"material\": {\"young_pa\": 10000000.0, \"thickness_m\": 0.0002, \"density_kg_m3\": 850.0}, \"friction\": 0.55, \"bend_damping_ratio\": 0.6, \"rayleigh\": 0.0005, \"payload_size\": [0.12058723113637387, 0.0686773183453275, 0.029322452977014482], \"payload_mass\": 0.16711485499377968, \"joint_stiffness\": 0.057340079083901555, \"dt\": 0.0001, \"contact_time\": 0.001, \"pinch_coeff\": 0.0, \"support_height\": 0.15, \"lift_height\": 0.35, \"gripper_overtravel\": 0.005, \"simulation_seconds\": 18.0, \"wall_limit\": 3600.0, \"grasp_face\": \"top\", \"yaw\": 0.0, \"tilt\": 0.0, \"side_start_distance\": 0.08, \"side_height_offset\": 0.0}"
+        ],
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-u",
+          "-B",
+          "test/bag_model/record_physical_parcel.py",
+          "--config",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff/config.json",
+          "--output",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff/recording"
+        ],
+        [
+          "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+          "-B",
+          "test/bag_model/render_physical_parcel_video.py",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff/recording/trial",
+          "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/thick-stiff/raw.mp4",
+          "--ffmpeg",
+          "/home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2"
+        ]
+      ],
+      "derived": {
+        "membrane_N_m": 2000.0,
+        "bending_Nm": 7.326007326007328e-06,
+        "areal_mass_kg_m2": 0.17
+      }
+    }
+  ],
+  "ffmpeg": "/home/ubuntu/Dev/Projects/real2sim/previews/newton-official-bag/.venv/lib/python3.11/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2",
+  "geometry_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+  "note": "One top-grasp attempt per engineering material preset, shared content and YAM protocol. Each dynamics command is serialized under /tmp/claude-gpu.lock."
+}

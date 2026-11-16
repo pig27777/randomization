@@ -73,3 +73,7 @@ flock /tmp/claude-gpu.lock ../.venv/bin/python -B -m yam_platform.benchmark --ou
 YAM 原始模型来自 MuJoCo Menagerie 的 `i2rt_yam`，提交 `f054586a8e90465d49ee5be15335c4a0c7f57caf`，MIT 许可（I2RT）。仅复制这个完整包，共 34 个文件、约 9 MB；包内 MANIFEST、来源元数据、许可及上游文件保持原样，单位和局部原点不变。原共享包保留在原处。
 
 归并检查见 [任务测试报告](../reports/yam-experience-test.md)。
+
+## 完整动作录像
+
+`TrialConfig.complete_motion=True` 用于录完接近、闭合、抬升、搬运、下降和松爪。闭合后发生的抓取失败或脱落会记录在结果的 `grasp_failure` 中，机械臂继续完成动作，最终 `outcome` 保留首次失败判定。失败后的下降按原目标高度完成，防止留在桌面的物体支撑读数提前结束空手下降。`motion_completed` 表示动作是否完成。数值、几何、挤压力及计算预算触发的停止仍正常生效。该选项默认False，2026-11-16用于用户要求的三档袋参数顶面完整流程录像。

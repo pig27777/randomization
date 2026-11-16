@@ -28,6 +28,7 @@ class TrialConfig:
     arm_height: float=.27
     lift_height: float=.25
     gripper_overtravel: float=0.
+    complete_motion: bool=False
 
 def vec(x):
     return ' '.join(format(float(v),'.17g') for v in np.asarray(x).ravel())
@@ -210,6 +211,8 @@ def run(backend, cfg, output, *, on_sample=None):
     open_gap=None
     outcome="pending"
     reason=""
+    grasp_failure=None
+    motion_completed=False
     peaks=dict(penetration_mm=0.,nonfinger_mm=0.,grip_N=0.,down_N=0.,tracking_mm=0.)
     loss=0.
     stable=0.
@@ -291,7 +294,8 @@ def run(backend, cfg, output, *, on_sample=None):
                     outcome,reason=("grasp_fail" if phase in ("lift","lift_hold") else "drop"),"both fingertip contacts/connection lost >50ms"
         elif phase=="lower":
             target[2]-=.2*dt
-            next_phase="open" if feedback["support_N"]>=.3*robot.mass*9.81 or target[2]<=lift_site[2]+.005 else None
+            supported=grasp_failure is None and feedback["support_N"]>=.3*robot.mass*9.81
+            next_phase="open" if supported or target[2]<=lift_site[2]+.005 else None
         elif phase=="open":
             pinch.release("open")
             spring.release()
@@ -352,14 +356,23 @@ def run(backend, cfg, output, *, on_sample=None):
                 outcome,reason="compute_limit","wall budget reached; incomplete trial"
         if cfg.smoke_seconds and d.time>=cfg.smoke_seconds:
             outcome,reason="smoke_only","short entry check; no grasp inference"
+        if cfg.complete_motion and outcome in ("grasp_fail","drop") and phase in ("close","lift","lift_hold","carry","carry_hold"):
+            # Complete the recorded arm motion while retaining the first failed
+            # grasp verdict. Numerical and force-limit failures still stop.
+            if grasp_failure is None:
+                grasp_failure=dict(outcome=outcome,reason=reason,phase=phase,time_s=float(d.time))
+            outcome,reason="pending",""
         if outcome!="pending":break
         if next_phase:
             phases.append(dict(phase=phase,start_s=phase_start,end_s=float(d.time)))
             phase_start=float(d.time)
             if next_phase=="done":
+                motion_completed=True
                 position=sim.com()
                 success=bool(np.all(np.abs(position[:2]-(np.array([-.25,.04])+[.5,0]))<=.10))
                 outcome,reason=("success","") if success else ("grasp_fail","final COM outside v2.2 target square")
+                if grasp_failure is not None:
+                    outcome,reason=grasp_failure["outcome"],grasp_failure["reason"]
                 break
             phase=next_phase
             if phase=="open":open_gap=gap
@@ -375,7 +388,8 @@ def run(backend, cfg, output, *, on_sample=None):
     result=dict(config=asdict(cfg),hostname=platform.node(),mujoco=mujoco.__version__,python=sys.executable,
                 frozen_v13_sha256=getattr(backend, "RELEASE_SHA", None),source_sha256=source_hashes,backend=backend.__name__,
                 robot_source_sha256=hashlib.sha256(Path(__file__).with_name("robot.py").read_bytes()).hexdigest(),
-                outcome=outcome,reason=reason,phase=phase,sim_time_s=float(d.time),wall_s=time.perf_counter()-started,
+                outcome=outcome,reason=reason,phase=phase,motion_completed=motion_completed,grasp_failure=grasp_failure,
+                sim_time_s=float(d.time),wall_s=time.perf_counter()-started,
                 timing_is_throughput=False,peaks=peaks,model_metrics=backend.summarize(trace),phases=phases,
                 initial_com=baseline_com.tolist(),final_com=sim.com().tolist(),pinch_events=pinch.events,
                 pinch_frame="articulated palm; reactions load arm",robot=robot.diagnostics(),

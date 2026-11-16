@@ -600,3 +600,10 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 用户要求去掉数值标题，按纸袋、塑料薄膜袋、气泡信封袋分类；塑料轨迹复用，只补录纸袋和气泡各一次。
 - 纸袋最高抬升21.92 cm，原生接触1.6076 mm超预算；气泡抓取失败，采用未标定的等效缓冲壁。含顶面尝试的四段连续视频已完整解码。
 - [分类视频与结果](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/) · [任务检查](../reports/physical-parcel-yam-video-test.md)。
+
+
+### 2026-11-16 三档袋参数顶面完整录像（ubun）
+
+- E=4/7/10 MPa、厚度100/150/200 μm，各一次统一YAM顶抓，完整动作均录至松爪，约12.87秒。
+- 三档均在5.03秒起抬时指尖接触丢失，最高抬升0.00068/0.01155/0.01955 mm；最终保留grasp_fail，后续为空手动作。
+- 4段视频完整解码通过，完整动作选项默认关闭；工程参数未标定。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-top-parameter-video-test.md)。

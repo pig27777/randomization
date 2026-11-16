@@ -462,3 +462,48 @@ PYTHONPATH=test/bag_model:experience:. flock /tmp/claude-gpu.lock \
 [三类连续视频](../runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4) · [配置和复用来源](../runs/2026-11-16/bag/physical-parcel-category-video-r1/cases.json) · [结果](../runs/2026-11-16/bag/physical-parcel-category-video-r1/summary.json) · [检查记录](../runs/2026-11-16/bag/physical-parcel-category-video-r1/verification.json)
 
 复现分类版使用同一录像入口，增加 `--reuse-film-run test/runs/2026-11-16/bag/physical-parcel-edge-sealed-randomized-r1`，输出指向新目录。当前入口默认生成分类标题。原数值标题版的入口源码已保存在该轮 `driver_source.py`。代码与结果已本机保存，GitHub推送因现有凭据助手路径失效而受阻。
+
+
+## 顶面搓起三档袋参数录像（2026-11-16）
+
+### 本轮计划
+
+用户指定在YAM中从顶面搓起，录制不同袋参数的物理效果。机器ubun，MuJoCo4.0.1 CPU，输出 `test/runs/2026-11-16/bag/physical-parcel-top-parameters-r1/`。薄软/中等/厚硬三档分别为E=4/7/10 MPa、厚度100/150/200 μm，密度850 kg/m³，Et、D和面密度关联计算；其余采用共同配置，袋334.70×250.84 mm、三段可弯曲内容物120.59×68.68×29.32 mm、167.11 g、铰链0.05734 N·m/rad、袋摩擦0.55、弯曲阻尼0.6、Rayleigh0.5 ms。三档都是工程预设。
+
+每档一次0.5秒准备、一次共享YAM顶面接近与合爪搓起，连续录制至平台结果或18秒窗口。yaw/tilt均0°、dt100 μs、150 mm支撑、10 N夹紧目标、单轨5 mm余量、抬升行程35 cm，pinch_coeff=0。沿用现有几何1 mm与角点包含检查、原平台动作和判定。正式动力学持共享锁。运行命令、配置、源码快照及机器人资产指纹随结果保存。
+
+交付标准为三档均有实际顶抓轨迹和1倍速参数视频，另给同步近景对照，20fps，完整解码且抽帧检查。抓起指标为内容物抬升≥50 mm且总支撑<0.05 N，完整搬运另按平台outcome记录。抓起或物理预算未通过时保留实际结果与视频，说明限制；录制技术失败则修复入口后在新目录重跑，不降低判据。
+
+### 本轮结果
+
+r1三档分别在5.0393/5.0294/5.0321秒、lift阶段因指尖接触丢失而停止，未达到50 mm抓起标准。原始轨迹与短录像保留于r1，随后按用户要求补录完整动作。
+
+### 完整流程补录计划
+
+用户追加要求完整流程。r1三档在仿真约5.03秒起抬时均失去指尖接触，原平台提前结束。补录r2复用各档r1的0.5秒准备态、材料及动作参数，每档一次完整动作。共享平台新增显式 `complete_motion=True` 录像选项，闭合后的抓取失败保留首次原判定与时间，继续原有lift/carry/lower/open目标；失败后的lower走到原目标高度，避免桌上物体的支撑读数使空手下降提前结束。数值、几何、挤压和预算停止按原值执行。默认关闭，原入口采用原停止流程。每档要求 `motion_completed=true` 且阶段覆盖settle/approach/close/lift/lift_hold/carry/carry_hold/lower/open，完整视频与同步对照均完整解码。失败时刻在视频中标注。输出 `physical-parcel-top-parameters-r2/`，窗口18秒。
+
+
+### 完整流程补录结果
+
+完成于2026-11-16 20:50 CST，机器ubun。三档均以 `complete_motion=True` 完成settle、approach、close、lift、lift_hold、carry、carry_hold、lower、open九个阶段，`motion_completed=true`。三组均在起抬时失去指尖接触，最终结果保留 `grasp_fail`，后续为空手动作。
+
+| 档位 | 首次失败/s | 完整仿真/s | 内容物最高抬升/mm | 原生穿透峰值/mm | 夹紧滤波峰值/N |
+| --- | --- | --- | --- | --- | --- |
+| 薄软 | 5.0393 | 12.8758 | 0.000678 | 0.132806 | 0.732 |
+| 中等 | 5.0294 | 12.8650 | 0.011549 | 0.097825 | 0.680 |
+| 厚硬 | 5.0321 | 12.8678 | 0.019546 | 0.066169 | 0.721 |
+
+三档各一次，均未出现满足抬升≥50 mm且支撑<0.05 N的采样。采样中的膜—内容物与膜—支撑几何深度均0、内容物角点外露0、非指穿透0、数值警告0，状态有限。机械臂跟踪峰值169.40/169.70/170.25 mm，接近下压力峰值35.35/31.71/31.10 N，实际夹紧滤波峰值约0.68–0.73 N，原10 N控制目标未建立稳定夹持。完整动作录制通过，顶面搓起未通过。工程材料预设未经实物标定，单次演示不构成重复性或物理验收。
+
+三档使用相同平台、适配器和材料源码指纹，逐文件快照哈希检查通过。新增选项默认False已核对，原默认停止分支保留。三段参数视频为1280×640、20fps，片长12.95/12.90/12.90秒；同步近景对照为1920×720、259帧、12.95秒、1倍速，末尾定格最多0.05秒。全部四段完整解码通过，核对顶面接近、搓合、松爪抽帧，以及失败时刻的红色提示。源状态间隔20 ms，视频由共享Mesa llvmpipe回放并插值。
+
+可从仓库根目录按下式复现单档，其他档位替换目录名；每档完整命令见commands.json，输出应选新目录。
+
+```sh
+PYTHONPATH=test/bag_model:experience:. flock /tmp/claude-gpu.lock \
+  .venv-physical-parcel/bin/python -u -B test/bag_model/record_physical_parcel.py \
+  --config test/runs/2026-11-16/bag/physical-parcel-top-parameters-r2/thin-soft/config.json \
+  --output test/runs/2026-11-16/bag/physical-parcel-top-parameters-replay/thin-soft/recording
+```
+
+[完整对照视频](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/top-grasp-parameter-comparison.mp4) · [配置与入口](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/manifest.json) · [结果](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/summary.json) · [视频核对](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/video-verification.json) · [任务检查](../../reports/physical-parcel-top-parameter-video-test.md)
