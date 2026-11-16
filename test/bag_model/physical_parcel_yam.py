@@ -11,7 +11,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT), str(ROOT / "experience")]
-from bag_sim.physical_parcel import Config as ParcelConfig, Parcel, vec  # noqa: E402
+from bag_sim.physical_parcel import Config as ParcelConfig, Parcel, material_parameters, vec  # noqa: E402
 from yam_platform.protocol import MuJoCoSim, TrialConfig, attach_robot, measure_contacts  # noqa: E402
 from physical_parcel_checks import film_box_geometry, film_payload_geometry  # noqa: E402
 
@@ -22,6 +22,7 @@ class Config(TrialConfig):
     pinch_coeff: float = 0.0
     contact_time: float = 0.001
     mode: str = "rigid"
+    geometry: str = "geometry/kraft_coarse_35.npz"
     bag_size: tuple = (0.35, 0.25)
     payload_size: tuple = (0.12, 0.08, 0.03)
     payload_mass: float = 0.3
@@ -34,6 +35,11 @@ class Config(TrialConfig):
     initial_state: str | None = None
     bend_damping_ratio: float = 0.1
     rayleigh: float = 1e-4
+    material: dict | None = None
+    friction: float = .45
+    compression_k1: float = 800.
+    compression_k2: float = 20000.
+    compression_damping: float = 1.
 
     def __post_init__(self):
         if self.grasp_face not in ("top", "side"):
@@ -111,11 +117,15 @@ def compile_yam_model(parcel, built, xml):
 
 
 def parcel_world(cfg):
-    p = Parcel(ParcelConfig(mode=cfg.mode, bag_size=tuple(cfg.bag_size),
+    material = material_parameters(**cfg.material) if cfg.material is not None else {}
+    p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
         payload_size=tuple(cfg.payload_size), payload_mass=cfg.payload_mass,
         joint_stiffness=cfg.joint_stiffness, center=(-0.25, 0.04),
         timestep=cfg.dt, contact_time=cfg.contact_time,
-        bend_damping_ratio=cfg.bend_damping_ratio, rayleigh=cfg.rayleigh))
+        bend_damping_ratio=cfg.bend_damping_ratio, rayleigh=cfg.rayleigh,
+        friction=cfg.friction, compression_k1=cfg.compression_k1,
+        compression_k2=cfg.compression_k2, compression_damping=cfg.compression_damping,
+        **material))
     root = ET.fromstring(p.xml)
     world = root.find("worldbody")
     world.remove(root.find(".//body[@name='contact_probe']"))

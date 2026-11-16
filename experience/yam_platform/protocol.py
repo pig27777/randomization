@@ -26,6 +26,8 @@ class TrialConfig:
     wall_limit: float=1800.
     smoke_seconds: float=0.
     arm_height: float=.27
+    lift_height: float=.25
+    gripper_overtravel: float=0.
 
 def vec(x):
     return ' '.join(format(float(v),'.17g') for v in np.asarray(x).ravel())
@@ -160,6 +162,10 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
 
 
 def run(backend, cfg, output, *, on_sample=None):
+    if not np.isfinite(cfg.lift_height) or cfg.lift_height <= 0:
+        raise ValueError("lift_height must be finite and positive")
+    if not np.isfinite(cfg.gripper_overtravel) or cfg.gripper_overtravel < 0:
+        raise ValueError("gripper_overtravel must be finite and nonnegative")
     output.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
     (output/"config.json").write_text(json.dumps(asdict(cfg),indent=2))
@@ -172,6 +178,9 @@ def run(backend, cfg, output, *, on_sample=None):
     robot = backend.scene(cfg)
     sim = robot.sim
     m,d = sim.m,sim.d
+    if -cfg.gripper_overtravel < m.actuator_ctrlrange[robot.gripper, 0]:
+        raise ValueError("gripper_overtravel exceeds the existing actuator range")
+    minimum_gap = -2 * cfg.gripper_overtravel
     (output/"model.xml").write_text(sim.built.xml)
     if hasattr(backend, "save_model"):
         backend.save_model(sim, output)
@@ -251,19 +260,19 @@ def run(backend, cfg, output, *, on_sample=None):
             if elapsed>8:
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):
-            gap=float(np.clip(gap+np.clip((filtered.mean()-10)*.002,-.05,.015)*dt,0.,.045))
+            gap=float(np.clip(gap+np.clip((filtered.mean()-10)*.002,-.05,.015)*dt,minimum_gap,.045))
             if phase=="close":
                 if spring.reference_gap is None and contacted and all(feedback["top_contact_each"]):
                     spring.arm(max(robot.gap(),0.),cfg.pinch_coeff>0)
                 stable=stable+dt if filtered.mean()>=9.5 else 0.
-                next_phase="lift" if stable>=.05 or elapsed>=8 or gap<=0 else None
+                next_phase="lift" if stable>=.05 or elapsed>=8 or gap<=minimum_gap else None
                 if next_phase:
                     if cfg.pinch_coeff>0 and not pinch.try_bind(current_tips):
                         outcome,reason="grasp_fail","v1.3 pinch eligibility absent at end of close"
                     lift_site=target.copy(); lift_object=sim.com().copy()
             elif phase=="lift":
-                target=lift_site+np.array([0.,0.,min(.25,.10*elapsed)])
-                next_phase="lift_hold" if elapsed>=2.5 else None
+                target=lift_site+np.array([0.,0.,min(cfg.lift_height,.10*elapsed)])
+                next_phase="lift_hold" if elapsed>=cfg.lift_height/.10 else None
             elif phase=="lift_hold":
                 next_phase="carry" if elapsed>=.2 else None
                 if next_phase and feedback["support_N"]>.05:
@@ -271,7 +280,7 @@ def run(backend, cfg, output, *, on_sample=None):
             elif phase=="carry":
                 duration=np.sqrt(2*np.pi*.5/1.)
                 a=min(1.,elapsed/duration)
-                target=lift_site+np.array([.5*(a-np.sin(2*np.pi*a)/(2*np.pi)),0.,.25])
+                target=lift_site+np.array([.5*(a-np.sin(2*np.pi*a)/(2*np.pi)),0.,cfg.lift_height])
                 next_phase="carry_hold" if a>=1 else None
             else:
                 next_phase="lower" if elapsed>=.3 else None

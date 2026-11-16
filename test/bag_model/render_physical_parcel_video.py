@@ -19,6 +19,7 @@ def main():
     parser.add_argument("run", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--ffmpeg", type=Path, required=True)
+    parser.add_argument("--view", choices=("both", "detail"), default="both")
     args = parser.parse_args()
     encoder = args.ffmpeg.resolve(strict=True)
     original = render_video.subprocess.Popen
@@ -32,7 +33,7 @@ def main():
         return original(command, *positional, **keywords)
 
     with patch.object(render_video.subprocess, "Popen", encode):
-        render_video.render(args.run, args.output, fps=20)
+        render_video.render(args.run, args.output, fps=20, view=args.view)
     metadata = args.output.with_name(args.output.stem + "_render.json")
     result = json.loads(metadata.read_text())
     result.update(encoder=str(encoder), representation="existing_two_sheet_2d_flex",

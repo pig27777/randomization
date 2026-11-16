@@ -259,3 +259,11 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
 首轮在用户要求停止后交付报告，随后追加YAM录像。几何复核发现旧初态和受压膜面穿透，已修正三角面初始化、MuJoCo4反力刷新，并将内容物接触改为同形八顶点凸mesh。11项回归和0.3秒静置通过。YAM真实运行到4.46855秒lift阶段，双侧指尖接触丢失而grasp_fail，224次20 ms采样中内容物—膜面相交为0。整体物理验收尚未通过。
 
 旧构型与box路径的GPU最大已测8192环境、9032.73环境步/s，9216 Graph创建OOM，每轮仅1.25 ms仿真；当前凸mesh版本的速度与容量尚未重测。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [首轮检查](../reports/physical-parcel-test.md) · [录像与穿透修复检查](../reports/physical-parcel-yam-video-test.md)。
+
+### 最外缘封口袋（2026-11-16）
+
+`geometry/kraft_edge_sealed_35.npz` 从原袋正反片生成，四周最外轮廓合并为34个共享封边节点，142节点、280三角面，闭合定向网格。参考态为两片平膜，面积0.175 m²；默认面密度对应21 g。生成入口为 `python -B bag_sim/make_edge_sealed_geometry.py`，物理模型通过 `Config(geometry="geometry/kraft_edge_sealed_35.npz")` 选择，YAM适配器使用同名参数。
+
+该版减回弹演示采用弯曲阻尼0.6、Rayleigh 5e-4 s及100 μs步长，0.5秒静置和16项回归通过。材料参数仍为工程预设，抓取结果与视频见同一主题报告。
+
+随机化录像入口为 `test/bag_model/randomized_physical_parcel_video.py`，两组同时随机采样袋尺寸、E/厚度/密度/摩擦/阻尼与内部物体尺寸/质量/弯曲刚度，分别采用刚体侧抓和三段可弯曲体顶抓，画面显示参数。种子20261116，用户授权本次35 cm抬升和单轨5 mm压紧余量。侧抓最高抬升21.03 cm、连续悬挂2.74秒，窗口止于carry；顶面搓起失败。侧抓原生接触峰值1.1972 mm超过1 mm预算，整体物理验收仍未通过。

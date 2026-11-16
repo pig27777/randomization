@@ -15,6 +15,7 @@ import contents  # noqa: E402,F401  (package import must coexist with legacy hel
 from bag_sim.physical_parcel import Config, Parcel, material_parameters, compression_force  # noqa: E402
 from bag_sim.bag_model import dihedrals  # noqa: E402
 from bag_sim.wrap import triangle_box_intersections, winding_number  # noqa: E402
+from bag_sim.make_edge_sealed_geometry import edge_sealed_geometry  # noqa: E402
 import physical_parcel_yam  # noqa: E402
 
 
@@ -31,6 +32,34 @@ class PhysicalParcelTests(unittest.TestCase):
         self.assertEqual(p.m.nflexelem, 396)
         self.assertEqual(p.m.neq, 0)
         self.assertTrue(np.all(p.envelope['masses'] > 0))
+
+    def test_edge_sealed_variant_has_shared_outer_perimeter(self):
+        mesh = edge_sealed_geometry(ROOT / 'bag_sim/geometry/kraft_coarse_35.npz')
+        with np.load(ROOT / 'bag_sim/geometry/kraft_edge_sealed_35.npz') as saved:
+            for name, value in mesh.items():
+                np.testing.assert_array_equal(saved[name], value)
+        vertices, faces = mesh['vertices'], mesh['faces']
+        top = np.unique(faces[mesh['panel_ids'] == 0])
+        bottom = np.unique(faces[mesh['panel_ids'] == 3])
+        np.testing.assert_array_equal(np.intersect1d(top, bottom), np.sort(mesh['seam_vertices']))
+        boundary = np.any(np.isclose(abs(vertices[:, :2]), [.125, .175]), axis=1)
+        np.testing.assert_array_equal(np.flatnonzero(boundary), np.sort(mesh['seam_vertices']))
+        directed = np.concatenate([faces[:, [0, 1]], faces[:, [1, 2]], faces[:, [2, 0]]])
+        edges, counts = np.unique(np.sort(directed, axis=1), axis=0, return_counts=True)
+        np.testing.assert_array_equal(counts, 2)
+        self.assertEqual(len(np.unique(directed, axis=0)), len(directed))
+        self.assertEqual(len(vertices) - len(edges) + len(faces), 2)
+        self.assertTrue(np.all(vertices[:, 2] == 0))
+        p = Parcel(replace(Config(), geometry='geometry/kraft_edge_sealed_35.npz',
+                           timestep=.0001, bend_damping_ratio=.6, rayleigh=.0005))
+        self.assertEqual(p.m.nflexvert, 142)
+        self.assertEqual(p.m.nflexelem, 280)
+        self.assertEqual(p.m.neq, 0)
+        self.assertAlmostEqual(p.envelope['masses'].sum(), .021)
+        self.assertTrue(np.all(p.envelope['masses'] > 0))
+        self.assertEqual(p.envelope['metadata']['preparation']['payload_intersecting_triangles'], 0)
+        self.assertLess(p.envelope['metadata']['preparation']['maximum_edge_strain'], .05)
+        np.testing.assert_allclose(np.abs(p.envelope['metadata']['preparation']['payload_corner_winding']), 1)
 
     def test_reference_geometry_is_independent(self):
         p = self.parcel

@@ -588,3 +588,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 修复初态三角面穿盒、MuJoCo4反力刷新及box专用碰撞漏检，内容物改用同形凸mesh接触；11项回归、0.3秒静置通过。
 - YAM执行到4.46855秒lift，双侧指尖接触丢失而grasp_fail，224次20 ms采样内容物—膜面相交0；已导出4.5秒实际视频。
 - 当前凸mesh配置GPU吞吐/容量未重测，旧8192环境数据对应旧构型。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-yam-video-test.md)。
+
+### 2026-11-16 最外缘封口与袋/内容物随机化录像（ubun）
+
+- 最外缘共享节点封边，142节点、280面，16项封口回归和0.5秒准备通过；用户授权本次35 cm抬升及单轨5 mm闭合余量。
+- 仅录两组随机配置，刚体侧抓最高抬升21.03 cm、连续悬挂2.74秒，10秒止于carry；三段可弯曲体顶面搓起失败。参数已标在1倍速实际视频中。
+- 侧抓原生接触1.1972 mm超过1 mm预算，整体物理验收仍未通过。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-yam-video-test.md)。

@@ -37,7 +37,7 @@ def main(default_backend="yam_platform.rigid_control"):
     parser.add_argument('--model-options',default='{}',help='Model-specific JSON options')
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--category',choices=('bendable','compressible'),default='bendable')
-    for name,default in (('yaw',0.),('tilt',0.),('dt',.001),('pinch-coeff',1.),('contact-time',.005),('wall-limit',1800.),('smoke-seconds',0.),('arm-height',.27)):
+    for name,default in (('yaw',0.),('tilt',0.),('dt',.001),('pinch-coeff',1.),('contact-time',.005),('wall-limit',1800.),('smoke-seconds',0.),('arm-height',.27),('lift-height',.25),('gripper-overtravel',0.)):
         parser.add_argument(f'--{name}',type=float,default=default)
     args=vars(parser.parse_args());backend=args.pop('backend');output=args.pop('output');extra=json.loads(args.pop('model_options'))
     if set(args)&set(extra):parser.error('model-options cannot replace shared protocol options')

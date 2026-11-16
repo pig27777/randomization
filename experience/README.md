@@ -62,6 +62,10 @@ flock /tmp/claude-gpu.lock ../.venv/bin/python -B -m yam_platform.benchmark --ou
 
 每次新运行保存实际共享平台和模型源码、SHA256、机器人资产指纹、模型、接触轨迹、关节状态与结果。旧目录拒绝覆盖。
 
+抬升行程通过 `--lift-height` 设置，默认0.25 m，速度0.1 m/s，保持与搬运阶段使用同一高度。2026-11-16用户授权袋子演示单次使用0.35 m，运行配置保存实际行程。
+
+`--gripper-overtravel` 设置单轨零位后的闭合余量，默认0 m，并校验模型已有控制范围。2026-11-16用户授权本次薄膜演示使用0.005 m，10 N反馈目标和原驱动力限制继续生效。
+
 ## 来源
 
 公共流程迁自 randomization 的 `test/flex3d/`，机械臂迁自 `policy/yam_probe_robot.py`。接触统计和弹簧保留冻结 v1.3 的实现，圆角几何来自 `bag_sim/mj_loose.py`。本次没有修改材料本构或进行物理重新标定。
