@@ -77,9 +77,11 @@ def sample(seed: int, episode: int, rigid: int, prototype: int,
         proto = 2 + e % 4
         if rigid == 1:
             proto = e % 2
+    # Consume the same draw for tight/loose twins, preserving identical payload responses.
+    loose_slack = wp.randf(rng,bounds[4][0],bounds[4][1])
     p.slack = 0.01
     if proto % 2 == 1:
-        p.slack = wp.randf(rng,bounds[4][0],bounds[4][1])
+        p.slack = loose_slack
     p.slack_y = p.slack*wp.randf(rng,bounds[17][0],bounds[17][1])
     # Target cantilever tip deflection under an end force equal to its weight.
     sag = wp.randf(rng,bounds[11][0],bounds[11][1])

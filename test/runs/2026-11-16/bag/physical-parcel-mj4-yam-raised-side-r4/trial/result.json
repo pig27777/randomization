@@ -1,0 +1,186 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 90.0,
+    "tilt": 0.0,
+    "dt": 2.5e-05,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.001,
+    "wall_limit": 7200.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "mode": "rigid",
+    "bag_size": [
+      0.35,
+      0.25
+    ],
+    "payload_size": [
+      0.12,
+      0.08,
+      0.03
+    ],
+    "payload_mass": 0.3,
+    "joint_stiffness": 0.08,
+    "simulation_seconds": 30.0,
+    "grasp_face": "side",
+    "support_height": 0.15,
+    "side_start_distance": 0.02,
+    "side_height_offset": 0.006
+  },
+  "hostname": "ubun",
+  "mujoco": "4.0.1",
+  "python": "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/bin/python",
+  "frozen_v13_sha256": null,
+  "source_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "37d544dd620ca133a66c9d2d424df431839d55091a0aecde29c601ecf9e833c4",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "0f163d020939bfc0365cc9512762af22a6d11dfb6d9dfb0ae64b6c35ebbdd99e",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "902cb5b007a3547f6841bb6537e792dfe6bba9d0a44dd92a474a39ee2296a99c",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "platform": "0f163d020939bfc0365cc9512762af22a6d11dfb6d9dfb0ae64b6c35ebbdd99e",
+    "backend": "057c089b469461059c12b6d3c76084498727f9767ab22a51a141bdb2c98a6406",
+    "parcel_model": "a8995d83dfc319d53063ac765c77da664117547efbc6b5b8c9cdbf8b18b01506",
+    "parcel_material": "baf174e77d2e79ee16a869cebcf32b0e8387953f6c8e0ffd4c18724ccd9dcb4c",
+    "parcel_wrap": "96a392f5fe216aee0dc04fd9e01eda8c74603eaf07e00f35a13b3478b1dd9694",
+    "parcel_geometry_check": "41fc0f7a676c620580fb2d69e142ae05ee5c42d12462d96d1a7ce38230caddb2"
+  },
+  "backend": "physical_parcel_yam",
+  "robot_source_sha256": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+  "outcome": "grasp_fail",
+  "reason": "final COM outside v2.2 target square",
+  "phase": "open",
+  "sim_time_s": 11.201500000090968,
+  "wall_s": 2554.1121684110003,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 24.658703463417194,
+    "nonfinger_mm": 24.658703463417194,
+    "grip_N": 3.0105428945803645,
+    "down_N": 2.8301036273127296,
+    "tracking_mm": 212.66404973632163
+  },
+  "model_metrics": {
+    "load_transfer": "native finger-film-payload contacts",
+    "attachments": 0
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.30004999999997106
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.30004999999997106,
+      "end_s": 2.4006999999977396
+    },
+    {
+      "phase": "close",
+      "start_s": 2.4006999999977396,
+      "end_s": 4.715899999992344
+    },
+    {
+      "phase": "lift",
+      "start_s": 4.715899999992344,
+      "end_s": 7.215949999986518
+    },
+    {
+      "phase": "lift_hold",
+      "start_s": 7.215949999986518,
+      "end_s": 7.4159999999860515
+    },
+    {
+      "phase": "carry",
+      "start_s": 7.4159999999860515,
+      "end_s": 9.188500000024144
+    },
+    {
+      "phase": "carry_hold",
+      "start_s": 9.188500000024144,
+      "end_s": 9.488525000034103
+    },
+    {
+      "phase": "lower",
+      "start_s": 9.488525000034103,
+      "end_s": 10.70147500007437
+    },
+    {
+      "phase": "open",
+      "start_s": 10.70147500007437,
+      "end_s": 11.201500000090968
+    }
+  ],
+  "initial_com": [
+    -0.2499812639828745,
+    0.040238337599818826,
+    0.1659972300604523
+  ],
+  "final_com": [
+    0.46963479548931025,
+    0.14955212096544587,
+    0.07537056582970916
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 189.862277182747,
+    "ik_max_rotation_deg": 63.73594116018856,
+    "tracking_max_mm": 212.66404973632163,
+    "tracking_p95_mm": 160.59502674727875,
+    "actuator_peak_Nm": [
+      3.1639416315884716,
+      14.569232638211304,
+      28.0,
+      10.0,
+      1.6551012006187449,
+      8.934085951825978
+    ],
+    "control_clip_steps": 287182,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 614,
+    "film_vertices": 200,
+    "film_triangles": 396,
+    "artificial_attachments": 0
+  },
+  "warnings": {}
+}

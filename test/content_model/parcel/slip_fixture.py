@@ -18,7 +18,7 @@ def main(output,dt=.0005):
     output.mkdir(parents=True,exist_ok=False)
     rows=[]
     for friction in (.05,.8):
-        b=Batch(8,rigid=True,prototype=1,action=2,level=0,dt=dt)
+        b=Batch(8,envelope=False,rigid=True,prototype=1,action=2,level=0,dt=dt)
         graph=b.graph()
         b.reset()
         for _ in range(round(.8/b.dt)):wp.capture_launch(graph)

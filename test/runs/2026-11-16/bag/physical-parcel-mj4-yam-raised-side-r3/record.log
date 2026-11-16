@@ -1,0 +1,11 @@
+{"time_s": 2.5e-05, "phase": "settle", "wall_s": 0.6294906150005772}
+{"time_s": 0.32002499999996886, "phase": "approach", "wall_s": 71.4095864990004}
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/test/runs/2026-11-16/bag/physical-parcel-mj4-yam-raised-side-r3/record.py", line 30, in <module>
+    result = run(backend, cfg, root / "trial", on_sample=observe)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/experience/yam_platform/protocol.py", line 307, in run
+    sim.step()
+  File "/home/ubuntu/Dev/Projects/random/test/bag_model/physical_parcel_yam.py", line 87, in step
+    mujoco.mj_step2(self.m, self.d)
+KeyboardInterrupt

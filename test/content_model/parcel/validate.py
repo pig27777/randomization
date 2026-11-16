@@ -50,7 +50,7 @@ def fixtures(out, seconds=2.0, n=8, dt=.0005):
     results=[]
     for prototype in range(6):
         for action,level,label in ((0,0,'static'),(1,0,'compression'),(2,1,'bag'),(2,2,'engagement'),(2,1,'eccentric')):
-            b=Batch(n,rigid=prototype<2,prototype=prototype,action=action,level=level,
+            b=Batch(n,envelope=False,rigid=prototype<2,prototype=prototype,action=action,level=level,
                     dt=dt,eccentric=.04 if label=='eccentric' else 0)
             samples=run(b,seconds,bag_bind=level==1)
             final=samples[-1]
@@ -81,7 +81,7 @@ def benchmark(out, sizes, steps):
     for rigid in (True,False):
         for n in sizes:
             for level in (0,1,2):
-                b=Batch(n,rigid=rigid,level=level)
+                b=Batch(n,envelope=False,rigid=rigid,level=level)
                 graph=b.graph()
                 for _ in range(20):
                     wp.capture_launch(graph)
@@ -124,7 +124,7 @@ def main():
     else:
         result=[]
         for rigid in (True,False):
-            b=Batch(args.n,rigid=rigid,action=2,dt=args.dt)
+            b=Batch(args.n,envelope=False,rigid=rigid,action=2,dt=args.dt)
             samples=run(b,args.seconds)
             q=np.array([x['qpos'] for x in samples])
             failed=~np.isfinite(q).all(axis=(0,2))

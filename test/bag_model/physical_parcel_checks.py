@@ -27,42 +27,47 @@ def serial(value):
     raise TypeError(type(value).__name__)
 
 
-def film_payload_geometry(m, d, faces):
-    """Audit full triangles independently of the native contact candidate list."""
+def film_box_geometry(m, d, faces, geom):
+    """Audit full triangles against one box-shaped solid, including convex meshes."""
     vertices = d.flexvert_xpos.copy()
     weights = np.array([[i/16, j/16, 1-(i+j)/16] for i in range(17) for j in range(17-i)])
     signs = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
+    name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, geom)
+    center, half = d.geom_xpos[geom], m.geom_size[geom]
+    rotation = d.geom_xmat[geom].reshape(3, 3)
+    intersecting = triangle_box_intersections(vertices, faces, half, center, rotation)
+    winding = winding_number(vertices, faces, (signs * half) @ rotation.T + center)
+    depth = 0.0
+    depth_upper = 0.0
+    if intersecting.any():
+        points = np.einsum("sk,tkj->tsj", weights, vertices[faces[intersecting]])
+        q = np.abs((points - center) @ rotation) - half
+        sdf = np.linalg.norm(np.maximum(q, 0), axis=2) + np.minimum(q.max(axis=2), 0)
+        depth = float(max(0, -sdf.min()))
+        # Intersect successively inset boxes to bound the deepest surface point.
+        lower, depth_upper = 0.0, float(half.min())
+        for _ in range(25):
+            middle = (lower + depth_upper) / 2
+            inside = triangle_box_intersections(vertices, faces[intersecting],
+                                                half - middle, center, rotation)
+            if inside.any():
+                lower = middle
+            else:
+                depth_upper = middle
+    return dict(geom=name, intersecting_triangles=int(intersecting.sum()),
+                outside_corners=int(np.sum(np.abs(winding) < .5)),
+                corner_winding=winding.tolist(), sampled_depth_m=depth,
+                geometric_depth_upper_m=depth_upper)
+
+
+def film_payload_geometry(m, d, faces):
+    """Audit payload faces independently of the native contact candidate list."""
     rows = []
     for geom in range(m.ngeom):
         name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, geom) or ""
         if not name.startswith(("payload_geom_", "plate_geom_")):
             continue
-        center, half = d.geom_xpos[geom], m.geom_size[geom]
-        rotation = d.geom_xmat[geom].reshape(3, 3)
-        intersecting = triangle_box_intersections(vertices, faces, half, center, rotation)
-        winding = winding_number(vertices, faces, (signs * half) @ rotation.T + center)
-        depth = 0.0
-        depth_upper = 0.0
-        if intersecting.any():
-            points = np.einsum("sk,tkj->tsj", weights, vertices[faces[intersecting]])
-            q = np.abs((points - center) @ rotation) - half
-            sdf = np.linalg.norm(np.maximum(q, 0), axis=2) + np.minimum(q.max(axis=2), 0)
-            depth = float(max(0, -sdf.min()))
-            # Intersect successively inset boxes to bound the deepest surface
-            # point. This catches narrow intersections between lattice samples.
-            lower, depth_upper = 0.0, float(half.min())
-            for _ in range(25):
-                middle = (lower + depth_upper) / 2
-                inside = triangle_box_intersections(vertices, faces[intersecting],
-                                                    half - middle, center, rotation)
-                if inside.any():
-                    lower = middle
-                else:
-                    depth_upper = middle
-        rows.append(dict(geom=name, intersecting_triangles=int(intersecting.sum()),
-                         outside_corners=int(np.sum(np.abs(winding) < .5)),
-                         corner_winding=winding.tolist(), sampled_depth_m=depth,
-                         geometric_depth_upper_m=depth_upper))
+        rows.append(film_box_geometry(m, d, faces, geom))
     return dict(intersecting_triangles=sum(row["intersecting_triangles"] for row in rows),
                 outside_corners=sum(row["outside_corners"] for row in rows),
                 sampled_depth_m=max(row["sampled_depth_m"] for row in rows),

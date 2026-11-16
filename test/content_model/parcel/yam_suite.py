@@ -12,5 +12,5 @@ if __name__=='__main__':
     args=parser.parse_args()
     args.output.mkdir(parents=True,exist_ok=False)
     for prototype in range(6):
-        execute('parcel.yam_adapter',dict(prototype=prototype,dt=.0005,
+        execute('parcel.yam_adapter',dict(prototype=prototype,dt=.000125,
                 category='compressible' if prototype>=4 else 'bendable'),args.output/f'p{prototype}')

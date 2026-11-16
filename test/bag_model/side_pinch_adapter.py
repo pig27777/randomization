@@ -1,24 +1,21 @@
-"""Side-pinch adapter for the unified YAM grasp platform (test/flex3d), four-part bag template.
+"""Side-pinch adapter for the unified YAM grasp platform (experience/yam_platform), four-part bag template.
 
 Contents: frozen v1.3 segmented body, read-only through test/flex3d/segmented.py (all faces compress
 through the released bushings, no plate stand-ins). Film: 20 taut-only spatial tendons from two sites on
-the real palm (link_6, at the platform pinch frame +-10 mm along the finger width) to the box corners and
-edge midpoints, shortened at the pinch; reactions load the arm. Pinch rule (r2): film at the grip point and
-gather >= GATHER_MIN -> ropes engage; press depth > DEPTH_CRIT -> the face-layer segments between the
-fingers are also pinned to the pinch frame. Each group releases on its own overload (pinch_coeff x current
-grip force). Rope slack is assigned per film loop (four_part_pack_demo.loop_slack). Hold damping (relative contents-palm
-velocity, only while a rope carries load) and closing-consumes-slack are on by default, switchable for comparison.
+the real palm (link_6, at the platform pinch frame +-10 mm along the finger width, lower one "rope_ga") to the
+box corners and edge midpoints, shortened at the pinch; reactions load the arm. Pinch rule (r2): film at the
+grip point and gather >= GATHER_MIN -> ropes engage; press depth > DEPTH_CRIT -> the face-layer segments
+between the fingers are also pinned to the pinch frame. Each group releases on its own overload (pinch_coeff x
+current grip force). Rope slack is assigned per film loop (four_part_pack_demo.loop_slack). Hold damping
+(relative contents-palm velocity, only while a rope carries load) and closing-consumes-slack are on by default,
+switchable for comparison; optional film bending stiffness (default 0).
 
-STATUS 2026-11-11: written and statically checked only. Running it needs (1) the YAM assets that
-policy/yam_probe_robot.py loads, and (2) an optional approach direction in grasp_platform.attach_robot /
-run, described in test/runs/2026-11-11/bag/side-pinch-demo-r2/REPORT.md. scene() refuses to start
-without (2) instead of running a top-down pinch under a side-pinch name.
+Needs the platform's optional approach direction (yam_platform.protocol.attach_robot(..., approach=...)).
 
-Usage after both are in place (repository root):
-  python -B test/flex3d/angles.py --backend side_pinch_adapter --dt .0004 \
-    --model-options '{"size":[0.3,0.2,0.04],"mass":0.5,"slack":[0.04,0.04],"face":"y"}' --output <new dir>
-(test/bag_model must be on PYTHONPATH; category "hard" is not offered by the angles.py CLI and needs
-angles.execute() with a dict.)
+Usage (from experience/; category "hard" is not offered by the angles CLI, so use run_suite --cases):
+  PYTHONPATH=../test/bag_model python -B -m yam_platform.run_suite behavior --backend side_pinch_adapter \
+    --cases cases.json --output <new dir>
+  with cases.json e.g. [{"category": "hard", "size": [0.3, 0.2, 0.04], "mass": 0.5, "slack": [0.04, 0.04]}]
 """
 from dataclasses import dataclass, replace
 import inspect
@@ -31,9 +28,9 @@ import numpy as np
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-sys.path[:0] = [str(ROOT / "test/flex3d"), str(HERE)]
-import segmented as SEG  # noqa: E402  (also activates the frozen v1.3 package)
-from grasp_platform import attach_robot, measure_contacts  # noqa: E402
+sys.path[:0] = [str(ROOT / "experience"), str(ROOT / "test/flex3d"), str(HERE)]
+import segmented as SEG  # noqa: E402  (model adapter kept in test/flex3d; activates the frozen v1.3 package)
+from yam_platform.protocol import attach_robot, measure_contacts, tips  # noqa: E402
 import mj_adapter as A  # noqa: E402
 from model import ANCHORS, build  # noqa: E402
 from pinch import fragments  # noqa: E402
@@ -43,8 +40,8 @@ GATHER_MIN, DEPTH_COEF, DEPTH_CRIT = 0.008, 1.0, 0.005   # r1/r2 initial values,
 LOAD_TAU = 0.005
 FREE = 10.0
 ROPE_SOLREF = "0.005 1"           # no tendon damping; dissipation only in the limit constraint
-SITE_HALF = 0.010                 # rope sites +-10 mm along the 20 mm finger width
-PINCH_Z = 0.1347                  # platform pinch frame on link_6 (grasp_platform.MuJoCoSim)
+SITE_HALF = 0.010                 # rope sites +-10 mm along the 20 mm finger width (link_6 local y)
+PINCH_Z = 0.1347                  # platform pinch frame on link_6 (yam_platform.protocol.MuJoCoSim)
 CENTER = np.array([-.25, .04])    # platform pick position
 
 
@@ -58,6 +55,9 @@ class Config(SEG.Config):
     hold_damping: bool = True          # damp contents-palm relative velocity while a rope carries load
     close_consumes_slack: bool = True  # fingers take up (w - g)/2 of the slack of the loop they close along
     film_bend_k: float = 0.0           # film bending stiffness [N m/rad]; ~0 plastic film, >0 paper / padded mailers
+    # Downward pitch of the approach from horizontal [deg]. 0 = the planned horizontal side pinch; on the
+    # platform YAM (270 mm mount, pick at (-0.25, 0.04)) a horizontal pose at a 40 mm face is unreachable.
+    approach_pitch_deg: float = 0.0
 
     def __post_init__(self):
         super().__post_init__()
@@ -67,6 +67,8 @@ class Config(SEG.Config):
         if s.shape != (2,) or not np.isfinite(s).all() or (s < 0).any():
             raise ValueError("slack needs two finite nonnegative lengths [m]")
         self.slack = tuple(float(v) for v in s)
+        if not 0.0 <= self.approach_pitch_deg < 90.0:
+            raise ValueError("approach_pitch_deg must be in [0, 90)")
 
 
 # ---------- pure geometry and rules (no simulator; checked by test_side_pinch_adapter.py)
@@ -181,8 +183,10 @@ class RopeSim(SEG.SegmentSim):
             for s in items:
                 node.append(ET.fromstring(s))
         link = root.find(".//body[@name='link_6']")
-        for nm, x in (("rope_ga", -SITE_HALF), ("rope_gb", SITE_HALF)):   # local x = finger width (to verify)
-            ET.SubElement(link, "site", name=nm, pos=f"{x} 0 {PINCH_Z}", size=".003")
+        # link_6 local y is the finger width (grasp site x); with the gripper camera kept up it points up,
+        # so rope_ga is the lower site (checked in scene()).
+        for nm, y in (("rope_ga", -SITE_HALF), ("rope_gb", SITE_HALF)):
+            ET.SubElement(link, "site", name=nm, pos=f"0 {y} {PINCH_Z}", size=".003")
         tendon = root.find("tendon")
         if tendon is None:
             tendon = ET.SubElement(root, "tendon")
@@ -244,8 +248,7 @@ class RopeSim(SEG.SegmentSim):
 
 def scene(cfg):
     if "approach" not in inspect.signature(attach_robot).parameters:
-        raise RuntimeError("side pinch needs the optional approach direction in grasp_platform.attach_robot/run "
-                           "(not landed; see side-pinch-demo-r2 REPORT, platform change section)")
+        raise RuntimeError("side pinch needs the optional approach direction in yam_platform.protocol.attach_robot")
     anchor = ANCHORS[cfg.category]
     kappa = replace(anchor, pinch_coeff=cfg.pinch_coeff,
                     size=cfg.size if cfg.size is not None else anchor.size,
@@ -265,10 +268,19 @@ def scene(cfg):
     built.rope_anchors, built.rope_sites, built.rope_tendons, built.face_segments = anchors, sites, tendons, face
     n, c, w = approach_axes(cfg.face)
     face_point = np.r_[CENTER, .002 + size[2] / 2] - n * (size @ np.abs(n) / 2)
+    a = np.radians(cfg.approach_pitch_deg)
+    n_arm = np.cos(a) * n + np.sin(a) * np.array([0., 0., -1.])    # approach tilted down about the closing axis
+    # The platform orients the grasp site as [c x n, c, n]; the wrist camera sits on its -x side, so pick the
+    # closing sign that keeps the camera above the fingers (fingers are symmetric).
+    closing = c if np.cross(c, n_arm)[2] < 0 else -c
     robot = attach_robot(cfg, built, RopeSim, CENTER, size[2] + .002, kappa.size, kappa.mass,
-                         approach=dict(direction=n, closing=c, contact_point=face_point))
+                         approach=dict(direction=n_arm, closing=closing, contact_point=face_point))
+    d, m = robot.sim.d, robot.sim.m
+    if not d.site_xpos[m.site("rope_ga").id][2] < d.site_xpos[m.site("rope_gb").id][2]:
+        raise RuntimeError("rope_ga must be the lower palm site in the side-pinch pose")
     robot.sim.pad_geoms = {side: robot.all_finger_sets[j] for j, side in enumerate(('left', 'right'))}
     robot.side = dict(n=n, c=c, w=w, size=size, open_w=0.0)
+    robot.sim.robot = robot          # for the gripper-table and hold-geometry health metrics
     if cfg.hold_damping:
         robot.sim.rope_damping_c = hold_damping_coef(kappa.mass, size, cfg.face)
     robot.sim.bend_k = cfg.film_bend_k
@@ -407,13 +419,46 @@ def check_state(sim):
     T = sim.rope_tension()
     health.update(rope_tension_max_N=float(T.max(initial=0.0)), ropes_taut=int((T > 0).sum()),
                   rope_loaded=sim.rope_loaded, hold_damping_gate_toggles=sim.gate_toggles)
+    robot = getattr(sim, "robot", None)
+    if robot is not None:
+        health.update(hold_geometry(robot))
     return failure, health
+
+
+def hold_geometry(robot):
+    """Gripper-table penetration (the platform only checks the contents), pinched-face normal elevation and
+    distance from the fingertip midpoint to the contents box surface."""
+    sim, d = robot.sim, robot.sim.d
+    fingers = set().union(*robot.all_finger_sets)
+    pen = dict(gripper_table_mm=0.0, finger_table_mm=0.0)
+    for c in d.contact[:d.ncon]:
+        g = (c.geom1, c.geom2)
+        if sim.table_geom in g:
+            o = g[1] if g[0] == sim.table_geom else g[0]
+            key = "finger_table_mm" if o in fingers else "gripper_table_mm" if robot.nonfinger_mask[o] else None
+            if key:
+                pen[key] = max(pen[key], -1e3 * float(c.dist))
+    R, t = sim.content_frame()
+    size, n = robot.side["size"], robot.side["n"]
+    p = R.T @ (tips(robot).mean(0) - t)                         # object frame, origin at the box centre
+    outside = np.maximum(np.abs(p) - size / 2, 0.0)
+    return dict(**pen, face_normal_elev_deg=float(np.degrees(np.arcsin(np.clip((R @ -n)[2], -1, 1)))),
+                tip_to_surface_mm=float(1e3 * np.linalg.norm(outside)))
 
 
 def summarize(trace):
     out = SEG.summarize(trace)
     out.update({k: max((row[k] for row in trace), default=None)
-                for k in ("rope_tension_max_N", "ropes_taut", "hold_damping_gate_toggles")})
+                for k in ("rope_tension_max_N", "ropes_taut", "hold_damping_gate_toggles",
+                          "gripper_table_mm", "finger_table_mm")})
+    for ph in ("lift_hold", "carry_hold"):
+        rows = [r for r in trace if r["phase"] == ph]
+        if rows:
+            rel = np.array([np.subtract(r["com"], r["tip_mid"]) for r in rows])
+            out[f"{ph}_face_normal_elev_deg"] = float(np.mean([r["face_normal_elev_deg"] for r in rows]))
+            out[f"{ph}_tip_to_surface_mm"] = float(np.mean([r["tip_to_surface_mm"] for r in rows]))
+            out[f"{ph}_swing_pp_mm"] = float(1e3 * np.ptp(rel[:, :2], axis=0).max())
+            out[f"{ph}_support_N"] = float(np.mean([r["support_N"] for r in rows]))
     return out
 
 

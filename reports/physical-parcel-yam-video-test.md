@@ -21,3 +21,12 @@ Mesa llvmpipe回放视频为20fps、90帧、4.5秒、1倍速、1280×480双视�
 当前证据限于采样时刻和这一配置，稳定摩擦承载尚未实现。当前凸mesh版本的GPU速度和容量未重测，旧8192环境数字对应旧构型及box路径。
 
 [视频](../test/runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/yam-attempt.mp4) · [结果](../test/runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/trial/result.json) · [视频检查](../test/runs/2026-11-16/bag/physical-parcel-mj4-yam-video-r3/video-verification.json) · [主题报告与命令](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)
+
+## 同版抓起补充（2026-11-16，运行中）
+
+用户明确要求观看同形凸mesh盒体接触的这版双膜片袋实际抓起效果。静态指尖box/凸mesh对照未发现漏碰，前次闭合末实际间隙3.5436 mm，夹紧不足后进入lift。当前使用15 cm高、70×50 mm窄支撑摆放，右侧yaw90°、向下30°接近，选用共享平台已有approach接口。内容物0.3 kg、膜材料、接触摩擦与10 N目标采用该模型配置，承载由指尖—膜—盒体接触传递。
+
+- 初始8姿态检查，1组可达、7组按原IK阈值不可达，可达组位置误差0.002071 mm、姿态误差0.000125°。
+- 新增摆放、支撑尺寸、几何与配置回归，13/13通过。
+- 支撑同样使用同尺寸凸mesh，记录膜—支撑几何深度，1 mm门槛同时检查内容物与支撑。首个支撑box入口在approach早段主动停止，结果保留。
+- 正式r2目录为 `test/runs/2026-11-16/bag/physical-parcel-mj4-yam-raised-side-r2/`，CPU MuJoCo4.0.1、dt25 μs，完整动作运行中。目标为内容物离支撑≥50 mm、总支撑<0.05 N，并交付实际录像。

@@ -18,14 +18,18 @@ from experience.yam_platform.protocol import TrialConfig,MuJoCoSim,attach_robot,
 
 @dataclass
 class Config(TrialConfig):
+    dt: float = .000125
+    pinch_coeff: float = 0.0
+    contact_time: float = .001
     prototype: int = 3
     seed: int = 7
     region: int = 0
     grasp_face: str = "top"
     side_pitch_deg: float = 0.0
+    envelope: bool = True
 
     def __post_init__(self):
-        if self.grasp_face not in ("top", "side") or self.region not in range(4):
+        if self.grasp_face not in ("top", "side", "corner") or self.region not in range(4):
             raise ValueError("Invalid grasp face or material region")
         if not np.isfinite(self.side_pitch_deg) or not 0 <= self.side_pitch_deg < 90:
             raise ValueError("Side approach pitch must be in [0,90) degrees")
@@ -78,15 +82,38 @@ def scene(cfg):
                 k=p['twist'] if j==0 else p['bend']
                 joint.set('pos',vec([-cell[0]/2,0,0]));joint.set('stiffness',str(k))
                 joint.set('damping',str(2*p['damping']*np.sqrt(k*mass*cell[0]**2/12)))
+    if cfg.envelope:
+        from contents.parcel.film import topology,settings,add_xml
+        topo=topology(settings()['subdivisions'])
+        dims=size*np.array([1+float(p['slack']),1+float(p['slack_y']),1+.5*float(p['slack']+p['slack_y'])])
+        dims[2]+=.004
+        positions=topo.vertices*dims+np.array([-.25,.04,dims[2]/2+settings()['contact_radius']+.0002])
+        root=add_xml(root,positions,topo,settings())
+        core=root.find(".//body[@name='segment0']")
+        initial=np.fromstring(core.get('pos'),sep=' ');initial[2]+=.002
+        core.set('pos',vec(initial))
     built=SimpleNamespace(xml=ET.tostring(root,encoding='unicode'),desc=SimpleNamespace(),cfg=cfg,
                           params=params,states=states,rigid=rigid)
     center=np.array([-.25,.04])
     approach=None
-    if cfg.grasp_face == "side":
+    if cfg.grasp_face in ("side","corner"):
         pitch=np.radians(cfg.side_pitch_deg)
-        approach=dict(direction=np.array([0.,np.cos(pitch),-np.sin(pitch)]),closing=np.array([-1.,0.,0.]),
+        inward=np.array([0.,1.,0.])
+        closing=np.array([-1.,0.,0.])
+        if cfg.grasp_face=="corner":
+            inward=np.array([-1.,1.,0.])/np.sqrt(2)
+            closing=np.array([-1.,-1.,0.])/np.sqrt(2)
+        approach=dict(direction=np.cos(pitch)*inward+np.array([0.,0.,-np.sin(pitch)]),closing=closing,
                       contact_point=np.array([center[0],center[1]-size[1]/2,.001+size[2]/2]))
-    robot=attach_robot(cfg,built,ParcelSim,center,size[2]+.001,size,float(p['mass']),approach=approach)
+    top=size[2]+.001
+    grasp_size=size
+    if cfg.envelope:
+        top=positions[:,2].max()
+        grasp_size=dims
+        if approach is not None:
+            approach['contact_point']=np.array([center[0],center[1]-dims[1]/2,dims[2]/2+.0012])
+            if cfg.grasp_face=='corner':approach['contact_point'][0]+=dims[0]/2
+    robot=attach_robot(cfg,built,ParcelSim,center,top,grasp_size,float(p['mass']),approach=approach)
     robot.sim.robot=robot
     return robot
 
@@ -111,6 +138,29 @@ class ParcelSim(MuJoCoSim):
         self.buffers={}
         self.close=0;self.releasing=0;self.previous_gap=None
         self.events=[]
+        self.surface=None;self.observer=None
+        if built.cfg.envelope:
+            from contents.parcel.film import Surface
+            from contents.parcel.film_contacts import Observer
+            self.surface=Surface(m,1,'cpu')
+            fields=dict(body_pos=wp.array(m.body_pos[None].astype('f'),dtype=wp.vec3,device='cpu'),
+                        body_mass=wp.array(m.body_mass[None].astype('f'),dtype=float,device='cpu'),
+                        friction=wp.array(m.geom_friction[None].astype('f'),dtype=wp.vec3,device='cpu'),
+                        armature=wp.array(m.dof_armature[None].astype('f'),dtype=float,device='cpu'))
+            pads=[{g for g in range(m.ngeom) if m.geom(g).name==f'{side}_pad' or m.geom(g).name.startswith(f'{side}_round_')}
+                  for side in ('left','right')]
+            self.surface.initialize(self.params,**fields,
+                core_geoms=wp.array(sorted(self.obj_geoms),dtype=int,device='cpu'),table=self.table_geom,
+                finger_geoms=wp.array(sorted(set.union(*pads)),dtype=int,device='cpu'),seed=built.cfg.seed,
+                offset=(-.25,.04,0.))
+            m.body_pos[:]=fields['body_pos'].numpy()[0]
+            m.body_mass[:]=fields['body_mass'].numpy()[0]
+            m.geom_friction[:]=fields['friction'].numpy()[0]
+            m.dof_armature[:]=fields['armature'].numpy()[0]
+            mujoco.mj_setConst(m,self.d)
+            mujoco.mj_forward(m,self.d)
+            self.observer=Observer(m,self.surface,pads,device='cpu',capacity=2048)
+            self.close=2
 
     def com(self):
         mass=self.m.body_mass[self.core]
@@ -125,14 +175,17 @@ class ParcelSim(MuJoCoSim):
         self.previous_gap=gap
         loads=np.zeros((1,2),dtype=np.float32)
         contact=np.zeros(6)
-        for i,c in enumerate(d.contact):
-            if not any(g in self.obj_geoms for g in c.geom):continue
-            mujoco.mj_contactForce(m,d,i,contact)
-            for j,group in enumerate(self.robot.all_finger_sets):
-                if any(g in group for g in c.geom):loads[0,j]+=max(contact[0],0)
+        if self.surface is None:
+            for i,c in enumerate(d.contact):
+                if not any(g in self.obj_geoms for g in c.geom):continue
+                mujoco.mj_contactForce(m,d,i,contact)
+                for j,group in enumerate(self.robot.all_finger_sets):
+                    if any(g in group for g in c.geom):loads[0,j]+=max(contact[0],0)
         state=self.states.numpy()
         proxy=self.film_spring.last_force if hasattr(self,'film_spring') else 0.0
-        if state['mode'][0] in (1,2):
+        if self.surface is not None:
+            pass
+        elif state['mode'][0] in (1,2):
             loads[:]=proxy
         else:
             midpoint=tips(self.robot).mean(0)
@@ -143,18 +196,20 @@ class ParcelSim(MuJoCoSim):
         self.gap.assign(np.array([gap],dtype=np.float32))
         arrays=dict(xpos=d.xpos[None].astype('f'),xmat=d.xmat.reshape(1,m.nbody,3,3).astype('f'),
                     xipos=d.xipos[None].astype('f'),qpos=d.qpos[None].astype('f'),
-                    qfrc=d.qfrc_applied[None].astype('f'),forces=d.xfrc_applied[None].astype('f'))
-        types=dict(xpos=wp.vec3,xmat=wp.mat33,xipos=wp.vec3,qpos=float,qfrc=float,forces=wp.spatial_vector)
+                    qfrc=d.qfrc_applied[None].astype('f'),forces=d.xfrc_applied[None].astype('f'),qvel=d.qvel[None].astype('f'))
+        types=dict(xpos=wp.vec3,xmat=wp.mat33,xipos=wp.vec3,qpos=float,qfrc=float,forces=wp.spatial_vector,qvel=float)
         for name,value in arrays.items():
             if name not in self.buffers:self.buffers[name]=wp.array(value,dtype=types[name],device='cpu')
             else:self.buffers[name].assign(value)
         b=self.buffers
-        wp.launch(K.dynamics,1,[m.opt.timestep,int(self.built.rigid),2,self.cart,self.built.cfg.region,
+        wp.launch(K.dynamics,1,[m.opt.timestep,int(self.built.rigid),0 if self.surface is not None else 2,self.cart,self.built.cfg.region,
             self.close,self.releasing,0,max(speed,0),self.params,self.states,self.ids,self.normal,self.gap,
             b['xpos'],b['xmat'],b['xipos'],b['qpos'],b['qfrc'],b['forces']],device='cpu')
+        if self.surface is not None:
+            self.surface.apply(b['xpos'],b['qvel'],b['forces'])
         d.qfrc_applied[:]=b['qfrc'].numpy()[0]
         d.xfrc_applied[:]=b['forces'].numpy()[0]
-        self.releasing=0
+        if self.surface is None:self.releasing=0
 
     def step(self):
         mujoco.mj_kinematics(self.m,self.d)
@@ -162,18 +217,33 @@ class ParcelSim(MuJoCoSim):
         self.apply()
         mujoco.mj_step(self.m,self.d)
         self.d.qfrc_applied[:]=0
+        if self.observer is not None:
+            self.observer.observe_cpu(self.m,self.d,self.close,self.releasing)
+            self.releasing=0
+            self.close=2
 
 
 class Attachment:
     def __init__(self,robot):self.sim=robot.sim
     @property
-    def active(self):return {} if self.sim.states.numpy()['mode'][0] in (1,2) else None
+    def active(self):
+        state=self.sim.observer.states if self.sim.observer is not None else self.sim.states
+        return {} if state.numpy()['mode'][0] in (1,2) else None
     @property
-    def load(self):return float(self.sim.states.numpy()['tension'].sum())
+    def load(self):
+        if self.sim.observer is not None:
+            feedback=measure_contacts(self.sim.robot,target_flexes={0})
+            return max(0.,-sum(f[2] for f in feedback['force_on_fingers_N']))
+        return float(self.sim.states.numpy()['tension'].sum())
     @property
     def events(self):return self.sim.events
     def try_bind(self,current_tips):
         self.sim.close=1
+        if self.sim.observer is not None:
+            self.sim.observer.observe_cpu(self.sim.m,self.sim.d,close=1)
+            s=self.sim.observer.states.numpy()[0]
+            self.sim.events.append({name:s[name].tolist() for name in s.dtype.names})
+            return self.active is not None
         qfrc=self.sim.d.qfrc_applied.copy()
         xfrc=self.sim.d.xfrc_applied.copy()
         self.sim.apply()
@@ -190,8 +260,18 @@ class Attachment:
 
 
 def attachment(robot,cfg):return Attachment(robot)
-def measure(robot):return measure_contacts(robot,target_geoms=robot.sim.obj_geoms)
-def check_state(sim):return (None if np.isfinite(sim.d.qpos).all() else 'nonfinite'),{}
+def measure(robot):
+    if robot.sim.surface is not None:return measure_contacts(robot,target_flexes={0})
+    return measure_contacts(robot,target_geoms=robot.sim.obj_geoms)
+def check_state(sim):
+    health={}
+    if sim.surface is not None:
+        s=sim.observer.states.numpy()[0]
+        health=dict(film_face=int(s['face_id']),film_mode=int(s['mode']),grasp_class=int(s['grasp_class']),
+                    gathered_m=float(s['gathered_length']),captured_m=float(s['captured_length']),
+                    slip_m=float(s['slip_distance']),film_energy_J=float(sim.surface.energy.numpy()[0]),
+                    broken_edges=int(sim.surface.damage.numpy().sum()))
+    return (None if np.isfinite(sim.d.qpos).all() else 'nonfinite'),health
 def summarize(trace):return {}
 def dimensions(sim):return dict(nv=sim.m.nv,rigid_bodies=len(sim.core))
 def source_files():return {f'parcel_{p.stem}':p for p in Path(K.__file__).parent.glob('*.py')}
@@ -222,5 +302,36 @@ class MaterialSpring:
 
 
 def gathering_spring(robot,cfg):
+    if robot.sim.surface is not None:
+        class NoSpring:
+            reference_gap=None
+            def arm(self,*args):pass
+            def force(self,*args):return 0.0
+            def release(self):pass
+        return NoSpring()
     robot.sim.film_spring=MaterialSpring(robot.sim)
     return robot.sim.film_spring
+
+
+def save_model(sim,output):
+    mujoco.mj_saveModel(sim.m,str(output/'model.mjb'),None)
+    if sim.surface is not None:
+        source=Path(K.__file__).parent
+        for original,saved in (('config.json','payload_ranges.json'),('film_config.json','film_ranges.json')):
+            (output/saved).write_bytes((source/original).read_bytes())
+        np.savez_compressed(output/'film_reference.npz',rest=sim.surface.rest.numpy(),
+            parameters=sim.surface.parameters.numpy(),masses=sim.surface.masses.numpy(),
+            payload_parameters=sim.params.numpy(),
+            triangles=sim.surface.topo.triangles,face_id=sim.surface.topo.face_id)
+
+
+STATE_SPEC='parcel-six-face-film-v1'
+def record_state(sim):
+    spec=mujoco.mjtState.mjSTATE_INTEGRATION
+    state=np.empty(mujoco.mj_stateSize(sim.m,spec))
+    mujoco.mj_getState(sim.m,sim.d,state,spec)
+    if sim.surface is None:return state
+    observed=sim.observer.states.numpy()
+    extra=[observed[name].reshape(-1) for name in observed.dtype.names]
+    return np.concatenate([state,sim.surface.damage.numpy().ravel(),
+        sim.observer.gathered.numpy().ravel(),sim.surface.fracture_loss.numpy().ravel(),*extra])

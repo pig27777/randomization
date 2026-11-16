@@ -79,12 +79,23 @@ class MuJoCoSim:
         mujoco.mj_step(self.m,self.d)
 
 
-def attach_robot(cfg,built,sim_factory,center,top,size,mass):
-    yaw, tilt = np.deg2rad([cfg.yaw, cfg.tilt])
-    rz = np.array([[np.cos(yaw),-np.sin(yaw),0],[np.sin(yaw),np.cos(yaw),0],[0,0,1]])
-    rx = np.array([[1,0,0],[0,np.cos(tilt),-np.sin(tilt)],[0,np.sin(tilt),np.cos(tilt)]])
-    rotation = rz @ rx @ np.diag([1., -1., -1.])
-    target = np.array([*center,top+.10])
+def attach_robot(cfg,built,sim_factory,center,top,size,mass,approach=None):
+    if approach is None:
+        yaw, tilt = np.deg2rad([cfg.yaw, cfg.tilt])
+        rz = np.array([[np.cos(yaw),-np.sin(yaw),0],[np.sin(yaw),np.cos(yaw),0],[0,0,1]])
+        rx = np.array([[1,0,0],[0,np.cos(tilt),-np.sin(tilt)],[0,np.sin(tilt),np.cos(tilt)]])
+        rotation = rz @ rx @ np.diag([1., -1., -1.])
+        target = np.array([*center,top+.10])
+    else:
+        # Optional adapter-chosen approach (e.g. a horizontal side pinch), world frame: grasp-site z along the
+        # inward direction n, y along the closing direction c; start 100 mm back from the contact point as
+        # the default top approach does. yaw/tilt do not apply.
+        n = np.asarray(approach["direction"], float)
+        c = np.asarray(approach["closing"], float)
+        if abs(np.linalg.norm(n)-1) > 1e-9 or abs(np.linalg.norm(c)-1) > 1e-9 or abs(n @ c) > 1e-9:
+            raise ValueError("approach direction and closing must be orthonormal")
+        rotation = np.column_stack([np.cross(c, n), c, n])
+        target = np.asarray(approach["contact_point"], float) - .10*n
     robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))
     m,d = robot.sim.m,robot.sim.d
     robot.control_period_steps = max(1, round(.01 / cfg.dt))
@@ -93,6 +104,8 @@ def attach_robot(cfg,built,sim_factory,center,top,size,mass):
     robot.pad_geom = [m.geom(f"{s}_pad").id for s in ("left", "right")]
     robot.nonfinger_mask &= ~np.isin(np.arange(m.ngeom), list(set.union(*robot.all_finger_sets)))
     robot.size, robot.mass = size,mass
+    if approach is not None:
+        robot.approach, robot.approach_extent = n, float(abs(np.asarray(size) @ n))
     return robot
 
 
@@ -113,6 +126,7 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
     penetration = 0.
     nonfinger = 0.
     buffer = np.zeros(6)
+    approach = getattr(robot, "approach", None)
     for i,c in enumerate(d.contact):
         if c.efc_address < 0:
             continue
@@ -126,8 +140,10 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
             for k in (0,1):
                 if gs[k] in group:
                     result[j] += (1 if k==1 else -1)*world
-                    # Top-facing contact normal pushing the finger upward.
-                    top_contacts[j] |= bool((1 if k==1 else -1)*c.frame[2] > .5 and buffer[0] > .05)
+                    # Top-facing contact normal pushing the finger upward (with an adapter
+                    # approach: pushing the finger back against the approach direction).
+                    facing = c.frame[2] if approach is None else -float(c.frame[:3] @ approach)
+                    top_contacts[j] |= bool((1 if k==1 else -1)*facing > .5 and buffer[0] > .05)
         if sim.table_geom in gs:
             support += (1 if gs[0] == sim.table_geom else -1) * world[2]
         for g in gs:
@@ -181,6 +197,7 @@ def run(backend, cfg, output, *, on_sample=None):
     integration_states=[]
     state_times=[]
     contact_tip_z=None
+    approach=getattr(robot,"approach",None)
     open_gap=None
     outcome="pending"
     reason=""
@@ -197,7 +214,10 @@ def run(backend, cfg, output, *, on_sample=None):
         raw=np.array(feedback["grip_each_N"])+spring_force
         filtered += dt/(.005+dt)*(raw-filtered)
         grip20 += dt/(.020+dt)*(float(raw.mean())-grip20)
-        down=max(0.,sum(f[2] for f in feedback["force_on_fingers_N"]))
+        if approach is None:
+            down=max(0.,sum(f[2] for f in feedback["force_on_fingers_N"]))
+        else:
+            down=max(0.,-sum(float(np.dot(f,approach)) for f in feedback["force_on_fingers_N"]))
         peaks["grip_N"]=max(peaks["grip_N"],float(grip20))
         peaks["down_N"]=max(peaks["down_N"],down)
         for key in ("penetration_mm","nonfinger_mm"):
@@ -212,13 +232,22 @@ def run(backend, cfg, output, *, on_sample=None):
         elif phase=="approach":
             # Move downward until first physical contact, then insert no more
             # than 15mm at 10mm/s, with the v2.2 total 20N down-force stop.
-            if max(feedback["contact_magnitude_each_N"])>.05:
-                if not contacted: contact_tip_z=float(tip_mid[2])
-                contacted=True
-            speed=.010 if contacted else .05
-            if contacted:depth=max(0.,contact_tip_z-float(tip_mid[2]))
-            target[2]-=speed*dt
-            next_phase="close" if depth>=min(.015,.6*robot.size[2]) or (contacted and down>=20) else None
+            if approach is None:
+                if max(feedback["contact_magnitude_each_N"])>.05:
+                    if not contacted: contact_tip_z=float(tip_mid[2])
+                    contacted=True
+                speed=.010 if contacted else .05
+                if contacted:depth=max(0.,contact_tip_z-float(tip_mid[2]))
+                target[2]-=speed*dt
+                next_phase="close" if depth>=min(.015,.6*robot.size[2]) or (contacted and down>=20) else None
+            else:
+                if max(feedback["contact_magnitude_each_N"])>.05:
+                    if not contacted: contact_tip=tip_mid.copy()
+                    contacted=True
+                speed=.010 if contacted else .05
+                if contacted:depth=max(0.,float((tip_mid-contact_tip)@approach))
+                target+=approach*speed*dt
+                next_phase="close" if depth>=min(.015,.6*robot.approach_extent) or (contacted and down>=20) else None
             if elapsed>8:
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):

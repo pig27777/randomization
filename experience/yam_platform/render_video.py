@@ -102,12 +102,17 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
         min_tet=int(np.argmin(dets(final_vertices)/dets(rest_vertices)))
         focus_reference=rest_vertices[tets[min_tet]].mean(0)
     cfg=result["config"]
+    if cfg.get("envelope",False):
+        option.flags[mujoco.mjtVisFlag.mjVIS_FLEXEDGE]=True
+        detail_option.flags[mujoco.mjtVisFlag.mjVIS_FLEXEDGE]=True
     model_label='Segmented v1.3' if result.get('backend')=='segmented' else '3D flex'
     if result.get('backend') == 'parcel.yam_adapter':
         model_label=f'Parcel prototype {cfg["prototype"]}'
-        if cfg.get("grasp_face") == "side":
-            model_label+=f' | side grasp {cfg.get("side_pitch_deg",0):g} deg'
+        if cfg.get("envelope",False):model_label+=" | six-face film"
+        if cfg.get("grasp_face") in ("side","corner"):
+            model_label+=f' | {cfg["grasp_face"]} grasp {cfg.get("side_pitch_deg",0):g} deg'
     title=f'{model_label} | {"TETRAHEDRA | " if tetra else ""}{cfg["category"]} | yaw {cfg["yaw"]:g} deg | pinch {cfg["pinch_coeff"]:g} | {result["outcome"]}'
+    if cfg.get("envelope",False):title=title.replace(f'pinch {cfg["pinch_coeff"]:g}','native contact')
     if view=='detail':title=f'{model_label} | {cfg["category"]} | {result["outcome"]}'
     if focus:title=f'{cfg.get("shape","box").upper()} tetrahedra | 10x slow | RED = inverted | final frame held 3s'
     font_size=20 if view=='both' else 16

@@ -1,0 +1,1504 @@
+{
+  "kernels": {
+    "reciprocity": {
+      "max_net_force": 0.0,
+      "max_global_moment": 4.0046870708465576e-08,
+      "nonzero_tension": true
+    },
+    "slack": [
+      {
+        "extension": -0.01,
+        "tension": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "payload_moment": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "extension": 0.0,
+        "tension": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "payload_moment": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "extension": 0.005,
+        "tension": [
+          1.9999980926513672,
+          1.9999980926513672,
+          1.9999980926513672
+        ],
+        "payload_moment": [
+          0.00756214139983058,
+          0.04598943889141083,
+          0.0
+        ]
+      },
+      {
+        "extension": 0.01,
+        "tension": [
+          3.9999961853027344,
+          3.9999990463256836,
+          3.9999961853027344
+        ],
+        "payload_moment": [
+          0.015124286524951458,
+          0.09197890758514404,
+          0.0
+        ]
+      }
+    ],
+    "zero_normal": {
+      "state": {
+        "mode": 2,
+        "gathered": 0.009939180687069893,
+        "captured": 0.014999999664723873,
+        "slip": 0.0023076911456882954,
+        "closed": 0,
+        "reason": 0,
+        "rng": 867204692,
+        "rest": [
+          0.13439224660396576,
+          0.09999171644449234,
+          0.13439224660396576
+        ],
+        "tension": [
+          3.0769197940826416,
+          3.076922655105591,
+          3.0769197940826416
+        ],
+        "anchor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "probability": 0.0
+      },
+      "forces": [
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          7.764649391174316,
+          0.011634067632257938,
+          0.07075299322605133,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -7.764649391174316,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "note": "one constitutive update, all normal loads zero; slip viscosity remains"
+    },
+    "multiroot": [
+      {
+        "dt": 0.00025,
+        "roots": [
+          [
+            0.0008695652173913045,
+            -9199.999999999998
+          ]
+        ],
+        "gpu_slip": 0.0008695649448782206,
+        "gpu_mode": 2,
+        "residual_at_gpu": 2.507120370864868e-06,
+        "residual_at_bounds": [
+          8.0,
+          -35.599999999999994
+        ]
+      },
+      {
+        "dt": 0.0005,
+        "roots": [
+          [
+            0.001538461538461539,
+            -5199.999999999998
+          ]
+        ],
+        "gpu_slip": 0.0015384613070636988,
+        "gpu_mode": 2,
+        "residual_at_gpu": 1.2032687664031982e-06,
+        "residual_at_bounds": [
+          8.0,
+          -3.5999999999999943
+        ]
+      },
+      {
+        "dt": 0.001,
+        "roots": [
+          [
+            0.0025000000000000014,
+            -3199.999999999998
+          ],
+          [
+            0.0035714285714285696,
+            2800.0
+          ]
+        ],
+        "gpu_slip": 0.00800000037997961,
+        "gpu_mode": 3,
+        "residual_at_gpu": 12.39999878406525,
+        "residual_at_bounds": [
+          8.0,
+          12.400000000000006
+        ]
+      }
+    ],
+    "same_event": {
+      "rng_unchanged": true
+    },
+    "zero_budget": {
+      "captured": 0,
+      "max_gathered": 0.0
+    },
+    "region_selection": [
+      {
+        "region": 0,
+        "captured": 0,
+        "max_gathered": 0.0,
+        "anchor": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "region": 1,
+        "captured": 20,
+        "max_gathered": 0.002913133939728141,
+        "anchor": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "region": 2,
+        "captured": 15,
+        "max_gathered": 0.0022769791539758444,
+        "anchor": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "region": 3,
+        "captured": 20,
+        "max_gathered": 0.0031714360229671,
+        "anchor": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "stationary_gather": {
+      "captured": 25,
+      "max_gathered": 0.004822138696908951,
+      "max_qvel": 0.0
+    },
+    "proxy_only_capture": {
+      "captured": 21,
+      "normal": [
+        19.999998092651367,
+        19.999998092651367
+      ],
+      "cart_above_payload": 0.10999171435832977
+    },
+    "film_energy": {
+      "max_delta_U": 0.0004619769752025604,
+      "mechanical_work": 0.0,
+      "e0": 0.003000000026077032,
+      "e1": 0.003011310240253806,
+      "normal": [
+        10.0,
+        10.0
+      ],
+      "note": "q and qvel held fixed; state growth only"
+    },
+    "failed_states": [
+      {
+        "mode": 3,
+        "max_force": 0.0,
+        "max_tension": 0.0
+      },
+      {
+        "mode": 4,
+        "max_force": 0.0,
+        "max_tension": 0.0
+      }
+    ],
+    "table_contacts": {
+      "normal": [
+        8.802130699157715,
+        8.802129745483398
+      ],
+      "pairs": [
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          3
+        ],
+        [
+          0,
+          4
+        ]
+      ],
+      "object_geom_ids": [
+        1,
+        2
+      ],
+      "gap": 0.002,
+      "access_distance": 0.20194973051548004,
+      "gathered_before": 0.0,
+      "state_after": {
+        "mode": 1,
+        "gathered": 0.006141141057014465,
+        "captured": 0.006141141057014465,
+        "slip": 0.0,
+        "closed": 1,
+        "reason": 0,
+        "rng": 867204692,
+        "rest": [
+          0.31366491317749023,
+          0.22073635458946228,
+          0.1288595348596573
+        ],
+        "tension": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "anchor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "probability": 0.8311572670936584
+      }
+    }
+  },
+  "consistency": {
+    "pre_engagement_normals": {
+      "gpu": [
+        0.0,
+        0.0
+      ],
+      "yam_contract": [
+        10.0,
+        10.0
+      ],
+      "native": [
+        10.0,
+        10.0
+      ],
+      "gap": 0.03,
+      "note": "same input normal, gap, material and zero velocity; constitutive API comparison, not full YAM replay",
+      "gathered_delta_difference": 1.1516036465764046e-05
+    },
+    "consistent_closing_energy": {
+      "max_unaccounted_storage": 0.00017365813255310059,
+      "e0": 0.003000000026077032,
+      "e1": 0.003005655249580741,
+      "old_U": 0.022499993443489075,
+      "new_U": 0.022820793092250824,
+      "fixed_material_closing_work": 0.00015025213360786438,
+      "normal_dissipation": 2.0000000000000002e-07,
+      "power_formula": "dU/de * de/dt; for two active springs dU/de=2*k*penetration",
+      "note": "no native tangential contact in this isolated proxy law; captured mode still inactive"
+    },
+    "flag_jitter": {
+      "attempts": [
+        [
+          1,
+          21
+        ],
+        [
+          2,
+          21
+        ],
+        [
+          3,
+          21
+        ],
+        [
+          4,
+          21
+        ],
+        [
+          5,
+          21
+        ],
+        [
+          6,
+          21
+        ],
+        [
+          7,
+          21
+        ],
+        [
+          8,
+          21
+        ],
+        [
+          9,
+          21
+        ],
+        [
+          10,
+          21
+        ],
+        [
+          11,
+          21
+        ],
+        [
+          12,
+          21
+        ],
+        [
+          13,
+          21
+        ],
+        [
+          14,
+          21
+        ],
+        [
+          15,
+          21
+        ],
+        [
+          16,
+          21
+        ],
+        [
+          17,
+          21
+        ],
+        [
+          18,
+          21
+        ],
+        [
+          19,
+          21
+        ],
+        [
+          20,
+          21
+        ]
+      ],
+      "max_qvel": 0.0,
+      "rng_changed_after_first": 0,
+      "rng_changed_total": 0
+    },
+    "contact_loss": {
+      "elapsed": 0.5,
+      "gathered_initial": 0.002,
+      "gathered_final": 0.0020000000949949026
+    },
+    "zero_normal_transient": {
+      "first_total_tension": 9.230762481689453,
+      "final_total_tension": 1.4901161193847656e-06,
+      "final_mode": 2
+    },
+    "potential_gradient": [
+      {
+        "body": 1,
+        "measured_force": [
+          5.926516532897949,
+          1.4883276224136353,
+          29.76449966430664
+        ],
+        "minus_gradient": [
+          5.926516288007888,
+          1.4883291120293407,
+          29.764504727540217
+        ],
+        "max_error": 5.063233576407811e-06
+      },
+      {
+        "body": 3,
+        "measured_force": [
+          -5.926516532897949,
+          -1.4883276224136353,
+          -29.76449966430664
+        ],
+        "minus_gradient": [
+          -5.926516288007888,
+          -1.4883291120293407,
+          -29.764504727535776
+        ],
+        "max_error": 5.063229135515712e-06
+      }
+    ],
+    "nonzero_cart_moment": [
+      -0.16370370984077454,
+      0.2979087829589844,
+      0.017699167132377625
+    ]
+  },
+  "batch": {
+    "static": [
+      {
+        "prototype": 0,
+        "max_translation_speed": 2.259556822536979e-06,
+        "mass_error": 5.960464477539063e-08,
+        "max_constraint_force": 20.770740509033203,
+        "max_constraint_penetration": 0.0002101268619298935,
+        "max_force_balance_residual": 0.0011698233429342508,
+        "finite": true
+      },
+      {
+        "prototype": 1,
+        "max_translation_speed": 2.259556822536979e-06,
+        "mass_error": 5.960464477539063e-08,
+        "max_constraint_force": 20.770740509033203,
+        "max_constraint_penetration": 0.0002101268619298935,
+        "max_force_balance_residual": 0.0011698233429342508,
+        "finite": true
+      },
+      {
+        "prototype": 2,
+        "max_translation_speed": 2.465365469106473e-06,
+        "mass_error": 1.1920928955078125e-07,
+        "max_constraint_force": 7.358475208282471,
+        "max_constraint_penetration": 0.0002108253538608551,
+        "max_force_balance_residual": 0.00048065185546875,
+        "finite": true
+      },
+      {
+        "prototype": 3,
+        "max_translation_speed": 2.418128360659466e-06,
+        "mass_error": 1.1920928955078125e-07,
+        "max_constraint_force": 7.3582868576049805,
+        "max_constraint_penetration": 0.00021087750792503357,
+        "max_force_balance_residual": 0.000125885009765625,
+        "finite": true
+      },
+      {
+        "prototype": 4,
+        "max_translation_speed": 2.6575128231343115e-06,
+        "mass_error": 1.1920928955078125e-07,
+        "max_constraint_force": 7.358412265777588,
+        "max_constraint_penetration": 0.00021027028560638428,
+        "max_force_balance_residual": 0.00040435791015625,
+        "finite": true
+      },
+      {
+        "prototype": 5,
+        "max_translation_speed": 2.528952563807252e-06,
+        "mass_error": 1.1920928955078125e-07,
+        "max_constraint_force": 7.358412265777588,
+        "max_constraint_penetration": 0.00021007657051086426,
+        "max_force_balance_residual": 0.00040435791015625,
+        "finite": true
+      }
+    ],
+    "batch": [
+      {
+        "n": 1,
+        "max_difference_from_N1": 0.0,
+        "max_within_batch_difference": 0.0
+      },
+      {
+        "n": 64,
+        "max_difference_from_N1": 6.566551746800542e-09,
+        "max_within_batch_difference": 1.4901161193847656e-08
+      },
+      {
+        "n": 512,
+        "max_difference_from_N1": 1.4901161193847656e-08,
+        "max_within_batch_difference": 2.1729874788434245e-08
+      },
+      {
+        "n": 2048,
+        "max_difference_from_N1": 1.4901161193847656e-08,
+        "max_within_batch_difference": 2.3921188585518394e-08
+      }
+    ],
+    "timestep": [
+      {
+        "dt": 0.00025,
+        "max_constraint_force": 6.974964141845703,
+        "max_constraint_penetration": 0.0002613421529531479,
+        "max_force_balance_residual": 0.004066132474690676,
+        "final_compression": 7.272565562743694e-05,
+        "max_mechanical_energy": 0.4946262559933686
+      },
+      {
+        "dt": 0.0005,
+        "max_constraint_force": 7.3582868576049805,
+        "max_constraint_penetration": 0.00028272392228245735,
+        "max_force_balance_residual": 0.004143137950450182,
+        "final_compression": 7.272565562743694e-05,
+        "max_mechanical_energy": 0.49462048986884677
+      },
+      {
+        "dt": 0.001,
+        "max_constraint_force": 6.953608989715576,
+        "max_constraint_penetration": 0.00032615847885608673,
+        "max_force_balance_residual": 0.006724071688950062,
+        "final_compression": 7.272564835147932e-05,
+        "max_mechanical_energy": 0.4945974869724644
+      }
+    ],
+    "coverage": {
+      "n": 512,
+      "unreachable_20N_target_by_core_geometry": 220,
+      "target_range": [
+        0.0020025793928653,
+        0.021993640810251236
+      ],
+      "depth_range": [
+        0.00219227303750813,
+        0.012028088793158531
+      ],
+      "target_vs_depth_pearson": 0.9805235225314888,
+      "unique_native_mass": 512,
+      "unique_compression": 512,
+      "rigid_dynamically_unused_fields": [
+        "bend",
+        "twist",
+        "damping",
+        "compression",
+        "quadratic",
+        "weights"
+      ]
+    },
+    "reset": {
+      "clock_before": 0,
+      "clock_after_graph": 1,
+      "state_nonzero_after_reset": false,
+      "external_after_reset": 0.0,
+      "generalized_after_reset": 0.0
+    }
+  },
+  "payload": {
+    "bending": [
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.005,
+        "gravity": 0.0,
+        "k": 10.9,
+        "measured": 0.004994760702880963,
+        "relative_target_error": -0.0010478594238074943,
+        "reference": 0.0049947601641360095,
+        "reference_angles": [
+          0.029978100415140093,
+          0.01498484005916557
+        ],
+        "joint_angles": [
+          0.029978102633645462,
+          0.014984840972154545
+        ],
+        "restoring_torque": [
+          -0.3267613187067355,
+          -0.16333476659648455
+        ],
+        "max_qvel": 1.2362544939482572e-11
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.005,
+        "gravity": 9.81,
+        "k": 10.9,
+        "measured": 0.006494361187294406,
+        "relative_target_error": 0.29887223745888125,
+        "reference": 0.006494363838719715,
+        "reference_angles": [
+          0.03998416762674485,
+          0.017489411494882763
+        ],
+        "joint_angles": [
+          0.03998415118135031,
+          0.017489400973946648
+        ],
+        "restoring_torque": [
+          -0.4358272478767184,
+          -0.19063447061601846
+        ],
+        "max_qvel": 1.5963110575635325e-11
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.02,
+        "gravity": 0.0,
+        "k": 2.725,
+        "measured": 0.019674039758192263,
+        "relative_target_error": -0.01629801209038686,
+        "reference": 0.019674052191328447,
+        "reference_angles": [
+          0.11863356693353443,
+          0.059055289673599486
+        ],
+        "joint_angles": [
+          0.11863347325148599,
+          0.059055258356536244
+        ],
+        "restoring_torque": [
+          -0.3232762146102993,
+          -0.16092557902156127
+        ],
+        "max_qvel": 1.6275318225006763e-05
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.02,
+        "gravity": 9.81,
+        "k": 2.725,
+        "measured": 0.025407197277067972,
+        "relative_target_error": 0.2703598638533986,
+        "reference": 0.025407306930173852,
+        "reference_angles": [
+          0.15758907437044012,
+          0.06850424475523618
+        ],
+        "joint_angles": [
+          0.15758837615243534,
+          0.0685039373881685
+        ],
+        "restoring_torque": [
+          -0.4294283250153863,
+          -0.18667322938275915
+        ],
+        "max_qvel": 9.394472748711978e-06
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.04,
+        "gravity": 0.0,
+        "k": 1.3625,
+        "measured": 0.03760541533049305,
+        "relative_target_error": -0.0598646167376737,
+        "reference": 0.037602354589444394,
+        "reference_angles": [
+          0.2298589064804387,
+          0.11301508030465421
+        ],
+        "joint_angles": [
+          0.22987929008327057,
+          0.11302143267262311
+        ],
+        "restoring_torque": [
+          -0.31321053273845617,
+          -0.153991702016449
+        ],
+        "max_qvel": 0.0007787342551945263
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.04,
+        "gravity": 9.81,
+        "k": 1.3625,
+        "measured": 0.047513796819030285,
+        "relative_target_error": 0.1878449204757571,
+        "reference": 0.04751918246366323,
+        "reference_angles": [
+          0.3010157588136553,
+          0.12835338346859962
+        ],
+        "joint_angles": [
+          0.30097819039093143,
+          0.12834142068072601
+        ],
+        "restoring_torque": [
+          -0.41008278440764406,
+          -0.1748651856774892
+        ],
+        "max_qvel": 0.00010031703620659929
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.06,
+        "gravity": 0.0,
+        "k": 0.9083333333333333,
+        "measured": 0.05281657965418096,
+        "relative_target_error": -0.11972367243031727,
+        "reference": 0.05283123631857823,
+        "reference_angles": [
+          0.32929553972333425,
+          0.1589668705659953
+        ],
+        "joint_angles": [
+          0.3291921843417897,
+          0.15893883072219908
+        ],
+        "restoring_torque": [
+          -0.29901623411045897,
+          -0.1443694379059975
+        ],
+        "max_qvel": 0.005771912677192605
+      },
+      {
+        "length": 0.2,
+        "mass": 0.25,
+        "target": 0.06,
+        "gravity": 9.81,
+        "k": 0.9083333333333333,
+        "measured": 0.06497910676427404,
+        "relative_target_error": 0.08298511273790074,
+        "reference": 0.06497159508348659,
+        "reference_angles": [
+          0.4233382796165628,
+          0.1756020886060605
+        ],
+        "joint_angles": [
+          0.42339290558924597,
+          0.17561388398652356
+        ],
+        "restoring_torque": [
+          -0.38458188924356507,
+          -0.15951594462109223
+        ],
+        "max_qvel": 0.008096612355003998
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.005,
+        "gravity": 0.0,
+        "k": 42.728,
+        "measured": 0.004997324032346873,
+        "relative_target_error": -0.0005351935306254982,
+        "reference": 0.004997324077453756,
+        "reference_angles": [
+          0.021420583770311682,
+          0.010708756041015483
+        ],
+        "joint_angles": [
+          0.0214205835176015,
+          0.010708755903320412
+        ],
+        "restoring_torque": [
+          -0.915258692540077,
+          -0.4575637222370746
+        ],
+        "max_qvel": 4.733643231306463e-12
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.005,
+        "gravity": 9.81,
+        "k": 42.728,
+        "measured": 0.006497118810768088,
+        "relative_target_error": 0.29942376215361755,
+        "reference": 0.006497122295670374,
+        "reference_angles": [
+          0.02856565443497872,
+          0.012496138356652848
+        ],
+        "joint_angles": [
+          0.028565639949580723,
+          0.012496129754862046
+        ],
+        "restoring_torque": [
+          -1.2205526637656852,
+          -0.5339346321657455
+        ],
+        "max_qvel": 6.122446993809142e-12
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.02,
+        "gravity": 0.0,
+        "k": 10.682,
+        "measured": 0.01983123763247341,
+        "relative_target_error": -0.008438118376329594,
+        "reference": 0.019831235603811958,
+        "reference_angles": [
+          0.08520972893217327,
+          0.04250807834267245
+        ],
+        "joint_angles": [
+          0.08520974126155959,
+          0.04250808227198336
+        ],
+        "restoring_torque": [
+          -0.9102104561559795,
+          -0.45407133482932627
+        ],
+        "max_qvel": 6.316805990111437e-06
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.02,
+        "gravity": 9.81,
+        "k": 10.682,
+        "measured": 0.025691230349919603,
+        "relative_target_error": 0.28456151749598013,
+        "reference": 0.025691265711446237,
+        "reference_angles": [
+          0.11339050211859175,
+          0.04944402721497735
+        ],
+        "joint_angles": [
+          0.11339036547943002,
+          0.049443924771467765
+        ],
+        "restoring_torque": [
+          -1.2112358840512716,
+          -0.5281600044088187
+        ],
+        "max_qvel": 6.962832586698813e-06
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.04,
+        "gravity": 0.0,
+        "k": 5.341,
+        "measured": 0.03870956586633956,
+        "relative_target_error": -0.032260853341511096,
+        "reference": 0.03870926486001879,
+        "reference_angles": [
+          0.1675511006490971,
+          0.08303714735944732
+        ],
+        "joint_angles": [
+          0.16755231039879886,
+          0.08303749708314533
+        ],
+        "restoring_torque": [
+          -0.8948968898399847,
+          -0.4435032719210792
+        ],
+        "max_qvel": 0.0004597900338622427
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.04,
+        "gravity": 9.81,
+        "k": 5.341,
+        "measured": 0.049528124127873385,
+        "relative_target_error": 0.2382031031968346,
+        "reference": 0.049531513013387214,
+        "reference_angles": [
+          0.22116031057432153,
+          0.09543507405591412
+        ],
+        "joint_angles": [
+          0.22114399515724975,
+          0.09542970993465033
+        ],
+        "restoring_torque": [
+          -1.181130078134871,
+          -0.5096900807609674
+        ],
+        "max_qvel": 0.00018879586112879827
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.06,
+        "gravity": 0.0,
+        "k": 3.560666666666667,
+        "measured": 0.05591276025539432,
+        "relative_target_error": -0.0681206624100946,
+        "reference": 0.05593468487510889,
+        "reference_angles": [
+          0.24484103957682,
+          0.12010414206047275
+        ],
+        "joint_angles": [
+          0.2447338747477481,
+          0.12007181179742428
+        ],
+        "restoring_torque": [
+          -0.8714157500184818,
+          -0.4275356978733621
+        ],
+        "max_qvel": 0.0005652731257960348
+      },
+      {
+        "length": 0.28,
+        "mass": 0.5,
+        "target": 0.06,
+        "gravity": 9.81,
+        "k": 3.560666666666667,
+        "measured": 0.07032563611077641,
+        "relative_target_error": 0.17209393517960692,
+        "reference": 0.07030954332348319,
+        "reference_angles": [
+          0.31932199620295726,
+          0.1356015448872817
+        ],
+        "joint_angles": [
+          0.31940494312056134,
+          0.13562642991976237
+        ],
+        "restoring_torque": [
+          -1.1372945341379455,
+          -0.4829205081343006
+        ],
+        "max_qvel": 0.0030318944193026514
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.005,
+        "gravity": 0.0,
+        "k": 100.45440000000004,
+        "measured": 0.004997950497028003,
+        "relative_target_error": -0.00040990059439940246,
+        "reference": 0.004997950771916865,
+        "reference_angles": [
+          0.018744647785857944,
+          0.009371294746167989
+        ],
+        "joint_angles": [
+          0.018744647310824276,
+          0.009371294615637507
+        ],
+        "restoring_torque": [
+          -1.8829822988204667,
+          -0.9413877778370967
+        ],
+        "max_qvel": 1.7063654200232389e-12
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.005,
+        "gravity": 9.81,
+        "k": 100.45440000000004,
+        "measured": 0.006497791288781807,
+        "relative_target_error": 0.29955825775636136,
+        "reference": 0.006497796362385945,
+        "reference_angles": [
+          0.024996131072048806,
+          0.010934912532497112
+        ],
+        "joint_angles": [
+          0.024996113396840977,
+          0.010934902254563146
+        ],
+        "restoring_torque": [
+          -2.5109695736116233,
+          -1.0984590450407885
+        ],
+        "max_qvel": 2.6452820993304096e-12
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.02,
+        "gravity": 0.0,
+        "k": 25.11360000000001,
+        "measured": 0.01987033403965832,
+        "relative_target_error": -0.006483298017083937,
+        "reference": 0.01987031866067546,
+        "reference_angles": [
+          0.07466088619155978,
+          0.037265354798834575
+        ],
+        "joint_angles": [
+          0.07466095251187448,
+          0.03726537660975083
+        ],
+        "restoring_torque": [
+          -1.8750052970022115,
+          -0.9358677620266388
+        ],
+        "max_qvel": 3.0970413745133927e-06
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.02,
+        "gravity": 9.81,
+        "k": 25.11360000000001,
+        "measured": 0.02576235541473859,
+        "relative_target_error": 0.28811777073692957,
+        "reference": 0.025762402061671845,
+        "reference_angles": [
+          0.09939748059758043,
+          0.043375707828403276
+        ],
+        "joint_angles": [
+          0.0993973255243123,
+          0.04337558758079634
+        ],
+        "restoring_torque": [
+          -2.49622467428737,
+          -1.0893171562690873
+        ],
+        "max_qvel": 2.352429102048108e-06
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.04,
+        "gravity": 0.0,
+        "k": 12.556800000000004,
+        "measured": 0.03899806990748922,
+        "relative_target_error": -0.025048252312769546,
+        "reference": 0.03899810188513807,
+        "reference_angles": [
+          0.14737028571024524,
+          0.07318323784486401
+        ],
+        "joint_angles": [
+          0.14736998989997657,
+          0.07318312267165883
+        ],
+        "restoring_torque": [
+          -1.8504954891760266,
+          -0.9189458347634859
+        ],
+        "max_qvel": 0.00035643406098573755
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.04,
+        "gravity": 9.81,
+        "k": 12.556800000000004,
+        "measured": 0.05006881670277957,
+        "relative_target_error": 0.2517204175694893,
+        "reference": 0.05007176249481775,
+        "reference_angles": [
+          0.19494514573808244,
+          0.08438316261804987
+        ],
+        "joint_angles": [
+          0.19493286910982102,
+          0.0843790104191721
+        ],
+        "restoring_torque": [
+          -2.4477330508382016,
+          -1.0595303580314606
+        ],
+        "max_qvel": 0.00020932153253878471
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.06,
+        "gravity": 0.0,
+        "k": 8.371200000000004,
+        "measured": 0.056778245533960936,
+        "relative_target_error": -0.0536959077673177,
+        "reference": 0.056798015045771304,
+        "reference_angles": [
+          0.21654701013806207,
+          0.106674427991674
+        ],
+        "joint_angles": [
+          0.21646317996883915,
+          0.10664868306130398
+        ],
+        "restoring_torque": [
+          -1.8120565721551471,
+          -0.8927774556427883
+        ],
+        "max_qvel": 0.00041468374977875536
+      },
+      {
+        "length": 0.32,
+        "mass": 0.9,
+        "target": 0.06,
+        "gravity": 9.81,
+        "k": 8.371200000000004,
+        "measured": 0.07186592059295283,
+        "relative_target_error": 0.19776534321588046,
+        "reference": 0.07186885830204683,
+        "reference_angles": [
+          0.2836517341766309,
+          0.12122692132357377
+        ],
+        "joint_angles": [
+          0.2836405728233385,
+          0.12122368129045287
+        ],
+        "restoring_torque": [
+          -2.374411963218732,
+          -1.0147876808186396
+        ],
+        "max_qvel": 0.003309794915618172
+      }
+    ],
+    "compression": [
+      {
+        "prototype": 2,
+        "cap_mass_fraction": 0.01,
+        "target": 0.002618541253883621,
+        "measured": 0.0026185412529500245,
+        "relative_error": -3.56533056213127e-10,
+        "linear_frequency_hz": 326.96153535004925,
+        "measured_frequency_hz": 326.97821822023235,
+        "final_energy_residual": 0.005456821988173394
+      },
+      {
+        "prototype": 2,
+        "cap_mass_fraction": 0.1,
+        "target": 0.002618541253883621,
+        "measured": 0.0026185412529500245,
+        "relative_error": -3.56533056213127e-10,
+        "linear_frequency_hz": 103.91237128440191,
+        "measured_frequency_hz": 103.92309690828785,
+        "final_energy_residual": 0.0012359680911916658
+      },
+      {
+        "prototype": 2,
+        "cap_mass_fraction": 0.3,
+        "target": 0.002618541253883621,
+        "measured": 0.0026185412529500245,
+        "relative_error": -3.56533056213127e-10,
+        "linear_frequency_hz": 60.01617030452502,
+        "measured_frequency_hz": 60.020734435532276,
+        "final_energy_residual": 0.000640745032774892
+      },
+      {
+        "prototype": 2,
+        "test": "native_platen",
+        "ramp_seconds": 0.2,
+        "target": 0.002618541253883621,
+        "depth": 0.0026185412529400385,
+        "core_load": 0.0,
+        "cap_load": 20.000000000231275
+      },
+      {
+        "prototype": 2,
+        "test": "native_platen",
+        "ramp_seconds": 1.0,
+        "target": 0.002618541253883621,
+        "depth": 0.002618541252943024,
+        "core_load": 0.0,
+        "cap_load": 20.00000000024044
+      },
+      {
+        "prototype": 4,
+        "cap_mass_fraction": 0.01,
+        "target": 0.02008292665018708,
+        "measured": 0.0200829263508978,
+        "relative_error": -1.4902672434258634e-08,
+        "linear_frequency_hz": 118.06274411285649,
+        "measured_frequency_hz": 118.06375442739076,
+        "final_energy_residual": 0.008834417196906141
+      },
+      {
+        "prototype": 4,
+        "cap_mass_fraction": 0.1,
+        "target": 0.02008292665018708,
+        "measured": 0.020082926350897798,
+        "relative_error": -1.4902672607014676e-08,
+        "linear_frequency_hz": 37.52178276253814,
+        "measured_frequency_hz": 37.521440823327616,
+        "final_energy_residual": 0.001838133070439646
+      },
+      {
+        "prototype": 4,
+        "cap_mass_fraction": 0.3,
+        "target": 0.02008292665018708,
+        "measured": 0.02008292635089779,
+        "relative_error": -1.4902672952526764e-08,
+        "linear_frequency_hz": 21.671276254898736,
+        "measured_frequency_hz": 21.671994365281464,
+        "final_energy_residual": -0.00016158415837463913
+      },
+      {
+        "prototype": 4,
+        "test": "native_platen",
+        "ramp_seconds": 0.2,
+        "target": 0.02008292665018708,
+        "depth": 0.01683087957350504,
+        "core_load": 4.595711441156462,
+        "cap_load": 15.404288558918998
+      },
+      {
+        "prototype": 4,
+        "test": "native_platen",
+        "ramp_seconds": 1.0,
+        "target": 0.02008292665018708,
+        "depth": 0.016830879572254636,
+        "core_load": 4.595711442823703,
+        "cap_load": 15.404288557243532
+      }
+    ],
+    "energy": [
+      {
+        "dt": 0.00025,
+        "damping": 0.0,
+        "initial_energy": 0.10476047911230724,
+        "final_energy": 0.10426592031472696,
+        "relative_residual": -0.004720852765956576,
+        "max_positive_residual": 0.09674756653654243
+      },
+      {
+        "dt": 0.00025,
+        "damping": 0.1,
+        "initial_energy": 0.10476047911230724,
+        "final_energy": 0.023945102270240597,
+        "relative_residual": 0.00014915138753581446,
+        "max_positive_residual": 0.08425148313236724
+      },
+      {
+        "dt": 0.0005,
+        "damping": 0.0,
+        "initial_energy": 0.10476047911230724,
+        "final_energy": 0.09050095235921096,
+        "relative_residual": -0.13611551678576725,
+        "max_positive_residual": 0.21663392619058133
+      },
+      {
+        "dt": 0.0005,
+        "damping": 0.1,
+        "initial_energy": 0.10476047911230724,
+        "final_energy": 0.025798892325898187,
+        "relative_residual": 0.03886094006764336,
+        "max_positive_residual": 0.1873521400157078
+      },
+      {
+        "dt": 0.001,
+        "damping": 0.0,
+        "initial_energy": 0.10476047911230724,
+        "final_energy": 0.14456886311935213,
+        "relative_residual": 0.37999429120946254,
+        "max_positive_residual": 0.7494424096203202
+      },
+      {
+        "dt": 0.001,
+        "damping": 0.1,
+        "initial_energy": 0.10476047911230724,
+        "final_energy": 0.02002871331427312,
+        "relative_residual": 0.0886623365860766,
+        "max_positive_residual": 0.6592782165087896
+      }
+    ]
+  },
+  "suspension": [
+    {
+      "paths": [
+        1
+      ],
+      "weight": 3.9240000000000004,
+      "mean_final_support": 3.9239935874938965,
+      "max_relative_force_imbalance": 1.6404948155468446e-06,
+      "first_payload_torque": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_payload_moment": 0.0,
+      "final_tilt_deg": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "final_speed": 2.0515201413218165e-06,
+      "note": "equilibrium claim requires small terminal speed; otherwise recorded transient only"
+    },
+    {
+      "paths": [
+        0,
+        2
+      ],
+      "weight": 3.9240000000000004,
+      "mean_final_support": 3.923999071121216,
+      "max_relative_force_imbalance": 2.4303625423272024e-07,
+      "first_payload_torque": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_payload_moment": 0.0,
+      "final_tilt_deg": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "final_speed": 3.5112654586555436e-05,
+      "note": "equilibrium claim requires small terminal speed; otherwise recorded transient only"
+    },
+    {
+      "paths": [
+        0,
+        1,
+        2
+      ],
+      "weight": 3.9240000000000004,
+      "mean_final_support": 3.9240097999572754,
+      "max_relative_force_imbalance": 2.491121676939656e-06,
+      "first_payload_torque": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_payload_moment": 0.0,
+      "final_tilt_deg": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "final_speed": 1.6697113096597604e-05,
+      "note": "equilibrium claim requires small terminal speed; otherwise recorded transient only"
+    },
+    {
+      "paths": [
+        2
+      ],
+      "weight": 3.9240000000000004,
+      "mean_final_support": 2.4562227725982666,
+      "max_relative_force_imbalance": 1.0,
+      "first_payload_torque": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "peak_payload_moment": 1.071699857711792,
+      "final_tilt_deg": [
+        64.41799926757812,
+        95.20674133300781,
+        92.11480712890625,
+        90.27922058105469,
+        95.20674133300781,
+        95.20674133300781,
+        95.20674133300781,
+        95.20674133300781
+      ],
+      "final_speed": 76.63036346435547,
+      "note": "equilibrium claim requires small terminal speed; otherwise recorded transient only"
+    }
+  ],
+  "frozen_vs_current": {
+    "README.md": {
+      "frozen": "0f14cd878605c4c82733d7fd9d24cc4204eef298c08513f72292d85e11b09b3f",
+      "current": "0f14cd878605c4c82733d7fd9d24cc4204eef298c08513f72292d85e11b09b3f"
+    },
+    "model.py": {
+      "frozen": "fde3941a9cef6e0b3eae6f4b0933823097626d45340c13746594989504ca95bb",
+      "current": "f3b4a6b5878ed96a0065200f3b2b4438236961483532a213211f57ad6a1604c4"
+    },
+    "__init__.py": {
+      "frozen": "cd20c79e594d19f302b6ec5d6743a6da26ab4e3f7f38eab4892ee800b5eb320f",
+      "current": "cd20c79e594d19f302b6ec5d6743a6da26ab4e3f7f38eab4892ee800b5eb320f"
+    },
+    "kernels.py": {
+      "frozen": "019b5dc20c4613f9975063016ee2b309d6b665d4eb9e54e1eea966f8b636e982",
+      "current": "019b5dc20c4613f9975063016ee2b309d6b665d4eb9e54e1eea966f8b636e982"
+    },
+    "config.json": {
+      "frozen": "147fbf8b5a5cfc4e8cc0673605b04dc022b346e8133cd3a4d9b0b6e5b2676199",
+      "current": "147fbf8b5a5cfc4e8cc0673605b04dc022b346e8133cd3a4d9b0b6e5b2676199"
+    }
+  },
+  "yam_force_ast_unchanged": {
+    "ParcelSim.apply": true,
+    "MaterialSpring.force": true,
+    "Attachment.try_bind": true
+  },
+  "native_palm_reaction": [
+    {
+      "paths": "1",
+      "mean_palm_load_after_gripper_weight": 3.9239938259124756
+    },
+    {
+      "paths": "0-2",
+      "mean_palm_load_after_gripper_weight": 3.923999547958374
+    },
+    {
+      "paths": "0-1-2",
+      "mean_palm_load_after_gripper_weight": 3.9240071773529053
+    }
+  ]
+}

@@ -10,10 +10,7 @@
   "f7_invalid_pilot": "f7_pilot_geom_index_invalid.jsonl",
   "gpu_required_cases_per_world_count": 9,
   "selected_cpu_config": "base + cache; c/d rejected",
-  "pending": [
-    "B1 and B4 soft GPU require accepted frozen v1.3 backend; do not repeat completed work",
-    "close effect results by effect_deadline, then stop continuation automation"
-  ],
+  "pending": [],
   "continuation_automation_id": "automation-2",
   "formal_cpu_rates": {
     "base": 0.08589016007854601,
@@ -37,9 +34,9 @@
   "gpu_diagnostics_rate_basis": 0.5935465145422997,
   "f6_f7_complete_at": "2026-11-07T07:53:18.149253+08:00",
   "f6_passed": false,
-  "next_step": "B1-B4 effect model per original REPORT plan",
+  "next_step": "Original B1-B4 closed; stop automation-2",
   "effect_deadline": "2026-11-13T00:00:00+08:00",
-  "effect_state": "waiting_for_accepted_frozen_v1_3_gpu_backend",
+  "effect_state": "closed_at_deadline_with_blocked_items",
   "effect_cpu_and_hard_gpu_complete_at": "2026-11-07T08:07:28.478698+08:00",
   "effect_results": {
     "B1": "CPU three anchors and hard GPU complete; two soft GPU blocked",
@@ -47,7 +44,10 @@
     "B3": "not fully passed; 18 top inputs complete after correction, nine side actions invalid",
     "B4": "hard 256/1024 paired throughput complete; two soft contents blocked"
   },
-  "content_gpu_gate_last_checked_at": "2026-11-10T21:56:50.563714+08:00",
-  "content_handoff_sha256": "e97a105215469d9f6ac8ee061eddcf7aae6309243d84b2c6cb31e3e2b8ade088",
-  "content_gpu_gate_note": "HANDOFF 2026-11-10: G2 now passed; G3 E4 is 85/90 (94.44%) below its 95% criterion, stopped before E5/G4/G5. It explicitly says the candidate is not accepted for bag soft-content GPU tests. No accepted frozen GPU archive found; no bag runs started or standards changed."
+  "content_gpu_gate_last_checked_at": "2026-11-13T15:47:37.486214+08:00",
+  "content_handoff_sha256": "b5aea59f4caded5c57ba5ad2ba594ecce25803f59d84254222aa73a4ecf02db3",
+  "content_gpu_gate_note": "HANDOFF 2026-11-10: G2 now passed; G3 E4 is 85/90 (94.44%) below its 95% criterion, stopped before E5/G4/G5. It explicitly says the candidate is not accepted for bag soft-content GPU tests. No accepted frozen GPU archive found; no bag runs started or standards changed.",
+  "effect_closed_at": "2026-11-13T15:47:37.486214+08:00",
+  "effect_passed": false,
+  "effect_close_reason": "deadline reached; soft GPU B1/B4 blocked and unexecuted"
 }

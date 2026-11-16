@@ -2,6 +2,7 @@
 from dataclasses import replace
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 from xml.etree import ElementTree as ET
 
@@ -14,6 +15,7 @@ import contents  # noqa: E402,F401  (package import must coexist with legacy hel
 from bag_sim.physical_parcel import Config, Parcel, material_parameters, compression_force  # noqa: E402
 from bag_sim.bag_model import dihedrals  # noqa: E402
 from bag_sim.wrap import triangle_box_intersections, winding_number  # noqa: E402
+import physical_parcel_yam  # noqa: E402
 
 
 class PhysicalParcelTests(unittest.TestCase):
@@ -124,6 +126,58 @@ class PhysicalParcelTests(unittest.TestCase):
     def test_unresolved_bending_step_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'does not resolve'):
             Parcel(replace(Config(), bending=.00135, timestep=.0004))
+
+    def test_raised_side_grasp_initial_state(self):
+        cfg = physical_parcel_yam.Config(grasp_face='side', support_height=.15, yaw=90., tilt=30.,
+                                         side_height_offset=.012)
+        robot = physical_parcel_yam.scene(cfg)
+        sim = robot.sim
+        np.testing.assert_allclose(sim.d.flexvert_xpos,
+                                   sim.parcel.envelope['current'] + [0, 0, .15], atol=1e-12)
+        np.testing.assert_allclose(sim.com(), sim.parcel.envelope['payload_origin'] + [0, 0, .15], atol=1e-12)
+        self.assertLess(robot.ik_errors[-1]['position_mm'], 1)
+        self.assertLess(robot.ik_errors[-1]['rotation_deg'], 1)
+        geom = sim.m.geom('table').id
+        signs = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
+        world = (signs * sim.m.geom_size[geom]) @ sim.d.geom_xmat[geom].reshape(3, 3).T
+        np.testing.assert_allclose(world.max(0) - world.min(0), [.07, .05, .15], atol=1e-8)
+        self.assertGreaterEqual(sim.floor_geom, 0)
+        for side in ('left', 'right'):
+            pad = sim.m.geom(f'{side}_pad').id
+            self.assertEqual(sim.m.geom_type[pad], mujoco.mjtGeom.mjGEOM_MESH)
+            self.assertEqual(sim.m.geom_solimp[pad, 0], .999)
+        reason, health = physical_parcel_yam.check_state(sim)
+        self.assertIsNone(reason)
+        self.assertEqual(health['payload_geometry']['intersecting_triangles'], 0)
+        self.assertLessEqual(physical_parcel_yam.measure(robot)['penetration_mm'], 1)
+
+    def test_side_grasp_config_validation(self):
+        for options in ({'support_height': -.1}, {'grasp_face': 'invalid'},
+                        {'grasp_face': 'side', 'tilt': 90.}, {'side_start_distance': 0.},
+                        {'side_height_offset': float('nan')}):
+            with self.subTest(options=options), self.assertRaises(ValueError):
+                physical_parcel_yam.Config(**options)
+
+    def test_close_side_start_rejects_initial_robot_overlap(self):
+        cfg = physical_parcel_yam.Config(grasp_face='side', support_height=.15, yaw=90., tilt=0.,
+                                         side_start_distance=.02, side_height_offset=.006)
+        with self.assertRaisesRegex(RuntimeError, 'initial film contact penetration'):
+            physical_parcel_yam.scene(cfg)
+
+    def test_prepared_state_roundtrip_preserves_parcel_state(self):
+        cfg = physical_parcel_yam.Config()
+        p, xml = physical_parcel_yam.parcel_world(cfg)
+        m = p.compile_model(xml)
+        d = mujoco.MjData(m)
+        physical_parcel_yam.initialize_state(p, m, d, cfg)
+        d.qvel[0] = .001
+        expected = d.qpos.copy()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'state.npz'
+            physical_parcel_yam.save_initial_state(p, d, cfg, path)
+            robot = physical_parcel_yam.scene(replace(cfg, initial_state=str(path)))
+            np.testing.assert_array_equal(robot.sim.d.qpos[:m.nq], expected)
+            self.assertEqual(robot.sim.d.qvel[0], .001)
 
 
 if __name__ == '__main__':

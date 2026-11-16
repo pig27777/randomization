@@ -28,7 +28,7 @@ def main(out):
     out.mkdir(parents=True,exist_ok=False)
     result={'sag':[],'extremes':[]}
     for factor in (.5,1.,2.):
-        b=Batch(8,prototype=3,level=0)
+        b=Batch(8,envelope=False,dt=.0005,prototype=3,level=0)
         q=b.data.qpos.numpy();q[:,2]+=.5;b.data.qpos.assign(q)
         b.model.jnt_stiffness.assign(b.model.jnt_stiffness.numpy()*factor)
         mjw.forward(b.model,b.data)
@@ -53,7 +53,7 @@ def main(out):
         fixed={k:[v[bound],v[bound]] for k,v in cfg.items()}
         path=out/f'extreme-{bound}.json';path.write_text(json.dumps(fixed,indent=2))
         for rigid in (True,False):
-            b=Batch(8,rigid=rigid,config=path,action=1)
+            b=Batch(8,envelope=False,dt=.0005,rigid=rigid,config=path,action=1)
             graph=b.graph()
             maximum=0.
             for i in range(4000):

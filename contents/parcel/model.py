@@ -113,14 +113,26 @@ def xml(rigid=False, dt=.0005):
     </worldbody><contact>{''.join(f'<exclude body1="segment{i}" body2="segment{i+1}"/>' for i in range(n-1))}</contact></mujoco>'''
 
 
+@wp.kernel
+def lift_payload_clearance(ids: wp.array2d(dtype=int), qpos0: wp.array2d(dtype=float), qpos: wp.array2d(dtype=float)):
+    e=wp.tid()
+    root=ids[0,8]
+    qpos0[e,root+2]+=.002
+    qpos[e,root+2]=qpos0[e,root+2]
+
+
+def ids_for_surface(m,rigid):
+    return [m.geom(f'{prefix}{i}').id for i in range(1 if rigid else 3) for prefix in ('core','capgeom')]
+
+
 class Batch:
     """One fixed topology, independently randomized native model per world.
 
     `level`: payload=0, ideal bag test connections=1, engagement+slip=2.
     `action`: static=0, compression fixture=1, closing/lifting fixture=2.
     """
-    def __init__(self, nworld=1, rigid=False, seed=7, prototype=-1, dt=.0005,
-                 level=2, action=0, eccentric=0.0, device='cuda:0', config=None):
+    def __init__(self, nworld=1, rigid=False, seed=7, prototype=-1, dt=.0000625,
+                 level=2, action=0, eccentric=0.0, device='cuda:0', config=None, envelope=True):
         if nworld < 1 or dt <= 0 or level not in (0,1,2) or action not in (0,1,2):
             raise ValueError('Invalid batch size, timestep, level or action')
         if prototype not in range(-1,6) or (prototype >= 0 and (prototype < 2) != rigid):
@@ -128,14 +140,22 @@ class Batch:
         self.nworld,self.rigid,self.dt,self.level = nworld,rigid,dt,level
         self.seed,self.prototype,self.action,self.eccentric = seed,prototype,action,eccentric
         self.device = device
-        self.cpu = mujoco.MjModel.from_xml_string(xml(rigid,dt))
+        self.envelope = envelope
+        source = xml(rigid,dt)
+        if envelope:
+            import xml.etree.ElementTree as ET
+            from .film import topology, settings, add_xml
+            topo=topology(settings()['subdivisions'])
+            positions=topo.vertices*np.array([.28,.18,.075])+np.array([0,0,.039])
+            source=ET.tostring(add_xml(ET.fromstring(source),positions,topo,settings()),encoding='unicode')
+        self.cpu = mujoco.MjModel.from_xml_string(source)
         m = self.cpu
         # Allocate all supported batched fields, including set_const outputs.
         sizes = {f.name:nworld for f in fields(mjw.Model)
                  if getattr(f.type,'shape',())[0:1] == ('*',)}
         with wp.ScopedDevice(device):
             self.model = mjw.put_model(m,batch_sizes=sizes)
-            self.data = mjw.make_data(m,nworld=nworld,nconmax=32,njmax=128)
+            self.data = mjw.make_data(m,nworld=nworld,nconmax=1024 if envelope else 32,nccdmax=256 if envelope else 32,njmax=1024 if envelope else 128)
             self.params = wp.empty(nworld,dtype=K.Parameters)
             self.states = wp.empty(nworld,dtype=K.State)
             self.normal = wp.zeros((nworld,2),dtype=float)
@@ -167,6 +187,14 @@ class Batch:
             if bounds.shape != (18,2) or not np.isfinite(bounds).all() or np.any(np.delete(bounds[:,0],10) <= 0) or np.any(bounds[:,1]<bounds[:,0]):
                 raise ValueError('Ranges must be finite, positive and ordered')
             self.bounds = wp.array(bounds,dtype=wp.vec2)
+            self.surface=None
+            self.observer=None
+            if envelope:
+                from .film import Surface
+                self.surface=Surface(m,nworld,device)
+                from .film_contacts import Observer
+                self.observer=Observer(m,self.surface,[{m.geom('left').id},{m.geom('right').id}],
+                    device,capacity=self.data.contact.dist.shape[0])
             self.reset()
 
     def reset(self, episode=0):
@@ -180,10 +208,23 @@ class Batch:
                 self.model.geom_friction,self.model.jnt_pos,self.model.jnt_stiffness,self.model.dof_damping,
                 self.model.qpos0,self.data.qpos])
             wp.launch(initialize_fixture,self.nworld,[self.params,self.addresses,self.model.qpos0,self.data.qpos])
+            if self.surface is not None:
+                geom_ids=wp.array(ids_for_surface(self.cpu,self.rigid),dtype=int,device=self.device)
+                fingers=wp.array([self.cpu.geom('left').id,self.cpu.geom('right').id],dtype=int,device=self.device)
+                from .film import close_payload_gaps
+                wp.launch(close_payload_gaps,(self.nworld,len(ids_for_surface(self.cpu,self.rigid))),
+                    [self.params,geom_ids,1 if self.rigid else 3,self.model.geom_size])
+                self.surface.initialize(self.params,self.model.body_pos,self.model.body_mass,
+                    self.model.geom_friction,geom_ids,self.cpu.geom('table').id,fingers,self.seed,episode,
+                    armature=self.model.dof_armature)
+                wp.launch(lift_payload_clearance,self.nworld,[self.ids,self.model.qpos0,self.data.qpos])
+                self.observer.reset()
             mjw.set_const(self.model,self.data)
             mjw.forward(self.model,self.data)
 
-    def step(self, close=0, release=0, bind=0, gather_speed=.04, region=0):
+    def step(self, close=0, release=0, bind=0, gather_speed=.04, region=0, face_id=-1):
+        if face_id not in range(-1,6):
+            raise ValueError("Invalid physical film face")
         if region not in range(4) or close not in (0,1) or release not in (0,1) or not np.isfinite(gather_speed):
             raise ValueError("Invalid capture region, event or gathering speed")
         with wp.ScopedDevice(self.device):
@@ -192,9 +233,10 @@ class Batch:
             d.qfrc_applied.zero_()
             self.normal.zero_()
             c = d.contact
-            wp.launch(K.contacts,c.dist.shape[0],[int(self.cpu.opt.cone),d.nacon,c.worldid,c.geom,c.frame,
-                c.friction,c.dim,c.efc_address,c.adhesion,d.efc.force,d.njmax,
-                self.cpu.geom('left').id,self.cpu.geom('right').id,self.normal])
+            if self.surface is None:
+                wp.launch(K.contacts,c.dist.shape[0],[int(self.cpu.opt.cone),d.nacon,c.worldid,c.geom,c.frame,
+                    c.friction,c.dim,c.efc_address,c.adhesion,d.efc.force,d.njmax,
+                    self.cpu.geom('left').id,self.cpu.geom('right').id,self.normal])
             # Normal feedback uses the last completed constraint solve. Refresh
             # current transforms before evaluating the current elastic forces.
             mjw.step1(m,d)
@@ -204,12 +246,17 @@ class Batch:
             else:
                 wp.launch(fixture_drive,self.nworld,[self.dt,self.clock,self.params,d.qpos,d.qvel,
                           d.qfrc_applied,self.addresses,0,0.0])
-            wp.launch(film_proxy,self.nworld,[self.states,self.params,d.qpos,d.qvel,self.addresses,self.normal,d.qfrc_applied])
+            if self.surface is None:
+                wp.launch(film_proxy,self.nworld,[self.states,self.params,d.qpos,d.qvel,self.addresses,self.normal,d.qfrc_applied])
             wp.launch(measure_gap,self.nworld,[d.qpos,self.addresses,self.gap])
-            wp.launch(K.dynamics,self.nworld,[self.dt,int(self.rigid),self.level,self.cart,region,
+            wp.launch(K.dynamics,self.nworld,[self.dt,int(self.rigid),0 if self.surface is not None else self.level,self.cart,region,
                 close,release,bind,gather_speed,self.params,self.states,self.ids,self.normal,self.gap,
                 d.xpos,d.xmat,d.xipos,d.qpos,d.qfrc_applied,d.xfrc_applied])
+            if self.surface is not None:
+                self.surface.apply(d.xpos,d.qvel,d.xfrc_applied)
             mjw.step2(m,d)
+            if self.observer is not None:
+                self.observer.observe_mjw(m,d,close,release,face_id,self.dt)
             wp.launch(tick,1,[self.clock])
 
     def graph(self, **kwargs):

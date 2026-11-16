@@ -14,7 +14,7 @@ from contents.parcel.model import film_proxy
 class PhysicsTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.b=Batch(8,prototype=3)
+        cls.b=Batch(8,envelope=False,dt=.0005,prototype=3)
 
     def setUp(self):
         self.b.reset()

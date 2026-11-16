@@ -127,10 +127,26 @@ class Xml(unittest.TestCase):
             if not desc.rigid:
                 self.assertEqual(connects.count("<connect"), len(segs))
 
-    def test_scene_refuses_without_platform_approach(self):
-        with self.assertRaisesRegex(RuntimeError, "approach direction"):
-            S.scene(S.Config(category="hard", size=(.3, .2, .04), mass=.5, slack=(.04, .04)))
-
+    def test_side_pose_on_platform(self):
+        """Long-face start pose on the real YAM. Horizontal is refused as unreachable (setup_fail); 15 deg down:
+        site z along the tilted approach, fingertips 90 mm before the face centre, closing along the face,
+        rope sites straddling the pinch frame across the finger width with rope_ga lower."""
+        from yam_platform.protocol import tips
+        cfg = dict(category="hard", size=(.3, .2, .04), mass=.5, slack=(.04, .04))
+        with self.assertRaisesRegex(RuntimeError, "initial pose unreachable"):
+            S.scene(S.Config(**cfg))
+        robot = S.scene(S.Config(**cfg, approach_pitch_deg=15.0))
+        m, d = robot.sim.m, robot.sim.d
+        a = np.radians(15.0)
+        n = np.array([0, np.cos(a), -np.sin(a)])
+        R = d.site_xmat[robot.site].reshape(3, 3)
+        np.testing.assert_allclose(R[:, 2], n, atol=2e-3)
+        np.testing.assert_allclose(abs(R[:, 1] @ [1, 0, 0]), 1, atol=2e-3)
+        face = np.r_[S.CENTER, .022] - [0, .1, 0]
+        np.testing.assert_allclose(tips(robot).mean(0), face - .0903 * n, atol=2e-3)
+        ga, gb = (d.site_xpos[m.site(k).id] for k in ("rope_ga", "rope_gb"))
+        np.testing.assert_allclose((ga + gb) / 2, d.xpos[m.body("pinch_frame").id], atol=1e-9)
+        np.testing.assert_allclose(gb - ga, .02 * np.cross(R[:, 1], n) * np.sign(np.cross(R[:, 1], n)[2]), atol=1e-3)
 
 if __name__ == "__main__":
     unittest.main()

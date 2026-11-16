@@ -1,0 +1,28 @@
+{"url": "http://localhost:8088", "paused": true, "custom_passive_forces": true, "config": "test/runs/2026-11-16/bag/physical-parcel-mj4-damped-entry-r4/selected-config.json"}
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/test/bag_model/view_physical_parcel.py", line 71, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/test/bag_model/view_physical_parcel.py", line 65, in main
+    viewer_handle.run_sim_loop(handle)
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/viewer_handle.py", line 534, in run_sim_loop
+    while handle.is_running():
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/viewer_handle.py", line 170, in is_running
+    self.close()
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/viewer_handle.py", line 146, in close
+    self._forward_error_fn()
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/launch_thread.py", line 120, in forward_error
+    raise e
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/launch_thread.py", line 112, in run
+    target_fn(viewer_endpoint)
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/launch_web.py", line 75, in target
+    run_web_viewer(
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/launch_web.py", line 45, in run_web_viewer
+    viewer = web_viewer.WebViewer(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/web_viewer.py", line 209, in __init__
+    super().__init__(
+  File "/home/ubuntu/Dev/Projects/random/.venv-physical-parcel/lib/python3.12/site-packages/mujoco/studio/viewer_protocol.py", line 135, in __init__
+    model = mujoco.MjSpec().compile()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Error: engine error: Python exception raised
