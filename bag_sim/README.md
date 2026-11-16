@@ -1,6 +1,20 @@
 # 软包统一物理模型 交接文档
 
-2026-11-02 · 状态：Newton 后端第一阶段完成，第二阶段（塑性/记忆/折痕）未开始
+## 当前建模基线（2026-11-16，用户确认）
+
+用户确认采用当前最外缘封口双膜片模型，后续袋子开发以此版本为基础。
+
+- 模型入口为 [`physical_parcel.py`](physical_parcel.py)，MuJoCo4.0.1原生二维flex承担膜面伸缩，自定义二面角力承担弯曲与弯曲阻尼。参考材料构型与装物初态分别保存。
+- 几何使用 [`geometry/kraft_edge_sealed_35.npz`](geometry/kraft_edge_sealed_35.npz)，142节点、280三角面，正反片在完整最外轮廓共享节点封合。通过 `Config(geometry="geometry/kraft_edge_sealed_35.npz")` 选择该基线。
+- 袋型分为纸袋、塑料薄膜袋、气泡信封袋，通过材料、厚度、摩擦、耗散和缓冲预设区分。对应YAM适配器的 `bag_profile="kraft"/"pe"/"bubble"`。
+- 内容物支持刚体、三段可弯曲体和可压缩体，袋与内容物的尺寸、质量和材料参数可随机化。
+- 载荷通过原生接触传递，盒体使用同形凸网格接触。抓取与录像接入 [`experience/`](../experience/README.md) 统一平台。
+
+材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。现有侧抓存在接触预算超限，顶面搓起及气泡袋抓取记录为失败。物理验证状态见 [主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) 与 [分类视频](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4)。
+
+## 历史后端说明（2026-11-02）
+
+当时状态为Newton后端第一阶段完成，第二阶段（塑性/记忆/折痕）未开始。
 
 四种外层袋子（PE 快递袋、牛皮纸邮寄袋、纸板文件封、气泡信封袋）用**同一套方程**，只靠 `profiles/*.json` 里的参数区分。有两个后端：MuJoCo（对照基准）和 Newton VBD（后续开发方向）。所有参数均为估计值，**未做实物标定**。
 

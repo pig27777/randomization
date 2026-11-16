@@ -54,3 +54,9 @@ Mesa llvmpipe回放视频为20fps、90帧、4.5秒、1倍速、1280×480双视�
 新增两轮膜—盒体/支撑采样几何深度均0、角点外露0、警告0。纸袋原生接触峰值1.6076 mm超预算，气泡信封0.8305 mm。四段及合成视频完整解码通过，检查纸袋悬挂和气泡信封帧，标题只有类别、动作及结果。连续视频约27.75秒，1280×534、20fps、1倍速。整体物理验收仍未通过。GitHub推送受既有凭据助手路径失效阻止，本机文件与提交保留。
 
 [三类视频](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4) · [本轮检查](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/verification.json) · [配置与来源](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/cases.json)
+
+## 建模基线确认检查（2026-11-16 21:20）
+
+用户确认当前最外缘封口双膜片方案作为后续建模基线。更新README首节、主题报告及进展记录，明确三类袋型、内容物参数化、模型入口和已有物理限制。检查范围为文档，方法为核对新增引用目标存在并执行 `git diff --check`。动力学结果沿用上述已保存证据。
+
+README基线引用目标存在性检查通过，差异格式检查通过。本轮检查完成，既有物理验证限制按原报告继续记录。

@@ -507,3 +507,9 @@ PYTHONPATH=test/bag_model:experience:. flock /tmp/claude-gpu.lock \
 ```
 
 [完整对照视频](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/top-grasp-parameter-comparison.mp4) · [配置与入口](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/manifest.json) · [结果](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/summary.json) · [视频核对](../runs/2026-11-16/bag/physical-parcel-top-parameters-r2/video-verification.json) · [任务检查](../../reports/physical-parcel-top-parameter-video-test.md)
+
+## 建模基线确认（2026-11-16 21:20，Asia/Taipei）
+
+用户明确决定采用当前袋子建模。确定的基线为MuJoCo4.0.1最外缘封口双膜片、142节点/280三角面、独立参考构型、原生膜面伸缩与接触、自定义弯曲及耗散，同形凸网格盒体接触。纸袋、塑料薄膜袋、气泡信封袋通过预设区分，内容物支持刚体、三段弯曲和可压缩模式，参数可随机化。后续建模开发以该方案为基础，入口与状态已写入 `bag_sim/README.md` 首节。
+
+本次为建模路线确认与文档更新。物理验证继续按已有结果记录，侧抓接触超预算、顶面与气泡抓取失败、材料及等效缓冲未标定仍为当前限制。检查仅核对文档引用和差异格式，结果见任务检查报告。
