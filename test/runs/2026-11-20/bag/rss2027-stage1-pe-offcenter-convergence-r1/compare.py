@@ -10,6 +10,13 @@ def measure(case):
     summary = json.loads((case / "summary.json").read_text())
     with (case / "curve.csv").open() as stream:
         pull = [row for row in csv.DictReader(stream) if row["phase"] == "pull"]
+    shape = config["initial_geometry"]
+    settings = dict(step_s=config["dt"], grid_m=shape.get("aperture_pitch_m", shape["nominal_local_pitch_m"]),
+                    grip_window_s=summary["longest_grip_hold_band_s"], total_pull_seconds=config["pull_seconds"])
+    if not pull:
+        return dict(**settings, valid_capture=False, capture_after_pull_s=None, captured_material_m=None,
+                    peak_tension_N=None, window_final_tension_N=None, full_peak_tension_N=None,
+                    release_after_pull_s=None, traction_slip_after_pull_s=None, traction_slip_force_N=None)
     start = float(pull[0]["t_s"])
     # Use the same 250 observations on the shared 1 ms time grid.
     end = start + .249 + 1e-8
@@ -18,13 +25,12 @@ def measure(case):
     captured = (captured_at is not None and captured_at <= end and
                 summary["longest_grip_hold_band_s"] >= .01 and summary["numerically_valid"])
     event = next((row for row in window if float(row["t_s"]) == captured_at), None)
-    return dict(step_s=config["dt"], grid_m=config["initial_geometry"]["nominal_local_pitch_m"],
-                valid_capture=bool(captured), grip_window_s=summary["longest_grip_hold_band_s"],
+    return dict(**settings, valid_capture=bool(captured),
                 capture_after_pull_s=float(captured_at) - start if captured else None,
                 captured_material_m=float(event["aperture_material_length_m"]) if captured else None,
                 peak_tension_N=max(float(row["signed_pull_N"]) for row in window),
                 window_final_tension_N=float(window[-1]["signed_pull_N"]),
-                total_pull_seconds=config["pull_seconds"], full_peak_tension_N=summary["peak_pull_N"],
+                full_peak_tension_N=summary["peak_pull_N"],
                 release_after_pull_s=(summary["release_t_s"] - start) if summary["release_t_s"] is not None else None,
                 traction_slip_after_pull_s=(summary["traction_slip_candidate_t_s"] - start)
                 if summary["traction_slip_candidate_t_s"] is not None else None,
@@ -39,8 +45,9 @@ def main():
     metrics = ("capture_after_pull_s", "captured_material_m", "peak_tension_N")
     full_metrics = ("full_peak_tension_N", "release_after_pull_s", "traction_slip_after_pull_s", "traction_slip_force_N")
     results = {}
-    for name in ("coarse-extended", "fine-extended", "half-step"):
-        case = run / name
+    cases = {name: run / name for name in ("coarse-extended", "fine-extended", "half-step")}
+    cases["refined-aperture"] = run.parent / "rss2027-stage1-pe-aperture-refinement-r1/refined-aperture"
+    for name, case in cases.items():
         if not (case / "summary.json").exists():
             continue
         observation = measure(case)
