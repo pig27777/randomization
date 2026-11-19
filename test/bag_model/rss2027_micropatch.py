@@ -169,9 +169,12 @@ def pad_reactions(m, d, pad_ids, pull_speed=None):
     cone_normal = np.zeros(2)
     sliding_normal = np.zeros(2)
     local = np.zeros(6)
-    for index, contact in enumerate(d.contact):
-        if contact.efc_address < 0 or 0 not in contact.flex:
-            continue
+    contacts = d.contact
+    touches_pad = np.isin(contacts.geom, tuple(pad_ids)).any(axis=1)
+    touches_film = (contacts.flex == 0).any(axis=1)
+    pad_contacts = np.flatnonzero((contacts.efc_address >= 0) & touches_pad & touches_film)
+    for index in pad_contacts:
+        contact = contacts[index]
         for slot, geom_id in enumerate(contact.geom):
             if geom_id not in pad_ids:
                 continue
