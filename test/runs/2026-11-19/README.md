@@ -24,7 +24,7 @@
 | [GPU 整图计时](bag/rss2027-stage1-yam-warp-profile-r1/) · [两段图](bag/rss2027-stage1-yam-warp-profile-r2/) | R4 静置与闭合入口的短窗设备、反馈耗时 | ubun RTX 5090。持锁运行 `rss2027_yam_warp_profile.py`，第二次附 `--split-stages` | 两轮均零溢出，设备 `step2` 占主要成本。 |
 | [基线 CPU 第一候选](bag/rss2027-stage1-pickup-baseline-cpu-r1/) · [GPU 判定](bag/rss2027-stage1-pickup-baseline-warp-r1/) | YAM 侧抓、提拉、悬停算力对照 | ubun。两端持锁执行各自 `run.sh` | CPU 在 6.50 s 尚未进入抬升，GPU 条件未过。 |
 | [200 μs 基线 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r2/) · [GPU](bag/rss2027-stage1-pickup-baseline-warp-r2/) | 复用已验证侧抓起始姿态，缩短侧向插入与闭合 | ubun。两端持锁执行各自 `run.sh` | CPU 通过 4.226 s；GPU 在 2.7604 s 露角停止，显存采样最高 966 MiB。 |
-| [100 μs 基线 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r3/) · [在线 GPU](bag/rss2027-stage1-pickup-baseline-warp-r3/) | 同一算力工况减半步长并记录原生穿透峰值 | ubun。两端持锁执行各自 `run.sh` | CPU 通过 4.2248 s，GPU 已启动。[计划](../../bag_model/RSS2027_STAGE1_REPORT.md#100-μs-算力工况复测计划)。 |
+| [100 μs 基线 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r3/) · [在线 GPU](bag/rss2027-stage1-pickup-baseline-warp-r3/) | 同一算力工况减半步长并记录原生穿透峰值 | ubun。两端持锁执行各自 `run.sh` | CPU 通过 4.2248 s；GPU 于 11 月 20 日 00:01（北京时间）在提拉 2.7595 s 处露角停止，墙钟 887.12 s。[结果](bag/rss2027-stage1-pickup-baseline-warp-r3/recording/summary.json)。 |
 | [rss2027-stage1-pe-traction-r1](bag/rss2027-stage1-pe-traction-r1/) | 记录两级局部网格的内侧摩擦牵引及切向速度 | ubun CPU。持锁执行本轮 `run_cases.sh` | 完成，整体滑移候选力相差 11.2%。 |
 | [稳压收拢](bag/rss2027-stage1-pe-gather-force-r1/) · [分辨率复查](bag/rss2027-stage1-pe-gather-force-r2/) · [1.25 mm 收拢](bag/rss2027-stage1-pe-gather-fine-grid-r1/) | 平坦余料慢速收拢，评估受控压力下的膜量增量 | ubun CPU。持锁执行各轮 `run.sh` / `run_cases.sh` | 半步长斜率差 0.15%，2.5→1.25 mm 共同行程差 7.89%。 |
 

@@ -33,7 +33,7 @@
 
 ## 整袋夹入诊断、同参 PE 与内容物装配
 
-最近检查时间 2026-11-19 23:48（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
+最近检查时间 2026-11-20 00:24（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
 
 | 检查 | 方法 | 结果 |
 | --- | --- | --- |
@@ -61,8 +61,14 @@
 | GPU 耗时分解 | 持锁执行 `rss2027_yam_warp_profile.py`，用 R4 两个状态帧分整图与两段图各 64 步 | `step2` 18.46–33.01 ms/步，完整反馈约 3.23–3.62 ms/步，零溢出。这些数据用于瓶颈定位，完整回合仍待测。 |
 | 3–5 s 基线 CPU 候选 | 执行 `rss2027-stage1-pickup-baseline-cpu-r1/run.sh` 和 `cpu-r2/run.sh` | 首个候选 6.50 s 仍在闭合；第二个以 200 μs 完成 4.226 s 抓取悬停，墙钟 82.15 s，穿透 0.697 mm，零告警。 |
 | 基线 GPU 200 μs | `rss2027-stage1-pickup-baseline-warp-r2/run.sh`，对停止态以 CPU 重算包覆几何 | 2.7604 s 提拉失败，墙钟 469.11 s、进程显存最高采样 966 MiB、零溢出。独立确认一个角点露出。 |
-| 基线 100 μs CPU | `rss2027-stage1-pickup-baseline-cpu-r3/run.sh` 与接触回放 | 通过完整 4.2248 s，墙钟 151.49 s，穿透 0.367 mm，并取得逐步峰值记录。同配置 GPU 在线复测已启动。 |
+| 基线 100 μs | CPU 和 GPU 各执行 `rss2027-stage1-pickup-baseline-*-r3/run.sh`，并以 CPU 几何重算 GPU 最终状态 | CPU 通过 4.2248 s，墙钟 151.49 s，穿透 0.367 mm。GPU 在 2.7595 s 露角，墙钟 887.12 s、采样显存 966 MiB、零溢出，原生穿透峰值 1.067 mm。 |
 | 牵引分组和穿透峰值记录 | 使用已存持载片验证分组，25 μs 同参整袋实际记录峰值 | 两侧摩擦锥分类通过包含关系核对，同态峰值定位到闭合期膜面 3/151，并用原三角面投影复核。 |
 | 原生触点整体滑移 | 持锁执行 `rss2027-stage1-pe-traction-r1/run_cases.sh`，对比 2.5/1.25 mm 原生摩擦锥和有载切向速度 | 两档候选力 0.33756/0.29977 N，力差 11.2%；时刻 0.547/0.529 s，差 3.3%。力仍未过 10%。 |
 | 平坦稳压聚拢 | 持锁执行 `rss2027-stage1-pe-gather-force-r1/run.sh`、`gather-force-r2/run_cases.sh` 与 `pe-gather-fine-grid-r1/run.sh`，在原始压力窗比对共同行程 | 5 mm 半步长差 0.15%；2.5→1.25 mm 共同行程斜率 0.67217→0.72519 m/m（差 7.89%），通过该工况的细网格复核。 |
 | 共享平台兼容 | `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py`，检查新增字段默认值和 Python 源码 | 19 项通过。 |
+| CPU/Warp 内容物接触法向 | 持锁执行 `rss2027_payload_contact_parity.py`，用 4 个同态姿态读取 Warp 约束，再给膜 0.01 m/s 法向投影对照 | 闭合末帧与停止帧的膜面 191 法向差为 89.18°、87.73°，设备约束投影误差小于 1 nm/s，零容量溢出。 |
+| 改变 PE 聚拢条件 | 持锁执行 `rss2027-stage1-pe-gather-conditions-r1/run_cases.sh` 并按原始压力窗拟合 | 4 mm 余料组斜率 0.713，0.8 N 下压力组斜率 0.709，均取得合格压力窗。各只运行一次，新增两组的独立网格复核待做。 |
+| 短回合慢速提拉 | 持锁执行 `rss2027-stage1-pickup-baseline-*-r4/run.sh`，核对离台并回放 GPU 停止态 | 0.18 m/s CPU 通过 4.7704 s，墙钟 91.60 s。GPU 在 2.7804 s 露角，墙钟 477.94 s、966 MiB、零溢出，穿透峰值 0.926 mm。 |
+| 整袋夹口材料 | `rss2027_yam_capture_audit.py` 回放 R4 空袋与同参 PE 侧抓，另用已知面积验证裁剪 | 平面裁剪的变形/参考面积为 4/24 m²。空袋 105 帧为零，整袋 PE 起抬 3.98 mm、悬停 8.74–10.19 mm，使用 20 mm 指宽和矩形夹口等效。 |
+| 整袋材料装配与入口 | 以同一 142 节点资产检查四种 `parcel_world`，运行 `rss2027-stage1-whole-bag-materials-r1/run.sh smoke`，按单步位置核对峰值。复跑 `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py` | 19 项回归通过。PE、气泡膜的 200 μs 入口通过；牛皮纸 200 μs 与纸板 100 μs 在静置早期的穿透峰值 1.416/1.390 mm 超限。 |
+| PE 同参整袋短动作与 15 mm 偏置 | 持锁运行材料对照 `run.sh pe` 和偏置 CPU `run.sh`，分别检查夹入数据和离台门槛 | PE 200 μs 成功夹入，3.0202 s 露角停止。偏置的原 PE 类整袋 CPU 通过 4.7804 s，墙钟 87.62 s，穿透 0.526 mm，GPU 对照已启动。 |

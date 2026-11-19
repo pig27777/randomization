@@ -36,9 +36,11 @@ def material_parameters(young_pa, thickness_m, density_kg_m3, poisson=0.3):
 
 
 def parcel_profile(name):
-    """Effective shell settings for the existing paper, film and bubble profiles."""
-    if name not in ("kraft", "pe", "bubble"):
-        raise ValueError("parcel profile must be kraft, pe or bubble")
+    """Effective shell settings for the existing bag profiles."""
+    # The paperboard asset stores 250 g/m² in its lumped vertex masses.
+    areal_masses = {"kraft": .12, "bubble": .13, "paperboard": .25}
+    if name != "pe" and name not in areal_masses:
+        raise ValueError("parcel profile must be kraft, pe, bubble or paperboard")
     profile = json.loads((HERE / "profiles" / f"{name}.json").read_text())
     parameters = profile["params"]
     if name == "pe":
@@ -47,7 +49,7 @@ def parcel_profile(name):
         thickness = parameters["membrane_thickness_m"]
         shell = dict(membrane=parameters["young_pa"] * thickness,
                      bending=parameters["bending_rigidity_nm"],
-                     material_thickness=thickness, areal_mass=.13 if name == "bubble" else .12)
+                     material_thickness=thickness, areal_mass=areal_masses[name])
     shell["radius"] = parameters["collision_radius_m"]
     return dict(shell=shell, texture=HERE / profile["texture"],
                 cushion=parameters if parameters.get("cushion") else None,
