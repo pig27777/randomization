@@ -1,0 +1,55 @@
+{
+  "hostname": "ubun",
+  "samples": 128,
+  "attempts": 256,
+  "input_sha256": "f07f5632e9432e89c73cb3cbf1a58c23e1ef7ed49b1153bb1fcfae32e3caf415",
+  "mesh": "geometry/kraft_edge_sealed_35.npz",
+  "mesh_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+  "shell": {
+    "membrane": 1200.0,
+    "bending": 3.956043956043956e-07,
+    "areal_mass": 0.0552,
+    "material_thickness": 6e-05,
+    "poisson": 0.3,
+    "radius": 0.00025
+  },
+  "groups": {
+    "0.30": {
+      "cut": {
+        "initial_strain": 24,
+        "enclosed": 8
+      },
+      "inside_seams": {
+        "initial_strain": 29,
+        "enclosed": 3
+      }
+    },
+    "0.60": {
+      "cut": {
+        "initial_strain": 32
+      },
+      "inside_seams": {
+        "initial_strain": 32
+      }
+    },
+    "0.90": {
+      "cut": {
+        "initial_strain": 30,
+        "enclosed": 2
+      },
+      "inside_seams": {
+        "initial_strain": 32
+      }
+    },
+    "continuous": {
+      "cut": {
+        "initial_strain": 28,
+        "enclosed": 4
+      },
+      "inside_seams": {
+        "initial_strain": 31,
+        "enclosed": 1
+      }
+    }
+  }
+}
