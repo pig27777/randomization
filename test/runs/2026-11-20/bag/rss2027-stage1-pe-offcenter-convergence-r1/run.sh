@@ -5,7 +5,7 @@ fixture=test/bag_model/rss2027_micropatch.py
 case "${1:?use coarse-extended, fine-extended or half-step}" in
     coarse-extended) levels=1; dt=.0001; pull=.65 ;;
     fine-extended) levels=2; dt=.0001; pull=.65 ;;
-    half-step) levels=2; dt=.00005; pull=.25 ;;
+    half-step) levels=2; dt=.00005; pull=.65 ;;
     *) exit 2 ;;
 esac
 cp -- "$fixture" "$run_dir/fixture-$1.py"
