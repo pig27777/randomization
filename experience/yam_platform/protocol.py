@@ -34,6 +34,11 @@ class TrialConfig:
     press_start_offset_m: float=.10
     press_only: bool=False
     close_gap_hold_s: float=0.
+    grasp_opening_m: float=.040
+    lift_speed_m_s: float=.10
+    pickup_only: bool=False
+    side_insert_speed_m_s: float=.010
+    closing_gain_m_per_N_s: float=.002
 
 
 class NormalPress:
@@ -214,6 +219,14 @@ def measure_contacts(robot, target_geoms=(), target_flexes=(), monitor_support=F
 def run(backend, cfg, output, *, on_sample=None):
     if not np.isfinite(cfg.lift_height) or cfg.lift_height <= 0:
         raise ValueError("lift_height must be finite and positive")
+    if not np.isfinite(cfg.lift_speed_m_s) or cfg.lift_speed_m_s <= 0:
+        raise ValueError("lift_speed_m_s must be finite and positive")
+    if not np.isfinite(cfg.grasp_opening_m) or not 0 < cfg.grasp_opening_m <= .045:
+        raise ValueError("grasp_opening_m must be in (0, .045] m")
+    if not np.isfinite(cfg.side_insert_speed_m_s) or cfg.side_insert_speed_m_s <= 0:
+        raise ValueError("side_insert_speed_m_s must be finite and positive")
+    if not np.isfinite(cfg.closing_gain_m_per_N_s) or cfg.closing_gain_m_per_N_s <= 0:
+        raise ValueError("closing_gain_m_per_N_s must be finite and positive")
     if not np.isfinite(cfg.gripper_overtravel) or cfg.gripper_overtravel < 0:
         raise ValueError("gripper_overtravel must be finite and nonnegative")
     if not np.isfinite(cfg.close_gap_hold_s) or cfg.close_gap_hold_s < 0:
@@ -247,7 +260,7 @@ def run(backend, cfg, output, *, on_sample=None):
     pinch = backend.attachment(robot,cfg)
     spring = backend.gathering_spring(robot, cfg) if hasattr(backend, "gathering_spring") else PinchSpring()
     dt = cfg.dt
-    gap = .040
+    gap = cfg.grasp_opening_m
     filtered = np.zeros(2)
     grip20 = 0.
     phase = "settle"
@@ -336,14 +349,15 @@ def run(backend, cfg, output, *, on_sample=None):
                 if max(feedback["contact_magnitude_each_N"])>.05:
                     if not contacted: contact_tip=tip_mid.copy()
                     contacted=True
-                speed=.010 if contacted else .05
+                speed=cfg.side_insert_speed_m_s if contacted else .05
                 if contacted:depth=max(0.,float((tip_mid-contact_tip)@approach))
                 target+=approach*speed*dt
                 next_phase="close" if depth>=min(.015,.6*robot.approach_extent) or (contacted and down>=20) else None
             if press is None and elapsed>8:
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):
-            gap=float(np.clip(gap+np.clip((filtered.mean()-10)*.002,-.05,.015)*dt,minimum_gap,.045))
+            gap_rate = np.clip((filtered.mean()-10)*cfg.closing_gain_m_per_N_s,-.05,.015)
+            gap=float(np.clip(gap+gap_rate*dt,minimum_gap,.045))
             if phase=="close":
                 if press is not None:
                     target[2] = press.move(target[2], tip_mid[2], down, feedback["direct_support_N"], dt, approach=False)
@@ -359,10 +373,10 @@ def run(backend, cfg, output, *, on_sample=None):
                         outcome,reason="grasp_fail","v1.3 pinch eligibility absent at end of close"
                     lift_site=target.copy(); lift_object=sim.com().copy()
             elif phase=="lift":
-                target=lift_site+np.array([0.,0.,min(cfg.lift_height,.10*elapsed)])
-                next_phase="lift_hold" if elapsed>=cfg.lift_height/.10 else None
+                target=lift_site+np.array([0.,0.,min(cfg.lift_height,cfg.lift_speed_m_s*elapsed)])
+                next_phase="lift_hold" if elapsed>=cfg.lift_height/cfg.lift_speed_m_s else None
             elif phase=="lift_hold":
-                next_phase="carry" if elapsed>=.2 else None
+                next_phase=("done" if cfg.pickup_only else "carry") if elapsed>=.2 else None
                 if next_phase and feedback["support_N"]>.05:
                     outcome,reason="grasp_fail","object remains on table after lift and hold"
             elif phase=="carry":
@@ -455,9 +469,12 @@ def run(backend, cfg, output, *, on_sample=None):
             phase_start=float(d.time)
             if next_phase=="done":
                 motion_completed=True
-                position=sim.com()
-                success=bool(np.all(np.abs(position[:2]-(np.array([-.25,.04])+[.5,0]))<=.10))
-                outcome,reason=("success","") if success else ("grasp_fail","final COM outside v2.2 target square")
+                if cfg.pickup_only:
+                    outcome,reason="pickup_ok",""
+                else:
+                    position=sim.com()
+                    success=bool(np.all(np.abs(position[:2]-(np.array([-.25,.04])+[.5,0]))<=.10))
+                    outcome,reason=("success","") if success else ("grasp_fail","final COM outside v2.2 target square")
                 if grasp_failure is not None:
                     outcome,reason=grasp_failure["outcome"],grasp_failure["reason"]
                 break

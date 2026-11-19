@@ -49,3 +49,15 @@
 | 几何与源文件检查 | 比对 R4 MJB 数值皮肤与指垫摩擦、匹配粗细试片几何、验证夹口内材料线裁剪，解析 Python 和 `git diff --check` | 摩擦 0.8、数值皮肤半径 0.25 mm 一致；加密后仍保持 10 mm 展开褶宽和 8 mm 余料；夹口材料长度的已知几何值核对通过。 |
 
 原始值、配置和后续批次见[Stage 1 实验报告](../test/bag_model/RSS2027_STAGE1_REPORT.md)。
+
+## 整袋侧抓、细网格与 GPU 分段计时
+
+| 检查 | 方法 | 结果 |
+| --- | --- | --- |
+| 整袋侧抓正对照 | 持锁执行 `rss2027-stage1-side-grasp-r1/run.sh`，回放核查夹入及导出提拉力—位移 | 8.50 s 试验覆盖 0.20 s 离台悬停，质心升高 146.57–158.59 mm，峰值拉力 5.049 N、原生穿透 0.484 mm、零告警。 |
+| 侧抓褶皱录像 | `render_rss2027_fold_video.py --edge 94 95 --start .32 --end 8.42 --highlight-time 7.42`；FFmpeg 完整解码并目检 | 1280×512、203 帧、25 fps，膜边角度 5.41°→106.49°。[视频](../test/runs/2026-11-19/bag/rss2027-stage1-side-grasp-r1/yam-side-fold.mp4)。 |
+| 同参 PE 整袋侧抓 | 持锁执行 `rss2027-stage1-side-grasp-matched-pe-r1/run.sh`，检查最终几何状态 | 提拉时原生穿透峰值 1.501 mm，一个刚性内容物角点脱离膜包覆。按几何验收判失败，半步长待测。 |
+| 单轴网格与 1.25 mm 两轴网格 | 执行 `rss2027-stage1-pe-mesh-axes-r1/run_cases.sh` 和 `rss2027-stage1-pe-quarter-grid-r1/run.sh`，复用切向速度检查 | 单轴均达到夹持力，闭合轴加密使起拉膜长减少约 3 mm。定开口预褶的 2.5→1.25 mm 峰值、持时、脱开差小于 5%，触点起滑仍差 63%。 |
+| GPU 耗时分解 | 持锁执行 `rss2027_yam_warp_profile.py`，用 R4 两个状态帧分整图与两段图各 64 步 | `step2` 18.46–33.01 ms/步，完整反馈约 3.23–3.62 ms/步，零溢出。这些数据用于瓶颈定位，完整回合仍待测。 |
+| 3–5 s 基线 CPU 候选 | 执行 `rss2027-stage1-pickup-baseline-cpu-r1/run.sh` 与条件 `warp-r1/run.sh` | 首个候选在 6.50 s 仍未完成闭合。零告警，穿透峰值 0.623 mm。GPU 条件未过。第二个候选沿用已通过的整袋侧抓初态，正在排队。 |
+| 共享平台兼容 | `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py`，检查新增字段默认值和 Python 源码 | 19 项通过。 |

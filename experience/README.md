@@ -76,6 +76,10 @@ flock /tmp/claude-gpu.lock ../.venv/bin/python -B -m yam_platform.benchmark --ou
 
 `close_gap_hold_s` 可为到达闭合指令下限后的等待配置时间，以便实际夹口跟踪。默认 0 s。达到持续夹持力或闭合时限时仍会进入抬升。
 
+算力试验可在 JSON 中使用 `pickup_only=true` 在提拉与悬停后结束。`grasp_opening_m` 与 `lift_speed_m_s` 默认分别为 0.040 m 和 0.10 m/s，仍按原桌面支撑和失触条件判定 `pickup_ok`。
+
+独立侧抓工况可设 `side_insert_speed_m_s` 与 `closing_gain_m_per_N_s`，默认分别为 0.01 m/s 与 0.002 m/(N·s)。插入深度、夹持力目标与闭合速度限值沿用平台设置。
+
 ## 来源
 
 公共流程迁自 randomization 的 `test/flex3d/`，机械臂迁自 `policy/yam_probe_robot.py`。接触统计和弹簧保留冻结 v1.3 的实现，圆角几何来自 `bag_sim/mj_loose.py`。本次没有修改材料本构或进行物理重新标定。

@@ -22,10 +22,19 @@ RADIUS = 0.0001
 OPEN_HALF = 0.0115
 CLOSED_HALF = 0.0042
 PAD_BOTTOM = 0.020
+PULL_SPEED = 0.025
 PHASES = (("settle", .08), ("press", .45), ("gather", .24), ("hold", .06), ("pull", .50))
 
 
-def coupon_grid(cells, slack, prefold, radius, *, prefold_width=None, flat_waist=False, refine_contact=False):
+def refine_axis(axis, half_extent, levels):
+    for _ in range(levels):
+        mid = (axis[:-1] + axis[1:]) / 2
+        axis = np.sort(np.r_[axis, mid[np.abs(mid) <= half_extent]])
+    return axis
+
+
+def coupon_grid(cells, slack, prefold, radius, *, prefold_width=None, flat_waist=False,
+                refine_contact=False, refine_levels=1):
     """Keep the initial x-edge lengths exactly equal to the flat reference."""
     axis = np.linspace(-SIDE / 2, SIDE / 2, cells + 1)
     width = (prefold_width or 2 * SIDE / cells) if prefold else SIDE / 2
@@ -36,11 +45,9 @@ def coupon_grid(cells, slack, prefold, radius, *, prefold_width=None, flat_waist
     x_axis = np.unique(np.round(np.r_[axis, np.ravel(ridges)], 12))
     y_axis = axis
     if refine_contact in (True, "x", "both"):
-        x_mids = (x_axis[:-1] + x_axis[1:]) / 2
-        x_axis = np.sort(np.r_[x_axis, x_mids[np.abs(x_mids) <= OPEN_HALF + .004]])
+        x_axis = refine_axis(x_axis, OPEN_HALF + .004, refine_levels)
     if refine_contact in (True, "y", "both"):
-        y_mids = (axis[:-1] + axis[1:]) / 2
-        y_axis = np.sort(np.r_[axis, y_mids[np.abs(y_mids) <= .010]])
+        y_axis = refine_axis(y_axis, .010, refine_levels)
     x, y = np.meshgrid(x_axis, y_axis)
     length = np.diff(x_axis)
     mid = (x_axis[:-1] + x_axis[1:]) / 2
@@ -82,7 +89,8 @@ def build(args):
     material = material_parameters(young, thickness, density, poisson)
     ref, current, faces, edges = coupon_grid(
         args.cells, args.slack, args.prefold, radius, prefold_width=args.prefold_width,
-        flat_waist=args.match_whole_bag_pe and not args.prefold, refine_contact=args.refine_contact)
+        flat_waist=args.match_whole_bag_pe and not args.prefold, refine_contact=args.refine_contact,
+        refine_levels=args.refine_levels)
     model = ET.fromstring(f"""
       <mujoco model="rss2027_micropatch">
         <option timestep="{args.dt}" integrator="discrete" solver="Newton"
@@ -151,10 +159,12 @@ def build(args):
     return xml, m, d, material, ref, current, faces
 
 
-def pad_reactions(m, d, pad_ids):
+def pad_reactions(m, d, pad_ids, measure_traction=False):
     force = np.zeros((2, 3))
     inner = np.zeros(2)
     active = np.zeros(2, dtype=int)
+    cone_normal = np.zeros(2)
+    sliding_normal = np.zeros(2)
     local = np.zeros(6)
     for index, contact in enumerate(d.contact):
         if contact.efc_address < 0 or 0 not in contact.flex:
@@ -170,8 +180,17 @@ def pad_reactions(m, d, pad_ids):
             force[pad] += sign * (frame.T @ local[:3])
             # Separate inward-facing pinch contacts from downward press contacts.
             if (2 * pad - 1) * sign * frame[0, 0] > .7:
-                inner[pad] += local[0] * abs(frame[0, 0])
-    return force, inner, active
+                normal = local[0] * abs(frame[0, 0])
+                inner[pad] += normal
+                if measure_traction and contact.dim == 3 and normal > 0:
+                    shear = local[1:3] / contact.friction[:2]
+                    if np.linalg.norm(shear) >= .95 * local[0]:
+                        cone_normal[pad] += normal
+                        adr = contact.efc_address
+                        pull_slip = sign * float(frame[1:, 2] @ d.efc_vel[adr + 1:adr + 3])
+                        if pull_slip > .10 * PULL_SPEED:
+                            sliding_normal[pad] += normal
+    return force, inner, active, cone_normal, sliding_normal
 
 
 def aperture_lengths(nodes, reference_lengths, half, z):
@@ -219,7 +238,7 @@ def run(args):
     phases = (*phases, ("pull", args.pull_seconds))
     row = np.flatnonzero(np.isclose(ref[:, 1], 0., atol=1e-12))
     reference_lengths = np.linalg.norm(np.diff(ref[row], axis=0), axis=1)
-    local_pitch = [SIDE / args.cells / (2 if args.refine_contact in (axis, "both") else 1)
+    local_pitch = [SIDE / args.cells / (2**args.refine_levels if args.refine_contact in (axis, "both") else 1)
                    for axis in ("x", "y")]
     shape = dict(vertices=len(ref), triangles=len(faces), nominal_local_pitch_m=min(local_pitch),
                  nominal_local_pitch_xy_m=local_pitch,
@@ -257,7 +276,7 @@ def run(args):
                 z_rate = np.clip(.02 * (press - args.press_force), -.02, .02)
                 z = max(PAD_BOTTOM + .00002, z + args.dt * z_rate)
             elif phase == "pull":
-                z += .025 * args.dt
+                z += PULL_SPEED * args.dt
             positions = np.array([[-half, 0, z], [half, 0, z]])
             # Supply the prescribed rigid-body velocity to the contact Jacobian.
             d.qpos[pad_qpos] = positions - pad_origins
@@ -270,7 +289,8 @@ def run(args):
             peak_penetration = max(penetration, peak_penetration)
             sampled = step % sample_steps == 0 or step + 1 == nsteps
             if sampled or args.grip_target is not None or (args.match_whole_bag_pe and phase == "press"):
-                force, inner, active = pad_reactions(m, d, pad_ids)
+                force, inner, active, cone, sliding = pad_reactions(
+                    m, d, pad_ids, measure_traction=args.match_whole_bag_pe and sampled and phase == "pull")
                 press = float(force[:, 2].sum())
                 if args.grip_target is not None:
                     grip_N = float(inner.sum())
@@ -288,7 +308,7 @@ def run(args):
                 marker_z = float(d.flexvert_xpos[marker, 2].mean())
                 contained = aperture_lengths(d.flexvert_xpos[row], reference_lengths, half, z)
                 rows.append((phase, t_eval, open_half - half, z, *force.ravel(), *inner,
-                             -press, penetration, marker_z, z - marker_z, *contained, *active))
+                             -press, penetration, marker_z, z - marker_z, *contained, *active, *cone, *sliding))
                 snapshots.append(d.flexvert_xpos.copy())
             if d.warning.number.sum() or not np.isfinite(d.qpos).all() or not np.isfinite(d.qvel).all():
                 failure = f"Unhealthy simulation in {phase} at {t_eval:.6g} s"
@@ -301,7 +321,8 @@ def run(args):
                    "right_fx_N", "right_fy_N", "right_fz_N", "left_inner_N", "right_inner_N",
                    "signed_pull_N", "penetration_m", "marker_z_m", "pad_minus_marker_z_m",
                    "aperture_material_length_m", "aperture_current_arc_length_m", "fold_excess_length_m",
-                   "left_active", "right_active")
+                   "left_active", "right_active", "left_cone_normal_N", "right_cone_normal_N",
+                   "left_sliding_normal_N", "right_sliding_normal_N")
         writer.writerow(("phase", *columns))
         writer.writerows(rows)
     np.savez_compressed(args.output / "coupon_nodes.npz", reference_m=ref, faces=faces, current_m=snapshots)
@@ -314,7 +335,7 @@ def run(args):
     transitions = np.flatnonzero(np.diff(np.r_[False, loaded, False]))
     longest_load = max((time_s[end - 1] - time_s[begin] for begin, end in transitions.reshape(-1, 2)), default=0.)
     capture = sustained_starts(time_s, loaded)
-    release, slip = [], []
+    release, slip, traction_slip = [], [], []
     if capture:
         after_capture = time_s > time_s[capture[0]]
         detached = (pull["left_active"] == 0) & (pull["right_active"] == 0)
@@ -329,6 +350,9 @@ def run(args):
         offset = distance - np.minimum.accumulate(distance)
         slip = [capture_index + i for i in sustained_starts(
             time_s[capture_index:], loaded[capture_index:] & (feed_loss > radius) & (offset > radius))]
+        loaded_sliding = loaded & (pull["left_sliding_normal_N"] >= .5 * pull["left_inner_N"])
+        loaded_sliding &= pull["right_sliding_normal_N"] >= .5 * pull["right_inner_N"]
+        traction_slip = sustained_starts(time_s, after_capture & loaded_sliding)
     valid = failure is None and peak_penetration <= .001
     summary = dict(numerically_valid=valid, failure=failure, peak_penetration_m=peak_penetration,
                    warnings=d.warning.number.tolist(), bilateral_pull_samples=int(bilateral.sum()),
@@ -343,6 +367,8 @@ def run(args):
                    release_t_s=float(time_s[release[0]]) if release else None,
                    slip_candidate_t_s=float(time_s[slip[0]]) if slip else None,
                    slip_candidate_force_N=float(tension[slip[0]]) if slip else None,
+                   traction_slip_candidate_t_s=float(time_s[traction_slip[0]]) if traction_slip else None,
+                   traction_slip_candidate_force_N=float(tension[traction_slip[0]]) if traction_slip else None,
                    simulated_s=float(d.time), wall_s=time.perf_counter() - started,
                    smoke_only=args.smoke, material_parameters_identified=False)
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
@@ -363,6 +389,7 @@ def main():
     parser.add_argument("--prefold-width", type=float, help="unfolded width of the central ridge, in metres")
     parser.add_argument("--refine-contact", nargs="?", const="both", choices=("x", "y", "both"),
                         help="halve mesh spacing locally around the pads on the selected axes")
+    parser.add_argument("--refine-levels", type=int, default=1, help="number of local halvings")
     parser.add_argument("--match-whole-bag-pe", action="store_true", help="use the YAM empty-bag PE material and contact skin")
     parser.add_argument("--pull-seconds", type=float, default=.5)
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
@@ -370,6 +397,8 @@ def main():
     args = parser.parse_args()
     if args.cells < 4 or args.cells % 4:
         parser.error("cells must be a multiple of four")
+    if args.refine_levels < 1 or (args.refine_levels > 1 and args.refine_contact is None):
+        parser.error("additional refinement levels require selected contact axes")
     if not 0 <= args.slack < SIDE / 2 or not 0 < args.dt <= .001:
         parser.error("slack must be in [0, .03) m and dt in (0, .001] s")
     if args.prefold_width is not None and (not args.prefold or not 0 < args.prefold_width <= SIDE):
