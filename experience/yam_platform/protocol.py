@@ -29,6 +29,42 @@ class TrialConfig:
     lift_height: float=.25
     gripper_overtravel: float=0.
     complete_motion: bool=False
+    press_target_N: float | None=None
+    press_timeout_s: float=12.
+    press_start_offset_m: float=.10
+    press_only: bool=False
+
+
+class NormalPress:
+    """Approach quickly, then track film-normal force through the YAM pose servo."""
+
+    support_limit_N = .05
+    hold_s = .010
+
+    def __init__(self, target_N, surface_z):
+        self.target_N = target_N
+        self.surface_z = surface_z
+        self.filtered_N = 0.
+        self.band_s = 0.
+        self.reached = False
+        self.peak_N = 0.
+        self.peak_direct_support_N = 0.
+
+    def move(self, z, tip_z, force_N, support_N, dt, approach):
+        self.filtered_N += dt / (.010 + dt) * (force_N - self.filtered_N)
+        if approach:
+            self.peak_N = max(self.peak_N, force_N)
+            self.peak_direct_support_N = max(self.peak_direct_support_N, support_N)
+            qualified = .8 * self.target_N <= force_N <= 1.2 * self.target_N and support_N <= self.support_limit_N
+            self.band_s = self.band_s + dt if qualified else 0.
+            self.reached = self.band_s >= self.hold_s
+        if support_N > self.support_limit_N:
+            velocity = .004
+        elif approach and tip_z > self.surface_z + .002 and force_N < .05:
+            velocity = -.05
+        else:
+            velocity = float(np.clip(.002 * (self.filtered_N - self.target_N), -.002, .004))
+        return z + dt * velocity
 
 def vec(x):
     return ' '.join(format(float(v),'.17g') for v in np.asarray(x).ravel())
@@ -88,7 +124,8 @@ def attach_robot(cfg,built,sim_factory,center,top,size,mass,approach=None):
         rz = np.array([[np.cos(yaw),-np.sin(yaw),0],[np.sin(yaw),np.cos(yaw),0],[0,0,1]])
         rx = np.array([[1,0,0],[0,np.cos(tilt),-np.sin(tilt)],[0,np.sin(tilt),np.cos(tilt)]])
         rotation = rz @ rx @ np.diag([1., -1., -1.])
-        target = np.array([*center,top+.10])
+        offset = cfg.press_start_offset_m if cfg.press_target_N is not None else .10
+        target = np.array([*center,top+offset])
     else:
         # Optional adapter-chosen approach (e.g. a horizontal side pinch), world frame: grasp-site z along the
         # inward direction n, y along the closing direction c; start 100 mm back from the contact point as
@@ -120,7 +157,7 @@ def tips(robot):
 
 
 
-def measure_contacts(robot, target_geoms=(), target_flexes=()):
+def measure_contacts(robot, target_geoms=(), target_flexes=(), monitor_support=False):
     sim = robot.sim
     m,d = sim.m,sim.d
     result = np.zeros((2,3))
@@ -128,6 +165,7 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
     support = 0.
     penetration = 0.
     nonfinger = 0.
+    direct_support = 0.
     buffer = np.zeros(6)
     approach = getattr(robot, "approach", None)
     for i,c in enumerate(d.contact):
@@ -135,6 +173,12 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
             continue
         gs = list(c.geom)
         if not (any(g in target_geoms for g in gs) or any(f in target_flexes for f in c.flex)):
+            if monitor_support and sim.table_geom in gs:
+                pad_slot = 1 - gs.index(sim.table_geom)
+                if any(gs[pad_slot] in group for group in robot.all_finger_sets):
+                    mujoco.mj_contactForce(m, d, i, buffer)
+                    world = c.frame.reshape(3, 3).T @ buffer[:3]
+                    direct_support += (1 if pad_slot == 1 else -1) * world[2]
             continue
         mujoco.mj_contactForce(m,d,i,buffer)
         world = c.frame.reshape(3,3).T @ buffer[:3]
@@ -155,8 +199,12 @@ def measure_contacts(robot, target_geoms=(), target_flexes=()):
     axis = d.geom_xpos[robot.pad_geom[1]]-d.geom_xpos[robot.pad_geom[0]]
     axis /= max(np.linalg.norm(axis),1e-12)
     grip = [max(0.,float(-result[0]@axis)),max(0.,float(result[1]@axis))]
-    return dict(grip_each_N=grip, contact_magnitude_each_N=np.linalg.norm(result,axis=1).tolist(), force_on_fingers_N=result.tolist(), support_N=float(support),
-                top_contact_each=top_contacts, penetration_mm=penetration, nonfinger_mm=nonfinger)
+    measured = dict(grip_each_N=grip, contact_magnitude_each_N=np.linalg.norm(result,axis=1).tolist(),
+                    force_on_fingers_N=result.tolist(), support_N=float(support),
+                    top_contact_each=top_contacts, penetration_mm=penetration, nonfinger_mm=nonfinger)
+    if monitor_support:
+        measured["direct_support_N"] = max(0., float(direct_support))
+    return measured
 
 
 
@@ -167,6 +215,13 @@ def run(backend, cfg, output, *, on_sample=None):
         raise ValueError("lift_height must be finite and positive")
     if not np.isfinite(cfg.gripper_overtravel) or cfg.gripper_overtravel < 0:
         raise ValueError("gripper_overtravel must be finite and nonnegative")
+    if cfg.press_target_N is not None and (
+            not np.isfinite(cfg.press_target_N) or cfg.press_target_N <= 0 or
+            not np.isfinite(cfg.press_timeout_s) or cfg.press_timeout_s <= NormalPress.hold_s or
+            not np.isfinite(cfg.press_start_offset_m) or cfg.press_start_offset_m <= 0.):
+        raise ValueError("normal force target, start offset and approach timeout must be positive and finite")
+    if cfg.press_only and cfg.press_target_N is None:
+        raise ValueError("press-only trials require a normal force target")
     output.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
     (output/"config.json").write_text(json.dumps(asdict(cfg),indent=2))
@@ -208,6 +263,13 @@ def run(backend, cfg, output, *, on_sample=None):
     state_times=[]
     contact_tip_z=None
     approach=getattr(robot,"approach",None)
+    press = None
+    if cfg.press_target_N is not None:
+        if approach is not None:
+            raise ValueError("normal force control requires the top approach")
+        if "direct_support_N" not in backend.measure(robot):
+            raise ValueError("normal force control requires separate direct support reactions")
+        press = NormalPress(cfg.press_target_N, start[2] - cfg.press_start_offset_m)
     open_gap=None
     outcome="pending"
     reason=""
@@ -236,6 +298,8 @@ def run(backend, cfg, output, *, on_sample=None):
             peaks[key]=max(peaks[key],feedback[key])
         if grip20 > (25 if cfg.category=="bendable" else 15):
             outcome,reason="over_squeeze","v2.2 category grip threshold"
+        if press is not None and feedback["penetration_mm"] > 1.:
+            outcome,reason="sim_fail","film contact penetration exceeds 1 mm"
         if phase=="settle":
             if elapsed>=.3:
                 baseline_com=sim.com().copy()
@@ -244,7 +308,19 @@ def run(backend, cfg, output, *, on_sample=None):
         elif phase=="approach":
             # Move downward until first physical contact, then insert no more
             # than 15mm at 10mm/s, with the v2.2 total 20N down-force stop.
-            if approach is None:
+            if press is not None:
+                contacted = contacted or down > .05
+                # The pose target can reach the surface before the arm has
+                # followed it. Brake using the lower of the two tip heights.
+                tracking_z = target[2] - d.site_xpos[robot.site, 2]
+                lower_tip_z = tip_mid[2] + min(0., tracking_z)
+                target[2] = press.move(target[2], lower_tip_z, down, feedback["direct_support_N"], dt, approach=True)
+                next_phase = "close" if press.reached else None
+                if press.reached and cfg.press_only and outcome == "pending":
+                    outcome, reason = "press_ok", "normal force held in target band"
+                elif not press.reached and elapsed >= cfg.press_timeout_s and outcome == "pending":
+                    outcome, reason = "grasp_fail", "normal force target not held before approach timeout"
+            elif approach is None:
                 if max(feedback["contact_magnitude_each_N"])>.05:
                     if not contacted: contact_tip_z=float(tip_mid[2])
                     contacted=True
@@ -260,11 +336,13 @@ def run(backend, cfg, output, *, on_sample=None):
                 if contacted:depth=max(0.,float((tip_mid-contact_tip)@approach))
                 target+=approach*speed*dt
                 next_phase="close" if depth>=min(.015,.6*robot.approach_extent) or (contacted and down>=20) else None
-            if elapsed>8:
+            if press is None and elapsed>8:
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):
             gap=float(np.clip(gap+np.clip((filtered.mean()-10)*.002,-.05,.015)*dt,minimum_gap,.045))
             if phase=="close":
+                if press is not None:
+                    target[2] = press.move(target[2], tip_mid[2], down, feedback["direct_support_N"], dt, approach=False)
                 if spring.reference_gap is None and contacted and all(feedback["top_contact_each"]):
                     spring.arm(max(robot.gap(),0.),cfg.pinch_coeff>0)
                 stable=stable+dt if filtered.mean()>=9.5 else 0.
@@ -338,10 +416,12 @@ def run(backend, cfg, output, *, on_sample=None):
             robot.tracking.append(tracking)
             robot.torque_peaks=np.maximum(robot.torque_peaks,np.abs(d.actuator_force[robot.act]))
             peaks["tracking_mm"]=max(peaks["tracking_mm"],tracking)
+            pressure_trace = {} if press is None else dict(down_N=down, press_band_s=press.band_s,
+                                                           filtered_down_N=press.filtered_N)
             trace.append(dict(t=float(d.time),phase=phase,com=sim.com().tolist(),tip_mid=tips(robot).mean(0).tolist(),
                               gap=robot.gap(),command_gap=gap,grip_N=float(filtered.mean()),spring_N=spring_force,
                               attached=pinch.active is not None,pinch_load_N=pinch.load,**health,
-                              tracking_mm=tracking,**backend.measure(robot)))
+                              tracking_mm=tracking,**backend.measure(robot),**pressure_trace))
             if not np.all(np.isfinite(d.qpos)) or not np.all(np.isfinite(d.qvel)):
                 outcome,reason="sim_fail","nonfinite state"
             elif model_failure:
@@ -395,6 +475,11 @@ def run(backend, cfg, output, *, on_sample=None):
                 pinch_frame="articulated palm; reactions load arm",robot=robot.diagnostics(),
                 dimensions=backend.dimensions(sim),
                 warnings={mujoco.mjtWarning(i).name:int(w.number) for i,w in enumerate(d.warning) if w.number})
+    if press is not None:
+        result["normal_press"] = dict(
+            target_N=press.target_N, band_N=[.8 * press.target_N, 1.2 * press.target_N],
+            required_hold_s=press.hold_s, achieved_hold_s=press.band_s, target_reached=press.reached,
+            peak_N=press.peak_N, peak_direct_support_N=press.peak_direct_support_N)
     (output/"result.json").write_text(json.dumps(result,indent=2))
     print(json.dumps({k:result[k] for k in ("outcome","reason","phase","sim_time_s","peaks","model_metrics")}),flush=True)
     return result

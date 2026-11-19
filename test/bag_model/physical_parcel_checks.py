@@ -70,8 +70,8 @@ def film_payload_geometry(m, d, faces):
         rows.append(film_box_geometry(m, d, faces, geom))
     return dict(intersecting_triangles=sum(row["intersecting_triangles"] for row in rows),
                 outside_corners=sum(row["outside_corners"] for row in rows),
-                sampled_depth_m=max(row["sampled_depth_m"] for row in rows),
-                geometric_depth_upper_m=max(row["geometric_depth_upper_m"] for row in rows), boxes=rows)
+                sampled_depth_m=max((row["sampled_depth_m"] for row in rows), default=0.),
+                geometric_depth_upper_m=max((row["geometric_depth_upper_m"] for row in rows), default=0.), boxes=rows)
 
 
 def simulate(parcel, seconds, drive=None, check_geometry=False):

@@ -15,7 +15,7 @@ import numpy as np
 
 from .bag_model import _topology, dihedrals
 from .legacy.contents import normalize_contents
-from .wrap import triangle_box_intersections, winding_number, wrap_generic
+from .wrap import open_pairs, panel_pairs, triangle_box_intersections, winding_number, wrap_generic
 
 HERE = Path(__file__).resolve().parent
 
@@ -87,14 +87,14 @@ class Config:
     probe_shape: str = "sphere"
 
     def __post_init__(self):
-        if self.mode not in ("rigid", "bendable", "compressible"):
-            raise ValueError("mode must be rigid, bendable or compressible")
+        if self.mode not in ("rigid", "bendable", "compressible", "empty"):
+            raise ValueError("mode must be rigid, bendable, compressible or empty")
         for name, length in (("bag_size", 2), ("payload_size", 3), ("payload_com", 3),
                              ("center", 2), ("gravity", 3)):
             value = np.asarray(getattr(self, name), dtype=float)
             if value.shape != (length,) or not np.isfinite(value).all():
                 raise ValueError(f"{name} needs {length} finite values")
-        positive = ("payload_mass", "areal_mass", "membrane", "bending", "radius", "material_thickness",
+        positive = ("areal_mass", "membrane", "bending", "radius", "material_thickness",
                     "timestep", "contact_time")
         nonnegative = ("rayleigh", "friction", "joint_stiffness", "joint_damping",
                        "compression_k1", "compression_k2", "compression_damping", "precreased_ratio", "bend_damping_ratio")
@@ -104,6 +104,8 @@ class Config:
                 raise ValueError(f"invalid {name}")
         if min(self.bag_size) <= 0 or min(self.payload_size) <= 0:
             raise ValueError("dimensions must be positive")
+        if not math.isfinite(self.payload_mass) or self.payload_mass < 0 or (self.mode != "empty" and not self.payload_mass):
+            raise ValueError("invalid payload_mass")
         if self.payload_inertia is not None:
             inertia = np.asarray(self.payload_inertia, dtype=float)
             if inertia.shape != (3,) or not np.isfinite(inertia).all() or min(inertia) <= 0:
@@ -145,27 +147,38 @@ def load_envelope(cfg):
         raise ValueError("degenerate reference triangles")
     masses = np.zeros(len(reference))
     np.add.at(masses, faces.ravel(), np.repeat(area * cfg.areal_mass / 3, 3))
-    item = normalize_contents([dict(shape="box", size_m=list(cfg.payload_size),
-                                    mass_kg=cfg.payload_mass)])[0]
-    current, preparation = wrap_generic(reference, reference.copy(), faces, panels,
-                                         [0], [3], item, cfg.radius, box_face_clearance=True)
-    if preparation["maximum_edge_strain"] > 0.05:
-        raise ValueError(f"initial film strain exceeds 5%: {preparation}")
-    half = np.asarray(cfg.payload_size) / 2
-    corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]) * half
-    winding = winding_number(current, faces, corners + item["position"])
-    intersections = triangle_box_intersections(current, faces, half, item["position"])
-    preparation.update(payload_intersecting_triangles=int(intersections.sum()),
-                       payload_corner_winding=winding.tolist())
-    if intersections.any() or np.any(np.abs(winding) < 0.5):
-        raise ValueError(f"initial film does not enclose the payload without intersection: {preparation}")
+    if cfg.mode == "empty":
+        pairs = panel_pairs(reference, faces, panels, [0], [3])
+        if not len(pairs):
+            raise ValueError("empty bag requires distinct paired front and back vertices")
+        gap = 2 * cfg.radius + .0002
+        current = reference.copy()
+        open_pairs(current, pairs, gap)
+        current[:, 2] += cfg.radius - current[:, 2].min()
+        preparation = dict(empty=True, paired_vertices=len(pairs), wall_clearance_m=gap)
+        payload_origin = None
+    else:
+        item = normalize_contents([dict(shape="box", size_m=list(cfg.payload_size),
+                                        mass_kg=cfg.payload_mass)])[0]
+        current, preparation = wrap_generic(reference, reference.copy(), faces, panels,
+                                             [0], [3], item, cfg.radius, box_face_clearance=True)
+        if preparation["maximum_edge_strain"] > 0.05:
+            raise ValueError(f"initial film strain exceeds 5%: {preparation}")
+        half = np.asarray(cfg.payload_size) / 2
+        corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)]) * half
+        winding = winding_number(current, faces, corners + item["position"])
+        intersections = triangle_box_intersections(current, faces, half, item["position"])
+        preparation.update(payload_intersecting_triangles=int(intersections.sum()),
+                           payload_corner_winding=winding.tolist())
+        if intersections.any() or np.any(np.abs(winding) < 0.5):
+            raise ValueError(f"initial film does not enclose the payload without intersection: {preparation}")
+        payload_origin = item["position"] + [*cfg.center, 0.]
     shift = np.array([*cfg.center, 0.0])
     reference += shift
     current += shift
-    item["position"] += shift
     lengths = np.linalg.norm(reference[unique[:, 1]] - reference[unique[:, 0]], axis=1)
     return dict(reference=reference, current=current, faces=faces, panels=panels,
-                edges=unique, masses=masses, payload_origin=item["position"],
+                edges=unique, masses=masses, payload_origin=payload_origin,
                 metadata=dict(source=str(path.relative_to(HERE.parent)),
                               source_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                               vertices=len(reference), triangles=len(faces), edges=len(unique),
@@ -180,6 +193,8 @@ def box_inertia(mass, size):
 
 
 def payload_xml(cfg, origin):
+    if cfg.mode == "empty":
+        return "", ""
     count = 1 if cfg.mode == "rigid" else 3
     length, width, height = cfg.payload_size
     segment = np.array([length / count, width, height])
@@ -281,13 +296,13 @@ class Parcel:
         self.initialize(self.m, self.d)
         self.film_dofs = self.node_dofs(self.m)
         self.payload_bodies = np.array([b for b in range(self.m.nbody)
-                                        if self.m.body(b).name.startswith(("payload_", "plate_"))])
+                                        if self.m.body(b).name.startswith(("payload_", "plate_"))], dtype=int)
         self.compression_joints = np.array([j for j in range(self.m.njnt)
                                             if self.m.joint(j).name.startswith("compression_")], dtype=int)
         self.compression_names = [self.m.joint(j).name for j in self.compression_joints]
         self.metadata = dict(config=asdict(cfg), geometry=film["metadata"],
                              nq=self.m.nq, nv=self.m.nv, neq=self.m.neq,
-                             payload_collision="native convex mesh, exact eight-vertex boxes",
+                             payload_collision=None if cfg.mode == "empty" else "native convex mesh, exact eight-vertex boxes",
                              bending="reference dihedral energy, existing bag_model gradient",
                              compression_axis="segment-local -z")
 
@@ -350,8 +365,14 @@ class Parcel:
         mujoco.mj_forwardSkip(model, data, mujoco.mjtStage.mjSTAGE_VEL, 1)
 
     def com(self):
+        if not len(self.payload_bodies):
+            return self.film_com(self.d)
         return np.average(self.d.xipos[self.payload_bodies], axis=0,
                           weights=self.m.body_mass[self.payload_bodies])
+
+    def film_com(self, data):
+        masses = self.envelope["masses"]
+        return np.average(data.flexvert_xpos[:len(masses)], axis=0, weights=masses)
 
     def contacts(self):
         """Signed world forces on payload, table and tool from native contacts."""

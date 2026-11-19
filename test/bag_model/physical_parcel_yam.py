@@ -42,10 +42,13 @@ class Config(TrialConfig):
     compression_k1: float = 800.
     compression_k2: float = 20000.
     compression_damping: float = 1.
+    ccd_tolerance_m: float | None = None
 
     def __post_init__(self):
         if self.grasp_face not in ("top", "side"):
             raise ValueError("grasp_face must be top or side")
+        if self.mode == "empty" and self.grasp_face == "side":
+            raise ValueError("the empty bag uses the top approach")
         if not np.isfinite(self.support_height) or self.support_height < 0:
             raise ValueError("support_height must be finite and nonnegative")
         if self.grasp_face == "side" and not 0 <= self.tilt < 90:
@@ -54,6 +57,9 @@ class Config(TrialConfig):
             raise ValueError("side_start_distance must be finite and positive")
         if not np.isfinite(self.side_height_offset):
             raise ValueError("side_height_offset must be finite")
+        if self.ccd_tolerance_m is not None and (
+                not np.isfinite(self.ccd_tolerance_m) or self.ccd_tolerance_m <= 0.):
+            raise ValueError("ccd_tolerance_m must be positive and finite")
 
 
 class ContactOnly:
@@ -84,7 +90,7 @@ class ParcelSim(MuJoCoSim):
         self.parcel = built.parcel
         self.film_dofs = self.parcel.node_dofs(self.m)
         self.payload_bodies = np.array([b for b in range(self.m.nbody)
-            if self.m.body(b).name.startswith(("payload_", "plate_"))])
+            if self.m.body(b).name.startswith(("payload_", "plate_"))], dtype=int)
         self.floor_geom = mujoco.mj_name2id(self.m, mujoco.mjtObj.mjOBJ_GEOM, "floor")
         initialize_state(self.parcel, self.m, self.d, built.cfg)
 
@@ -94,6 +100,8 @@ class ParcelSim(MuJoCoSim):
         mujoco.mj_step2(self.m, self.d)
 
     def com(self):
+        if not len(self.payload_bodies):
+            return self.parcel.film_com(self.d)
         return np.average(self.d.xipos[self.payload_bodies], axis=0,
                           weights=self.m.body_mass[self.payload_bodies])
 
@@ -124,7 +132,7 @@ def parcel_world(cfg):
     if profile is not None:
         material.update(profile["shell"])
     p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
-        payload_size=tuple(cfg.payload_size), payload_mass=cfg.payload_mass,
+        payload_size=tuple(cfg.payload_size), payload_mass=0. if cfg.mode == "empty" else cfg.payload_mass,
         joint_stiffness=cfg.joint_stiffness, center=(-0.25, 0.04),
         timestep=cfg.dt, contact_time=cfg.contact_time,
         bend_damping_ratio=cfg.bend_damping_ratio, rayleigh=cfg.rayleigh,
@@ -132,6 +140,8 @@ def parcel_world(cfg):
         compression_k2=cfg.compression_k2, compression_damping=cfg.compression_damping,
         **material))
     root = ET.fromstring(p.xml)
+    if cfg.ccd_tolerance_m is not None:
+        root.find("option").set("ccd_tolerance", str(cfg.ccd_tolerance_m))
     if profile is not None:
         asset = root.find("asset")
         ET.SubElement(asset, "texture", name="bag_texture", type="2d", file=str(profile["texture"]))
@@ -166,16 +176,23 @@ def parcel_world(cfg):
     return p, ET.tostring(root, encoding="unicode")
 
 
+def prepared_signature(parcel, cfg):
+    settings = dict(model=asdict(parcel.cfg), support_height=cfg.support_height)
+    if cfg.ccd_tolerance_m is not None:
+        settings["ccd_tolerance_m"] = cfg.ccd_tolerance_m
+    return json.dumps(settings, sort_keys=True)
+
+
 def initialize_state(parcel, model, data, cfg):
     parcel.initialize(model, data)
     dofs = parcel.node_dofs(model)
     data.qpos[dofs[:, 2]] += cfg.support_height
-    data.qpos[model.joint("payload_free").qposadr[0] + 2] += cfg.support_height
+    if cfg.mode != "empty":
+        data.qpos[model.joint("payload_free").qposadr[0] + 2] += cfg.support_height
     if cfg.initial_state:
-        expected = json.dumps(dict(model=asdict(parcel.cfg), support_height=cfg.support_height), sort_keys=True)
         with np.load(cfg.initial_state) as state:
             qpos, qvel = state["qpos"], state["qvel"]
-            if state["config_json"].item() != expected:
+            if state["config_json"].item() != prepared_signature(parcel, cfg):
                 raise ValueError("prepared state uses a different parcel or support configuration")
             if qpos.shape != (parcel.m.nq,) or qvel.shape != (parcel.m.nv,):
                 raise ValueError("prepared state has incompatible dimensions")
@@ -188,8 +205,7 @@ def initialize_state(parcel, model, data, cfg):
 
 
 def save_initial_state(parcel, data, cfg, path):
-    signature = json.dumps(dict(model=asdict(parcel.cfg), support_height=cfg.support_height), sort_keys=True)
-    np.savez_compressed(path, qpos=data.qpos, qvel=data.qvel, config_json=np.asarray(signature))
+    np.savez_compressed(path, qpos=data.qpos, qvel=data.qvel, config_json=np.asarray(prepared_signature(parcel, cfg)))
 
 
 def scene(cfg):
@@ -216,9 +232,10 @@ def scene(cfg):
     built = SimpleNamespace(xml=xml,
         desc=SimpleNamespace(), cfg=cfg, parcel=p,
         compile_model=lambda xml: compile_yam_model(p, built, xml))
+    height = np.ptp(current[:, 2]) + 2 * p.cfg.radius if cfg.mode == "empty" else cfg.payload_size[2]
     robot = attach_robot(cfg, built, ParcelSim, np.array(p.cfg.center), top,
-                        np.array([*cfg.bag_size, cfg.payload_size[2]]),
-                        cfg.payload_mass + p.envelope["masses"].sum(), approach=approach)
+                        np.array([*cfg.bag_size, height]),
+                        p.cfg.payload_mass + p.envelope["masses"].sum(), approach=approach)
     initial = measure(robot)
     if initial["penetration_mm"] > 1:
         raise RuntimeError(f"initial film contact penetration exceeds 1 mm: {initial['penetration_mm']:.6g} mm")
@@ -227,7 +244,8 @@ def scene(cfg):
 
 def measure(robot):
     flex = mujoco.mj_name2id(robot.sim.m, mujoco.mjtObj.mjOBJ_FLEX, "bag")
-    result = measure_contacts(robot, target_flexes={flex})
+    result = measure_contacts(robot, target_flexes={flex},
+                              monitor_support=robot.sim.built.cfg.press_target_N is not None)
     if robot.sim.floor_geom < 0:
         return result
     floor_support = 0.0
@@ -273,7 +291,8 @@ def check_state(sim):
 
 def dimensions(sim):
     return dict(nv=sim.m.nv, film_vertices=sim.m.nflexvert,
-                film_triangles=sim.m.nflexelem, artificial_attachments=0)
+                film_triangles=sim.m.nflexelem, payload_bodies=len(sim.payload_bodies),
+                artificial_attachments=0)
 
 
 def refresh(sim):
@@ -281,7 +300,9 @@ def refresh(sim):
 
 
 def summarize(trace):
-    return dict(load_transfer="native finger-film-payload contacts", attachments=0)
+    has_payload = any(row.get("payload_geometry", {}).get("boxes") for row in trace)
+    return dict(load_transfer="native finger-film-payload contacts" if has_payload else "native finger-film contacts",
+                attachments=0)
 
 
 def source_files():

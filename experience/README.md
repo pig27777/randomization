@@ -66,6 +66,10 @@ flock /tmp/claude-gpu.lock ../.venv/bin/python -B -m yam_platform.benchmark --ou
 
 `--gripper-overtravel` 设置单轨零位后的闭合余量，默认0 m，并校验模型已有控制范围。2026-11-16用户授权本次薄膜演示使用0.005 m，10 N反馈目标和原驱动力限制继续生效。
 
+袋模型顶部试验可在运行 JSON 中设定 `press_target_N` 与 `press_timeout_s`，启用法向力反馈。`press_start_offset_m` 表示初始抓取点高于目标表面的距离，默认 0.10 m。以实测和指令折算指尖中较低者为准，距表面 2 mm 时切换低速。达到目标力的 80%–120% 并持续 10 ms 后进入闭合；窗口内指垫直接支撑反力须 ≤0.05 N。诊断用 `press_only=true` 达标即结束。适配器需在 `measure()` 中单列 `direct_support_N`，`physical_parcel_yam` 已提供。默认 `press_target_N=null` 使用既有接近动作。
+
+`physical_parcel_yam` 支持 `mode="empty"` 顶抓，同一两片封口资产仅生成袋膜，空袋质心按膜节点质量计算。运行 JSON 可显式设定 `ccd_tolerance_m`，该值随模型与准备状态签名归档。
+
 ## 来源
 
 公共流程迁自 randomization 的 `test/flex3d/`，机械臂迁自 `policy/yam_probe_robot.py`。接触统计和弹簧保留冻结 v1.3 的实现，圆角几何来自 `bag_sim/mj_loose.py`。本次没有修改材料本构或进行物理重新标定。
