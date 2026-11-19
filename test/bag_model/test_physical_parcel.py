@@ -158,6 +158,41 @@ class PhysicalParcelTests(unittest.TestCase):
         self.assertAlmostEqual(second['areal_mass']/first['areal_mass'], 2)
         self.assertAlmostEqual(second['bending']/first['bending'], 8)
 
+    def test_material_override_preserves_profile_collision_skin(self):
+        cfg = physical_parcel_yam.Config(bag_profile='pe')
+        preset, _ = physical_parcel_yam.parcel_world(cfg)
+        inputs = dict(young_pa=2e7, thickness_m=.00008, density_kg_m3=920.)
+        first, _ = physical_parcel_yam.parcel_world(replace(cfg, material=inputs))
+        second, _ = physical_parcel_yam.parcel_world(
+            replace(cfg, material=dict(inputs, thickness_m=2 * inputs['thickness_m'])))
+        self.assertEqual(first.cfg.material_thickness, inputs['thickness_m'])
+        self.assertEqual(first.cfg.radius, preset.cfg.radius)
+        self.assertEqual(second.cfg.radius, preset.cfg.radius)
+        self.assertAlmostEqual(second.cfg.membrane / first.cfg.membrane, 2.)
+        self.assertAlmostEqual(second.cfg.areal_mass / first.cfg.areal_mass, 2.)
+        self.assertAlmostEqual(second.cfg.bending / first.cfg.bending, 8.)
+
+    def test_equal_volume_payloads_at_distinct_offsets(self):
+        length, width = .334, .234  # 350 x 250 mm bag less 8 mm per seam
+        height = length * width / (length + width + np.sqrt(length**2 - length * width + width**2))
+        volume = .30 * height * (length - height) * (width - height)
+        cfg = physical_parcel_yam.Config(geometry='geometry/kraft_edge_sealed_35.npz', bag_profile='pe',
+                                         payload_mass=.20, dt=.0001, ccd_tolerance_m=1e-9)
+        compact = replace(cfg, payload_size=(.185, .130, volume / (.185 * .130)))
+        centered, _ = physical_parcel_yam.parcel_world(compact)
+        cases = (replace(compact, payload_offset_xy=(-.020, .010)),
+                 replace(cfg, payload_size=(.225, .140, volume / (.225 * .140)), payload_offset_xy=(.020, -.010)))
+        for candidate in cases:
+            with self.subTest(size=candidate.payload_size, offset=candidate.payload_offset_xy):
+                placed, _ = physical_parcel_yam.parcel_world(candidate)
+                np.testing.assert_allclose(placed.envelope['payload_origin'][:2] - placed.cfg.center,
+                                           candidate.payload_offset_xy, atol=1e-12)
+                np.testing.assert_array_equal(placed.envelope['reference'], centered.envelope['reference'])
+                self.assertAlmostEqual(np.prod(placed.cfg.payload_size), volume)
+                check = placed.envelope['metadata']['preparation']
+                self.assertEqual(check['payload_intersecting_triangles'], 0)
+                self.assertTrue(np.all(np.abs(check['payload_corner_winding']) >= .5))
+
     def test_payload_mass_and_torque(self):
         p = Parcel(replace(Config(), mode='bendable'))
         self.assertAlmostEqual(float(p.m.body_mass[p.payload_bodies].sum()), .3)

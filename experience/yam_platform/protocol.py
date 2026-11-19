@@ -33,6 +33,7 @@ class TrialConfig:
     press_timeout_s: float=12.
     press_start_offset_m: float=.10
     press_only: bool=False
+    close_gap_hold_s: float=0.
 
 
 class NormalPress:
@@ -215,6 +216,8 @@ def run(backend, cfg, output, *, on_sample=None):
         raise ValueError("lift_height must be finite and positive")
     if not np.isfinite(cfg.gripper_overtravel) or cfg.gripper_overtravel < 0:
         raise ValueError("gripper_overtravel must be finite and nonnegative")
+    if not np.isfinite(cfg.close_gap_hold_s) or cfg.close_gap_hold_s < 0:
+        raise ValueError("close_gap_hold_s must be finite and nonnegative")
     if cfg.press_target_N is not None and (
             not np.isfinite(cfg.press_target_N) or cfg.press_target_N <= 0 or
             not np.isfinite(cfg.press_timeout_s) or cfg.press_timeout_s <= NormalPress.hold_s or
@@ -278,6 +281,7 @@ def run(backend, cfg, output, *, on_sample=None):
     peaks=dict(penetration_mm=0.,nonfinger_mm=0.,grip_N=0.,down_N=0.,tracking_mm=0.)
     loss=0.
     stable=0.
+    gap_hold=0.
     sample_every=max(1,round(.02/dt))
     for step in range(round(getattr(cfg, "simulation_seconds", 30.)/dt)):
         elapsed=float(d.time)-phase_start
@@ -346,7 +350,10 @@ def run(backend, cfg, output, *, on_sample=None):
                 if spring.reference_gap is None and contacted and all(feedback["top_contact_each"]):
                     spring.arm(max(robot.gap(),0.),cfg.pinch_coeff>0)
                 stable=stable+dt if filtered.mean()>=9.5 else 0.
-                next_phase="lift" if stable>=.05 or elapsed>=8 or gap<=minimum_gap else None
+                at_limit = gap <= minimum_gap
+                gap_hold = gap_hold + dt if at_limit else 0.
+                limit_hold_complete = at_limit and gap_hold >= cfg.close_gap_hold_s
+                next_phase="lift" if stable>=.05 or elapsed>=8 or limit_hold_complete else None
                 if next_phase:
                     if cfg.pinch_coeff>0 and not pinch.try_bind(current_tips):
                         outcome,reason="grasp_fail","v1.3 pinch eligibility absent at end of close"

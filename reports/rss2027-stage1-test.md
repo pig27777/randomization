@@ -30,3 +30,22 @@
 | 空袋接近限速复测 | 同一入口读取 `rss2027-stage1-empty-yam-r3/config.json` | 3.4584 s 法向力验收通过，接近峰值降至 0.646 N、原生穿透峰值 0.150 mm、零告警、直接碰桌反力零。试验达法向门槛即停止。 |
 
 本轮归档了完整尝试和独立加载复测，限速版的闭合与提拉尚待验证。后续记录整袋的连续参数样本、捕获与滑移临界点及完整 GPU 回合。
+
+## 整袋夹入诊断、同参 PE 与内容物装配
+
+最近检查时间 2026-11-19 22:35（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
+
+| 检查 | 方法 | 结果 |
+| --- | --- | --- |
+| R4 限速空袋 | `record_physical_parcel.py` 读取 R4 配置，`rss2027_yam_capture_audit.py` 对齐 MJB、`trajectory.npz` 和力轨迹 | 0.5 N 压力带通过。闭合与起抬 105 帧均无双侧内表面接触候选及夹口内膜三角面，起抬拉力零。归为空夹。回放只重建几何，20 ms 采样间隙不做接触推断。 |
+| 空袋增加闭合保持 | `record_physical_parcel.py` 读取 `rss2027-stage1-empty-yam-close-hold-r1/config.json`，再回放 120 帧 | 起抬夹口降到 0.581 mm，膜仍未进入夹口，桌面支撑至少 0.09328 N。旧整袋侧抓正对照能识别双侧内触点、夹口内膜面及 4.668 N 正拉力。 |
+| GPU 在线反馈 | `record_physical_parcel.py --engine warp`，同模型依次检查 20 ms 入口及 0.5 N 力控 | 入口通过。加载在 9.859 s 仿真、约 1200 s 墙钟停于预算，未满足连续 10 ms，最大采样显存 964 MiB，零容量溢出。未测得完整 GPU 回合。 |
+| 同参 PE 第一批 | `flock /tmp/claude-gpu.lock bash test/runs/2026-11-19/bag/rss2027-stage1-pe-matched-r1/run_cases.sh`，枚举平坦余料、预褶、零摩擦，分别复核半网格和半步长 | 五组数值检查通过。平坦余料和预褶出现双侧承载及完全脱开，零摩擦无有效拉力。半步长峰值差约 1.9%，半网格 +216%，网格验收失败，起滑力仍为候选。首批含有效捕获的墙钟字段有计数变量覆盖错误，已修复。 |
+| 同参 PE 按面积分配质量 | `flock /tmp/claude-gpu.lock bash test/runs/2026-11-19/bag/rss2027-stage1-pe-matched-r2/run_cases.sh` | 5 组完成。平坦有余料峰值 0.4091 N，粗/细网格预褶 0.4854/0.5268 N（差 8.5%）。半网格起滑候选相差 32.7%，整体定量网格门槛待过。半步长的峰值、时长、起滑候选和脱开差分别小于 1%。 |
+| 切向接触复核 | `rss2027_coupon_sliding.py` 分析预褶粗、半网格、半步长轨迹 | 触点估计分别为 0.0942、0.3375、0.0996 N，网格加密后仍未收敛。保留采样近似和候选定义。 |
+| 同 6.5 N 夹持力复测 | `flock /tmp/claude-gpu.lock bash test/runs/2026-11-19/bag/rss2027-stage1-pe-clamp-force-r1/run_cases.sh`，补做相同触点速度复核 | 粗细网格均达标 60 ms，起拉时夹口材料 9.786/6.356 mm，峰值 0.4295/0.6564 N，仍超 10%。 |
+| 材料随机化与位置入口 | `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py`，核对旧准备态指纹 | 19 项通过。显式厚度覆盖保留 PE 碰撞皮肤；同为 30% 解析填充率的内容物尺寸与偏置可装配，参考袋形一致，实体三角面无相交。旧居中准备态兼容。 |
+| 同 30% 填充率顶部抓取 | `flock /tmp/claude-gpu.lock bash test/runs/2026-11-19/bag/rss2027-stage1-content-pair-r1/run_cases.sh`，再逐帧回放 | 两组下压力达标分别需 10.088/8.465 s，起抬时均无夹口内膜面或正拉力。 |
+| 几何与源文件检查 | 比对 R4 MJB 数值皮肤与指垫摩擦、匹配粗细试片几何、验证夹口内材料线裁剪，解析 Python 和 `git diff --check` | 摩擦 0.8、数值皮肤半径 0.25 mm 一致；加密后仍保持 10 mm 展开褶宽和 8 mm 余料；夹口材料长度的已知几何值核对通过。 |
+
+原始值、配置和后续批次见[Stage 1 实验报告](../test/bag_model/RSS2027_STAGE1_REPORT.md)。

@@ -70,6 +70,12 @@ flock /tmp/claude-gpu.lock ../.venv/bin/python -B -m yam_platform.benchmark --ou
 
 `physical_parcel_yam` 支持 `mode="empty"` 顶抓，同一两片封口资产仅生成袋膜，空袋质心按膜节点质量计算。运行 JSON 可显式设定 `ccd_tolerance_m`，该值随模型与准备状态签名归档。
 
+同一袋型可用 `bag_profile` 保留外观和接触皮肤，用 `material` 指定 `young_pa`、`thickness_m`、`density_kg_m3` 和可选的 `poisson`。模型用同一组材料参数计算膜拉伸刚度、弯曲刚度与面密度。
+
+`payload_offset_xy` 以米指定内容物相对袋中心的平面偏置。选项进入包覆和内容物装配，封口参考坐标与刚度设置沿用原袋参数。
+
+`close_gap_hold_s` 可为到达闭合指令下限后的等待配置时间，以便实际夹口跟踪。默认 0 s。达到持续夹持力或闭合时限时仍会进入抬升。
+
 ## 来源
 
 公共流程迁自 randomization 的 `test/flex3d/`，机械臂迁自 `policy/yam_probe_robot.py`。接触统计和弹簧保留冻结 v1.3 的实现，圆角几何来自 `bag_sim/mj_loose.py`。本次没有修改材料本构或进行物理重新标定。

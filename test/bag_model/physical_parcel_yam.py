@@ -43,6 +43,7 @@ class Config(TrialConfig):
     compression_k2: float = 20000.
     compression_damping: float = 1.
     ccd_tolerance_m: float | None = None
+    payload_offset_xy: tuple = (0.0, 0.0)
 
     def __post_init__(self):
         if self.grasp_face not in ("top", "side"):
@@ -127,12 +128,13 @@ def compile_yam_model(parcel, built, xml):
 
 
 def parcel_world(cfg):
-    material = material_parameters(**cfg.material) if cfg.material is not None else {}
     profile = parcel_profile(cfg.bag_profile) if cfg.bag_profile is not None else None
-    if profile is not None:
-        material.update(profile["shell"])
+    material = profile["shell"].copy() if profile is not None else {}
+    if cfg.material is not None:
+        material.update(material_parameters(**cfg.material))
     p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
         payload_size=tuple(cfg.payload_size), payload_mass=0. if cfg.mode == "empty" else cfg.payload_mass,
+        payload_offset_xy=tuple(cfg.payload_offset_xy),
         joint_stiffness=cfg.joint_stiffness, center=(-0.25, 0.04),
         timestep=cfg.dt, contact_time=cfg.contact_time,
         bend_damping_ratio=cfg.bend_damping_ratio, rayleigh=cfg.rayleigh,
@@ -177,7 +179,11 @@ def parcel_world(cfg):
 
 
 def prepared_signature(parcel, cfg):
-    settings = dict(model=asdict(parcel.cfg), support_height=cfg.support_height)
+    model = asdict(parcel.cfg)
+    # Prepared archives from before positioning support use the centered payload.
+    if not any(parcel.cfg.payload_offset_xy):
+        model.pop("payload_offset_xy")
+    settings = dict(model=model, support_height=cfg.support_height)
     if cfg.ccd_tolerance_m is not None:
         settings["ccd_tolerance_m"] = cfg.ccd_tolerance_m
     return json.dumps(settings, sort_keys=True)
@@ -208,7 +214,7 @@ def save_initial_state(parcel, data, cfg, path):
     np.savez_compressed(path, qpos=data.qpos, qvel=data.qvel, config_json=np.asarray(prepared_signature(parcel, cfg)))
 
 
-def scene(cfg):
+def scene(cfg, *, sim_factory=ParcelSim):
     p, xml = parcel_world(cfg)
     current = p.envelope["current"]
     top = float(current[:, 2].max() + p.cfg.radius + cfg.support_height)
@@ -233,7 +239,7 @@ def scene(cfg):
         desc=SimpleNamespace(), cfg=cfg, parcel=p,
         compile_model=lambda xml: compile_yam_model(p, built, xml))
     height = np.ptp(current[:, 2]) + 2 * p.cfg.radius if cfg.mode == "empty" else cfg.payload_size[2]
-    robot = attach_robot(cfg, built, ParcelSim, np.array(p.cfg.center), top,
+    robot = attach_robot(cfg, built, sim_factory, np.array(p.cfg.center), top,
                         np.array([*cfg.bag_size, height]),
                         p.cfg.payload_mass + p.envelope["masses"].sum(), approach=approach)
     initial = measure(robot)

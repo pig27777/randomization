@@ -102,7 +102,7 @@ def _clear_box_sheet(local, faces, shared, half, clearance, sign):
 
 
 def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radius, iterations=1600, wall_gap=None,
-                 box_face_clearance=False):
+                 box_face_clearance=False, content_offset_xy=(0., 0.)):
     """Open any front/back bag around one content, as initialization.py does for the bubble mailer.
 
     Front-group vertices rise and back-group vertices drop by a plateau profile over the content,
@@ -126,15 +126,20 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
     front = np.unique(faces[np.isin(panel_ids, front_ids)])
     shared = np.intersect1d(front, np.unique(faces[np.isin(panel_ids, back_ids)]))
     back = np.setdiff1d(np.unique(faces[np.isin(panel_ids, back_ids)]), front)
-    center = q[front, :2].mean(axis=0)
+    offset = np.asarray(content_offset_xy, dtype=float)
+    if offset.shape != (2,) or not np.isfinite(offset).all():
+        raise ValueError("content_offset_xy needs two finite values")
+    center = q[front, :2].mean(axis=0) + offset
     outer = (q[front, :2].max(axis=0) - q[front, :2].min(axis=0)) / 2
     extents = item["half_size"][:2]
-    if np.any(extents + .008 >= outer):
+    if np.any(extents + .008 + np.abs(offset) >= outer):
         raise ValueError("Content does not fit inside this bag with a usable seam allowance")
     gap = float(np.median(q[front, 2]) - np.median(q[back, 2]))
     lift = max(0., 2 * item["half_size"][2] + 2 * radius + .0015 - gap)
     plateau = extents + .003
-    u = np.clip((np.abs(q[:, :2] - center) - plateau) / (outer - plateau), 0, 1)
+    distance_xy = q[:, :2] - center
+    side_extent = outer - np.where(distance_xy >= 0, offset, -offset)
+    u = np.clip((np.abs(distance_xy) - plateau) / (side_extent - plateau), 0, 1)
     profile = np.prod(1 - u * u * (3 - 2 * u), axis=1)
     q[front, 2] += .5 * lift * profile[front]
     q[back, 2] -= .5 * lift * profile[back]

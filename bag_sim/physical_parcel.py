@@ -85,11 +85,12 @@ class Config:
     gravity: tuple = (0.0, 0.0, -9.81)
     self_collision: bool = True
     probe_shape: str = "sphere"
+    payload_offset_xy: tuple = (0.0, 0.0)  # payload position relative to the bag [m]
 
     def __post_init__(self):
         if self.mode not in ("rigid", "bendable", "compressible", "empty"):
             raise ValueError("mode must be rigid, bendable, compressible or empty")
-        for name, length in (("bag_size", 2), ("payload_size", 3), ("payload_com", 3),
+        for name, length in (("bag_size", 2), ("payload_size", 3), ("payload_offset_xy", 2), ("payload_com", 3),
                              ("center", 2), ("gravity", 3)):
             value = np.asarray(getattr(self, name), dtype=float)
             if value.shape != (length,) or not np.isfinite(value).all():
@@ -114,6 +115,8 @@ class Config:
                 raise ValueError("principal inertias violate the triangle inequality")
         if self.mode != "rigid" and (self.payload_inertia is not None or any(self.payload_com)):
             raise ValueError("explicit COM and principal inertias apply to rigid mode")
+        if self.mode == "empty" and any(self.payload_offset_xy):
+            raise ValueError("an empty bag cannot specify a payload position")
         if self.probe_shape not in ("box", "sphere", "capsule"):
             raise ValueError("unsupported probe shape")
         if not math.isfinite(self.poisson) or not -1 < self.poisson < 0.5:
@@ -161,7 +164,8 @@ def load_envelope(cfg):
         item = normalize_contents([dict(shape="box", size_m=list(cfg.payload_size),
                                         mass_kg=cfg.payload_mass)])[0]
         current, preparation = wrap_generic(reference, reference.copy(), faces, panels,
-                                             [0], [3], item, cfg.radius, box_face_clearance=True)
+                                             [0], [3], item, cfg.radius, box_face_clearance=True,
+                                             content_offset_xy=cfg.payload_offset_xy)
         if preparation["maximum_edge_strain"] > 0.05:
             raise ValueError(f"initial film strain exceeds 5%: {preparation}")
         half = np.asarray(cfg.payload_size) / 2

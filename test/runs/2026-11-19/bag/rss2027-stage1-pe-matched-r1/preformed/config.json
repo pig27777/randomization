@@ -1,0 +1,58 @@
+{
+  "output": "test/runs/2026-11-19/bag/rss2027-stage1-pe-matched-r1/preformed",
+  "cells": 12,
+  "slack": 0.008,
+  "dt": 0.0001,
+  "friction": 0.8,
+  "press_force": 0.5,
+  "pad_contact_time": 0.001,
+  "prefold": true,
+  "prefold_width": 0.01,
+  "refine_contact": false,
+  "match_whole_bag_pe": true,
+  "pull_seconds": 1.2,
+  "smoke": false,
+  "material": {
+    "membrane": 1200.0,
+    "bending": 3.956043956043956e-07,
+    "areal_mass": 0.0552,
+    "material_thickness": 6e-05,
+    "poisson": 0.3,
+    "young_pa": 20000000.0,
+    "thickness_m": 6e-05,
+    "density_kg_m3": 920.0,
+    "pad_friction": 0.8,
+    "self_friction": 0.45,
+    "support_friction": 0.45,
+    "contact_radius_m": 0.00025,
+    "support_contact_time_s": 0.001,
+    "constitutive_model": "native stretch and bending"
+  },
+  "phases_s": [
+    [
+      "gather",
+      0.012
+    ],
+    [
+      "hold",
+      0.06
+    ],
+    [
+      "pull",
+      1.2
+    ]
+  ],
+  "initial_geometry": {
+    "vertices": 169,
+    "triangles": 288,
+    "nominal_local_pitch_m": 0.005,
+    "reference_span_m": 0.05999999999999999,
+    "projected_span_m": 0.052,
+    "central_rise_m": 0.004898979485566357,
+    "prefold_width_m": 0.01
+  },
+  "ccd_tolerance_m": 1e-09,
+  "hostname": "ubun",
+  "mujoco": "4.0.1",
+  "source_sha256": "4da7fd7737f814447c1710e3670250d9991e5917d23c69bada2de47ffe392fee"
+}
