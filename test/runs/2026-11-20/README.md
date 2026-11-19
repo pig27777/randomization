@@ -15,12 +15,14 @@
 | [PE 膜量与载荷区间](bag/rss2027-stage1-pe-aperture-width-r1/) | 2.5/1.25 mm PE 预褶曲线的整指宽膜量、起滑前刚度和超载 | `measure.py <牵引数据目录> <本轮 audit.json>` | 捕获膜量差约 43%，候选刚度差 56.7%，连续双侧超载均仅 9 ms。 |
 | [低余料和压力](bag/rss2027-stage1-pe-low-slack-r1/) · [补做拉拔](bag/rss2027-stage1-pe-capture-boundary-r1/) | 同参 PE 平坦侧余料的第三档压力、余料及空夹对照 | 持锁执行各轮 `run_cases.sh` | 0/2 mm 余料及 0.3 N 组三组均无正拉力，4 mm／0.5 N 和 8 mm／0.8 N 均有持续承载和脱开。 |
 | [临界捕获细网格](bag/rss2027-stage1-pe-capture-fine-r1/) · [慢速拉拔](bag/rss2027-stage1-pe-slow-pull-r1/) | 4 mm 余料的 1.25 mm 网格入口、既有预褶的半速拉拔 | 持锁执行各轮 `run.sh` | 慢速候选力 0.063 N，脱开位移约 13.6 mm，正超载 9 ms。4 mm 细网格无夹入。 |
-| [8 mm 细网格捕获](bag/rss2027-stage1-pe-nominal-capture-fine-r1/) · [保留 1.10 mm 开口](bag/rss2027-stage1-pe-residual-gap-r1/) | PE 平坦余料，1.25 mm 网格，0.5 N，比较闭合过窄的影响 | 持锁执行各轮 `run.sh` | 原 0.40 mm 开口在提拉前膜量降至零，前 0.15 s 无正拉力。1.10 mm 排队。 |
+| [8 mm 细网格捕获](bag/rss2027-stage1-pe-nominal-capture-fine-r1/) · [保留 1.10 mm 开口](bag/rss2027-stage1-pe-residual-gap-r1/) | PE 平坦余料，1.25 mm 网格，0.5 N，比较闭合过窄的影响 | 持锁执行各轮 `run.sh` | 0.40 mm 处无膜，1.10 mm 工况起抬保留 4.095 mm，均无正拉力。 |
+| [入夹后切换夹力](bag/rss2027-stage1-pe-gather-grip-r1/) | 在 1.10 mm 几何开口实际入膜后，起抬前切到 1 N 夹力反馈 | 持锁执行本轮 `run.sh` | 细网格已启动。 |
 | [三种内容物布局的夹口材料](bag/rss2027-stage1-content-aperture-r1/) | 居中、横移 15 mm、紧凑约 30% 的 CPU 整袋夹口复核 | `rss2027_yam_capture_audit.py <trial> <output>`，各回放一次 | 起抬等效膜长 8.066/8.363/9.394 mm，紧凑布局悬停仍缺同帧双侧内触点。 |
 | [同态凸碰撞容差](bag/rss2027-stage1-ccd-parity-r1/) | 原 CPU 和 Warp 接触法向差异的容差敏感性 | 持锁执行本轮 `run_cases.sh`，再用 `check_normal_depth.py` | 0.1/1 μm 容差下，关键法向仍相差约 89°，设备原生法向与深度的投影不一致。 |
 | [隔离 Warp 法向修复](bag/rss2027-stage1-warp-film-normal-r1/) | 保留产生深度的 GJK/EPA 法向，原同态对照与完整在线居中侧抓 | 用 `create_overlay.py` 生成隔离版本，持锁执行 `run_parity.sh` 和条件 `run_trial.sh`，再执行 `analyze_trial.py` | 整袋完成 4.76965 s，墙钟 539.12 s，显存峰值 966 MiB，穿透 0.469 mm。[褶皱录像](bag/rss2027-stage1-warp-film-normal-r1/yam-warp-fold.mp4)。 |
 | [约 30% 布局的隔离版](bag/rss2027-stage1-warp-film-normal-30pct-r1/) | 同修正的另一内容物布局对照 | 持锁执行本轮 `run.sh` | 4.75966 s 完整通过，墙钟 579.86 s，穿透 0.813 mm，停止态保持包覆。 |
 | [纸板上缘进给](bag/rss2027-stage1-whole-bag-materials-r4/) | 只将纸板接近目标升高 16 mm | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 及 `run.sh paperboard <本轮目录>` | 完成 6.0969 s，悬停离台，穿透峰值 0.685 mm，最小单指力 6.98 N。 |
-| [牛皮纸与气泡膜上缘进给](bag/rss2027-stage1-whole-bag-upper-r1/) | 原各自基准参数下，对照同一 16 mm 高度变化 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 和各自完整动作 | 排队。 |
-| [PE 受控拉力](bag/rss2027-stage1-pe-force-pull-r1/) · [1 N 夹力对照](bag/rss2027-stage1-pe-force-pull-r2/) | 同参 PE 0.30 N 拉力反馈，对比 6.5 N 与 1.0 N 夹力 | 持锁执行首轮 `run.sh`。后者附 <本轮目录> 和 `1.0` | 6.5 N 有 0.1229 s 拉力达标窗，同期无整体滑移。1 N 组排队。 |
-| [闭环场景的批量设备短窗](bag/rss2027-stage1-yam-batch-reference-r1/) | 通过轨迹的三种姿态，1/16/64 世界 | 持锁执行本轮 `run.sh` | 排队。 |
+| [牛皮纸与气泡膜上缘进给](bag/rss2027-stage1-whole-bag-upper-r1/) | 原各自基准参数下，对照同一 16 mm 高度变化 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 和各自完整动作 | 牛皮纸离台但膜—膜峰值 1.931 mm。气泡膜侧向受推后离开支撑，未捕获。 |
+| [牛皮纸上缘半步长](bag/rss2027-stage1-kraft-upper-half-step-r1/) | 相同工况仅减半至 100 μs | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 与完整动作 | 排队。 |
+| [PE 受控拉力](bag/rss2027-stage1-pe-force-pull-r1/) · [1 N 夹力对照](bag/rss2027-stage1-pe-force-pull-r2/) | 同参 PE 0.30 N 拉力反馈，对比 6.5 N 与 1.0 N 夹力 | 持锁执行首轮 `run.sh`。后者附 <本轮目录> 和 `1.0` | 6.5 N 有 0.1229 s 拉力达标窗，同期无整体滑移。1 N 保持期实际开口仍为 3.92 mm，未建立夹力。 |
+| [闭环场景的批量设备短窗](bag/rss2027-stage1-yam-batch-reference-r1/) | 通过轨迹的三种姿态，1/16/64 世界 | 持锁执行本轮 `run.sh` | 9 个窗口通过。64 世界为 1,895–2,278 环境步/s，采样显存 1,798 MiB。 |

@@ -24,7 +24,7 @@ CLOSED_HALF = 0.0042
 PAD_HALF_THICKNESS = .004
 PAD_BOTTOM = 0.020
 PULL_SPEED = 0.025
-PHASES = (("settle", .08), ("press", .45), ("gather", .24), ("hold", .06), ("pull", .50))
+PHASES = (("settle", .08), ("press", .45), ("gather", .24))
 
 
 def refine_axis(axis, half_extent, levels):
@@ -235,8 +235,8 @@ def run(args):
     pad_origins = m.body_pos[bodies].copy()
     pad_ids = {int(geom): pad for pad, body in enumerate(bodies) for geom in np.flatnonzero(m.geom_bodyid == body)}
     gather_seconds = .012 if args.grip_target is None else .30
-    phases = (("gather", gather_seconds), ("hold", .06)) if args.prefold else PHASES[:-1]
-    phases = (*phases, ("pull", args.pull_seconds))
+    phases = (("gather", gather_seconds),) if args.prefold else PHASES
+    phases = (*phases, ("hold", args.hold_seconds), ("pull", args.pull_seconds))
     controlled_gather = args.gather_seconds is not None
     controlled_pull = args.pull_force_target is not None
     if controlled_gather:
@@ -262,6 +262,7 @@ def run(args):
     z = pad_origins[0, 2]
     open_half = pad_origins[1, 0]
     close_half = CLOSED_HALF if args.closed_gap is None else PAD_HALF_THICKNESS + args.closed_gap / 2
+    min_grip_half = .00405 if args.prefold else PAD_HALF_THICKNESS + 1.5 * material["contact_radius_m"]
     half = open_half
     previous = pad_origins
     marker = np.flatnonzero((abs(ref[:, 0]) < 1e-9) & (abs(ref[:, 1]) < .006))
@@ -278,9 +279,10 @@ def run(args):
         nsteps = 2 if args.smoke else round(duration / args.dt)
         for step in range(nsteps):
             pull_rate = 0.
-            if args.grip_target is not None:
+            gripping = args.grip_target is not None and (args.prefold or phase in ("hold", "pull"))
+            if gripping:
                 rate = float(np.clip(.0015 * (grip_filtered_N - args.grip_target), -.012, .012))
-                half = float(np.clip(half + args.dt * rate, .00405, open_half))
+                half = float(np.clip(half + args.dt * rate, min_grip_half, open_half))
             elif phase == "gather":
                 half = open_half - (open_half - close_half) * (step + 1) / nsteps
             elif phase in ("hold", "pull"):
@@ -437,7 +439,8 @@ def main():
     parser.add_argument("--pull-seconds", type=float, default=.5)
     parser.add_argument("--pull-speed", type=float, default=PULL_SPEED, help="vertical pull speed, in metres per second")
     parser.add_argument("--pull-force-target", type=float, help="force feedback target during pull, in newtons")
-    parser.add_argument("--closed-gap", type=float, help="final geometric gap between the pads, in metres")
+    parser.add_argument("--closed-gap", type=float, help="gap between the pads at the end of gathering, in metres")
+    parser.add_argument("--hold-seconds", type=float, default=.06)
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
     parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
@@ -457,6 +460,8 @@ def main():
         parser.error("slack must be below the .020 m of material reserved for the side ridges")
     if not np.isfinite(args.pull_seconds) or args.pull_seconds <= 0:
         parser.error("pull duration must be positive and finite")
+    if not np.isfinite(args.hold_seconds) or args.hold_seconds <= 0:
+        parser.error("hold duration must be positive and finite")
     if not np.isfinite(args.pull_speed) or args.pull_speed <= 0:
         parser.error("pull speed must be positive and finite")
     if args.pull_force_target is not None and (args.grip_target is None or
@@ -464,11 +469,13 @@ def main():
         parser.error("pull force target must be positive and finite and needs --grip-target")
     initial_half = .005 if args.prefold else OPEN_HALF
     if args.closed_gap is not None and (
-            args.grip_target is not None or not 0 < args.closed_gap < 2 * (initial_half - PAD_HALF_THICKNESS)):
-        parser.error("closed gap must be between zero and the initial opening, with no force-based grip target")
-    if args.grip_target is not None and (not args.prefold or not args.match_whole_bag_pe or
-                                        not np.isfinite(args.grip_target) or args.grip_target <= 0):
-        parser.error("grip target must be positive, finite, and used with matched PE preformed geometry")
+            not 0 < args.closed_gap < 2 * (initial_half - PAD_HALF_THICKNESS) or
+            (args.prefold and args.grip_target is not None)):
+        parser.error("closed gap must be between zero and the initial opening, without prefold grip feedback")
+    if args.grip_target is not None and (not args.match_whole_bag_pe or not np.isfinite(args.grip_target) or
+                                        args.grip_target <= 0 or (not args.prefold and
+                                        (args.gather_seconds is None or args.closed_gap is None))):
+        parser.error("grip target needs positive force and matched PE with a prefold or a controlled gather and gap")
     if args.gather_seconds is not None and (args.prefold or not args.match_whole_bag_pe or
                                            not np.isfinite(args.gather_seconds) or args.gather_seconds <= 0):
         parser.error("gather duration must be positive, finite, and used with flat matched PE")
