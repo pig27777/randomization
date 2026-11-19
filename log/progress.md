@@ -702,3 +702,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 隔离 Warp 修正通过 142 节点居中整袋 YAM 闭环。4.76965 s 模拟／539.12 s 墙钟，RTX 5090 采样显存峰值 966 MiB。
 - 原生穿透 0.469 mm，无外露及实体相交；悬停全部 10 帧离台、两指最低闭合轴反力 3.30 N。
 - 约 30% 填充布局复测、PE 受控拉力和纸板上缘进给已排队。[算力验收](../test/runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-r1/benchmark.json) · [褶皱录像](../test/runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-r1/yam-warp-fold.mp4) · [任务检查](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-20 Stage 1 名义细网格与拉力控制
+
+- 1.25 mm 档 8 mm 余料在 0.40 mm 末段开口失去膜量，起拉无正拉力。保留 1.10 mm 开口的对照排队。
+- 6.5 N 夹力下闭环拉力达标 0.1229 s，但没有整体滑移。1.0 N 夹力对照排队。
+- 隔离 Warp 的约 30% 填充率复测已开始。纸板上缘进给通过入口。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。

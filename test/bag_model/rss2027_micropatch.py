@@ -21,6 +21,7 @@ SIDE = 0.060
 RADIUS = 0.0001
 OPEN_HALF = 0.0115
 CLOSED_HALF = 0.0042
+PAD_HALF_THICKNESS = .004
 PAD_BOTTOM = 0.020
 PULL_SPEED = 0.025
 PHASES = (("settle", .08), ("press", .45), ("gather", .24), ("hold", .06), ("pull", .50))
@@ -195,7 +196,7 @@ def pad_reactions(m, d, pad_ids, pull_speed=None):
 
 def aperture_lengths(nodes, reference_lengths, half, z):
     """Clip the central material line to the 3D volume between the pads."""
-    half_gap = half - .004
+    half_gap = half - PAD_HALF_THICKNESS
     lower = np.array([-half_gap, -.010, z - PAD_BOTTOM])
     upper = np.array([half_gap, .010, z + PAD_BOTTOM])
     start = nodes[:-1]
@@ -260,6 +261,7 @@ def run(args):
     rows, snapshots = [], []
     z = pad_origins[0, 2]
     open_half = pad_origins[1, 0]
+    close_half = CLOSED_HALF if args.closed_gap is None else PAD_HALF_THICKNESS + args.closed_gap / 2
     half = open_half
     previous = pad_origins
     marker = np.flatnonzero((abs(ref[:, 0]) < 1e-9) & (abs(ref[:, 1]) < .006))
@@ -280,9 +282,9 @@ def run(args):
                 rate = float(np.clip(.0015 * (grip_filtered_N - args.grip_target), -.012, .012))
                 half = float(np.clip(half + args.dt * rate, .00405, open_half))
             elif phase == "gather":
-                half = open_half - (open_half - CLOSED_HALF) * (step + 1) / nsteps
+                half = open_half - (open_half - close_half) * (step + 1) / nsteps
             elif phase in ("hold", "pull"):
-                half = CLOSED_HALF
+                half = close_half
             if not args.prefold and phase in ("press", "gather"):
                 if controlled_gather and phase == "gather":
                     z_rate = np.clip(.01 * (press_filtered_N - args.press_force), -.008, .008)
@@ -435,6 +437,7 @@ def main():
     parser.add_argument("--pull-seconds", type=float, default=.5)
     parser.add_argument("--pull-speed", type=float, default=PULL_SPEED, help="vertical pull speed, in metres per second")
     parser.add_argument("--pull-force-target", type=float, help="force feedback target during pull, in newtons")
+    parser.add_argument("--closed-gap", type=float, help="final geometric gap between the pads, in metres")
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
     parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
@@ -459,6 +462,10 @@ def main():
     if args.pull_force_target is not None and (args.grip_target is None or
                                               not np.isfinite(args.pull_force_target) or args.pull_force_target <= 0):
         parser.error("pull force target must be positive and finite and needs --grip-target")
+    initial_half = .005 if args.prefold else OPEN_HALF
+    if args.closed_gap is not None and (
+            args.grip_target is not None or not 0 < args.closed_gap < 2 * (initial_half - PAD_HALF_THICKNESS)):
+        parser.error("closed gap must be between zero and the initial opening, with no force-based grip target")
     if args.grip_target is not None and (not args.prefold or not args.match_whole_bag_pe or
                                         not np.isfinite(args.grip_target) or args.grip_target <= 0):
         parser.error("grip target must be positive, finite, and used with matched PE preformed geometry")
