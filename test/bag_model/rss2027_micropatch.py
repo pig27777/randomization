@@ -92,6 +92,8 @@ def build(args):
         args.cells, args.slack, args.prefold, radius, prefold_width=args.prefold_width,
         flat_waist=args.match_whole_bag_pe and not args.prefold, refine_contact=args.refine_contact,
         refine_levels=args.refine_levels)
+    ref[:, 0] += args.coupon_offset_x
+    current[:, 0] += args.coupon_offset_x
     model = ET.fromstring(f"""
       <mujoco model="rss2027_micropatch">
         <option timestep="{args.dt}" integrator="discrete" solver="Newton"
@@ -265,7 +267,7 @@ def run(args):
     min_grip_half = .00405 if args.prefold else PAD_HALF_THICKNESS + 1.5 * material["contact_radius_m"]
     half = open_half
     previous = pad_origins
-    marker = np.flatnonzero((abs(ref[:, 0]) < 1e-9) & (abs(ref[:, 1]) < .006))
+    marker = np.flatnonzero((abs(ref[:, 0] - args.coupon_offset_x) < 1e-9) & (abs(ref[:, 1]) < .006))
     press = 0.
     peak_penetration, failure = 0., None
     press_band_s = peak_press_band_s = peak_press_N = 0.
@@ -428,6 +430,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cells", type=int, default=12)
     parser.add_argument("--slack", type=float, default=.002)
+    parser.add_argument("--coupon-offset-x", type=float, default=0.,
+                        help="coupon registration offset along the closing axis, in metres")
     parser.add_argument("--dt", type=float, default=.0001)
     parser.add_argument("--friction", type=float, help="pad friction (default .5, or .8 for matched PE)")
     parser.add_argument("--press-force", type=float, default=.5)
@@ -455,6 +459,8 @@ def main():
         parser.error("additional refinement levels require selected contact axes")
     if not 0 <= args.slack < SIDE / 2 or not 0 < args.dt <= .001:
         parser.error("slack must be in [0, .03) m and dt in (0, .001] s")
+    if not abs(args.coupon_offset_x) < SIDE / 2 - OPEN_HALF - PAD_HALF_THICKNESS:
+        parser.error("coupon offset would put a pad outside the nominal specimen width")
     if args.prefold_width is not None and (not args.prefold or not 0 < args.prefold_width <= SIDE):
         parser.error("prefold width requires --prefold and must be in (0, .06] m")
     if args.prefold and not 0 < args.slack < (args.prefold_width or 2 * SIDE / args.cells):
