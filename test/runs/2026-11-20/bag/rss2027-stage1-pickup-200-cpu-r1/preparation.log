@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/prepare_physical_parcel.py", line 71, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/prepare_physical_parcel.py", line 33, in main
+    p, xml = backend.parcel_world(cfg)
+             ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/physical_parcel_yam.py", line 139, in parcel_world
+    p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
+        payload_size=tuple(cfg.payload_size), payload_mass=0. if cfg.mode == "empty" else cfg.payload_mass,
+    ...<5 lines>...
+        compression_k2=cfg.compression_k2, compression_damping=cfg.compression_damping,
+        **material))
+  File "/home/ubuntu/workspace/gzl/randomization/bag_sim/physical_parcel.py", line 270, in __init__
+    raise ValueError(f"timestep does not resolve explicit film bending; use <= {0.2/omega_bound:.6g} s")
+ValueError: timestep does not resolve explicit film bending; use <= 4.97514e-05 s
