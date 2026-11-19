@@ -653,3 +653,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 整袋侧抓在 CCD 1 nm 工况通过离台悬停，质心升高 147–159 mm，穿透峰值 0.484 mm。[褶皱录像](../test/runs/2026-11-19/bag/rss2027-stage1-side-grasp-r1/yam-side-fold.mp4)。
 - 2.5→1.25 mm 的 PE 预褶峰值、承载时长、脱开时刻差均小于 5%，触点起滑候选差 63%，仍需原生接触牵引复核。
 - 短窗 GPU `step2` 18.46–33.01 ms/步。第一整袋短回合候选未通过 CPU 门槛。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-19 Stage 1 短回合与原生摩擦牵引
+
+- 200 μs CPU 短回合通过，4.226 s 模拟／82.15 s 墙钟；RTX 5090 同配置 2.760 s 露角停止，独立复核确认。
+- PE 原生整体滑移候选 0.338/0.300 N，网格差 11.2%；平坦稳压收拢的局部斜率初值 0.434。
+- 同参整袋 50 μs 离台且无露角，峰值穿透 1.113 mm。更细步长和收拢复查排队。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。

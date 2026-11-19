@@ -216,7 +216,7 @@ def measure_contacts(robot, target_geoms=(), target_flexes=(), monitor_support=F
 
 
 
-def run(backend, cfg, output, *, on_sample=None):
+def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
     if not np.isfinite(cfg.lift_height) or cfg.lift_height <= 0:
         raise ValueError("lift_height must be finite and positive")
     if not np.isfinite(cfg.lift_speed_m_s) or cfg.lift_speed_m_s <= 0:
@@ -311,6 +311,8 @@ def run(backend, cfg, output, *, on_sample=None):
             down=max(0.,-sum(float(np.dot(f,approach)) for f in feedback["force_on_fingers_N"]))
         peaks["grip_N"]=max(peaks["grip_N"],float(grip20))
         peaks["down_N"]=max(peaks["down_N"],down)
+        if on_penetration_peak is not None and feedback["penetration_mm"] > peaks["penetration_mm"]:
+            on_penetration_peak(robot, phase)
         for key in ("penetration_mm","nonfinger_mm"):
             peaks[key]=max(peaks[key],feedback[key])
         if grip20 > (25 if cfg.category=="bendable" else 15):
