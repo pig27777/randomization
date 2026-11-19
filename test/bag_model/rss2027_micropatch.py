@@ -54,7 +54,7 @@ def coupon_grid(cells, slack, prefold):
     return ref, current, np.asarray(faces), edges
 
 
-def build(cells, slack, dt, friction, prefold):
+def build(cells, slack, dt, friction, prefold, pad_contact_time):
     young, thickness, density, poisson = 255e6, 50.8e-6, 924., .45
     material = material_parameters(young, thickness, density, poisson)
     ref, current, faces, edges = coupon_grid(cells, slack, prefold)
@@ -84,7 +84,7 @@ def build(cells, slack, dt, friction, prefold):
         tip = ET.fromstring(fingertip_xml(name, 0, (sign * open_half, 0, start_z)))
         for part in tip.findall("geom"):
             part.attrib.update(conaffinity="2", condim="3", priority="1", friction=f"{friction} .005 .0001",
-                               solref=".001 1", solimp=".999 .999 .001")
+                               solref=f"{pad_contact_time} 1", solimp=".999 .999 .001")
             if part.get("type") == "box":
                 half = np.fromstring(part.attrib.pop("size"), sep=" ")
                 corners = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)])
@@ -132,7 +132,8 @@ def pad_reactions(m, d, pad_ids):
 
 def run(args):
     start = time.perf_counter()
-    xml, m, d, material, ref, faces = build(args.cells, args.slack, args.dt, args.friction, args.prefold)
+    xml, m, d, material, ref, faces = build(
+        args.cells, args.slack, args.dt, args.friction, args.prefold, args.pad_contact_time)
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "model.xml").write_text(xml)
     mujoco.mj_saveModel(m, str(args.output / "model.mjb"), None)
@@ -222,6 +223,7 @@ def main():
     parser.add_argument("--dt", type=float, default=.0001)
     parser.add_argument("--friction", type=float, default=.5)
     parser.add_argument("--press-force", type=float, default=.5)
+    parser.add_argument("--pad-contact-time", type=float, default=.001, help="pad contact time constant in seconds")
     parser.add_argument("--prefold", action="store_true", help="test pulling an initially folded coupon")
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
@@ -233,6 +235,8 @@ def main():
         parser.error("prefold slack must be positive and below the two central edge lengths")
     if not 0 <= args.friction <= 1 or not np.isfinite(args.press_force) or args.press_force <= 0:
         parser.error("friction must be in [0, 1] and press force must be positive")
+    if not np.isfinite(args.pad_contact_time) or args.pad_contact_time < 2 * args.dt:
+        parser.error("pad contact time must be at least twice the timestep")
     if not run(args):
         raise SystemExit(1)
 
