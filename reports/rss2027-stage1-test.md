@@ -33,7 +33,7 @@
 
 ## 整袋夹入诊断、同参 PE 与内容物装配
 
-最近检查时间 2026-11-20 01:24（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
+最近检查时间 2026-11-20 01:33（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
 
 | 检查 | 方法 | 结果 |
 | --- | --- | --- |
@@ -87,3 +87,4 @@
 | GPU 通过回合录像 | `render_rss2027_fold_video.py --edge 94 95 --start .32 --end 4.75 --highlight-time 4.68`，FFmpeg 完整解码并目检 | 1280×512、112 帧、25 fps。膜边 5.41°→72.50°，终态双视角可核查。[视频](../test/runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-r1/yam-warp-fold.mp4)。 |
 | 8 mm 名义细网格 | 持锁运行 `rss2027-stage1-pe-nominal-capture-fine-r1/run.sh`，比较收拢、起拉和 2.5 mm 记录 | 1.25 mm 试片能收拢，0.40 mm 开口处保留膜为零，首 0.15 s 无正拉力。1.10 mm 开口已排队。 |
 | 受控拉力双侧承载 | 持锁运行 `rss2027-stage1-pe-force-pull-r1/run.sh` 并按原生反力与相对位移抽查连续窗 | 0.270–0.281 N 持续 0.1229 s 时合计夹力 6.50–6.72 N，未出现整体滑移。原生穿透 0.250 mm、零警告。 |
+| 隔离版约 30% 填充率完整动作 | 持锁执行 `rss2027-stage1-warp-film-normal-30pct-r1/run.sh`，校验悬停、夹口和停止态包覆 | RTX 5090 通过 4.75966 s 完整模拟，墙钟 579.86 s，966 MiB，峰值穿透 0.813 mm。悬停支撑为零，停止态无露角或相交。 |

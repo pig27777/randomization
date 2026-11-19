@@ -708,3 +708,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 1.25 mm 档 8 mm 余料在 0.40 mm 末段开口失去膜量，起拉无正拉力。保留 1.10 mm 开口的对照排队。
 - 6.5 N 夹力下闭环拉力达标 0.1229 s，但没有整体滑移。1.0 N 夹力对照排队。
 - 隔离 Warp 的约 30% 填充率复测已开始。纸板上缘进给通过入口。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-20 Stage 1 第二种布局的 GPU 验收
+
+- 约 30% 填充布局 4.75966 s 完成，墙钟 579.86 s、采样显存 966 MiB、原生穿透峰值 0.813 mm。
+- 悬停 10 帧离台，每指闭合轴力至少 3.52 N。独立回放确认终点无露角或实体相交。
+- 同 142 节点模型的分阶段批量设备计时已排队。[本轮验收](../test/runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-30pct-r1/benchmark.json) · [阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md)。
