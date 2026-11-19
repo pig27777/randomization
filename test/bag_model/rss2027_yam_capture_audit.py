@@ -81,8 +81,11 @@ def audit(trial, output):
     groups = [set(np.flatnonzero(model.geom_bodyid == model.geom_bodyid[geom])) for geom in pads]
     faces = model.flex_elem.reshape(-1, 3)
     rows, locator = [], []
+    phases = ("close", "lift", "lift_hold")
+    if result["config"].get("pickup_release_seconds", 0.):
+        phases += ("open",)
     for qpos, sample in zip(positions, trace, strict=True):
-        if sample["phase"] not in ("close", "lift", "lift_hold"):
+        if sample["phase"] not in phases:
             continue
         data.qpos[:] = qpos
         # No sampled velocities are present. Only read geometry from this replay.

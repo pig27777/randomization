@@ -37,6 +37,7 @@ class TrialConfig:
     grasp_opening_m: float=.040
     lift_speed_m_s: float=.10
     pickup_only: bool=False
+    pickup_release_seconds: float=0.
     side_insert_speed_m_s: float=.010
     closing_gain_m_per_N_s: float=.002
 
@@ -238,6 +239,11 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
         raise ValueError("normal force target, start offset and approach timeout must be positive and finite")
     if cfg.press_only and cfg.press_target_N is None:
         raise ValueError("press-only trials require a normal force target")
+    if not np.isfinite(cfg.pickup_release_seconds) or cfg.pickup_release_seconds < 0:
+        raise ValueError("pickup_release_seconds must be finite and nonnegative")
+    release_ramp = cfg.pickup_release_seconds > 0
+    if release_ramp and (not cfg.pickup_only or cfg.pinch_coeff):
+        raise ValueError("a pickup release requires pickup_only and native contact")
     output.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
     (output/"config.json").write_text(json.dumps(asdict(cfg),indent=2))
@@ -296,6 +302,7 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
     stable=0.
     gap_hold=0.
     sample_every=max(1,round(.02/dt))
+    release_sample_every=max(1,round(.002/dt))
     for step in range(round(getattr(cfg, "simulation_seconds", 30.)/dt)):
         elapsed=float(d.time)-phase_start
         current_tips=tips(robot)
@@ -378,9 +385,12 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                 target=lift_site+np.array([0.,0.,min(cfg.lift_height,cfg.lift_speed_m_s*elapsed)])
                 next_phase="lift_hold" if elapsed>=cfg.lift_height/cfg.lift_speed_m_s else None
             elif phase=="lift_hold":
-                next_phase=("done" if cfg.pickup_only else "carry") if elapsed>=.2 else None
+                pickup_end = "open" if release_ramp else "done"
+                next_phase=(pickup_end if cfg.pickup_only else "carry") if elapsed>=.2 else None
                 if next_phase and feedback["support_N"]>.05:
                     outcome,reason="grasp_fail","object remains on table after lift and hold"
+                elif next_phase == "open" and min(feedback["grip_each_N"]) < .05:
+                    outcome,reason="grasp_fail","pickup release needs bilateral load after the hold"
             elif phase=="carry":
                 duration=np.sqrt(2*np.pi*.5/1.)
                 a=min(1.,elapsed/duration)
@@ -400,8 +410,17 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
         elif phase=="open":
             pinch.release("open")
             spring.release()
-            gap=min(.095,open_gap+.060)
-            next_phase="done" if elapsed>=.5 else None
+            if release_ramp:
+                fraction=min(1.,elapsed/cfg.pickup_release_seconds)
+                gap=open_gap+(cfg.grasp_opening_m-open_gap)*fraction
+                present=max(feedback["contact_magnitude_each_N"])>.05
+                loss=0. if present else loss+dt
+                next_phase="done" if loss>=.050 else None
+                if not next_phase and elapsed>=cfg.pickup_release_seconds+.10:
+                    outcome,reason="release_fail","contact remains after the pickup release ramp"
+            else:
+                gap=min(.095,open_gap+.060)
+                next_phase="done" if elapsed>=.5 else None
         else:
             raise RuntimeError(phase)
         if pinch.active is not None:
@@ -429,7 +448,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
             break
         if d.time < previous_time+dt/2:
             outcome,reason="sim_fail","MuJoCo automatic state reset"
-        if step%sample_every==0:
+        stride = release_sample_every if release_ramp and phase == "open" else sample_every
+        if step%stride==0:
             if hasattr(backend, "refresh"):
                 backend.refresh(sim)
             else:
@@ -472,7 +492,7 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
             if next_phase=="done":
                 motion_completed=True
                 if cfg.pickup_only:
-                    outcome,reason="pickup_ok",""
+                    outcome,reason=("pickup_release_ok" if release_ramp else "pickup_ok"),""
                 else:
                     position=sim.com()
                     success=bool(np.all(np.abs(position[:2]-(np.array([-.25,.04])+[.5,0]))<=.10))
@@ -481,7 +501,10 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                     outcome,reason=grasp_failure["outcome"],grasp_failure["reason"]
                 break
             phase=next_phase
-            if phase=="open":open_gap=gap
+            if phase=="open":
+                open_gap=gap
+                if release_ramp:
+                    loss=0.
     if outcome=="pending":outcome,reason="incomplete","simulation time budget reached"
     (output/"trace.json").write_text(json.dumps(trace,indent=2))
     extra_state = {}

@@ -78,6 +78,8 @@ flock /tmp/claude-gpu.lock ../.venv/bin/python -B -m yam_platform.benchmark --ou
 
 算力试验可在 JSON 中使用 `pickup_only=true` 在提拉与悬停后结束。`grasp_opening_m` 与 `lift_speed_m_s` 默认分别为 0.040 m 和 0.10 m/s，仍按原桌面支撑和失触条件判定 `pickup_ok`。
 
+整袋松夹试验可在原生接触的 `pickup_only` 模式设置 `pickup_release_seconds`。完成离台悬停并确认两指承载后，目标开口按该时长线性回到抓取前开口，松夹轨迹每 2 ms 采样。持续 50 ms 双指失触后记录 `pickup_release_ok`。
+
 独立侧抓工况可设 `side_insert_speed_m_s` 与 `closing_gain_m_per_N_s`，默认分别为 0.01 m/s 与 0.002 m/(N·s)。插入深度、夹持力目标与闭合速度限值沿用平台设置。
 
 ## 来源
