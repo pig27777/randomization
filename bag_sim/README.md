@@ -56,9 +56,8 @@ bag_sim/
 | 统一材料模型 / Newton VBD | `bag_model.py`、`newton_bag.py`、`bending_history.py`、`profiles/` |
 | 薄板片与 2D flex 袋 | `mj_loose.py`、`flex_geometry.py`、`wrap.py`、`loose_setup.py` |
 | Round 3 效果袋 | `effect_model.py`、`film_pinch.py`，冻结内容物通过 `frozen_content.py` 接入 |
-| 完整 flex 与软内容物联合求解 | `soft_flex_adapter.py`、`soft_content_backend.py`、`flex_*` 辅助模块 |
-| 静态插值袋候选 | `interpolated_bag.py` |
-| 原生 3D flex 内容物 / 整包候选 | `native_flex_contents.py`、`native_flex_gpu.py` |
+| 完整 flex 与软内容物联合求解 | `soft_content_backend.py`、[CPU 单步成本对照](../test/bag_model/flex_soft_cost.py) |
+| 原生 3D flex 内容物候选 | [YAM 模型适配器](../test/flex3d/native_flex.py)、[实验报告](../test/flex3d/REPORT.md) |
 
 以上使用已有方案名称，不代表都已验收或冻结；具体边界以本文最新状态和 [实验报告](../test/bag_model/REPORT.md) 为准。`outputs/` 中的旧证据和被显式引用的后端快照保留原位；独立测试代码统一在 `test/`。
 

@@ -322,7 +322,6 @@ def run(batch, max_time=90., progress=None):
     angle = np.array([np.random.default_rng(s['seed']).uniform(0, 2 * math.pi) for s in batch.specs])
     carry = .5 * np.c_[np.cos(angle), np.sin(angle), np.zeros(n)]
     carry_T = np.sqrt(2 * math.pi * .5 / a_max)
-    sign = np.array([1., -1.])  # pA closes towards +y, pB towards -y
     starts, p0, top = batch.starts, batch.pad_p0, batch.original_top
     check_every = max(1, round(.010 / dt))
     phase = np.full(n, SETTLE); phase_t = np.zeros(n)

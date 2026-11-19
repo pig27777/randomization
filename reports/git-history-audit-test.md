@@ -1,6 +1,6 @@
 # Git 历史与架构审计检查
 
-最近检查于 2026-11-19 21:42（北京时间），机器 `ubun`。基线为主线 `b9ddb6a7` 和远端实验分支 `fbb4a0e4`。源码从 Git 提取至临时目录，适用候选只在该副本中试删。
+首次审计于 2026-11-19 21:42（北京时间），机器 `ubun`。基线为主线 `b9ddb6a7` 和远端实验分支 `fbb4a0e4`。源码从 Git 提取至临时目录，适用候选只在该副本中试删。
 
 | 范围 | 方法 | 结果 |
 | --- | --- | --- |
@@ -14,3 +14,15 @@
 F6/F7 的历史 manifest 记录完成于 2026-11-07，期限为 2026-11-08。实际使用的 F6/F7 与 B1–B4 期限读取仍位于各批次驱动；共享函数的调用关系见 [跨线记录](../log/ideas.md)。
 
 检查覆盖 Git 提交态和仓库内可见调用方。整袋 GPU 回合、吞吐和物理验收沿用原实验报告，本轮进行了离线检查及 CPU 回归。Stage 1 报告另记录 17 项单元检查，本轮的 16 项整包回归对应上述 Git 基线。
+
+## 清理回归
+
+最近检查于 2026-11-19 21:58（北京时间），机器 `ubun`。以 `37a0dc63` 为基线，使用 `git archive` 提取关联源码后叠加清理差异，在临时目录执行。
+
+| 范围 | 方法与结果 |
+| --- | --- |
+| 源码和历史链接 | AST 对照确认两处无效赋值已移除。`git grep` 确认现行脚本和配置无期限看守引用。`git cat-file -e` 核对迁移表中的历史源码，20 条新增链接和 `git diff --check` 通过。 |
+| CPU 回归 | `python -B -m unittest discover -s <目录> -p <文件>` 共 31 项通过。MuJoCo 3.17.0 检查 `test/flex3d/test_platform.py`（2 项）、`test/bag_model/test_side_pinch_adapter.py`（9 项）和 `test/content_model/tests/test_mjwarp_batching.py`（3 项，`PYTHONPATH=contents/segment`）。MuJoCo 4.0.1 检查 `test/bag_model/test_physical_parcel.py`（17 项）。 |
+| CLI 入口 | `--help` 9/9 通过。MuJoCo 3.17.0 检查 `round3_flex.py`、`round3_effect.py`、`flex_round2.py`、`flex_batch.py`、`flex_diagnostics.py`、`effect_batch.py`、`film_gather_grid.py` 和 `flex_soft_cost.py`。MuJoCo 4.0.1 检查 `record_physical_parcel.py`。 |
+
+首次检查 B4 入口时发现 `NameError: name 'Path' is not defined`。`226eeedf` 迁移时增加了路径计算，补上 `pathlib.Path` 导入后复测通过。历史批次的期限和物理结果查阅原报告，本轮验证覆盖源码、入口和 CPU 回归。

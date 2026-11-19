@@ -259,7 +259,6 @@ def run(a, case, params, seed, out):
         escaped = wp.zeros(nworld, dtype=int)
         overflow_bits = wp.zeros(nworld, dtype=int)
         overflow_events = wp.zeros(nworld, dtype=int)
-        niter_sum = wp.zeros(nworld, dtype=int)
         half = wp.vec3(*sim.desc.segments[0].half)
 
         def step():

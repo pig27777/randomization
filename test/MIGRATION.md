@@ -1,6 +1,6 @@
 # 代码迁移表（2026-11-09）
 
-模型目录保留建模实现，独立测试入口迁到对应主题。本表用于把历史报告中的命令对应到当前工作区；历史结果、冻结包、原始记录与快照保持原内容。
+模型目录保留建模实现，独立测试入口迁到对应主题。本表用于定位历史报告中的命令。已退役的入口指向 Git 中的原文件。历史结果、冻结包、原始记录与快照保持原内容。
 
 | 原路径 | 当前路径 |
 | --- | --- |
@@ -11,7 +11,7 @@
 | `bag_sim/c1_newton.py` | [test/bag_model/c1_newton.py](../test/bag_model/c1_newton.py) |
 | `bag_sim/loose_speed.py` | [test/bag_model/loose_speed.py](../test/bag_model/loose_speed.py) |
 | `bag_sim/render_demo.py` | [test/bag_model/render_demo.py](../test/bag_model/render_demo.py) |
-| `bag_sim/deadline_watch.py` | [test/bag_model/deadline_watch.py](../test/bag_model/deadline_watch.py) |
+| `bag_sim/deadline_watch.py` | F6/F7 批次看守已退役。[迁移后的历史源码](https://github.com/pig27777/randomization/blob/b9ddb6a7294ccb3aefbd5edf26818e3dd042da7f/test/bag_model/deadline_watch.py) |
 | `bag_sim/flex_diagnostics.py` | [test/bag_model/flex_diagnostics.py](../test/bag_model/flex_diagnostics.py) |
 | `contents/segment/run_round1.py` | [test/content_model/run_round1.py](../test/content_model/run_round1.py) |
 | `contents/segment/run_round2.py` | [test/content_model/run_round2.py](../test/content_model/run_round2.py) |

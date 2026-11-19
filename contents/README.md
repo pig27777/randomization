@@ -10,11 +10,12 @@
 | 分段模型 v1 | `segment/model.py`、`segment/bushing.py`、`segment/mj_adapter.py` | [冻结标签](segment/results/freeze_v1_newton/release_v1/v1.json)；历史包保持原样 |
 | 顶面捏取 v1.2 | 分段本体与 `segment/pinch.py` 的历史 weld 规则 | [冻结标签](segment/results/pinch_effect_v1_2/v22_review/release_v1_2/v1.2.json)；复现使用标签旁的归档，当前源码已演进 |
 | 顶面捏取 v1.3 | `segment/pinch.py`，共享分段本体 | [冻结标签](segment/results/pinch_connect_v1_3/release_v1_3/v1.3.json)；connect 连接，当前冻结参考 |
-| 捏取 v1.4 候选 | `segment/pinch_v14.py`、`segment/pinch_v14_reference.json` | 本机候选；参数依据见 [标定方法](pinch_calibration.md)，未冻结 |
 | Warp / MJWarp 后端 | `segment/warp_*`、`segment/mjwarp_backend.py`、`segment/mjwarp_v13.py` | 区分 v1.2 与 v1.3 的规则；接入状态以交接和实验报告为准 |
 | Newton 四面体 | `newton/unified_soft.py`、`newton/newton_soft.py` | 历史建模与代理评估依赖，保留生成器；独立检查在 `test/contact_transfer/` |
 | 旧粒子键模型 | [legacy/particle/](legacy/particle/) | 已停止路线；代码与原结果一起归档 |
 | 早期刚体核心模型 | [legacy/rigid/](legacy/rigid/) | 历史原型；代码与原结果一起归档 |
+
+捏取 v1.4 尚未冻结。连接载荷方向和 R3 保持增益的后续问题见 [I-37 与 I-38](../log/ideas.md)。
 
 同一模型的测量、采样、参数换算和任务适配接口可以随模型维护；独立的 `validate_*`、`benchmark_*`、`analyze_*`、`diagnose_*`、`run_round*` 及单元测试统一在 `test/`。已有版本名和冻结包是版本依据，不复制整套当前源码来制造新版本。
 

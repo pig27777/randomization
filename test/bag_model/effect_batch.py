@@ -10,6 +10,7 @@ import math
 import time
 from dataclasses import replace
 from datetime import datetime
+from pathlib import Path
 
 import mujoco
 import mujoco_warp as mjw
