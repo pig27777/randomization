@@ -41,3 +41,4 @@
 | [仓库原封边装配](bag/rss2027-stage1-randomized-wrap-assets-r1/) | 同一有效内腔在 162、200 节点仓库资产上的装配对照 | `.venv-physical-parcel/bin/python -B <本轮目录>/check_assets.py` | 固定 60% 和 90% 组的 128 次尝试均超初始应变门槛。 |
 | [气泡膜无台面松夹](bag/rss2027-stage1-bubble-free-release-r1/) | 复用 40 g、127 mm 悬停，首个零支撑松夹帧撤离小台面 | 持锁调用本轮 `run.sh` | 台面初位和整合状态复放检查通过。短入口和完整动作排队。 |
 | [整袋力—位移 JSON](bag/rss2027-stage1-reference-curves-r1/stage1_whole_bag_data.json) · [原生触点滑动](bag/rss2027-stage1-reference-curves-r1/contact-paths.json) | 对齐顶部下压、带载提拉和整袋松夹的归档曲线，复核接触处的相对滑动 | `.venv-physical-parcel/bin/python -B` 执行本轮 `export_curves.py`、`contact_paths.py` | 8 条轨迹、5,269 个样本，2,139 个松夹帧复算对齐。数据重复导出一致。 |
+| [高填充率的精确包覆与应变](bag/rss2027-stage1-randomized-volume-projection-r1/) | 保留原参考长度，比较最近表面方向膜面投影与逐步精确包覆门槛 | `.venv-physical-parcel/bin/python -B` 执行 `project_volume.py`，各跑一次默认与 `--keep-enclosed` | 去掉逐步包覆门槛可降低应变但引入穿入，保持包覆时两个 60%、两个 90% 工况仍超应变。 |
