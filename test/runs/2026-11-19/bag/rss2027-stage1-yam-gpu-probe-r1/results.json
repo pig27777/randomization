@@ -1,0 +1,1241 @@
+{
+  "host": "ubun",
+  "mujoco": "4.0.1",
+  "mjwarp": "4.0.1",
+  "warp": "1.19.0",
+  "model_sha256": "962216f11ceff02e0bb2997f1f61b7872388c14e915a0bea28ce330b8126f6de",
+  "trajectory_sha256": "9778a70329f1a88453f7882d357a693f0a0b7a8ebece3dc5cb6f719f7a4d095f",
+  "dimensions": {
+    "nq": 615,
+    "nv": 614,
+    "nu": 7,
+    "film_vertices": 200,
+    "film_triangles": 396
+  },
+  "dt_s": 2.5e-05,
+  "cold_device_mib_sampled_whole_card": 1148,
+  "asset_fingerprint": {
+    "yam_linear_4310.xml": "beb1ccea8eefc3e181a562459fb55626e4beb7ef63eb0ceac55bdf8f24c63434",
+    "LICENSE": "dc46c3a7dc48221aa783e634d15db0f816ba83ba5cdb77bbaa91525c61c7552f",
+    "assets/linear_4310/d405_wrist_linear_4310.stl": "f01bcd92b447c3a44c1ad9345367628d4157fe4c07b545ccbf9bc4ae81115112",
+    "assets/linear_4310/gripper.stl": "d949c401186197d842ca8f9b23bfcbf24bed8461b421df06093c65e4ead21f5d",
+    "assets/linear_4310/tip_left.stl": "03d94f53d7b5e9e1871ea6f3925c68d7a2f894b08e0c575fa0b9ed4024684ff7",
+    "assets/linear_4310/tip_right.stl": "8f620aae9c15e00e2ea4e5bf5e9a49e7edb2d23128b8955cfacc0da8da45c72f",
+    "assets/model2.stl": "5ac61c0313ed00c38655e41681af1b8b307cf8d5ef57209a75f215cea02df754",
+    "assets/model2__10.stl": "b879cc07f547b7a2ac52e428dd206e80a0d4b0e805cb56b9a8230df04a690923",
+    "assets/model2__11.stl": "af220d2a51e8444392aef36e2fe4a6f69aed22bc292a7f38e54da3b4f5253434",
+    "assets/model2__12.stl": "e79614869bd2283f70fafa150ce748d5b6c03377a651448c6fe9893a22f6d1de",
+    "assets/model2__13.stl": "32b62f14f00ea82bfc79b935f7dac32c7cb276a3abc0aae8362cbba3fb1326de",
+    "assets/model2__14.stl": "72d2178789dd5e0358c2caf9dad90b8881e505f4c52a8d6d18c71b5e93e8c84b",
+    "assets/model2__15.stl": "ca8788184d54f30c18482cb9b48dffb010a93dbc029054b6cc515083a740d324",
+    "assets/model2__16.stl": "18bb99691eed524393e8f3a0ff29e79d97ab75689bc92144bbdfafa2cc79d37b",
+    "assets/model2__17.stl": "6513dbd192d2bf3a4f7016231f1ba5eca93916c9ebfdc334e9b435ca1d302ff6",
+    "assets/model2__2.stl": "30dab41f14bae95d737abca3c934eb5d570ab107dff0b40952fbdfb9d07eab79",
+    "assets/model2__3.stl": "9fd96f5ad387fe7dd96eaa65e386637800e2f5637b6167fbad4ecb37d8598f47",
+    "assets/model2__4.stl": "33c0e7ef538e2c4473efa9c4ef2a8441b6094b65090b4dec71abe82001d974df",
+    "assets/model2__5.stl": "09f08e7dead2d6363618471adadb1b94af39e8056676670f3fd21ec06c197b20",
+    "assets/model2__6.stl": "888b5919d10dbfb59b964c3cafc2ddbdac3b5426e20dd13bcaf4baedd5ee15c9",
+    "assets/model2__7.stl": "2d64b18f1e70b0460eb53335d340b7c879976a3093ec67b07bcb7245e371a91d",
+    "assets/model2__8.stl": "db3708da6b14daf3fc9a1909a8325b68f65ff69146cdd20b69a9ddc4ce51f50d",
+    "assets/model2__9.stl": "74969d09b8b7f75cc984c5c7e5526d2941c6724f48b3efa1fa8730cc7820f4f5"
+  },
+  "sources_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "1f9d46b16b5c99d1084251c247b3d61175bf3542eb4fc11eedd13dd16149f324",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "d964502558c31332c560ee9e7318666cb4441d329b26a70d0a1d55399959c867",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "902cb5b007a3547f6841bb6537e792dfe6bba9d0a44dd92a474a39ee2296a99c",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "parcel_model": "1b4d1434abd75ffa4c889d3d456fc1795562b1719e7d2f962787950f8a90c760",
+    "parcel_material": "baf174e77d2e79ee16a869cebcf32b0e8387953f6c8e0ffd4c18724ccd9dcb4c",
+    "parcel_wrap": "ba1df6ed7dddce97e891425022b8f2219c4c3c6220cb6b9d576d6ca879750142",
+    "parcel_geometry_check": "41fc0f7a676c620580fb2d69e142ae05ee5c42d12462d96d1a7ce38230caddb2",
+    "gpu_parcel": "cb6ad13430df304b162e739971c49b00424fb10705fca7f3cddcc006130fa658"
+  },
+  "timing_is_throughput": false,
+  "cases": {
+    "settle": {
+      "archive_time_s": 0.10002499999999306,
+      "archive_frame": 5,
+      "checks": {
+        "finite_ten_steps": true,
+        "zero_overflow": true,
+        "first_hinge_force": true,
+        "last_film_position": true,
+        "last_robot_joints": true
+      },
+      "upload_s": 0.044379305036272854,
+      "device_mib_sampled_after_upload": 1688,
+      "device_mib_sampled_after_steps": 2086,
+      "wall_s": 6.587091935973149,
+      "steps": [
+        {
+          "step": 1,
+          "finite": true,
+          "cpu_time_s": 2.5e-05,
+          "gpu_time_s": 2.499999936844688e-05,
+          "cpu_ncon": 66,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 7,
+          "cpu_solver_iterations": 4,
+          "ctrl": [
+            0.6340364422042265,
+            2.4691668504567366,
+            1.5479146578117107,
+            -0.6392331836328763,
+            -0.0061430117659652195,
+            -0.9367600615465307,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12794540839587232,
+          "gpu_hinge_force_relative_L2_error": 0.00020035918064812593,
+          "film_max_position_diff_m": 4.55502889539499e-08,
+          "robot_max_joint_diff_rad": 8.476984936223175e-08,
+          "gpu_step_with_readback_diagnostic_s": 6.235073129995726
+        },
+        {
+          "step": 2,
+          "finite": true,
+          "cpu_time_s": 5e-05,
+          "gpu_time_s": 4.999999873689376e-05,
+          "cpu_ncon": 67,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 2,
+          "cpu_solver_iterations": 5,
+          "ctrl": [
+            0.6340364422042265,
+            2.4691668504567366,
+            1.5479146578117107,
+            -0.6392331836328763,
+            -0.0061430117659652195,
+            -0.9367600615465307,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12795532160381956,
+          "gpu_hinge_force_relative_L2_error": 0.00018820579303769063,
+          "film_max_position_diff_m": 1.0930805864720039e-07,
+          "robot_max_joint_diff_rad": 8.466679846108605e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.02130329399369657
+        },
+        {
+          "step": 3,
+          "finite": true,
+          "cpu_time_s": 7.500000000000001e-05,
+          "gpu_time_s": 7.499999628635123e-05,
+          "cpu_ncon": 67,
+          "gpu_ncon": 59,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 3,
+          "cpu_solver_iterations": 4,
+          "ctrl": [
+            0.6340364422042294,
+            2.469166850456082,
+            1.547914657812162,
+            -0.6392331836317996,
+            -0.0061430117661710965,
+            -0.9367600615451138,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12796703241678276,
+          "gpu_hinge_force_relative_L2_error": 0.00016175903630169145,
+          "film_max_position_diff_m": 2.1382431355960883e-07,
+          "robot_max_joint_diff_rad": 8.451238642237513e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.025563695991877466
+        },
+        {
+          "step": 4,
+          "finite": true,
+          "cpu_time_s": 0.0001,
+          "gpu_time_s": 9.999999747378752e-05,
+          "cpu_ncon": 67,
+          "gpu_ncon": 59,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 3,
+          "cpu_solver_iterations": 4,
+          "ctrl": [
+            0.6340364422042379,
+            2.469166850454637,
+            1.5479146578131107,
+            -0.6392331836296639,
+            -0.006143011766622905,
+            -0.9367600615422866,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.1279802414206827,
+          "gpu_hinge_force_relative_L2_error": 0.0002628006868184165,
+          "film_max_position_diff_m": 3.477118837276257e-07,
+          "robot_max_joint_diff_rad": 8.430672338022305e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.023962909006513655
+        },
+        {
+          "step": 5,
+          "finite": true,
+          "cpu_time_s": 0.000125,
+          "gpu_time_s": 0.00012499999138526618,
+          "cpu_ncon": 67,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 4,
+          "cpu_solver_iterations": 4,
+          "ctrl": [
+            0.6340364422042521,
+            2.469166850452405,
+            1.5479146578145548,
+            -0.6392331836264709,
+            -0.006143011767317718,
+            -0.936760061538051,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12799465798447135,
+          "gpu_hinge_force_relative_L2_error": 0.000319365437118073,
+          "film_max_position_diff_m": 5.087226447795453e-07,
+          "robot_max_joint_diff_rad": 8.404991813648621e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.030077402014285326
+        },
+        {
+          "step": 6,
+          "finite": true,
+          "cpu_time_s": 0.00015000000000000001,
+          "gpu_time_s": 0.00014999999257270247,
+          "cpu_ncon": 67,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 3,
+          "cpu_solver_iterations": 5,
+          "ctrl": [
+            0.6340364422042718,
+            2.4691668504493887,
+            1.5479146578164937,
+            -0.6392331836222221,
+            -0.0061430117682526745,
+            -0.9367600615324091,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12801000636657042,
+          "gpu_hinge_force_relative_L2_error": 0.00021131843238742415,
+          "film_max_position_diff_m": 6.93244388559871e-07,
+          "robot_max_joint_diff_rad": 8.374207993711025e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.02498303697211668
+        },
+        {
+          "step": 7,
+          "finite": true,
+          "cpu_time_s": 0.00017500000000000003,
+          "gpu_time_s": 0.00017499999376013875,
+          "cpu_ncon": 67,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 6,
+          "cpu_solver_iterations": 5,
+          "ctrl": [
+            0.6340364422042968,
+            2.4691668504455913,
+            1.5479146578189258,
+            -0.6392331836169195,
+            -0.006143011769424838,
+            -0.9367600615253626,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12802603123208622,
+          "gpu_hinge_force_relative_L2_error": 0.00020941993629488076,
+          "film_max_position_diff_m": 8.981977067045659e-07,
+          "robot_max_joint_diff_rad": 8.338331758395157e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.04008435504510999
+        },
+        {
+          "step": 8,
+          "finite": true,
+          "cpu_time_s": 0.00020000000000000004,
+          "gpu_time_s": 0.00019999999494757503,
+          "cpu_ncon": 67,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 3,
+          "cpu_solver_iterations": 5,
+          "ctrl": [
+            0.634036442204327,
+            2.469166850441015,
+            1.5479146578218497,
+            -0.6392331836105645,
+            -0.006143011770831387,
+            -0.9367600615169138,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12804250118035307,
+          "gpu_hinge_force_relative_L2_error": 0.00037059599270088925,
+          "film_max_position_diff_m": 1.1212901447379362e-06,
+          "robot_max_joint_diff_rad": 8.297373987886658e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.024953459040261805
+        },
+        {
+          "step": 9,
+          "finite": true,
+          "cpu_time_s": 0.00022500000000000005,
+          "gpu_time_s": 0.00022499999613501132,
+          "cpu_ncon": 67,
+          "gpu_ncon": 60,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 7,
+          "cpu_solver_iterations": 4,
+          "ctrl": [
+            0.6340364422043624,
+            2.469166850435663,
+            1.547914657825264,
+            -0.6392331836031586,
+            -0.006143011772469488,
+            -0.9367600615070644,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12805921204596857,
+          "gpu_hinge_force_relative_L2_error": 0.00031463924004504614,
+          "film_max_position_diff_m": 1.3592712624441042e-06,
+          "robot_max_joint_diff_rad": 8.251345473553329e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.0450000919518061
+        },
+        {
+          "step": 10,
+          "finite": true,
+          "cpu_time_s": 0.00025000000000000006,
+          "gpu_time_s": 0.00024999998277053237,
+          "cpu_ncon": 67,
+          "gpu_ncon": 59,
+          "gpu_active_finger_flex_contacts": [
+            0,
+            0
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 11,
+          "cpu_solver_iterations": 3,
+          "ctrl": [
+            0.6340364422044028,
+            2.4691668504295388,
+            1.5479146578291676,
+            -0.6392331835947038,
+            -0.006143011774336345,
+            -0.9367600614958165,
+            0.02710274912890717
+          ],
+          "cpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.0,
+            0.0
+          ],
+          "cpu_hinge_force_L2_N": 0.12807598884302746,
+          "gpu_hinge_force_relative_L2_error": 0.0003947201909340584,
+          "film_max_position_diff_m": 1.6094756677937897e-06,
+          "robot_max_joint_diff_rad": 8.200257051171889e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.06406202097423375
+        }
+      ]
+    },
+    "close": {
+      "archive_time_s": 2.740024999996949,
+      "archive_frame": 137,
+      "checks": {
+        "finite_ten_steps": true,
+        "zero_overflow": true,
+        "first_hinge_force": true,
+        "last_film_position": true,
+        "last_robot_joints": true,
+        "first_two_finger_forces": true
+      },
+      "upload_s": 0.04105548397637904,
+      "device_mib_sampled_after_upload": 2086,
+      "device_mib_sampled_after_steps": 2086,
+      "wall_s": 0.7231477359891869,
+      "steps": [
+        {
+          "step": 1,
+          "finite": true,
+          "cpu_time_s": 2.5e-05,
+          "gpu_time_s": 2.499999936844688e-05,
+          "cpu_ncon": 103,
+          "gpu_ncon": 94,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 9,
+          "cpu_solver_iterations": 18,
+          "ctrl": [
+            0.6362398752379348,
+            2.7266432884569283,
+            1.6191930969387993,
+            -0.4534320615185171,
+            -0.006170184190715073,
+            -0.9345574304046323,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.1249171572462553,
+              0.10907538119211548,
+              2.173800638406137
+            ],
+            [
+              -0.014468146054349804,
+              0.13778906501499075,
+              0.17277092135574285
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.06996195018291473,
+              -0.0421026274561882,
+              1.6744253635406494
+            ],
+            [
+              -0.0026909182779490948,
+              0.05894029140472412,
+              0.0807066261768341
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.5246432409068302,
+            0.12178533015404418
+          ],
+          "cpu_hinge_force_L2_N": 0.1588007133758679,
+          "gpu_hinge_force_relative_L2_error": 5.650198437655585e-05,
+          "film_max_position_diff_m": 3.399061049261319e-08,
+          "robot_max_joint_diff_rad": 8.003679985435497e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.05685151496436447
+        },
+        {
+          "step": 2,
+          "finite": true,
+          "cpu_time_s": 5e-05,
+          "gpu_time_s": 4.999999873689376e-05,
+          "cpu_ncon": 103,
+          "gpu_ncon": 94,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 7,
+          "cpu_solver_iterations": 5,
+          "ctrl": [
+            0.6362398752379348,
+            2.7266432884569283,
+            1.6191930969387993,
+            -0.4534320615185171,
+            -0.006170184190715073,
+            -0.9345574304046323,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.12261189803970303,
+              0.11950075633209108,
+              2.175147058571058
+            ],
+            [
+              -0.014242524211465778,
+              0.13811441346915393,
+              0.17311666012581015
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.07222439348697662,
+              -0.039933428168296814,
+              1.6717665195465088
+            ],
+            [
+              -0.003318366128951311,
+              0.05803602561354637,
+              0.07922102510929108
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.5304244780088874,
+            0.12388815805604765
+          ],
+          "cpu_hinge_force_L2_N": 0.15880107203494315,
+          "gpu_hinge_force_relative_L2_error": 8.008951701035632e-05,
+          "film_max_position_diff_m": 9.260072668366222e-08,
+          "robot_max_joint_diff_rad": 7.816569347340874e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.04527070501353592
+        },
+        {
+          "step": 3,
+          "finite": true,
+          "cpu_time_s": 7.500000000000001e-05,
+          "gpu_time_s": 7.499999628635123e-05,
+          "cpu_ncon": 105,
+          "gpu_ncon": 97,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 6,
+          "cpu_solver_iterations": 7,
+          "ctrl": [
+            0.6362398752402638,
+            2.726643288155357,
+            1.6191930969741706,
+            -0.45343206161798344,
+            -0.00617018421670695,
+            -0.9345574304914672,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.12670692351392407,
+              0.12289517788862488,
+              2.16962870382104
+            ],
+            [
+              -0.014867050052519882,
+              0.13788280200203698,
+              0.17290937099772016
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.07501828670501709,
+              -0.03920505940914154,
+              1.6702936887741089
+            ],
+            [
+              -0.004110734909772873,
+              0.05722413957118988,
+              0.07832616567611694
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.5275259797953786,
+            0.12476979149414327
+          ],
+          "cpu_hinge_force_L2_N": 0.1588015190893638,
+          "gpu_hinge_force_relative_L2_error": 0.00013652089750742756,
+          "film_max_position_diff_m": 1.8177233017406768e-07,
+          "robot_max_joint_diff_rad": 9.347365859113665e-08,
+          "gpu_step_with_readback_diagnostic_s": 0.042799438000656664
+        },
+        {
+          "step": 4,
+          "finite": true,
+          "cpu_time_s": 0.0001,
+          "gpu_time_s": 9.999999747378752e-05,
+          "cpu_ncon": 105,
+          "gpu_ncon": 95,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 6,
+          "cpu_solver_iterations": 8,
+          "ctrl": [
+            0.6362398752471898,
+            2.726643287252617,
+            1.6191930970870905,
+            -0.4534320618623149,
+            -0.006170184299561768,
+            -0.9345574306780252,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.12854682739879975,
+              0.1180551230349328,
+              2.128284754608513
+            ],
+            [
+              -0.014617979117024425,
+              0.13531645636221656,
+              0.1696543126172218
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.07849102467298508,
+              -0.03720826655626297,
+              1.6644675731658936
+            ],
+            [
+              -0.005301271099597216,
+              0.05609554052352905,
+              0.07702537626028061
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.49166928044697766,
+            0.12224105040951122
+          ],
+          "cpu_hinge_force_L2_N": 0.15880205034952635,
+          "gpu_hinge_force_relative_L2_error": 0.0002068335593393364,
+          "film_max_position_diff_m": 2.9867571539968774e-07,
+          "robot_max_joint_diff_rad": 1.24288607850076e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.042647371999919415
+        },
+        {
+          "step": 5,
+          "finite": true,
+          "cpu_time_s": 0.000125,
+          "gpu_time_s": 0.00012499999138526618,
+          "cpu_ncon": 105,
+          "gpu_ncon": 95,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 12,
+          "cpu_solver_iterations": 7,
+          "ctrl": [
+            0.6362398752586564,
+            2.726643285763129,
+            1.6191930972748076,
+            -0.45343206224948124,
+            -0.006170184437749662,
+            -0.9345574309630608,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.13853934092988385,
+              0.11467001930682992,
+              2.1162848172026463
+            ],
+            [
+              -0.016020656020326065,
+              0.13449121070116213,
+              0.1688574143138086
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.07768239080905914,
+              -0.031970903277397156,
+              1.6570833921432495
+            ],
+            [
+              -0.03259751573204994,
+              0.08219193667173386,
+              0.11870691180229187
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.48587351989066313,
+            0.07433087678794763
+          ],
+          "cpu_hinge_force_L2_N": 0.15880266237602458,
+          "gpu_hinge_force_relative_L2_error": 0.00020786977056547957,
+          "film_max_position_diff_m": 4.158883889372028e-07,
+          "robot_max_joint_diff_rad": 1.626910075547272e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.07246774504892528
+        },
+        {
+          "step": 6,
+          "finite": true,
+          "cpu_time_s": 0.00015000000000000001,
+          "gpu_time_s": 0.00014999999257270247,
+          "cpu_ncon": 105,
+          "gpu_ncon": 95,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 13,
+          "cpu_solver_iterations": 6,
+          "ctrl": [
+            0.6362398752745843,
+            2.726643283703349,
+            1.6191930975353181,
+            -0.4534320627763104,
+            -0.006170184629710342,
+            -0.9345574313451932,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.14527442946016858,
+              0.11263585061939221,
+              2.1034424290773
+            ],
+            [
+              -0.01706342751518891,
+              0.1336055103143263,
+              0.16794013007393838
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.02820727974176407,
+              -0.05855029076337814,
+              1.084264874458313
+            ],
+            [
+              -0.03802452236413956,
+              0.09066813439130783,
+              0.132984921336174
+            ]
+          ],
+          "finger_force_diff_N": [
+            1.0400636040088374,
+            0.059201793607305424
+          ],
+          "cpu_hinge_force_L2_N": 0.15880334952151107,
+          "gpu_hinge_force_relative_L2_error": 0.00022742564593460467,
+          "film_max_position_diff_m": 5.334463476312879e-07,
+          "robot_max_joint_diff_rad": 2.0863707517193575e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.07552858901908621
+        },
+        {
+          "step": 7,
+          "finite": true,
+          "cpu_time_s": 0.00017500000000000003,
+          "gpu_time_s": 0.00017499999376013875,
+          "cpu_ncon": 105,
+          "gpu_ncon": 95,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 12,
+          "cpu_solver_iterations": 7,
+          "ctrl": [
+            0.6362398752949878,
+            2.726643281086666,
+            1.6191930978658027,
+            -0.4534320634410843,
+            -0.006170184874109695,
+            -0.9345574318231498,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.14677227190707356,
+              0.11907257199289166,
+              2.1000666763776903
+            ],
+            [
+              -0.01749113465976613,
+              0.1333442985317173,
+              0.16768298644724805
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.030481766909360886,
+              -0.05671998858451843,
+              1.0757511854171753
+            ],
+            [
+              -0.010865836404263973,
+              0.06736160814762115,
+              0.08486123383045197
+            ]
+          ],
+          "finger_force_diff_N": [
+            1.0457766161703304,
+            0.10609925878070792
+          ],
+          "cpu_hinge_force_L2_N": 0.15880410672048803,
+          "gpu_hinge_force_relative_L2_error": 0.00031988738250446206,
+          "film_max_position_diff_m": 6.436056942530862e-07,
+          "robot_max_joint_diff_rad": 2.620847718848296e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.07044591900194064
+        },
+        {
+          "step": 8,
+          "finite": true,
+          "cpu_time_s": 0.00020000000000000004,
+          "gpu_time_s": 0.00019999999494757503,
+          "cpu_ncon": 105,
+          "gpu_ncon": 97,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 13,
+          "cpu_solver_iterations": 7,
+          "ctrl": [
+            0.6362398753198186,
+            2.726643277925917,
+            1.61919309826412,
+            -0.4534320642417259,
+            -0.006170185169714782,
+            -0.9345574323957989,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.1438601740383908,
+              0.1313988183563542,
+              2.1056756591483015
+            ],
+            [
+              -0.01745493805900503,
+              0.1336771902957694,
+              0.16807031814194384
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.08596885949373245,
+              -0.033476706594228745,
+              1.657344102859497
+            ],
+            [
+              -0.010560004971921444,
+              0.06432205438613892,
+              0.08101239055395126
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.4811824263122878,
+            0.1115202122273574
+          ],
+          "cpu_hinge_force_L2_N": 0.1588049286143507,
+          "gpu_hinge_force_relative_L2_error": 0.00037654951961892173,
+          "film_max_position_diff_m": 7.460373840029286e-07,
+          "robot_max_joint_diff_rad": 2.0378574472346145e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.0771353270392865
+        },
+        {
+          "step": 9,
+          "finite": true,
+          "cpu_time_s": 0.00022500000000000005,
+          "gpu_time_s": 0.00022499999613501132,
+          "cpu_ncon": 105,
+          "gpu_ncon": 97,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 14,
+          "cpu_solver_iterations": 5,
+          "ctrl": [
+            0.6362398753489654,
+            2.7266432742352786,
+            1.6191930987270347,
+            -0.45343206517666834,
+            -0.006170185514922813,
+            -0.9345574330621462,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.14974081220783206,
+              0.1322437130165963,
+              2.099769644635881
+            ],
+            [
+              -0.018542250267739445,
+              0.13300912399261255,
+              0.1674551712296803
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.07725700736045837,
+              -0.04549110680818558,
+              1.5648118257522583
+            ],
+            [
+              -0.039627522230148315,
+              0.08835189044475555,
+              0.1265101581811905
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.5683515075444268,
+            0.06415100385354534
+          ],
+          "cpu_hinge_force_L2_N": 0.15880580950397358,
+          "gpu_hinge_force_relative_L2_error": 0.00032386975270768623,
+          "film_max_position_diff_m": 8.461748636400638e-07,
+          "robot_max_joint_diff_rad": 1.5290796206990365e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.08192487602354959
+        },
+        {
+          "step": 10,
+          "finite": true,
+          "cpu_time_s": 0.00025000000000000006,
+          "gpu_time_s": 0.00024999998277053237,
+          "cpu_ncon": 105,
+          "gpu_ncon": 96,
+          "gpu_active_finger_flex_contacts": [
+            4,
+            6
+          ],
+          "gpu_overflow": 0,
+          "gpu_solver_iterations": 15,
+          "cpu_solver_iterations": 6,
+          "ctrl": [
+            0.6362398753823001,
+            2.726643270026497,
+            1.6191930992516324,
+            -0.4534320662447535,
+            -0.006170185908276941,
+            -0.9345574338213298,
+            0.01603413566377652
+          ],
+          "cpu_finger_force_N": [
+            [
+              -0.15266868591202357,
+              0.13268558038919673,
+              2.095695513535037
+            ],
+            [
+              -0.01939632418930001,
+              0.1323033861532889,
+              0.1667563964253093
+            ]
+          ],
+          "gpu_finger_force_N": [
+            [
+              -0.07952132821083069,
+              -0.04556355997920036,
+              1.5554757118225098
+            ],
+            [
+              -0.040721163153648376,
+              0.08752067387104034,
+              0.12538807094097137
+            ]
+          ],
+          "finger_force_diff_N": [
+            0.5735509795502584,
+            0.06458775758290551
+          ],
+          "cpu_hinge_force_L2_N": 0.15880674340446485,
+          "gpu_hinge_force_relative_L2_error": 0.000355813816824047,
+          "film_max_position_diff_m": 9.462003506023956e-07,
+          "robot_max_joint_diff_rad": 1.0941354222637756e-07,
+          "gpu_step_with_readback_diagnostic_s": 0.08664267201675102
+        }
+      ]
+    }
+  }
+}

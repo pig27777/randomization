@@ -613,3 +613,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 确定最外缘封口双膜片作为后续建模基础，三类袋型为纸袋、塑料薄膜袋、气泡信封袋，内容物和袋参数可随机化。
 - README首节记录模型入口与当前物理限制，本轮仅更新与检查文档。
 - [基线入口](../bag_sim/README.md) · [主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [任务检查](../reports/physical-parcel-yam-video-test.md)。
+
+### 2026-11-19 RSS 2027 Stage 1 首轮
+
+- 128 个随机几何样本覆盖 30%–90% 填充率；60% 切片的一侧余料上界约 0.035–69.9 mm。
+- PE 预褶拉力峰值约 0.061 N，零指垫摩擦对照为零。平膜聚拢与材料族参数包络仍待验证。
+- 现有 YAM 侧夹整袋轨迹的同一膜边从 5.7° 弯至 107.3°。完整 200 节点 YAM 已在 RTX 5090 跑通短步进，闭环与接触力一致性仍待测。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)

@@ -1,0 +1,6 @@
+# 2026-11-19 运行索引
+
+| 运行 | 对象与问题 | 机器和命令 | 状态与证据 |
+| --- | --- | --- | --- |
+| [rss2027-stage1-r1](bag/rss2027-stage1-r1/) | PE 60 mm 试片、随机整袋几何、142 节点封口袋和 200 节点 YAM 入口。检查原生接触、聚拢、预褶承载，并回放整袋折痕 | ubun。正式动力学以 `flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B` 启动，用 `test/bag_model/rub_contact_e1.py`、`rss2027_micropatch.py`、`rss2027_geometry.py`。录像复用 `render_rss2027_fold_video.py` | E1、随机几何与预褶对照通过，四材料包络仍待验证。见[主题报告](../../bag_model/RSS2027_STAGE1_REPORT.md)和[测试报告](../../../reports/rss2027-stage1-test.md)。 |
+| [rss2027-stage1-yam-gpu-probe-r1](bag/rss2027-stage1-yam-gpu-probe-r1/) | 完整 YAM 与 200 节点双膜片包裹，检查静置和合指的 GPU 短步进 | ubun，RTX 5090。 `flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/runs/2026-11-19/bag/rss2027-stage1-yam-gpu-probe-r1/probe.py` | 入口通过，接触力存在差异。见[测试报告](../../../reports/rss2027-stage1-yam-gpu-probe-test.md)和[逐步数据](bag/rss2027-stage1-yam-gpu-probe-r1/results.json)。 |

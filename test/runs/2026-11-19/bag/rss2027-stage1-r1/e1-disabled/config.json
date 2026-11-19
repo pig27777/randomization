@@ -1,0 +1,98 @@
+{
+  "parcel": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.35,
+      0.25
+    ],
+    "payload_size": [
+      0.12,
+      0.08,
+      0.03
+    ],
+    "payload_mass": 0.3,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "mode": "rigid",
+    "areal_mass": 0.12,
+    "membrane": 1000.0,
+    "poisson": 0.3,
+    "bending": 2.0604395604395607e-06,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.1,
+    "material_thickness": 0.00015,
+    "rayleigh": 0.0001,
+    "radius": 0.0005,
+    "friction": 0.45,
+    "joint_stiffness": 0.08,
+    "joint_damping": 0.003,
+    "compression_k1": 800.0,
+    "compression_k2": 20000.0,
+    "compression_damping": 1.0,
+    "timestep": 2.5e-05,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      0.0,
+      0.0
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere"
+  },
+  "enabled": false,
+  "core": "mesh",
+  "timestep_s": 2.5e-05,
+  "phases": [
+    [
+      "hover",
+      0.005
+    ],
+    [
+      "descend",
+      0.15
+    ],
+    [
+      "hold",
+      0.03
+    ],
+    [
+      "retract",
+      0.15
+    ],
+    [
+      "separated",
+      0.01
+    ]
+  ],
+  "target_triangle": 63,
+  "target_m": [
+    0.011691142859135037,
+    -0.0059325250412589564,
+    0.03313444588158126
+  ],
+  "start_z_m": 0.05563444588158126,
+  "press_z_m": 0.052634445881581254,
+  "tip_geom_ids": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "artificial_attachments": 0,
+  "nsensor": 0,
+  "sample_time": "contact/poses evaluated at t_eval; integration ends at t_eval+dt"
+}

@@ -79,6 +79,20 @@ def tool_contacts(p, group):
     return force, records
 
 
+def film_constraint_reaction(parcel, records):
+    """Recover the tip reaction from the native constraint Jacobian on film DOFs."""
+    m, d = parcel.m, parcel.d
+    selected = np.zeros(d.nefc)
+    for contact in records:
+        start = contact["efc_address"]
+        if start >= 0:
+            stop = start + contact["dim"]  # Elliptic cone in the parcel model.
+            selected[start:stop] = d.efc_force[start:stop]
+    generalized = np.zeros(m.nv)
+    mujoco.mj_mulJacTVec(m, d, generalized, selected)
+    return -generalized[parcel.film_dofs].sum(axis=0)
+
+
 def run(output, geometry, enabled=True, core="mesh", smoke=False):
     output.mkdir(parents=True, exist_ok=False)
     started = time.perf_counter()
@@ -125,7 +139,7 @@ def run(output, geometry, enabled=True, core="mesh", smoke=False):
     rows,states,times = [],[],[]
     step_id = 0
     peaks = dict(force_z_N=0., tangential_N=0., candidates=0, active=0,
-                 tool_penetration_m=0., all_penetration_m=0., body_mapping_error_N=0., shared_mapping_error_N=0.)
+                 tool_penetration_m=0., all_penetration_m=0., constraint_mapping_error_N=0., shared_mapping_error_N=0.)
     stage_stats = {}
     with (output/"contacts.jsonl").open("w") as contacts_file:
         for phase, duration in phases:
@@ -159,11 +173,11 @@ def run(output, geometry, enabled=True, core="mesh", smoke=False):
                     active_count=active, force_on_tip_N=force, contacts=records),
                     default=lambda x: x.tolist() if isinstance(x,np.ndarray) else x.item())+"\n")
                 if sampled:
-                    mujoco.mj_rnePostConstraint(m,d)
-                    body_force = d.cfrc_ext[tipbody,3:].copy()
+                    # MuJoCo 4.0.1's cfrc_ext omits contacts involving a flex.
+                    constraint_force = film_constraint_reaction(p, records)
                     shared = measure_contacts(robot,target_flexes={0})
                     shared_force = np.asarray(shared["force_on_fingers_N"])[0]
-                    peaks["body_mapping_error_N"] = max(peaks["body_mapping_error_N"],float(np.linalg.norm(force-body_force)))
+                    peaks["constraint_mapping_error_N"] = max(peaks["constraint_mapping_error_N"],float(np.linalg.norm(force-constraint_force)))
                     peaks["shared_mapping_error_N"] = max(peaks["shared_mapping_error_N"],float(np.linalg.norm(force-shared_force)))
                     niter = int(np.max(d.solver_niter))
                     solver = d.solver
@@ -171,7 +185,7 @@ def run(output, geometry, enabled=True, core="mesh", smoke=False):
                     rows.append(dict(t_eval=t_eval,phase=phase,tip_pos_m=d.xpos[tipbody].copy(),
                         commanded_tip_pos_m=d.mocap_pos[mocap].copy(), velocity_z_m_s=(0. if phase in ("hover","hold","separated") else -.02 if phase=="descend" else .02),
                         candidate_count=len(records),active_count=active,force_on_tip_N=force,
-                        body_force_N=body_force,shared_force_N=shared_force,
+                        constraint_force_N=constraint_force,shared_force_N=shared_force,
                         shared_grip_N=shared["grip_each_N"],tool_penetration_m=pen,
                         max_node_displacement_m=float(np.linalg.norm(d.flexvert_xpos-reference,axis=1).max()),
                         solver_niter=niter,solver_last_gradient=gradient,warnings=d.warning.number.copy()))
@@ -185,7 +199,7 @@ def run(output, geometry, enabled=True, core="mesh", smoke=False):
     checks = dict(finite=bool(np.isfinite(d.qpos).all() and np.isfinite(d.qvel).all()),
         no_warning=bool(d.warning.number.sum()==0),no_attachment=m.neq==0,
         hover_clear=stage_stats["hover"]["candidate_steps"]==0,
-        body_mapping=peaks["body_mapping_error_N"]<1e-6,
+        constraint_mapping=peaks["constraint_mapping_error_N"]<1e-6,
         shared_mapping=peaks["shared_mapping_error_N"]<1e-6,
         penetration_budget=peaks["all_penetration_m"]<=.001)
     if not smoke:
