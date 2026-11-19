@@ -10,7 +10,7 @@
 - 内容物支持刚体、三段可弯曲体和可压缩体，袋与内容物的尺寸、质量和材料参数可随机化。
 - 载荷通过原生接触传递，盒体使用同形凸网格接触。抓取与录像接入 [`experience/`](../experience/README.md) 统一平台。
 
-材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。Stage 1 整袋侧抓通过了同参 PE 的 25 μs 离台悬停，以及牛皮纸和纸板的 100 μs 离台悬停，三组最大原生穿透均在 1 mm 内。气泡膜在所测条件下已夹入并建立拉力，离台悬停待验证。[Stage 1 报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [袋模型报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
+材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。Stage 1 整袋侧抓有四类悬停工况通过原 1 mm 穿透门槛。同参 PE 用 25 μs，牛皮纸和纸板用 100 μs，气泡膜用 40 g 内容物与 200 μs 进行短程悬停。气泡膜包裹在松夹中重新接触台面。[Stage 1 报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [袋模型报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
 
 2026-11-19新增近满面薄层示例：袋350×250 mm、内容物330×230×6 mm、200 g；初始化修复共享封边邻面的包盒投影，参考拓扑与常规初态保持。顶抓未抓起；侧抓提起约176 mm但落位及穿透预算未通过。[实际视频与检查](../reports/folded-clothes-grasp-test.md)。
 

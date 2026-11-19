@@ -35,7 +35,7 @@ def refine_axis(axis, half_extent, levels):
 
 
 def coupon_grid(cells, slack, prefold, radius, *, prefold_width=None, flat_waist=False,
-                refine_contact=False, refine_levels=1):
+                refine_contact=False, refine_levels=1, refine_aperture=False):
     """Keep the initial x-edge lengths exactly equal to the flat reference."""
     axis = np.linspace(-SIDE / 2, SIDE / 2, cells + 1)
     width = (prefold_width or 2 * SIDE / cells) if prefold else SIDE / 2
@@ -49,6 +49,9 @@ def coupon_grid(cells, slack, prefold, radius, *, prefold_width=None, flat_waist
         x_axis = refine_axis(x_axis, OPEN_HALF + .004, refine_levels)
     if refine_contact in (True, "y", "both"):
         y_axis = refine_axis(y_axis, .010, refine_levels)
+    if refine_aperture:
+        x_axis = refine_axis(x_axis, OPEN_HALF - PAD_HALF_THICKNESS, 1)
+        y_axis = refine_axis(y_axis, .010, 1)
     x, y = np.meshgrid(x_axis, y_axis)
     length = np.diff(x_axis)
     mid = (x_axis[:-1] + x_axis[1:]) / 2
@@ -91,7 +94,7 @@ def build(args):
     ref, current, faces, edges = coupon_grid(
         args.cells, args.slack, args.prefold, radius, prefold_width=args.prefold_width,
         flat_waist=args.match_whole_bag_pe and not args.prefold, refine_contact=args.refine_contact,
-        refine_levels=args.refine_levels)
+        refine_levels=args.refine_levels, refine_aperture=args.refine_aperture)
     ref[:, 0] += args.coupon_offset_x
     current[:, 0] += args.coupon_offset_x
     model = ET.fromstring(f"""
@@ -255,6 +258,7 @@ def run(args):
                    for axis in ("x", "y")]
     shape = dict(vertices=len(ref), triangles=len(faces), nominal_local_pitch_m=min(local_pitch),
                  nominal_local_pitch_xy_m=local_pitch,
+                 aperture_pitch_m=min(local_pitch) / (2 if args.refine_aperture else 1),
                  reference_span_m=float(reference_lengths.sum()), projected_span_m=float(np.ptp(initial[row, 0])),
                  central_rise_m=float(initial[row[len(row) // 2], 2] - initial[row[0], 2]),
                  prefold_width_m=(args.prefold_width or 2 * SIDE / args.cells) if args.prefold else None)
@@ -281,6 +285,8 @@ def run(args):
     minimum_pad_height = z - PAD_BOTTOM
     sample_steps = max(1, round(.001 / args.dt))
     for phase, duration in phases[:1] if args.smoke else phases:
+        if args.refine_aperture:
+            print(json.dumps(dict(phase=phase, time_s=float(d.time), wall_s=time.perf_counter() - started)), flush=True)
         nsteps = 2 if args.smoke else round(duration / args.dt)
         for step in range(nsteps):
             pull_rate = 0.
@@ -444,6 +450,7 @@ def main():
     parser.add_argument("--refine-contact", nargs="?", const="both", choices=("x", "y", "both"),
                         help="halve mesh spacing locally around the pads on the selected axes")
     parser.add_argument("--refine-levels", type=int, default=1, help="number of local halvings")
+    parser.add_argument("--refine-aperture", action="store_true", help="halve spacing again inside the open aperture")
     parser.add_argument("--match-whole-bag-pe", action="store_true", help="use the YAM empty-bag PE material and contact skin")
     parser.add_argument("--pull-seconds", type=float, default=.5)
     parser.add_argument("--pull-speed", type=float, default=PULL_SPEED, help="vertical pull speed, in metres per second")
@@ -460,6 +467,8 @@ def main():
         parser.error("cells must be a multiple of four")
     if args.refine_levels < 1 or (args.refine_levels > 1 and args.refine_contact is None):
         parser.error("additional refinement levels require selected contact axes")
+    if args.refine_aperture and (args.refine_contact != "both" or args.prefold or not args.match_whole_bag_pe):
+        parser.error("aperture refinement needs matched flat PE and refinement along both axes")
     if not 0 <= args.slack < SIDE / 2 or not 0 < args.dt <= .001:
         parser.error("slack must be in [0, .03) m and dt in (0, .001] s")
     if not abs(args.coupon_offset_x) < SIDE / 2 - OPEN_HALF - PAD_HALF_THICKNESS:
