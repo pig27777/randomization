@@ -696,3 +696,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 原生网格面法向与 GJK/EPA 深度不一致。隔离版保留原法向后，CPU/Warp 同态角差低于 0.004°。完整闭环已启动。
 - 4 mm 余料细网格无正拉力，2.5 mm 档捕获边界未重现。名义 8 mm 复测排队。
 - 纸板膜接触时间 0.25 ms 使峰值降至 1.242 mm，仍超限。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-20 Stage 1 首个 GPU 整袋算力回合
+
+- 隔离 Warp 修正通过 142 节点居中整袋 YAM 闭环。4.76965 s 模拟／539.12 s 墙钟，RTX 5090 采样显存峰值 966 MiB。
+- 原生穿透 0.469 mm，无外露及实体相交；悬停全部 10 帧离台、两指最低闭合轴反力 3.30 N。
+- 约 30% 填充布局复测、PE 受控拉力和纸板上缘进给已排队。[算力验收](../test/runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-r1/benchmark.json) · [褶皱录像](../test/runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-r1/yam-warp-fold.mp4) · [任务检查](../reports/rss2027-stage1-test.md)。

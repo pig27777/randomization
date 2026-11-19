@@ -275,7 +275,7 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
 
 首轮在用户要求停止后交付报告，随后追加YAM录像。几何复核发现旧初态和受压膜面穿透，已修正三角面初始化、MuJoCo4反力刷新，并将内容物接触改为同形八顶点凸mesh。11项回归和0.3秒静置通过。YAM真实运行到4.46855秒lift阶段，双侧指尖接触丢失而grasp_fail，224次20 ms采样中内容物—膜面相交为0。整体物理验收尚未通过。
 
-旧构型与box路径的GPU最大已测8192环境、9032.73环境步/s，9216 Graph创建OOM，每轮仅1.25 ms仿真；当前凸mesh版本的速度与容量尚未重测。[主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) · [首轮检查](../reports/physical-parcel-test.md) · [录像与穿透修复检查](../reports/physical-parcel-yam-video-test.md)。
+旧构型与 box 路径的 GPU 最大已测 8192 环境、9032.73 环境步/s，9216 环境建图耗尽显存，每轮 1.25 ms 仿真。当前 142 节点凸网格整袋在隔离 Warp 法向修复版上通过单环境 YAM 在线抓取，4.76965 s 仿真、539.12 s 墙钟，采样显存峰值 966 MiB。该凸网格模型的完整动作批量容量待测。[整袋单环境算力验收](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [历史容量与主题结果](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
 
 ### 最外缘封口袋（2026-11-16）
 

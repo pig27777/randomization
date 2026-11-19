@@ -18,4 +18,7 @@
 | [8 mm 细网格捕获](bag/rss2027-stage1-pe-nominal-capture-fine-r1/) | PE 平坦余料，1.25 mm 网格，0.5 N，验证名义正例 | 持锁执行本轮 `run.sh` | 排队。 |
 | [三种内容物布局的夹口材料](bag/rss2027-stage1-content-aperture-r1/) | 居中、横移 15 mm、紧凑约 30% 的 CPU 整袋夹口复核 | `rss2027_yam_capture_audit.py <trial> <output>`，各回放一次 | 起抬等效膜长 8.066/8.363/9.394 mm，紧凑布局悬停仍缺同帧双侧内触点。 |
 | [同态凸碰撞容差](bag/rss2027-stage1-ccd-parity-r1/) | 原 CPU 和 Warp 接触法向差异的容差敏感性 | 持锁执行本轮 `run_cases.sh`，再用 `check_normal_depth.py` | 0.1/1 μm 容差下，关键法向仍相差约 89°，设备原生法向与深度的投影不一致。 |
-| [隔离 Warp 法向修复](bag/rss2027-stage1-warp-film-normal-r1/) | 保留产生深度的 GJK/EPA 法向，原同态对照与完整在线居中侧抓 | 用 `create_overlay.py` 生成隔离版本，持锁执行 `run_parity.sh` 和条件 `run_trial.sh` | 同态门槛通过，法向差不超过 0.004°；原居中完整回合进行中。 |
+| [隔离 Warp 法向修复](bag/rss2027-stage1-warp-film-normal-r1/) | 保留产生深度的 GJK/EPA 法向，原同态对照与完整在线居中侧抓 | 用 `create_overlay.py` 生成隔离版本，持锁执行 `run_parity.sh` 和条件 `run_trial.sh`，再执行 `analyze_trial.py` | 整袋完成 4.76965 s，墙钟 539.12 s，显存峰值 966 MiB，穿透 0.469 mm。[褶皱录像](bag/rss2027-stage1-warp-film-normal-r1/yam-warp-fold.mp4)。 |
+| [约 30% 布局的隔离版](bag/rss2027-stage1-warp-film-normal-30pct-r1/) | 同修正的另一内容物布局对照 | 持锁执行本轮 `run.sh` | 排队。 |
+| [纸板上缘进给](bag/rss2027-stage1-whole-bag-materials-r4/) | 只将纸板接近目标升高 16 mm | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 及 `run.sh paperboard <本轮目录>` | 排队。 |
+| [PE 受控拉力](bag/rss2027-stage1-pe-force-pull-r1/) | 同参 PE 0.30 N 拉力反馈、6.5 N 夹力 | 持锁执行本轮 `run.sh` | 排队。 |

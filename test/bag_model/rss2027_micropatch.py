@@ -237,6 +237,7 @@ def run(args):
     phases = (("gather", gather_seconds), ("hold", .06)) if args.prefold else PHASES[:-1]
     phases = (*phases, ("pull", args.pull_seconds))
     controlled_gather = args.gather_seconds is not None
+    controlled_pull = args.pull_force_target is not None
     if controlled_gather:
         phases = tuple((phase, args.gather_seconds if phase == "gather" else duration)
                        for phase, duration in phases)
@@ -268,11 +269,13 @@ def run(args):
     press_filtered_N = gather_band_s = peak_gather_band_s = 0.
     gather_pressure_window = None
     grip_filtered_N = grip_band_s = peak_grip_band_s = 0.
+    pull_filtered_N = pull_band_s = peak_pull_band_s = 0.
     minimum_pad_height = z - PAD_BOTTOM
     sample_steps = max(1, round(.001 / args.dt))
     for phase, duration in phases[:1] if args.smoke else phases:
         nsteps = 2 if args.smoke else round(duration / args.dt)
         for step in range(nsteps):
+            pull_rate = 0.
             if args.grip_target is not None:
                 rate = float(np.clip(.0015 * (grip_filtered_N - args.grip_target), -.012, .012))
                 half = float(np.clip(half + args.dt * rate, .00405, open_half))
@@ -287,7 +290,13 @@ def run(args):
                     z_rate = np.clip(.02 * (press - args.press_force), -.02, .02)
                 z = max(PAD_BOTTOM + .00002, z + args.dt * z_rate)
             elif phase == "pull":
-                z += args.pull_speed * args.dt
+                pull_rate = args.pull_speed
+                if controlled_pull:
+                    pull_goal = args.pull_force_target * min(1., (step + 1) * args.dt / .40)
+                    if step == 0:
+                        pull_filtered_N = -press
+                    pull_rate = float(np.clip(.1 * (pull_goal - pull_filtered_N), 0., args.pull_speed))
+                z += pull_rate * args.dt
             positions = np.array([[-half, 0, z], [half, 0, z]])
             # Supply the prescribed rigid-body velocity to the contact Jacobian.
             d.qpos[pad_qpos] = positions - pad_origins
@@ -301,10 +310,16 @@ def run(args):
             sampled = step % sample_steps == 0 or step + 1 == nsteps
             watching_normal = (args.match_whole_bag_pe and phase == "press") or (controlled_gather and phase == "gather")
             if sampled or args.grip_target is not None or watching_normal:
-                traction_speed = args.pull_speed if args.match_whole_bag_pe and sampled and phase == "pull" else None
+                traction_speed = pull_rate if args.match_whole_bag_pe and sampled and pull_rate > 0 else None
                 force, inner, active, cone, sliding = pad_reactions(
                     m, d, pad_ids, pull_speed=traction_speed)
                 press = float(force[:, 2].sum())
+                if controlled_pull and phase == "pull":
+                    pull_filtered_N += args.dt / (.005 + args.dt) * (-press - pull_filtered_N)
+                    in_band = .9 * args.pull_force_target <= -press <= 1.1 * args.pull_force_target
+                    both_loaded = min(inner) > .001 and (step + 1) * args.dt >= .40
+                    pull_band_s = pull_band_s + args.dt if in_band and both_loaded else 0.
+                    peak_pull_band_s = max(peak_pull_band_s, pull_band_s)
                 if args.grip_target is not None:
                     grip_N = float(inner.sum())
                     grip_filtered_N += args.dt / (.005 + args.dt) * (grip_N - grip_filtered_N)
@@ -329,7 +344,8 @@ def run(args):
                 marker_z = float(d.flexvert_xpos[marker, 2].mean())
                 contained = aperture_lengths(d.flexvert_xpos[row], reference_lengths, half, z)
                 rows.append((phase, t_eval, open_half - half, z, *force.ravel(), *inner,
-                             -press, penetration, marker_z, z - marker_z, *contained, *active, *cone, *sliding))
+                             -press, penetration, marker_z, z - marker_z, *contained, *active, *cone, *sliding,
+                             pull_rate))
                 snapshots.append(d.flexvert_xpos.copy())
             if d.warning.number.sum() or not np.isfinite(d.qpos).all() or not np.isfinite(d.qvel).all():
                 failure = f"Unhealthy simulation in {phase} at {t_eval:.6g} s"
@@ -343,7 +359,7 @@ def run(args):
                    "signed_pull_N", "penetration_m", "marker_z_m", "pad_minus_marker_z_m",
                    "aperture_material_length_m", "aperture_current_arc_length_m", "fold_excess_length_m",
                    "left_active", "right_active", "left_cone_normal_N", "right_cone_normal_N",
-                   "left_sliding_normal_N", "right_sliding_normal_N")
+                   "left_sliding_normal_N", "right_sliding_normal_N", "pad_pull_speed_m_s")
         writer.writerow(("phase", *columns))
         writer.writerows(rows)
     np.savez_compressed(args.output / "coupon_nodes.npz", reference_m=ref, faces=faces, current_m=snapshots)
@@ -383,6 +399,8 @@ def run(args):
                    longest_gather_band_s=peak_gather_band_s if controlled_gather else None,
                    gather_pressure_window_s=gather_pressure_window,
                    grip_target_N=args.grip_target, longest_grip_hold_band_s=peak_grip_band_s,
+                   pull_force_target_N=args.pull_force_target,
+                   longest_pull_force_band_s=peak_pull_band_s if controlled_pull else None,
                    minimum_pad_height_m=minimum_pad_height,
                    peak_aperture_material_length_m=max((row[16] for row in rows), default=0.),
                    peak_fold_excess_length_m=max((row[18] for row in rows), default=0.),
@@ -416,6 +434,7 @@ def main():
     parser.add_argument("--match-whole-bag-pe", action="store_true", help="use the YAM empty-bag PE material and contact skin")
     parser.add_argument("--pull-seconds", type=float, default=.5)
     parser.add_argument("--pull-speed", type=float, default=PULL_SPEED, help="vertical pull speed, in metres per second")
+    parser.add_argument("--pull-force-target", type=float, help="force feedback target during pull, in newtons")
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
     parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
@@ -437,6 +456,9 @@ def main():
         parser.error("pull duration must be positive and finite")
     if not np.isfinite(args.pull_speed) or args.pull_speed <= 0:
         parser.error("pull speed must be positive and finite")
+    if args.pull_force_target is not None and (args.grip_target is None or
+                                              not np.isfinite(args.pull_force_target) or args.pull_force_target <= 0):
+        parser.error("pull force target must be positive and finite and needs --grip-target")
     if args.grip_target is not None and (not args.prefold or not args.match_whole_bag_pe or
                                         not np.isfinite(args.grip_target) or args.grip_target <= 0):
         parser.error("grip target must be positive, finite, and used with matched PE preformed geometry")

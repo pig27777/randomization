@@ -1,0 +1,934 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 90.0,
+    "tilt": 15.0,
+    "dt": 0.0002,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.001,
+    "wall_limit": 2400.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "lift_height": 0.35,
+    "gripper_overtravel": 0.005,
+    "complete_motion": false,
+    "press_target_N": null,
+    "press_timeout_s": 12.0,
+    "press_start_offset_m": 0.1,
+    "press_only": false,
+    "close_gap_hold_s": 0.15,
+    "grasp_opening_m": 0.04,
+    "lift_speed_m_s": 0.18,
+    "pickup_only": true,
+    "side_insert_speed_m_s": 0.03,
+    "closing_gain_m_per_N_s": 0.0035,
+    "mode": "rigid",
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.3326220518110015,
+      0.2385586838827861
+    ],
+    "payload_size": [
+      0.10029524206522866,
+      0.08064179506196759,
+      0.03256293275570878
+    ],
+    "payload_mass": 0.34803719106121356,
+    "joint_stiffness": 0.09027357274800496,
+    "simulation_seconds": 6.5,
+    "grasp_face": "side",
+    "support_height": 0.15,
+    "side_start_distance": 0.08,
+    "side_height_offset": 0.0,
+    "initial_state": "test/runs/2026-11-20/bag/rss2027-stage1-pickup-baseline-cpu-r4/preparation/initial_state.npz",
+    "bend_damping_ratio": 0.4052621588287628,
+    "rayleigh": 0.0003944166060075295,
+    "material": {
+      "young_pa": 6427165.844598597,
+      "thickness_m": 0.00019304227183560626,
+      "density_kg_m3": 851.2719675461022
+    },
+    "bag_profile": null,
+    "friction": 0.4465135706395541,
+    "compression_k1": 800.0,
+    "compression_k2": 20000.0,
+    "compression_damping": 1.0,
+    "ccd_tolerance_m": 1e-09,
+    "payload_offset_xy": [
+      0.0,
+      0.0
+    ],
+    "film_contact_time_s": null
+  },
+  "hostname": "ubun",
+  "mujoco": "4.0.1",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/bin/python",
+  "frozen_v13_sha256": null,
+  "source_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "1f9d46b16b5c99d1084251c247b3d61175bf3542eb4fc11eedd13dd16149f324",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "e63d23a14c9fa36b760dd7b39418e1d2027acb3924223db33f417ddd5fe9a495",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "902cb5b007a3547f6841bb6537e792dfe6bba9d0a44dd92a474a39ee2296a99c",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "platform": "e63d23a14c9fa36b760dd7b39418e1d2027acb3924223db33f417ddd5fe9a495",
+    "backend": "938ed9377cf351e333ddb937cb758a2c348082cf35e34b164e121b5bf3b9957e",
+    "parcel_model": "7009d09171e5360bd4a7b903632713a5335945dc1e5cfdf19ff634962c0a2c29",
+    "parcel_material": "baf174e77d2e79ee16a869cebcf32b0e8387953f6c8e0ffd4c18724ccd9dcb4c",
+    "parcel_wrap": "0b7c151226d42febd63b6a5c7186ca11b3d5516e749db6df6cbc2fb75f72a0e4",
+    "parcel_geometry_check": "e8c5d250d5d31a1ca8d66b738cc06d5b88f9c2501ebe3db6cd8a4d9eba69b8d9",
+    "cpu_adapter": "37a6491bfeeb3920fc6dc9110e4d0db551422c37f2d49c49da747af76b113060",
+    "warp_bending": "cb6ad13430df304b162e739971c49b00424fb10705fca7f3cddcc006130fa658"
+  },
+  "backend": "physical_parcel_yam_warp",
+  "robot_source_sha256": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+  "outcome": "pickup_ok",
+  "reason": "",
+  "phase": "lift_hold",
+  "motion_completed": true,
+  "grasp_failure": null,
+  "sim_time_s": 4.76964807510376,
+  "wall_s": 539.1218043459812,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.4691429203376174,
+    "nonfinger_mm": 0.003237626515328884,
+    "grip_N": 5.524771160931215,
+    "down_N": 0.29021803053094275,
+    "tracking_mm": 28.925603192052463
+  },
+  "model_metrics": {
+    "load_transfer": "native finger-film-payload contacts",
+    "attachments": 0
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.30020391941070557
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.30020391941070557,
+      "end_s": 0.8811569213867188
+    },
+    {
+      "phase": "close",
+      "start_s": 0.8811569213867188,
+      "end_s": 2.624410629272461
+    },
+    {
+      "phase": "lift",
+      "start_s": 2.624410629272461,
+      "end_s": 4.569253921508789
+    },
+    {
+      "phase": "lift_hold",
+      "start_s": 4.569253921508789,
+      "end_s": 4.76964807510376
+    }
+  ],
+  "initial_com": [
+    -0.2500021457672119,
+    0.04000569507479668,
+    0.16727660596370697
+  ],
+  "final_com": [
+    -0.2276873290538788,
+    0.04302633926272392,
+    0.33665207028388977
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 1.384822772071578,
+    "ik_max_rotation_deg": 0.663557167586008,
+    "tracking_max_mm": 28.925603192052463,
+    "tracking_p95_mm": 27.969498151381277,
+    "actuator_peak_Nm": [
+      1.2157717943191528,
+      2.2987136840820312,
+      1.645559310913086,
+      0.4616260528564453,
+      0.7552471160888672,
+      0.08270919322967529
+    ],
+    "control_clip_steps": 0,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 440,
+    "film_vertices": 142,
+    "film_triangles": 280,
+    "payload_bodies": 1,
+    "artificial_attachments": 0
+  },
+  "warnings": {},
+  "gpu_samples": [
+    {
+      "t_s": 0.00019999999494757503,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 932,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.06019991263747215,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.12020088732242584,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.1602015644311905,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.20020224153995514,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.2402029186487198,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.28020358085632324,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.3202042579650879,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.38020527362823486,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.4202059507369995,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.46020662784576416,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.500207245349884,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.5402019619941711,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.5801966786384583,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.6201913952827454,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.6601861119270325,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.7001808285713196,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.7401755452156067,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.7801702618598938,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.8201649785041809,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.860159695148468,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.9001544117927551,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.9401491284370422,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 0.9801438450813293,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.0201445817947388,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.060151219367981,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.1001578569412231,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.1601678133010864,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.2201777696609497,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.280187726020813,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.3401976823806763,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.4002076387405396,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.4602175951004028,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.5202275514602661,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.5802375078201294,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.6402474641799927,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.700257420539856,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.7602673768997192,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.8202773332595825,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.8802872896194458,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.940297245979309,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 1.9803038835525513,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.040313720703125,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.1003236770629883,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.1603336334228516,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.220343589782715,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.280353546142578,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.3403635025024414,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.4003734588623047,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.460383415222168,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.5203933715820312,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.5804033279418945,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.640413284301758,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.700423240661621,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.7404298782348633,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.7804365158081055,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.8404464721679688,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.900456428527832,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.940463066101074,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 2.9804697036743164,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.0404796600341797,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.080486297607422,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.140496253967285,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.2005062103271484,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.2605161666870117,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.320526123046875,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.360532760620117,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.4005393981933594,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.4405460357666016,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.500555992126465,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.560565948486328,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.6005725860595703,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.6405792236328125,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.700589179992676,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.760599136352539,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.8206090927124023,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.8806190490722656,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 3.940629005432129,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.000638008117676,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.060576438903809,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.120514869689941,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.180453300476074,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.240391731262207,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.30033016204834,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.380248069763184,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.440186500549316,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.500124931335449,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.560063362121582,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.580042839050293,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.659960746765137,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    },
+    {
+      "t_s": 4.7198991775512695,
+      "device": "NVIDIA GeForce RTX 5090",
+      "warp": "1.19.0",
+      "mujoco_warp": "4.0.1",
+      "process_memory_mib": 966,
+      "overflow_bits": 0
+    }
+  ]
+}
