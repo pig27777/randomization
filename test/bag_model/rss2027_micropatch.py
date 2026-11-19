@@ -293,6 +293,8 @@ def run(args):
                 else:
                     z_rate = np.clip(.02 * (press - args.press_force), -.02, .02)
                 z = max(PAD_BOTTOM + .00002, z + args.dt * z_rate)
+            elif phase == "hold" and args.hold_downforce is not None:
+                z += args.dt * float(np.clip(.02 * (press - args.hold_downforce), 0., .006))
             elif phase == "pull":
                 pull_rate = args.pull_speed
                 if controlled_pull:
@@ -441,6 +443,7 @@ def main():
     parser.add_argument("--pull-force-target", type=float, help="force feedback target during pull, in newtons")
     parser.add_argument("--closed-gap", type=float, help="gap between the pads at the end of gathering, in metres")
     parser.add_argument("--hold-seconds", type=float, default=.06)
+    parser.add_argument("--hold-downforce", type=float, help="relieve support compression to this level during hold")
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
     parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
@@ -476,6 +479,9 @@ def main():
                                         args.grip_target <= 0 or (not args.prefold and
                                         (args.gather_seconds is None or args.closed_gap is None))):
         parser.error("grip target needs positive force and matched PE with a prefold or a controlled gather and gap")
+    if args.hold_downforce is not None and (args.prefold or args.grip_target is None or
+                                            not np.isfinite(args.hold_downforce) or args.hold_downforce < 0):
+        parser.error("hold downforce requires flat-specimen grip feedback and a finite nonnegative target")
     if args.gather_seconds is not None and (args.prefold or not args.match_whole_bag_pe or
                                            not np.isfinite(args.gather_seconds) or args.gather_seconds <= 0):
         parser.error("gather duration must be positive, finite, and used with flat matched PE")

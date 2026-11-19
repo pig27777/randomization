@@ -23,7 +23,9 @@
 | [约 30% 布局的隔离版](bag/rss2027-stage1-warp-film-normal-30pct-r1/) | 同修正的另一内容物布局对照 | 持锁执行本轮 `run.sh` | 4.75966 s 完整通过，墙钟 579.86 s，穿透 0.813 mm，停止态保持包覆。 |
 | [纸板上缘进给](bag/rss2027-stage1-whole-bag-materials-r4/) | 只将纸板接近目标升高 16 mm | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 及 `run.sh paperboard <本轮目录>` | 完成 6.0969 s，悬停离台，穿透峰值 0.685 mm，最小单指力 6.98 N。 |
 | [牛皮纸与气泡膜上缘进给](bag/rss2027-stage1-whole-bag-upper-r1/) | 原各自基准参数下，对照同一 16 mm 高度变化 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 和各自完整动作 | 牛皮纸离台但膜—膜峰值 1.931 mm。气泡膜侧向受推后离开支撑，未捕获。 |
-| [牛皮纸上缘半步长](bag/rss2027-stage1-kraft-upper-half-step-r1/) | 相同工况仅减半至 100 μs | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 与完整动作 | 排队。 |
+| [牛皮纸上缘半步长](bag/rss2027-stage1-kraft-upper-half-step-r1/) · [膜顺应性](bag/rss2027-stage1-kraft-film-contact-r1/) · [支架清障](bag/rss2027-stage1-kraft-strut-clearance-r1/) | 分别减半步长、缩短膜 contact 时间常数、降低接近高度 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 与完整动作 | 100 μs 仍有 1.902 mm 膜—膜穿透；0.25 ms 膜试验峰值为支架—膜 1.628 mm，清障排队。 |
+| [气泡膜初始净空](bag/rss2027-stage1-bubble-clear-start-r1/) | 同上缘布局仅增加初始侧面距离 30 mm | 持锁执行本轮 `run.sh` | 排队。 |
 | [PE 受控拉力](bag/rss2027-stage1-pe-force-pull-r1/) · [1 N 夹力对照](bag/rss2027-stage1-pe-force-pull-r2/) | 同参 PE 0.30 N 拉力反馈，对比 6.5 N 与 1.0 N 夹力 | 持锁执行首轮 `run.sh`。后者附 <本轮目录> 和 `1.0` | 6.5 N 有 0.1229 s 拉力达标窗，同期无整体滑移。1 N 保持期实际开口仍为 3.92 mm，未建立夹力。 |
 | [闭环场景的批量设备短窗](bag/rss2027-stage1-yam-batch-reference-r1/) | 通过轨迹的三种姿态，1/16/64 世界 | 持锁执行本轮 `run.sh` | 9 个窗口通过。64 世界为 1,895–2,278 环境步/s，采样显存 1,798 MiB。 |
-| [居中整袋慢松夹](bag/rss2027-stage1-whole-bag-release-r1/) · [半步长](bag/rss2027-stage1-whole-bag-release-r2/) · [纸板上缘](bag/rss2027-stage1-paperboard-release-r1/) | 完整悬停后受控打开夹口，逐步观察自由脱手 | 持锁执行首轮 `run.sh`，其他配置传对应目录 | 200 μs 工况通过。滑移候选开口 9.03 mm、拉力 3.407 N，10.57 mm 时完全失触。后续对照排队。 |
+| [居中整袋慢松夹](bag/rss2027-stage1-whole-bag-release-r1/) · [半步长](bag/rss2027-stage1-whole-bag-release-r2/) · [50 μs](bag/rss2027-stage1-whole-bag-release-r3/) · [纸板上缘](bag/rss2027-stage1-paperboard-release-r1/) | 完整悬停后受控打开夹口，逐步观察自由脱手 | 持锁执行各轮 `run.sh` 或复用首轮脚本并传目标目录 | PE 200/100 μs 和纸板完成脱手。PE 双档脱开开口约 10.57/10.45 mm，候选力差 29.5%。50 μs 正在复测。 |
+| [PE 入夹后卸除压触](bag/rss2027-stage1-pe-gather-relief-r1/) | 细网格保持阶段调整竖向接触 | 持锁执行本轮 `run.sh` | 排队。 |

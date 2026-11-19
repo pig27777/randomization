@@ -6,6 +6,7 @@ from pathlib import Path
 import time
 
 import mujoco
+import numpy as np
 
 import physical_parcel_yam
 from yam_platform.protocol import run
@@ -30,6 +31,36 @@ def penetration_peak(robot, phase):
                 pos_m=contact.pos.tolist(), normal=contact.frame[:3].tolist(), sides=sides)
 
 
+def release_contacts(robot):
+    model, data = robot.sim.m, robot.sim.d
+    flex = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_FLEX, "bag")
+    pads = {int(geom): i for i, core in enumerate(robot.pad_geom)
+            for geom in np.flatnonzero(model.geom_bodyid == model.geom_bodyid[core])}
+    left, right = data.geom_xpos[robot.pad_geom]
+    axis = right - left
+    axis /= max(np.linalg.norm(axis), 1e-12)
+    local_force = np.zeros(6)
+    records = []
+    for index, contact in enumerate(data.contact):
+        address = contact.efc_address
+        if address < 0 or flex not in contact.flex:
+            continue
+        film_slot = list(contact.flex).index(flex)
+        pad_slot = 1 - film_slot
+        pad = pads.get(int(contact.geom[pad_slot]))
+        if pad is None:
+            continue
+        mujoco.mj_contactForce(model, data, index, local_force)
+        normal = (2 * pad_slot - 1) * contact.frame[:3]
+        records.append(dict(pad=pad, element=int(contact.elem[film_slot]), vertex=int(contact.vert[film_slot]),
+                            inner=bool((2 * pad - 1) * (normal @ axis) > .7), normal_on_pad=normal.tolist(),
+                            pos_m=contact.pos.tolist(), force_contact_N=local_force[:3].tolist(),
+                            friction=contact.friction[:2].tolist(),
+                            tangent_constraint_velocity_m_s=data.efc_vel[address + 1:address + 3].tolist()
+                            if contact.dim == 3 else []))
+    return records
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--config", type=Path, required=True)
@@ -47,9 +78,12 @@ def main():
     started = time.perf_counter()
     device_samples = []
     penetration_events = []
+    release_samples = []
 
     def observe(robot, row):
         nonlocal last, previous_phase
+        if cfg.pickup_release_seconds and row["phase"] in ("lift_hold", "open"):
+            release_samples.append(dict(t_s=row["t"], phase=row["phase"], contacts=release_contacts(robot)))
         now = time.perf_counter()
         if now - last >= 5 or row["phase"] != previous_phase:
             if args.engine == "warp":
@@ -72,6 +106,8 @@ def main():
                  on_penetration_peak=observe_peak if args.record_penetration_peaks else None)
     if args.record_penetration_peaks:
         (args.output / "penetration-peaks.json").write_text(json.dumps(penetration_events, indent=2) + "\n")
+    if release_samples:
+        (args.output / "release-contacts.json").write_text(json.dumps(release_samples, indent=2) + "\n")
     if args.engine == "warp":
         result["gpu_samples"] = device_samples
     (args.output / "summary.json").write_text(json.dumps(result, indent=2))
