@@ -1,0 +1,77 @@
+{
+  "output": "test/runs/2026-11-20/bag/rss2027-stage1-pe-capture-fine-r1/level-2",
+  "cells": 12,
+  "slack": 0.004,
+  "dt": 0.0001,
+  "friction": 0.8,
+  "press_force": 0.5,
+  "pad_contact_time": 0.001,
+  "prefold": false,
+  "prefold_width": null,
+  "refine_contact": "both",
+  "refine_levels": 2,
+  "match_whole_bag_pe": true,
+  "pull_seconds": 0.1,
+  "pull_speed": 0.025,
+  "grip_target": null,
+  "gather_seconds": 0.96,
+  "gather_only": false,
+  "smoke": false,
+  "material": {
+    "membrane": 1200.0,
+    "bending": 3.956043956043956e-07,
+    "areal_mass": 0.0552,
+    "material_thickness": 6e-05,
+    "poisson": 0.3,
+    "young_pa": 20000000.0,
+    "thickness_m": 6e-05,
+    "density_kg_m3": 920.0,
+    "pad_friction": 0.8,
+    "self_friction": 0.45,
+    "support_friction": 0.45,
+    "contact_radius_m": 0.00025,
+    "support_contact_time_s": 0.001,
+    "vertex_mass_distribution": "triangle_area",
+    "total_film_mass_kg": 0.00019872,
+    "constitutive_model": "native stretch and bending"
+  },
+  "phases_s": [
+    [
+      "settle",
+      0.08
+    ],
+    [
+      "press",
+      0.45
+    ],
+    [
+      "gather",
+      0.96
+    ],
+    [
+      "hold",
+      0.06
+    ],
+    [
+      "pull",
+      0.1
+    ]
+  ],
+  "initial_geometry": {
+    "vertices": 775,
+    "triangles": 1440,
+    "nominal_local_pitch_m": 0.00125,
+    "nominal_local_pitch_xy_m": [
+      0.00125,
+      0.00125
+    ],
+    "reference_span_m": 0.060000000000000005,
+    "projected_span_m": 0.056000000000000015,
+    "central_rise_m": -2.168404344971009e-18,
+    "prefold_width_m": null
+  },
+  "ccd_tolerance_m": 1e-09,
+  "hostname": "ubun",
+  "mujoco": "4.0.1",
+  "source_sha256": "d6974cbec3b1d8a3213508e20d8723829f9f258e2e8e690bdbdb0a6696d1b13b"
+}
