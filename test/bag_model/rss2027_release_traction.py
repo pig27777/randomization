@@ -10,6 +10,23 @@ import numpy as np
 from rss2027_micropatch import sustained_starts
 
 
+def inner_loads(contacts):
+    normal = np.zeros(2)
+    sliding = np.zeros(2)
+    for contact in contacts:
+        force, *shear = contact["force_contact_N"]
+        if not contact["inner"] or force <= 0.:
+            continue
+        pad = contact["pad"]
+        normal[pad] += force
+        velocity = contact["tangent_constraint_velocity_m_s"]
+        if velocity and min(contact["friction"]) > 0.:
+            ratio = np.linalg.norm(np.asarray(shear) / contact["friction"]) / force
+            if ratio >= .95 and np.linalg.norm(velocity) > .002:
+                sliding[pad] += force
+    return normal, sliding
+
+
 def audit(run):
     frames = json.loads((run / "recording/release-contacts.json").read_text())
     with (run / "capture/capture-audit.csv").open() as stream:
@@ -18,19 +35,7 @@ def audit(run):
     for frame in frames:
         time = frame["t_s"]
         sample = curve[time]
-        normal = np.zeros(2)
-        sliding = np.zeros(2)
-        for contact in frame["contacts"]:
-            force, *shear = contact["force_contact_N"]
-            if not contact["inner"] or force <= 0.:
-                continue
-            pad = contact["pad"]
-            normal[pad] += force
-            velocity = contact["tangent_constraint_velocity_m_s"]
-            if velocity and min(contact["friction"]) > 0.:
-                ratio = np.linalg.norm(np.asarray(shear) / contact["friction"]) / force
-                if ratio >= .95 and np.linalg.norm(velocity) > .002:
-                    sliding[pad] += force
+        normal, sliding = inner_loads(frame["contacts"])
         positive_load = float(sample["tension_N"]) > .001 and float(sample["support_N"]) <= .05
         dual = bool(min(normal) > .001)
         classified = frame["phase"] == "open" and positive_load and dual and bool((sliding >= .5 * normal).all())

@@ -40,6 +40,7 @@ class TrialConfig:
     pickup_release_seconds: float=0.
     side_insert_speed_m_s: float=.010
     closing_gain_m_per_N_s: float=.002
+    lift_hold_seconds: float=.20
 
 
 class NormalPress:
@@ -222,6 +223,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
         raise ValueError("lift_height must be finite and positive")
     if not np.isfinite(cfg.lift_speed_m_s) or cfg.lift_speed_m_s <= 0:
         raise ValueError("lift_speed_m_s must be finite and positive")
+    if not np.isfinite(cfg.lift_hold_seconds) or cfg.lift_hold_seconds <= 0:
+        raise ValueError("lift_hold_seconds must be finite and positive")
     if not np.isfinite(cfg.grasp_opening_m) or not 0 < cfg.grasp_opening_m <= .045:
         raise ValueError("grasp_opening_m must be in (0, .045] m")
     if not np.isfinite(cfg.side_insert_speed_m_s) or cfg.side_insert_speed_m_s <= 0:
@@ -386,7 +389,7 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                 next_phase="lift_hold" if elapsed>=cfg.lift_height/cfg.lift_speed_m_s else None
             elif phase=="lift_hold":
                 pickup_end = "open" if release_ramp else "done"
-                next_phase=(pickup_end if cfg.pickup_only else "carry") if elapsed>=.2 else None
+                next_phase=(pickup_end if cfg.pickup_only else "carry") if elapsed>=cfg.lift_hold_seconds else None
                 if next_phase and feedback["support_N"]>.05:
                     outcome,reason="grasp_fail","object remains on table after lift and hold"
                 elif next_phase == "open" and min(feedback["grip_each_N"]) < .05:

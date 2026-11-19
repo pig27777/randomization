@@ -22,6 +22,9 @@ CASES = (
     ("pe-randomized-127", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-r1/sample-127/recording/trial"),
     ("pe-randomized-002", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-r1/sample-002/recording/trial"),
     ("bubble-unsupported-release", "bubble", "2026-11-20/bag/rss2027-stage1-bubble-free-release-floor-r1/recording/trial"),
+    ("pe-coarse-aperture", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-local-mesh-r1/coarse/recording/trial"),
+    ("pe-refined-aperture", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-local-mesh-r1/refined/recording/trial"),
+    ("pe-refined-relief", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-relief-r1/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
@@ -94,6 +97,9 @@ def export_case(label, material, path, axis_index):
                 outcome=result["outcome"], reason=result["reason"], warnings=result["warnings"],
                 normal_press=result.get("normal_press"), release=release, config=result["config"],
                 samples=samples)
+    relief = trial.parent / "closure-relief.json"
+    if relief.exists():
+        meta["closure_pressure_relief"] = load_json(relief)
     print(label, len(samples), len(aperture), len(traction), result["outcome"])
     return meta
 
