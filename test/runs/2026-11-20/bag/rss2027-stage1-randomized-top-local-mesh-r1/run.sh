@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
-run_dir=$(dirname "$0")
+source_dir=$(dirname "$0")
+run_dir=${1:-$source_dir}
+if (( $# )); then shift; fi
+if (( $# == 0 )); then set -- refined coarse; fi
 python=.venv-physical-parcel/bin/python
-record="$run_dir/refine_parcel.py"
-for variant in refined coarse; do
+record="$source_dir/refine_parcel.py"
+for variant in "$@"; do
     case_dir="$run_dir/$variant"
     "$python" -B "$record" --config "$case_dir/smoke.json" --output "$case_dir/smoke" \
         --record-penetration-peaks > "$case_dir/smoke.log" 2>&1
-    if ! "$python" -B - "$case_dir/smoke/summary.json" "$run_dir/preparation.json" "$variant" <<'PY'
+    if ! "$python" -B - "$case_dir/smoke/summary.json" "$source_dir/preparation.json" "$variant" <<'PY'
 import json
 from pathlib import Path
 import sys
