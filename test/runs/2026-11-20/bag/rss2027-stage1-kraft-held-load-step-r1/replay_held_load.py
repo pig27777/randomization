@@ -23,7 +23,8 @@ from record_support_withdrawal import FLOOR, SUPPORT, support_pose, world_with_m
 from rss2027_release_traction import inner_loads  # noqa: E402
 
 FIELDS = ("time_s", "added_N", "actual_gap_m", "tension_N", "support_N", "left_inner_N", "right_inner_N",
-          "left_slide_N", "right_slide_N", "both_sliding", "fingertip_contact_N", "penetration_mm")
+          "left_slide_N", "right_slide_N", "both_sliding", "fingertip_contact_N", "penetration_mm",
+          "added_along_closing_axis_N")
 RATE = 5.
 
 
@@ -61,13 +62,31 @@ def held_scene():
     return robot, index, hashlib.sha256(state.tobytes()).hexdigest()
 
 
-def run(dt, limit):
+def jaw_axis(robot):
+    left, right = robot.sim.d.geom_xpos[robot.pad_geom]
+    inward = right - left
+    return inward / np.linalg.norm(inward), (left + right) / 2.
+
+
+def run(dt, limit, load_mode):
     robot, index, fingerprint = held_scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
     control = sim.d.ctrl.copy()
     payload = int(sim.payload_bodies[0])
     start = float(sim.d.time)
+    mujoco.mj_fwdPosition(sim.m, sim.d)
+    closing, pad_center = jaw_axis(robot)
+    down = np.array([0., 0., -1.])
+    if load_mode == "jaw-tangent":
+        outward = sim.com() - pad_center
+        projected = outward - (outward @ closing) * closing
+        if np.linalg.norm(projected) < 1e-6:
+            raise ValueError("The held parcel does not define a tangential pull direction")
+        direction = projected / np.linalg.norm(projected)
+        np.testing.assert_allclose(direction @ closing, 0., atol=1e-12, rtol=0.)
+    else:
+        direction = down
     peak = loss_at = None
     rows = []
     outcome = "no_loss_before_limit"
@@ -76,18 +95,20 @@ def run(dt, limit):
         elapsed = float(sim.d.time) - start
         load = RATE * elapsed
         gap = robot.gap()
-        sim.d.xfrc_applied[payload, 2] = -load
+        sim.d.xfrc_applied[payload, :3] = load * direction
         sim.step()
         measured = backend.measure(robot)
         support = measured["support_N"]
         grip = max(measured["contact_magnitude_each_N"])
         depth = measured["penetration_mm"]
-        tension = -sum(reaction[2] for reaction in measured["force_on_fingers_N"])
+        force = np.sum(measured["force_on_fingers_N"], axis=0)
+        tension = float(force @ direction)
         normal, sliding = inner_loads(release_contacts(robot))
-        bilateral = min(normal) > .001 and tension > .001 and support <= .05
-        sliding_now = i > 0 and bilateral and (sliding >= .5 * normal).all()
-        rows.append((elapsed, load, gap, tension, support, *normal, *sliding, sliding_now, grip, depth))
-        if i == 0 and not bilateral:
+        bilateral = min(normal) > .001 and support <= .05
+        sliding_now = i > 0 and bilateral and tension > .001 and (sliding >= .5 * normal).all()
+        axial_load = float(load * (direction @ jaw_axis(robot)[0]))
+        rows.append((elapsed, load, gap, tension, support, *normal, *sliding, sliding_now, grip, depth, axial_load))
+        if i == 0 and (not bilateral or force @ down <= .001):
             raise ValueError("Restored state is missing bilateral suspension")
         if depth > 1. or sim.d.warning.number.any():
             if depth > 1.:
@@ -119,6 +140,7 @@ def run(dt, limit):
 
     loss = loss_at if outcome == "detached" and np.max(rows[:loss_at + 1, 4]) <= .05 else None
     result = dict(dt_s=dt, rate_N_s=RATE, source_frame=index, source_time_s=start, source_state_sha256=fingerprint,
+                  force_direction=direction.tolist(), initial_closing_axis=closing.tolist(), load_mode=load_mode,
                   actuator_input=control.tolist(), physics_steps=len(rows), outcome=outcome,
                   wall_s=time.perf_counter() - wall_start, first=sample(0), end_health=health,
                   peak_penetration_mm=float(rows[:, 11].max()), deepest_invalid_contact=peak,
@@ -133,6 +155,7 @@ def main():
     parser.add_argument("output", nargs="?", type=Path)
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--extract", action="store_true")
+    parser.add_argument("--direction", choices=("vertical", "jaw-tangent"), default="vertical")
     args = parser.parse_args()
     if args.extract:
         extract_state()
@@ -141,7 +164,7 @@ def main():
         parser.error("specify an output directory")
     args.output.mkdir(exist_ok=False)
     for dt in (.0001, .00005):
-        result, rows = run(dt, .02 if args.smoke else 2.4)
+        result, rows = run(dt, .02 if args.smoke else 2.4, args.direction)
         stem = args.output / f"dt-{round(dt * 1e6)}us"
         stem.with_suffix(".json").write_text(json.dumps(result, indent=2) + "\n")
         np.savez_compressed(stem.with_suffix(".npz"), columns=np.asarray(FIELDS), rows=rows)

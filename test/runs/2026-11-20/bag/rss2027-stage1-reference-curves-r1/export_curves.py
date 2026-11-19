@@ -25,6 +25,8 @@ CASES = (
     ("pe-coarse-aperture", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-local-mesh-r1/coarse/recording/trial"),
     ("pe-refined-aperture", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-local-mesh-r1/refined/recording/trial"),
     ("pe-refined-relief", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-relief-r1/recording/trial"),
+    ("pe-top-0p3N", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-pressure-sweep-r1/low/refined/recording/trial"),
+    ("pe-top-0p8N", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-pressure-sweep-r1/high/refined/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",

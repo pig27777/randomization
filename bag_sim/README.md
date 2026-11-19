@@ -14,6 +14,8 @@
 
 牛皮纸撤离零载支撑后，100 μs 两档加载速率的悬空失触均约为附加 5.16 N。50 μs 完整回合出现双侧滑动采样，闭合膜自接触超过 1 mm，材料等效摩擦仍待验收。[牛皮纸加载对照](../test/runs/2026-11-20/bag/rss2027-stage1-kraft-load-ramp-clear-r1/load-ramp-comparison.json)。
 
+同一悬空状态固定执行器的 100 与 50 μs 载荷复测，悬空脱手附加载荷变化 1.32%。同一带载 PE 的 0.3、0.5 与 0.8 N 顶抓均达到压力带，起抬处夹口无膜。[固定输入结果](../test/runs/2026-11-20/bag/rss2027-stage1-kraft-held-load-step-r1/recording/dt-50us.json) · [整袋压力](../test/runs/2026-11-20/bag/rss2027-stage1-randomized-top-pressure-sweep-r1/pressure-comparison.json)。
+
 当前整袋装配按 5% 初始边应变、零实体交叉和八角点包覆筛选。128 个随机样本扣除封口宽度后，142 节点原初始化通过四个样本，覆盖 30% 和 61.8%。封口宽度用于计算有效内腔，动力学膜边沿按共享边表示。[装配记录](../test/runs/2026-11-20/bag/rss2027-stage1-randomized-wrap-r1/summary.json)。
 
 2026-11-19新增近满面薄层示例：袋350×250 mm、内容物330×230×6 mm、200 g；初始化修复共享封边邻面的包盒投影，参考拓扑与常规初态保持。顶抓未抓起；侧抓提起约176 mm但落位及穿透预算未通过。[实际视频与检查](../reports/folded-clothes-grasp-test.md)。
