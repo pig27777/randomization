@@ -24,8 +24,12 @@ def main():
     parser.add_argument("--start", type=float, default=.30)
     parser.add_argument("--end", type=float, required=True)
     parser.add_argument("--highlight-time", type=float, required=True)
+    parser.add_argument("--detail-azimuth", type=float, default=-55., help="close-up camera azimuth in degrees")
+    parser.add_argument("--detail-elevation", type=float, default=-24., help="close-up camera elevation in degrees")
     parser.add_argument("--ffmpeg", default="ffmpeg")
     args = parser.parse_args()
+    if not np.isfinite([args.detail_azimuth, args.detail_elevation]).all() or not -90 <= args.detail_elevation <= 90:
+        parser.error("close-up camera angles must be finite and elevation in [-90, 90] degrees")
     if args.output.exists():
         raise FileExistsError(args.output)
     model, data, poses, times, _, rows = load_yam_recording(args.run)
@@ -58,7 +62,7 @@ def main():
     full = mujoco.MjvCamera()
     full.azimuth, full.elevation, full.distance = -61., -26., .59
     detail = mujoco.MjvCamera()
-    detail.azimuth, detail.elevation, detail.distance = -55., -24., .20
+    detail.azimuth, detail.elevation, detail.distance = args.detail_azimuth, args.detail_elevation, .20
     args.output.parent.mkdir(parents=True, exist_ok=True)
     font = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
     filters = ",".join(f"drawtext=fontfile={font}:text={title}:x={x}:y=16:fontsize=25:"
@@ -88,11 +92,19 @@ def main():
                     renderer.update_scene(data, camera=full, scene_option=option)
                     left = renderer.render().copy()
                     renderer.update_scene(data, camera=detail, scene_option=detail_option)
-                    if t >= 4.65:
+                    if t >= args.highlight_time - .35:
+                        faces_on_edge = data.flexvert_xpos[adjacent]
+                        normals = np.cross(faces_on_edge[:, 1] - faces_on_edge[:, 0],
+                                           faces_on_edge[:, 2] - faces_on_edge[:, 0])
+                        outward = normals.sum(axis=0)
+                        # Keep the visual marker just outside the opaque membrane.
+                        marker_points = xyz + .001 * outward / max(np.linalg.norm(outward), 1e-12)
                         marker = renderer.scene.geoms[renderer.scene.ngeom]
                         mujoco.mjv_initGeom(marker, mujoco.mjtGeom.mjGEOM_CAPSULE, np.zeros(3), np.zeros(3),
                                             np.eye(3).ravel(), np.array([1., .72, .18, 1.]))
-                        mujoco.mjv_connector(marker, mujoco.mjtGeom.mjGEOM_CAPSULE, .00055, xyz[0], xyz[1])
+                        marker.emission = .7
+                        mujoco.mjv_connector(marker, mujoco.mjtGeom.mjGEOM_CAPSULE, .00075,
+                                             marker_points[0], marker_points[1])
                         renderer.scene.ngeom += 1
                     right = renderer.render()
                     encoder.stdin.write(np.concatenate((left, right), axis=1).tobytes())
@@ -116,7 +128,8 @@ def main():
     metadata = dict(source=str(args.run), edge=args.edge, start_s=args.start, end_s=args.end, frames=len(rendered_times),
                     fps=fps, resolution=[2 * width, height], renderer=software_renderer, speed=1.,
                     physics_recomputed=False, interpolated_between_saved_poses=True,
-                    highlight_is_render_only=True, detail_rigid_geometry="pads only", evidence=evidence,
+                    highlight_is_render_only=True, detail_rigid_geometry="pads only",
+                    detail_camera_deg=[args.detail_azimuth, args.detail_elevation], evidence=evidence,
                     source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     args.output.with_suffix(".json").write_text(json.dumps(metadata, indent=2) + "\n")
     print(args.output, software_renderer, flush=True)

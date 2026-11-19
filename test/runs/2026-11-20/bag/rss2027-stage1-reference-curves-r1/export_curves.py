@@ -18,6 +18,10 @@ CASES = (
     ("paperboard-side-release", "paperboard", "2026-11-20/bag/rss2027-stage1-paperboard-release-r1/recording/trial"),
     ("kraft-side-release", "kraft", "2026-11-20/bag/rss2027-stage1-kraft-release-r2/recording/trial"),
     ("bubble-supported-release", "bubble", "2026-11-20/bag/rss2027-stage1-bubble-short-hover-r1/recording/trial"),
+    ("pe-randomized-004", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-relaxed-r1/sample-004/recording/trial"),
+    ("pe-randomized-127", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-r1/sample-127/recording/trial"),
+    ("pe-randomized-002", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-r1/sample-002/recording/trial"),
+    ("bubble-unsupported-release", "bubble", "2026-11-20/bag/rss2027-stage1-bubble-free-release-floor-r1/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",

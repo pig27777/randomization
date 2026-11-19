@@ -10,7 +10,7 @@
 - 内容物支持刚体、三段可弯曲体和可压缩体，袋与内容物的尺寸、质量和材料参数可随机化。
 - 载荷通过原生接触传递，盒体使用同形凸网格接触。抓取与录像接入 [`experience/`](../experience/README.md) 统一平台。
 
-材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。Stage 1 整袋侧抓有四类悬停工况通过原 1 mm 穿透门槛。同参 PE 用 25 μs，牛皮纸和纸板用 100 μs，气泡膜用 40 g 内容物与 200 μs 进行短程悬停。气泡膜包裹在松夹中重新接触台面。[Stage 1 报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [袋模型报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
+材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。Stage 1 整袋侧抓有四类悬停工况通过原 1 mm 穿透门槛。同参 PE 用 25 μs，牛皮纸和纸板用 100 μs，气泡膜用 40 g 内容物与 200 μs 进行短程悬停。气泡膜在零载时撤离小台面及地面的对照中完成悬空脱手。[Stage 1 报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [袋模型报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
 
 当前整袋装配按 5% 初始边应变、零实体交叉和八角点包覆筛选。128 个随机样本扣除封口宽度后，142 节点原初始化通过四个样本，覆盖 30% 和 61.8%。封口宽度用于计算有效内腔，动力学膜边沿按共享边表示。[装配记录](../test/runs/2026-11-20/bag/rss2027-stage1-randomized-wrap-r1/summary.json)。
 

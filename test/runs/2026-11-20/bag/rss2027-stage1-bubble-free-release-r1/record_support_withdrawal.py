@@ -2,6 +2,7 @@
 
 import argparse
 from dataclasses import replace
+from functools import partial
 import json
 from pathlib import Path
 import sys
@@ -18,19 +19,26 @@ from record_physical_parcel import penetration_peak, release_contacts  # noqa: E
 from yam_platform.protocol import run  # noqa: E402
 
 SUPPORT = "withdrawable_support"
+FLOOR = "withdrawable_floor"
 RETRACTION_M = .120
-STATE_SPEC = mujoco.mjtState.mjSTATE_INTEGRATION
+FLOOR_RETRACTION_M = .500
+STATE_SPEC = int(mujoco.mjtState.mjSTATE_INTEGRATION)
 parcel_world = backend.parcel_world
 
 
-def world_with_movable_support(cfg):
+def world_with_movable_support(cfg, lower_floor=False):
     parcel, xml = parcel_world(cfg)
     root = ET.fromstring(xml)
     world = root.find("worldbody")
-    table = world.find("geom[@name='table']")
-    support = ET.SubElement(world, "body", name=SUPPORT, mocap="true", pos=table.attrib.pop("pos"))
-    world.remove(table)
-    support.append(table)
+    surfaces = [("table", SUPPORT)]
+    if lower_floor:
+        surfaces.append(("floor", FLOOR))
+    for name, body in surfaces:
+        geom = world.find(f"geom[@name='{name}']")
+        position = geom.attrib.pop("pos", "0 0 0")
+        support = ET.SubElement(world, "body", name=body, mocap="true", pos=position)
+        world.remove(geom)
+        support.append(geom)
     return parcel, ET.tostring(root, encoding="unicode")
 
 
@@ -40,11 +48,19 @@ def integration_state(sim):
     return state
 
 
+def support_pose(sim, body):
+    mocap = sim.m.body_mocapid[sim.m.body(body).id]
+    if mocap < 0:
+        raise RuntimeError(f"The {body} has no MuJoCo kinematic pose")
+    return sim.d.mocap_pos[mocap]
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--config", type=Path, default=RUN / "config.json")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--smoke", action="store_true")
+    parser.add_argument("--lower-floor", action="store_true", help="withdraw both support surfaces")
     args = parser.parse_args()
     cfg = backend.Config(**json.loads(args.config.read_text()))
     if not cfg.support_height > RETRACTION_M or not cfg.pickup_release_seconds:
@@ -68,21 +84,28 @@ def main():
         if phase != "open" or event is not None:
             return
         sim = robot.sim
-        mocap = sim.m.body_mocapid[sim.m.body(SUPPORT).id]
-        if mocap < 0:
-            raise RuntimeError("The support has no MuJoCo kinematic pose")
-        position = sim.d.mocap_pos[mocap]
+        position = support_pose(sim, SUPPORT)
         event = dict(first_open_t_s=row["t"], before_m=position.tolist(), after_m=None,
                      support_N=row["support_N"], support_geometry=row["support_geometry"])
-        if row["support_N"] == 0. and row["support_geometry"]["intersecting_triangles"] == 0:
-            position[2] -= RETRACTION_M
+        eligible = row["support_N"] == 0. and row["support_geometry"]["intersecting_triangles"] == 0
+        if args.lower_floor:
+            floor = support_pose(sim, FLOOR)
+            floor_clearance = float(sim.d.flexvert_xpos[:, 2].min() - sim.m.flex_radius[0] - floor[2])
+            event.update(floor_before_m=floor.tolist(), floor_after_m=None, floor_clearance_m=floor_clearance)
+            eligible = eligible and floor_clearance > 0.
+        if eligible:
+            position[2] -= FLOOR_RETRACTION_M if args.lower_floor else RETRACTION_M
             event["after_m"] = position.tolist()
+            if args.lower_floor:
+                floor[2] -= FLOOR_RETRACTION_M
+                event["floor_after_m"] = floor.tolist()
         (args.output / "withdrawal.json").write_text(json.dumps(event, indent=2) + "\n")
 
     def on_peak(robot, phase):
         peaks.append(penetration_peak(robot, phase))
 
-    with patch.multiple(backend, parcel_world=world_with_movable_support, record_state=integration_state,
+    world = partial(world_with_movable_support, lower_floor=args.lower_floor)
+    with patch.multiple(backend, parcel_world=world, record_state=integration_state,
                         STATE_SPEC=STATE_SPEC, create=True):
         result = run(backend, cfg, args.output / "trial", on_sample=on_sample, on_penetration_peak=on_peak)
     for name, payload in (("summary.json", result), ("penetration-peaks.json", peaks)):

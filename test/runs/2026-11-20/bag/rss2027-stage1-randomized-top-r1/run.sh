@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
-run_dir=$(dirname "$0")
+run_dir=${1:-$(dirname "$0")}
+if (( $# )); then shift; fi
+if (( $# == 0 )); then set -- 004 127 002; fi
 python=.venv-physical-parcel/bin/python
 record=test/bag_model/record_physical_parcel.py
 audit=test/bag_model/rss2027_yam_capture_audit.py
-for id in 004 127 002; do
+for id in "$@"; do
     case_dir="$run_dir/sample-$id"
     if ! "$python" -B "$record" --config "$case_dir/smoke.json" --output "$case_dir/smoke" \
         --record-penetration-peaks > "$case_dir/smoke.log" 2>&1; then
