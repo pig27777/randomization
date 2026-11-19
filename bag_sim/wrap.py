@@ -56,6 +56,51 @@ def triangle_box_intersections(vertices, faces, half_size, center, rotation=None
     return ~np.any(separated & (lengths > 1e-14), axis=1)
 
 
+def _clear_box_sheet(local, faces, shared, half, clearance, sign):
+    """Keep the triangle footprint over a box on its exterior z face."""
+    xy = local[faces, :2]
+    eye = np.eye(3)
+    extent = half[:2]
+    weights = [np.broadcast_to(eye, (len(faces), 3, 3))]
+    valid = [np.all(np.abs(xy) <= extent, axis=2)]
+
+    # Extremes of a clipped linear triangle occur at original vertices, box
+    # corners, or triangle/rectangle edge intersections. Vertex-only projection
+    # misses the latter two when the contents nearly fill the sheet.
+    corners = np.array([[x, y] for x in (-1, 1) for y in (-1, 1)]) * extent
+    u, v = xy[:, 1] - xy[:, 0], xy[:, 2] - xy[:, 0]
+    det = u[:, 0] * v[:, 1] - u[:, 1] * v[:, 0]
+    denom = np.where(abs(det) > 1e-20, det, 1.)
+    delta = corners[None] - xy[:, None, 0]
+    b = (delta[:, :, 0] * v[:, None, 1] - delta[:, :, 1] * v[:, None, 0]) / denom[:, None]
+    c = (u[:, None, 0] * delta[:, :, 1] - u[:, None, 1] * delta[:, :, 0]) / denom[:, None]
+    bary = np.stack((1 - b - c, b, c), axis=2)
+    weights.append(bary)
+    valid.append(np.all(bary >= -1e-12, axis=2) & (abs(det[:, None]) > 1e-20))
+    for axis in (0, 1):
+        first = xy
+        step = np.roll(xy, -1, axis=1) - first
+        divisor = np.where(abs(step[:, :, axis]) > 1e-20, step[:, :, axis], 1.)
+        for side in (-1, 1):
+            t = (side * extent[axis] - first[:, :, axis]) / divisor
+            other = first[:, :, 1-axis] + t * step[:, :, 1-axis]
+            weights.append((1-t[:, :, None]) * eye + t[:, :, None] * np.roll(eye, -1, axis=0))
+            valid.append((t >= 0) & (t <= 1) & (abs(other) <= extent[1-axis])
+                         & (abs(step[:, :, axis]) > 1e-20))
+    weights = np.maximum(np.concatenate(weights, axis=1), 0.)
+    valid = np.concatenate(valid, axis=1)
+    free_weights = weights * ~np.isin(faces, shared)[:, None, :]
+    norm = np.sum(free_weights**2, axis=2)
+    height = np.einsum('tki,ti->tk', weights, sign * local[faces, 2])
+    deficit = np.where(valid & (norm > 1e-20), np.maximum(half[2] + clearance - height, 0.), 0.)
+    selected = np.argmax(deficit / np.sqrt(np.maximum(norm, 1e-20)), axis=1)
+    row = np.arange(len(faces))
+    correction = deficit[row, selected, None] * free_weights[row, selected] / np.maximum(norm[row, selected, None], 1e-20)
+    dz = np.zeros(len(local))
+    np.maximum.at(dz, faces.ravel(), correction.ravel())
+    local[:, 2] += sign * dz
+
+
 def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radius, iterations=1600, wall_gap=None,
                  box_face_clearance=False):
     """Open any front/back bag around one content, as initialization.py does for the bubble mailer.
@@ -79,6 +124,7 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
 
     q = start.copy()
     front = np.unique(faces[np.isin(panel_ids, front_ids)])
+    shared = np.intersect1d(front, np.unique(faces[np.isin(panel_ids, back_ids)]))
     back = np.setdiff1d(np.unique(faces[np.isin(panel_ids, back_ids)]), front)
     center = q[front, :2].mean(axis=0)
     outer = (q[front, :2].max(axis=0) - q[front, :2].min(axis=0)) / 2
@@ -102,6 +148,16 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
     floor = q[:, 2].min()
     pairs = panel_pairs(rest, faces, panel_ids, front_ids, back_ids)
     wall_gap = 2 * radius + .0002 if wall_gap is None else wall_gap
+    seam_clearance = False
+    if box_face_clearance and len(shared):
+        initial = (q - item["position"]) @ item["rotation"]
+        triangles = initial[faces, :2]
+        overlap = np.all(triangles.max(axis=1) >= -item["half_size"][:2] - radius, axis=1)
+        overlap &= np.all(triangles.min(axis=1) <= item["half_size"][:2] + radius, axis=1)
+        sheets = np.isin(panel_ids, [*front_ids, *back_ids])
+        seam_clearance = bool(np.any(overlap & sheets & np.any(np.isin(faces, shared), axis=1)))
+        if seam_clearance:
+            seam_reference = (rest[shared] - item["position"]) @ item["rotation"]
     for _ in range(iterations):
         for group, target in zip(groups, targets):
             a, b = group.T
@@ -118,15 +174,30 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
             # exterior side, then let edge projection redistribute the slack.
             local = (q - item["position"]) @ item["rotation"]
             half = item["half_size"]
+            if seam_clearance:
+                # Initialize the sealed rim on the box's equatorial side wall.
+                # Otherwise point-only box clearance permits the entire rim to
+                # drift above/below the box and cut its corners.
+                local[shared, :2] = seam_reference[:, :2]
+                local[shared, 2] = 0.
             triangles = local[faces]
             overlap = np.all(triangles[:, :, :2].max(axis=1) >= -half[:2] - radius, axis=1)
             overlap &= np.all(triangles[:, :, :2].min(axis=1) <= half[:2] + radius, axis=1)
             for panels, sign in ((front_ids, 1), (back_ids, -1)):
-                ids = np.unique(faces[overlap & np.isin(panel_ids, panels)])
-                local[ids, 2] = sign * np.maximum(sign * local[ids, 2], half[2] + radius + .0003)
+                selected = faces[overlap & np.isin(panel_ids, panels)]
+                if seam_clearance and len(selected):
+                    # Shared seam vertices remain on the side wall; projecting
+                    # them to top and bottom would overwrite the same node.
+                    _clear_box_sheet(local, selected, shared, half, radius + .0003, sign)
+                elif len(selected):
+                    ids = np.unique(selected)
+                    local[ids, 2] = sign * np.maximum(sign * local[ids, 2], half[2] + radius + .0003)
             q = local @ item["rotation"].T + item["position"]
         open_pairs(q, pairs, wall_gap)
-        q[:, 2] = np.maximum(q[:, 2], floor)
+        if not seam_clearance:
+            # Box initialization is translated above the table only after both
+            # sheets have cleared the solid; an early floor blocks the bottom.
+            q[:, 2] = np.maximum(q[:, 2], floor)
     # Rest the lowest node just above the table, and move the content with it.
     shift = radius + .00015 - q[:, 2].min()
     q[:, 2] += shift
@@ -135,7 +206,7 @@ def wrap_generic(rest, start, faces, panel_ids, front_ids, back_ids, item, radiu
     gaps = q[pairs[:, 0], 2] - q[pairs[:, 1], 2] if len(pairs) else np.array([np.inf])
     return q, dict(maximum_edge_strain=float(np.abs(strain).max()), minimum_wall_gap_m=float(gaps.min()),
                    method="generic front/back plateau + projections + wall gap",
-                   box_face_clearance=box_face_clearance)
+                   box_face_clearance=box_face_clearance, box_seam_clearance=seam_clearance)
 
 
 def winding_number(v, f, pts):

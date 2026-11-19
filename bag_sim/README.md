@@ -12,6 +12,10 @@
 
 材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。现有侧抓存在接触预算超限，顶面搓起及气泡袋抓取记录为失败。物理验证状态见 [主题报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md) 与 [分类视频](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/randomized-bag-and-contents.mp4)。
 
+2026-11-19新增近满面薄层示例：袋350×250 mm、内容物330×230×6 mm、200 g；初始化修复共享封边邻面的包盒投影，参考拓扑与常规初态保持。顶抓未抓起；侧抓提起约176 mm但落位及穿透预算未通过。[实际视频与检查](../reports/folded-clothes-grasp-test.md)。
+
+同一薄层包裹已做CPU受控表面搓动：每指0.5/2 N、5/10 mm与零摩擦对照，有摩擦力但未形成明显折脊；35 mm网格下不能排除毫米级褶皱。[实测与视频](../reports/surface-rub-test.md)。
+
 ## 历史后端说明（2026-11-02）
 
 当时状态为Newton后端第一阶段完成，第二阶段（塑性/记忆/折痕）未开始。

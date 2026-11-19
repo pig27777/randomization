@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "<stdin>", line 7, in <module>
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/physical_parcel_yam.py", line 126, in parcel_world
+    p = Parcel(ParcelConfig(mode=cfg.mode, geometry=cfg.geometry, bag_size=tuple(cfg.bag_size),
+        payload_size=tuple(cfg.payload_size), payload_mass=cfg.payload_mass,
+    ...<4 lines>...
+        compression_k2=cfg.compression_k2, compression_damping=cfg.compression_damping,
+        **material))
+  File "/home/ubuntu/workspace/gzl/randomization/bag_sim/physical_parcel.py", line 239, in __init__
+    self.envelope = load_envelope(cfg)
+                    ~~~~~~~~~~~~~^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/bag_sim/physical_parcel.py", line 161, in load_envelope
+    raise ValueError(f"initial film does not enclose the payload without intersection: {preparation}")
+ValueError: initial film does not enclose the payload without intersection: {'maximum_edge_strain': 0.014548947212129182, 'minimum_wall_gap_m': 0.0091, 'method': 'generic front/back plateau + projections + wall gap', 'box_face_clearance': True, 'payload_intersecting_triangles': 60, 'payload_corner_winding': [1.0000000000000002, 1.4135798584282297e-16, 0.9999999999999994, -2.208718528794109e-18, 0.9999999999999997, -1.0601848938211722e-16, 1.000000000000001, 7.067899292141149e-17]}

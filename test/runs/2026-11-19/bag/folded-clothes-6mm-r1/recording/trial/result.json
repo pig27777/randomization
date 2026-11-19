@@ -1,0 +1,206 @@
+{
+  "config": {
+    "category": "bendable",
+    "yaw": 0.0,
+    "tilt": 0.0,
+    "dt": 0.0001,
+    "pinch_coeff": 0.0,
+    "contact_time": 0.001,
+    "wall_limit": 1800.0,
+    "smoke_seconds": 0.0,
+    "arm_height": 0.27,
+    "lift_height": 0.25,
+    "gripper_overtravel": 0.0,
+    "complete_motion": true,
+    "mode": "bendable",
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.35,
+      0.25
+    ],
+    "payload_size": [
+      0.33,
+      0.23,
+      0.006
+    ],
+    "payload_mass": 0.2,
+    "joint_stiffness": 0.08,
+    "simulation_seconds": 18.0,
+    "grasp_face": "top",
+    "support_height": 0.15,
+    "side_start_distance": 0.1,
+    "side_height_offset": 0.0,
+    "initial_state": "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-19/bag/folded-clothes-6mm-r1/preparation/initial_state.npz",
+    "bend_damping_ratio": 0.6,
+    "rayleigh": 0.0005,
+    "material": null,
+    "bag_profile": "pe",
+    "friction": 0.45,
+    "compression_k1": 800.0,
+    "compression_k2": 20000.0,
+    "compression_damping": 1.0
+  },
+  "hostname": "ubun",
+  "mujoco": "4.0.1",
+  "python": "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/bin/python",
+  "frozen_v13_sha256": null,
+  "source_sha256": {
+    "yam___init__": "2632ccca05391cc7dec3f958bb3a5620a1e9bef72f45ef7874963a236ed09505",
+    "yam_angles": "1f9d46b16b5c99d1084251c247b3d61175bf3542eb4fc11eedd13dd16149f324",
+    "yam_benchmark": "c02a4d0184c068810455b0261a8fffc8fbbfd7498df5e83e16f22e3d68cc6b5b",
+    "yam_contacts": "f894da72edc75b0d0e435860e4e3ffd84ef3483c5c09d11b508a7fd8757c85b7",
+    "yam_export_tetra": "98ab95e937707eb552eec024d70264996f38ae0b17b1b327df429c987301b824",
+    "yam_geometry": "b80de8640ff4f94c68954215e374d3b294991560d6585f3356a36363dc6340b6",
+    "yam_pinch": "e447d15c476ba66d772300d808cd25315f0e642269bcc51547c613b64af54c3a",
+    "yam_protocol": "d964502558c31332c560ee9e7318666cb4441d329b26a70d0a1d55399959c867",
+    "yam_provenance": "49f7f88d7b3fb77aa8aafa45bb235445feb929a3dd6dc23982f4e52e7313f32d",
+    "yam_render_comparison": "f54c57282d0e23ecbfd6141594edc68961cd85ba64c578a92f2cee6ae27f599d",
+    "yam_render_video": "902cb5b007a3547f6841bb6537e792dfe6bba9d0a44dd92a474a39ee2296a99c",
+    "yam_rigid_control": "855388c03048719e0e80fe89662e04abbfee3405f8fd9e1b914729b7ecb6de03",
+    "yam_robot": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+    "yam_run_suite": "7b7f010a471eb4fa481121992bfe36e908536024b84a7846f6e3d2339a63e480",
+    "platform": "d964502558c31332c560ee9e7318666cb4441d329b26a70d0a1d55399959c867",
+    "backend": "341321888057fba2f98e9dcd16d340a452fb4eba591c87b13921a64ab6a1b43d",
+    "parcel_model": "1b4d1434abd75ffa4c889d3d456fc1795562b1719e7d2f962787950f8a90c760",
+    "parcel_material": "baf174e77d2e79ee16a869cebcf32b0e8387953f6c8e0ffd4c18724ccd9dcb4c",
+    "parcel_wrap": "ba1df6ed7dddce97e891425022b8f2219c4c3c6220cb6b9d576d6ca879750142",
+    "parcel_geometry_check": "41fc0f7a676c620580fb2d69e142ae05ee5c42d12462d96d1a7ce38230caddb2"
+  },
+  "backend": "physical_parcel_yam",
+  "robot_source_sha256": "d7fe1430ec95edc74fe579290ea855aa59b1952773f20a4ff0c0603f078a346e",
+  "outcome": "grasp_fail",
+  "reason": "both fingertip contacts/connection lost >50ms",
+  "phase": "open",
+  "motion_completed": true,
+  "grasp_failure": {
+    "outcome": "grasp_fail",
+    "reason": "both fingertip contacts/connection lost >50ms",
+    "phase": "lift",
+    "time_s": 4.660000000002478
+  },
+  "sim_time_s": 10.952499999987813,
+  "wall_s": 394.3680822069873,
+  "timing_is_throughput": false,
+  "peaks": {
+    "penetration_mm": 0.054278121486136956,
+    "nonfinger_mm": 0.0,
+    "grip_N": 0.10353237800448624,
+    "down_N": 0.4141775555333469,
+    "tracking_mm": 40.68535721024102
+  },
+  "model_metrics": {
+    "load_transfer": "native finger-film-payload contacts",
+    "attachments": 0
+  },
+  "phases": [
+    {
+      "phase": "settle",
+      "start_s": 0.0,
+      "end_s": 0.30019999999998326
+    },
+    {
+      "phase": "approach",
+      "start_s": 0.30019999999998326,
+      "end_s": 2.435800000000716
+    },
+    {
+      "phase": "close",
+      "start_s": 2.435800000000716,
+      "end_s": 4.454100000002958
+    },
+    {
+      "phase": "lift",
+      "start_s": 4.454100000002958,
+      "end_s": 6.954299999997131
+    },
+    {
+      "phase": "lift_hold",
+      "start_s": 6.954299999997131,
+      "end_s": 7.1544999999966645
+    },
+    {
+      "phase": "carry",
+      "start_s": 7.1544999999966645,
+      "end_s": 8.927099999992533
+    },
+    {
+      "phase": "carry_hold",
+      "start_s": 8.927099999992533,
+      "end_s": 9.227299999991834
+    },
+    {
+      "phase": "lower",
+      "start_s": 9.227299999991834,
+      "end_s": 10.452299999988979
+    },
+    {
+      "phase": "open",
+      "start_s": 10.452299999988979,
+      "end_s": 10.952499999987813
+    }
+  ],
+  "initial_com": [
+    -0.24999578158444616,
+    0.0400129062283795,
+    0.15312353674151213
+  ],
+  "final_com": [
+    -0.24996648849593955,
+    0.03997270089572916,
+    0.1531505549146798
+  ],
+  "pinch_events": [],
+  "pinch_frame": "articulated palm; reactions load arm",
+  "robot": {
+    "robot": "YAM linear_4310, full articulated dynamics",
+    "ik_max_position_mm": 0.0648119366370879,
+    "ik_max_rotation_deg": 6.32679385593518,
+    "tracking_max_mm": 40.68535721024102,
+    "tracking_p95_mm": 31.563131796056282,
+    "actuator_peak_Nm": [
+      1.3820190909420802,
+      1.7331390041047996,
+      1.569114114361355,
+      0.5021222428784284,
+      0.09295614588750707,
+      0.23302903771386596
+    ],
+    "control_clip_steps": 10007,
+    "nonfinger_contact_samples": 0,
+    "nonfinger_max_penetration_mm": 0.0,
+    "self_max_penetration_mm": 0.0,
+    "original_force_limits_Nm": [
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -28.0,
+        28.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ],
+      [
+        -10.0,
+        10.0
+      ]
+    ]
+  },
+  "dimensions": {
+    "nv": 442,
+    "film_vertices": 142,
+    "film_triangles": 280,
+    "artificial_attachments": 0
+  },
+  "warnings": {}
+}

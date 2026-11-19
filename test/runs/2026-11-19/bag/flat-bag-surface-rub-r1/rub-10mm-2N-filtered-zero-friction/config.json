@@ -1,0 +1,132 @@
+{
+  "parcel": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.35,
+      0.25
+    ],
+    "payload_size": [
+      0.33,
+      0.23,
+      0.006
+    ],
+    "payload_mass": 0.2,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "mode": "bendable",
+    "areal_mass": 0.0552,
+    "membrane": 1200.0,
+    "poisson": 0.3,
+    "bending": 3.956043956043956e-07,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.6,
+    "material_thickness": 6e-05,
+    "rayleigh": 0.0005,
+    "radius": 0.00025,
+    "friction": 0.45,
+    "joint_stiffness": 0.08,
+    "joint_damping": 0.003,
+    "compression_k1": 800.0,
+    "compression_k2": 20000.0,
+    "compression_damping": 1.0,
+    "timestep": 0.0001,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      -0.25,
+      0.04
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere"
+  },
+  "source_config": "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/config.json",
+  "effective_dt_s": 0.0001,
+  "friction": 0.0,
+  "distance_per_pad_m": 0.01,
+  "target_force_each_N": 2.0,
+  "normal_gain_m_per_N_s": 0.01,
+  "force_filter_s": 0.005,
+  "phases": [
+    [
+      "hover",
+      0.02
+    ],
+    [
+      "press",
+      1.5
+    ],
+    [
+      "loaded",
+      0.05
+    ],
+    [
+      "rub",
+      0.4
+    ],
+    [
+      "unload",
+      0.6
+    ],
+    [
+      "relax",
+      0.1
+    ]
+  ],
+  "pad_origins_m": [
+    [
+      -0.28,
+      0.04,
+      0.18934551969285784
+    ],
+    [
+      -0.22,
+      0.04,
+      0.18938429182964137
+    ]
+  ],
+  "initial_metrics": {
+    "row_crest_m": 0.000683181601419558,
+    "row_excess_length_m": 9.23668797372934e-06,
+    "max_dihedral_change_deg": 0.0,
+    "min_principal_material_strain": 0.0027517132427419266,
+    "local_material_dx_range_m": [
+      0.0,
+      0.0
+    ],
+    "payload_com_displacement_m": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "rows": [
+    [
+      59,
+      51,
+      43,
+      35,
+      27
+    ],
+    [
+      60,
+      52,
+      44,
+      36,
+      28
+    ]
+  ],
+  "numerical_contact_radius_m": 0.00025,
+  "artificial_attachments": 0,
+  "prescribed_boundary": "shared translation-stage fingertips; actual qvel supplied to contact solver",
+  "machine": "ubun",
+  "mujoco": "4.0.1"
+}

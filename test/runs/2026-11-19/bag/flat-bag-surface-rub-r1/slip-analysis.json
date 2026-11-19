@@ -1,0 +1,107 @@
+{
+  "results": [
+    {
+      "case": "press-only-release",
+      "nominal_distance_mm": 0.0,
+      "friction": 0.8,
+      "pressure_in_band_fraction": [
+        1.0,
+        1.0
+      ],
+      "mean_tangential_slip_speed_mm_s": [
+        0.015364183676865335,
+        0.015066266328447635
+      ],
+      "integrated_tangential_x_slip_mm": [
+        0.0061227105121697475,
+        0.006008715963451876
+      ],
+      "integrated_contact_material_x_motion_mm": [
+        -0.005983102137259194,
+        0.005904557982931735
+      ],
+      "mean_friction_cone_ratio": [
+        0.029346533987280526,
+        0.03148807547071736
+      ]
+    },
+    {
+      "case": "rub-5mm",
+      "nominal_distance_mm": 5.0,
+      "friction": 0.8,
+      "pressure_in_band_fraction": [
+        1.0,
+        1.0
+      ],
+      "mean_tangential_slip_speed_mm_s": [
+        12.057862364734259,
+        11.684366182350397
+      ],
+      "integrated_tangential_x_slip_mm": [
+        4.846638536462818,
+        4.696657929262259
+      ],
+      "integrated_contact_material_x_motion_mm": [
+        0.1526046139779117,
+        -0.1345833323591206
+      ],
+      "mean_friction_cone_ratio": [
+        0.881226829884333,
+        0.8654684473150399
+      ]
+    },
+    {
+      "case": "rub-10mm",
+      "nominal_distance_mm": 10.0,
+      "friction": 0.8,
+      "pressure_in_band_fraction": [
+        1.0,
+        1.0
+      ],
+      "mean_tangential_slip_speed_mm_s": [
+        27.08086757267468,
+        24.329938638690656
+      ],
+      "integrated_tangential_x_slip_mm": [
+        10.885217091422243,
+        9.779381908630917
+      ],
+      "integrated_contact_material_x_motion_mm": [
+        -1.089239510080569,
+        -0.1748324077086973
+      ],
+      "mean_friction_cone_ratio": [
+        0.9046500187673309,
+        0.9153275258617167
+      ]
+    },
+    {
+      "case": "rub-10mm-zero-friction",
+      "nominal_distance_mm": 10.0,
+      "friction": 0.0,
+      "pressure_in_band_fraction": [
+        1.0,
+        1.0
+      ],
+      "mean_tangential_slip_speed_mm_s": [
+        24.841295478142804,
+        24.862779053068188
+      ],
+      "integrated_tangential_x_slip_mm": [
+        9.985691305914065,
+        9.994262491164832
+      ],
+      "integrated_contact_material_x_motion_mm": [
+        0.014986772199082968,
+        -0.00598724648903735
+      ],
+      "mean_friction_cone_ratio": [
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "method": "Force-weighted contact-point film velocity interpolated from actual triangle node velocities; tangent projection relative to actual pad velocity; integration over recorded rub samples.",
+  "limitations": "This post-processing uses pre-step generalized velocities, not solved contact velocities. High-frequency velocity/contact switching can alias the integrated small material motion. Values are exploratory and are excluded from quantitative conclusions; primary results use measured nodal positions and geometry.",
+  "validated_for_precise_slip": false
+}

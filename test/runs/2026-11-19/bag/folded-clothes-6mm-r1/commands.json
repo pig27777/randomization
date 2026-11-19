@@ -1,0 +1,43 @@
+{
+  "record": [
+    "flock",
+    "/tmp/claude-gpu.lock",
+    "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/bin/python",
+    "-B",
+    "-u",
+    "test/bag_model/record_physical_parcel.py",
+    "--config",
+    "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/config.json",
+    "--output",
+    "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/recording"
+  ],
+  "render": [
+    "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/bin/python",
+    "-B",
+    "test/bag_model/render_physical_parcel_video.py",
+    "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/recording/trial",
+    "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/grasp-raw.mp4",
+    "--ffmpeg",
+    "/usr/bin/ffmpeg"
+  ],
+  "regression": [
+    "flock",
+    "/tmp/claude-gpu.lock",
+    "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/bin/python",
+    "-B",
+    "-u",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "test/bag_model",
+    "-p",
+    "test_physical_parcel.py",
+    "-v"
+  ],
+  "environment": {
+    "PYTHONPATH": "test/bag_model:experience:.",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1"
+  }
+}

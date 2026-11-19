@@ -78,6 +78,20 @@ class PhysicalParcelTests(unittest.TestCase):
         winding = winding_number(e['current'], e['faces'], corners + e['payload_origin'])
         np.testing.assert_allclose(abs(winding), 1, atol=1e-10)
         self.assertLessEqual(e['metadata']['preparation']['maximum_edge_strain'], .05)
+        self.assertFalse(e['metadata']['preparation']['box_seam_clearance'])
+
+    def test_nearly_full_thin_payload_clears_shared_seam_triangles(self):
+        p = Parcel(replace(Config(), geometry='geometry/kraft_edge_sealed_35.npz',
+                           payload_size=(.33, .23, .006), radius=.00025))
+        e = p.envelope
+        with np.load(ROOT / 'bag_sim/geometry/kraft_edge_sealed_35.npz') as source:
+            np.testing.assert_array_equal(e['faces'], source['faces'])
+        self.assertEqual(p.m.nflexvert, 142)
+        self.assertEqual(p.m.neq, 0)
+        self.assertTrue(e['metadata']['preparation']['box_seam_clearance'])
+        self.assertEqual(e['metadata']['preparation']['payload_intersecting_triangles'], 0)
+        np.testing.assert_allclose(abs(np.asarray(e['metadata']['preparation']['payload_corner_winding'])), 1)
+        self.assertLessEqual(e['metadata']['preparation']['maximum_edge_strain'], .05)
 
     def test_triangle_crossing_is_detected_with_exterior_vertices(self):
         vertices = np.array([[-2., -2., 0.], [2., -2., 0.], [0., 2., 0.]])

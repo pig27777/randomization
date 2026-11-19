@@ -1,0 +1,21 @@
+[
+  "/usr/bin/ffmpeg",
+  "-hide_banner",
+  "-loglevel",
+  "error",
+  "-i",
+  "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/grasp-raw.mp4",
+  "-vf",
+  "pad=iw:ih+80:0:80:color=0x141920,drawtext=fontfile=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc:textfile=test/runs/2026-11-19/bag/folded-clothes-6mm-r1/caption-top.txt:fontcolor=white:fontsize=24:line_spacing=8:x=16:y=8",
+  "-c:v",
+  "libx264",
+  "-preset",
+  "fast",
+  "-crf",
+  "22",
+  "-pix_fmt",
+  "yuv420p",
+  "-movflags",
+  "+faststart",
+  "test/runs/2026-11-19/bag/folded-clothes-6mm-r1/top-grasp.mp4"
+]
