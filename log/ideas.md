@@ -6,6 +6,12 @@
 
 ## 跨线（袋子 × 内容物）
 
+### I-39 历史批次期限与维护入口 · 待整理（2026-11-19）
+
+F6/F7 已完成，`test/bag_model/deadline_watch.py` 只处理原批次 manifest，主线和 GPU 实验分支都只有两份文档引用。退役脚本时可把迁移表与说明指向原提交。`round3_flex.py` 的 `BASE`、`f3_inputs`、`append` 等仍被提速、聚膜和效果袋脚本调用；日期锁定的入口宜从常用导航移到历史复现说明，保留共享函数。
+
+`contents/segment/mjwarp_v13.py::run` 的 `sign` 和 `test/bag_model/flex_round2.py::run` 的 `niter_sum` 只赋值，真实控制和求解器统计有各自的数据路径。两处赋值可独立清理。`bag_sim/README.md` 和 `contents/README.md` 中 7 个两线均缺失的文件路径应从可运行索引撤下，对应候选可继续按历史状态记录。[依据与回归](../reports/git-history-audit-test.md)
+
 ### I-38 R3保持控制器的增益下界对首接触时序敏感 · 待v1.4处理（内容物线，2026-11-08）
 
 按总体判断审阅和用户要求记录：`protocols.Closer.hold`以`max(s_sq,1e-8)/(.05 F)`估计保持增益。硬物首接触瞬态可在共同挤压前使低通力越过目标，`s_sq=0`时增益退化；CPU同样可能发生。任务路径`top_grasp.py`、`policy_protocol.py`及GPU批量执行器不调用Closer，本次硬物R3平均力差按只记录层处理，不阻塞训练后端验收。冻结版本/测法本轮不改。
