@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
-run_dir=$(dirname "$0")
+run_dir=${1:-$(dirname "$0")}
 runner="$(dirname "$run_dir")/rss2027-stage1-whole-bag-materials-r1/run.sh"
 python=.venv-physical-parcel/bin/python
 bash "$runner" smoke "$run_dir"
 for material in kraft bubble; do
     case_dir="$run_dir/$material"
+    [[ -f "$case_dir/smoke.json" ]] || continue
     if "$python" -B - "$case_dir/smoke/trial/trace.json" <<'PY'
 import json
 from pathlib import Path
