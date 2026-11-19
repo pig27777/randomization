@@ -86,11 +86,16 @@ def main():
     parser.add_argument("cpu", type=Path, help="reference CPU trial directory")
     parser.add_argument("output", type=Path)
     parser.add_argument("--film-vertical-velocity", type=float, default=0., help="uniform film velocity, in m/s")
+    parser.add_argument("--ccd-tolerance-m", type=float, help="override the compiled convex collision tolerance")
     args = parser.parse_args()
     if not np.isfinite(args.film_vertical_velocity):
         parser.error("the added film velocity must be finite")
     trial = args.warp / "trial"
     model = mujoco.MjModel.from_binary_path(str(trial / "model.mjb"))
+    if args.ccd_tolerance_m is not None:
+        if not np.isfinite(args.ccd_tolerance_m) or args.ccd_tolerance_m <= 0:
+            parser.error("the CCD tolerance must be positive and finite")
+        model.opt.ccd_tolerance = args.ccd_tolerance_m
     geom = model.geom("payload_geom_0").id
     peak = json.loads((args.warp / "penetration-peaks.json").read_text())[-1]
     watched = {side["element"] for side in peak["sides"] if "element" in side and side["element"] >= 0}
@@ -114,6 +119,7 @@ def main():
                   for name, (t, qpos) in frames.items()}
     provenance = dict(warp_recording=str(args.warp), cpu_trial=str(args.cpu),
                       imposed_film_vertical_velocity_m_s=args.film_vertical_velocity,
+                      ccd_tolerance_m=float(model.opt.ccd_tolerance),
                       source_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), frames=result)
     with args.output.open("x") as stream:
         stream.write(json.dumps(provenance, indent=2) + "\n")

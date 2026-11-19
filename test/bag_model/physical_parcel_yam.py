@@ -44,6 +44,7 @@ class Config(TrialConfig):
     compression_damping: float = 1.
     ccd_tolerance_m: float | None = None
     payload_offset_xy: tuple = (0.0, 0.0)
+    film_contact_time_s: float | None = None
 
     def __post_init__(self):
         if self.grasp_face not in ("top", "side"):
@@ -61,6 +62,9 @@ class Config(TrialConfig):
         if self.ccd_tolerance_m is not None and (
                 not np.isfinite(self.ccd_tolerance_m) or self.ccd_tolerance_m <= 0.):
             raise ValueError("ccd_tolerance_m must be positive and finite")
+        if self.film_contact_time_s is not None and (
+                not np.isfinite(self.film_contact_time_s) or self.film_contact_time_s < 2 * self.dt):
+            raise ValueError("film_contact_time_s must be finite and at least twice the timestep")
 
 
 class ContactOnly:
@@ -162,6 +166,8 @@ def parcel_world(cfg):
             contact.set("solimp", vec(solimp))
         p.metadata["bag_profile"] = dict(name=cfg.bag_profile, source_sha256=profile["source_sha256"],
                                          cushion=profile["cushion"] is not None)
+    if cfg.film_contact_time_s is not None:
+        root.find(".//flexcomp[@name='bag']/contact").set("solref", vec([cfg.film_contact_time_s, 1.]))
     world = root.find("worldbody")
     world.remove(root.find(".//body[@name='contact_probe']"))
     if cfg.support_height:
@@ -186,6 +192,8 @@ def prepared_signature(parcel, cfg):
     settings = dict(model=model, support_height=cfg.support_height)
     if cfg.ccd_tolerance_m is not None:
         settings["ccd_tolerance_m"] = cfg.ccd_tolerance_m
+    if cfg.film_contact_time_s is not None:
+        settings["film_contact_time_s"] = cfg.film_contact_time_s
     return json.dumps(settings, sort_keys=True)
 
 

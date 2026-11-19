@@ -159,7 +159,7 @@ def build(args):
     return xml, m, d, material, ref, current, faces
 
 
-def pad_reactions(m, d, pad_ids, measure_traction=False):
+def pad_reactions(m, d, pad_ids, pull_speed=None):
     force = np.zeros((2, 3))
     inner = np.zeros(2)
     active = np.zeros(2, dtype=int)
@@ -182,13 +182,13 @@ def pad_reactions(m, d, pad_ids, measure_traction=False):
             if (2 * pad - 1) * sign * frame[0, 0] > .7:
                 normal = local[0] * abs(frame[0, 0])
                 inner[pad] += normal
-                if measure_traction and contact.dim == 3 and normal > 0:
+                if pull_speed is not None and contact.dim == 3 and normal > 0:
                     shear = local[1:3] / contact.friction[:2]
                     if np.linalg.norm(shear) >= .95 * local[0]:
                         cone_normal[pad] += normal
                         adr = contact.efc_address
                         pull_slip = sign * float(frame[1:, 2] @ d.efc_vel[adr + 1:adr + 3])
-                        if pull_slip > .10 * PULL_SPEED:
+                        if pull_slip > .10 * pull_speed:
                             sliding_normal[pad] += normal
     return force, inner, active, cone_normal, sliding_normal
 
@@ -287,7 +287,7 @@ def run(args):
                     z_rate = np.clip(.02 * (press - args.press_force), -.02, .02)
                 z = max(PAD_BOTTOM + .00002, z + args.dt * z_rate)
             elif phase == "pull":
-                z += PULL_SPEED * args.dt
+                z += args.pull_speed * args.dt
             positions = np.array([[-half, 0, z], [half, 0, z]])
             # Supply the prescribed rigid-body velocity to the contact Jacobian.
             d.qpos[pad_qpos] = positions - pad_origins
@@ -301,8 +301,9 @@ def run(args):
             sampled = step % sample_steps == 0 or step + 1 == nsteps
             watching_normal = (args.match_whole_bag_pe and phase == "press") or (controlled_gather and phase == "gather")
             if sampled or args.grip_target is not None or watching_normal:
+                traction_speed = args.pull_speed if args.match_whole_bag_pe and sampled and phase == "pull" else None
                 force, inner, active, cone, sliding = pad_reactions(
-                    m, d, pad_ids, measure_traction=args.match_whole_bag_pe and sampled and phase == "pull")
+                    m, d, pad_ids, pull_speed=traction_speed)
                 press = float(force[:, 2].sum())
                 if args.grip_target is not None:
                     grip_N = float(inner.sum())
@@ -414,6 +415,7 @@ def main():
     parser.add_argument("--refine-levels", type=int, default=1, help="number of local halvings")
     parser.add_argument("--match-whole-bag-pe", action="store_true", help="use the YAM empty-bag PE material and contact skin")
     parser.add_argument("--pull-seconds", type=float, default=.5)
+    parser.add_argument("--pull-speed", type=float, default=PULL_SPEED, help="vertical pull speed, in metres per second")
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
     parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
@@ -433,6 +435,8 @@ def main():
         parser.error("slack must be below the .020 m of material reserved for the side ridges")
     if not np.isfinite(args.pull_seconds) or args.pull_seconds <= 0:
         parser.error("pull duration must be positive and finite")
+    if not np.isfinite(args.pull_speed) or args.pull_speed <= 0:
+        parser.error("pull speed must be positive and finite")
     if args.grip_target is not None and (not args.prefold or not args.match_whole_bag_pe or
                                         not np.isfinite(args.grip_target) or args.grip_target <= 0):
         parser.error("grip target must be positive, finite, and used with matched PE preformed geometry")
