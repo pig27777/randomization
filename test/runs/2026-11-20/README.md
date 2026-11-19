@@ -8,6 +8,9 @@
 | [同态接触比对](bag/rss2027-stage1-payload-contact-parity-r1/) · [原生法向速度复核](bag/rss2027-stage1-payload-contact-parity-r2/) | 完整 YAM 侧抓的 4 个存档姿态，比较 CPU 和 Warp 角点约束 | 持锁运行 `rss2027_payload_contact_parity.py`，第二轮附 `--film-vertical-velocity .01` | 闭合末帧与停止帧膜面 191 法向差 89.18°、87.73°，Warp 原始读数与约束投影吻合。 |
 | [0.18 m/s CPU](bag/rss2027-stage1-pickup-baseline-cpu-r4/) · [同配置 GPU](bag/rss2027-stage1-pickup-baseline-warp-r4/) | 142 节点整袋侧抓，刚性内容物，200 μs | 持锁执行各自 `run.sh` | CPU 通过 4.7704 s，GPU 在 2.7804 s 露角停止，墙钟 477.94 s。 |
 | [整袋夹口材料](bag/rss2027-stage1-whole-bag-aperture-r1/) | 原空袋顶抓与同参 PE 侧抓的夹口材料面积 | `rss2027_yam_capture_audit.py <trial> <output>`，各回放一次 | 空袋 105 帧均为零；侧抓起抬 3.98 mm，悬停 8.74–10.19 mm。 |
-| [整袋材料对照](bag/rss2027-stage1-whole-bag-materials-r1/) | 同一 142 节点封口袋和刚性内容物，4 类工程预设 | 持锁执行 `run.sh smoke`，入口通过后执行 `run.sh <material>` | PE、气泡膜通过入口，牛皮纸和纸板穿透超 1 mm。PE 成功夹入，3.0202 s 提拉期间露角。气泡膜完整动作排队。 |
-| [偏置 15 mm CPU](bag/rss2027-stage1-pickup-baseline-cpu-r5/) · [条件 GPU](bag/rss2027-stage1-pickup-baseline-warp-r5/) | 原慢速算力工况移动内容物横向位置 | 持锁执行各自 `run.sh` | CPU 通过 4.7804 s，悬停最小闭合轴反力 2.53 N。同配置 GPU 已启动。 |
-| [纸材早期接触对照](bag/rss2027-stage1-whole-bag-materials-r2/) | 同牛皮纸与纸板的 0.5 ms 接触时间常数入口 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` | 排队。 |
+| [整袋材料对照](bag/rss2027-stage1-whole-bag-materials-r1/) | 同一 142 节点封口袋和刚性内容物，4 类工程预设 | 持锁执行 `run.sh smoke`，入口通过后执行 `run.sh <material>` | PE、气泡膜通过入口。PE 成功夹入后露角，气泡膜未建立正拉力。牛皮纸和纸板入口穿透超 1 mm。 |
+| [偏置 15 mm CPU](bag/rss2027-stage1-pickup-baseline-cpu-r5/) · [同配置 GPU](bag/rss2027-stage1-pickup-baseline-warp-r5/) | 原慢速算力工况移动内容物横向位置 | 持锁执行各自 `run.sh` | CPU 通过 4.7804 s。同配置 GPU 在 2.8805 s 露出同一角点，相交膜面由 191 变为 204。 |
+| [纸材 0.5 ms 接触复测](bag/rss2027-stage1-whole-bag-materials-r2/) | 同牛皮纸与纸板，减小接触时间常数 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 及 `run.sh <material> <本轮目录>` | 入口峰值 0.855/0.748 mm，均通过。完整回合已启动。 |
+| [约 30% 填充率 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r6/) · [同配置 GPU](bag/rss2027-stage1-pickup-baseline-warp-r6/) | 已存紧凑包装尺寸和偏置，复用 YAM 短动作 | 持锁执行各自 `run.sh` | CPU 通过 4.7626 s，墙钟 91.35 s。条件 GPU 排队。 |
+| [PE 膜量与载荷区间](bag/rss2027-stage1-pe-aperture-width-r1/) | 2.5/1.25 mm PE 预褶曲线的整指宽膜量、起滑前刚度和超载 | `measure.py <牵引数据目录> <本轮 audit.json>` | 捕获膜量差约 43%，候选刚度差 56.7%，连续双侧超载均仅 9 ms。 |
+| [低余料和压力](bag/rss2027-stage1-pe-low-slack-r1/) · [补做拉拔](bag/rss2027-stage1-pe-capture-boundary-r1/) | 同参 PE 平坦侧余料的第三档压力、余料及空夹对照 | 持锁执行各轮 `run_cases.sh` | 0/2 mm 余料及 0.3 N 组三组均无正拉力。补做拉拔排队。 |

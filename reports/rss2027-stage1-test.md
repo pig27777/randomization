@@ -33,7 +33,7 @@
 
 ## 整袋夹入诊断、同参 PE 与内容物装配
 
-最近检查时间 2026-11-20 00:24（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
+最近检查时间 2026-11-20 00:39（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
 
 | 检查 | 方法 | 结果 |
 | --- | --- | --- |
@@ -72,3 +72,6 @@
 | 整袋夹口材料 | `rss2027_yam_capture_audit.py` 回放 R4 空袋与同参 PE 侧抓，另用已知面积验证裁剪 | 平面裁剪的变形/参考面积为 4/24 m²。空袋 105 帧为零，整袋 PE 起抬 3.98 mm、悬停 8.74–10.19 mm，使用 20 mm 指宽和矩形夹口等效。 |
 | 整袋材料装配与入口 | 以同一 142 节点资产检查四种 `parcel_world`，运行 `rss2027-stage1-whole-bag-materials-r1/run.sh smoke`，按单步位置核对峰值。复跑 `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py` | 19 项回归通过。PE、气泡膜的 200 μs 入口通过；牛皮纸 200 μs 与纸板 100 μs 在静置早期的穿透峰值 1.416/1.390 mm 超限。 |
 | PE 同参整袋短动作与 15 mm 偏置 | 持锁运行材料对照 `run.sh pe` 和偏置 CPU `run.sh`，分别检查夹入数据和离台门槛 | PE 200 μs 成功夹入，3.0202 s 露角停止。偏置的原 PE 类整袋 CPU 通过 4.7804 s，墙钟 87.62 s，穿透 0.526 mm，GPU 对照已启动。 |
+| 偏置在线 GPU、约 30% 填充率 CPU | 持锁执行 `rss2027-stage1-pickup-baseline-warp-r5/run.sh` 和 `cpu-r6/run.sh`，以两端轨迹复核几何与悬停 | GPU 偏置 2.8805 s 露角，穿透 0.676 mm、966 MiB、零溢出。约 30% CPU 在 4.7626 s 通过离台、双侧承载和穿透门槛。 |
+| 气泡膜动作、纸材 0.5 ms 入口 | 持锁执行材料首轮 `run.sh bubble` 与 `run.sh smoke <材料复测目录>` | 气泡膜 3.0188 s 失触，起抬有 2.63 mm 等效膜长但无正拉力。两种纸材入口峰值 0.855/0.748 mm，均通过，完整回合已启动。 |
+| 同参 PE 起拉复核 | 对存档运行 `rss2027-stage1-pe-aperture-width-r1/measure.py`，再持锁执行 `rss2027-stage1-pe-low-slack-r1/run_cases.sh` | 捕获帧整指宽等效长度 5.33/3.04 mm，起滑前候选刚度 77.52/33.58 N/m，超载各 9 ms。低余料或低压力三组均无正拉力，其中两组有合格收拢窗口。 |
