@@ -63,6 +63,14 @@ def aperture_material_areas(current, reference, half_extents):
     return areas
 
 
+def aperture_box(data, pad_centers, left_pad_body, opening):
+    # Finger x spans the 20 mm width, y is the gap, and z spans 40 mm.
+    # Use the finger frame because the mesh compiler rotates the pad axes.
+    # The rectangular envelope includes the rounded corners.
+    return (pad_centers.mean(axis=0), data.xmat[left_pad_body].reshape(3, 3),
+            np.array([.010, opening / 2, .020]))
+
+
 def audit(trial, output):
     model = mujoco.MjModel.from_binary_path(str(trial / "model.mjb"))
     data = mujoco.MjData(model)
@@ -97,15 +105,10 @@ def audit(trial, output):
         axis /= np.linalg.norm(axis)
         contacts = frame_contacts(model, data, groups, axis)
         by_pad = [sum(c["pad"] == pad and c["inner"] for c in contacts) for pad in (0, 1)]
-        # Use the finger frame. The mesh compiler rotates the pad's local axes.
-        rotation = data.xmat[left_pad_body].reshape(3, 3)
-        # Finger x spans the 20 mm pad width, y is the gap, and z spans 40 mm.
-        # The rectangular volume includes the rounded corners as an upper bound.
         opening = sample["gap"]
+        center, rotation, half_extents = aperture_box(data, centers, left_pad_body, opening)
         if opening > 0.:
             max_axis_error = max(max_axis_error, abs(1. - float(rotation[:, 1] @ axis)))
-        half_extents = np.array([.010, opening / 2, .020])
-        center = centers.mean(axis=0)
         intersecting = np.flatnonzero(triangle_box_intersections(
             data.flexvert_xpos, faces, half_extents, center, rotation
         )) if opening > 0 else np.empty(0, dtype=int)
