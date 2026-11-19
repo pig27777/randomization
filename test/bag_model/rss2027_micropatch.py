@@ -272,6 +272,8 @@ def run(args):
     open_half = pad_origins[1, 0]
     close_half = CLOSED_HALF if args.closed_gap is None else PAD_HALF_THICKNESS + args.closed_gap / 2
     min_grip_half = .00405 if args.prefold else PAD_HALF_THICKNESS + 1.5 * material["contact_radius_m"]
+    if args.min_grip_gap is not None:
+        min_grip_half = PAD_HALF_THICKNESS + args.min_grip_gap / 2
     half = open_half
     previous = pad_origins
     marker = np.flatnonzero((abs(ref[:, 0] - args.coupon_offset_x) < 1e-9) & (abs(ref[:, 1]) < .006))
@@ -459,6 +461,7 @@ def main():
     parser.add_argument("--hold-seconds", type=float, default=.06)
     parser.add_argument("--hold-downforce", type=float, help="relieve support compression to this level during hold")
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
+    parser.add_argument("--min-grip-gap", type=float, help="minimum gap in force-controlled closure, in metres")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
     parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
     parser.add_argument("--smoke", action="store_true")
@@ -497,6 +500,10 @@ def main():
                                         args.grip_target <= 0 or (not args.prefold and
                                         (args.gather_seconds is None or args.closed_gap is None))):
         parser.error("grip target needs positive force and matched PE with a prefold or a controlled gather and gap")
+    if args.min_grip_gap is not None:
+        max_initial_half = .0065 if args.prefold else OPEN_HALF
+        if args.grip_target is None or not 0 < args.min_grip_gap < 2 * (max_initial_half - PAD_HALF_THICKNESS):
+            parser.error("minimum grip gap needs force feedback and must be within the initial opening")
     if args.hold_downforce is not None and (args.prefold or args.grip_target is None or
                                             not np.isfinite(args.hold_downforce) or args.hold_downforce < 0):
         parser.error("hold downforce requires flat-specimen grip feedback and a finite nonnegative target")

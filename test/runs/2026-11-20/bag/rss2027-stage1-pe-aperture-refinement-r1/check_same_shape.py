@@ -1,11 +1,16 @@
 """Rebuild native fingertip contact geometry at the same archived film shape."""
 
+import argparse
 import csv
 import json
 from pathlib import Path
+import sys
 
 import mujoco
 import numpy as np
+
+sys.path.insert(0, "test/bag_model")
+from rss2027_micropatch import OPEN_HALF, pad_reactions  # noqa: E402
 
 
 def interpolate(reference, faces, current, points):
@@ -27,7 +32,7 @@ def interpolate(reference, faces, current, points):
     return np.einsum("ij,ijk->ik", weights[index, side], current[cells[index, side]])
 
 
-def collision(model, reference, current, sample):
+def pose(model, reference, current, sample):
     data = mujoco.MjData(model)
     film = model.jnt_qposadr[model.body_jntadr[model.flex_vertbodyid, None] + np.arange(3)]
     bodies = np.array([model.body(name).id for name in ("left", "right")])
@@ -35,10 +40,15 @@ def collision(model, reference, current, sample):
     pad_lookup = {int(geom): pad for pad, body in enumerate(bodies)
                   for geom in np.flatnonzero(model.geom_bodyid == body)}
     data.qpos[film] = current - reference
-    half = .0115 - float(sample["gather_per_pad_m"])
+    half = OPEN_HALF - float(sample["gather_per_pad_m"])
     height = float(sample["pad_z_m"])
     centers = np.array([[-half, 0., height], [half, 0., height]])
     data.qpos[pads] = centers - model.body_pos[bodies]
+    return data, pad_lookup
+
+
+def collision(model, reference, current, sample):
+    data, pad_lookup = pose(model, reference, current, sample)
     mujoco.mj_fwdPosition(model, data)
     assert np.allclose(data.flexvert_xpos, current, atol=1e-12, rtol=0.)
     inner = [[], []]
@@ -59,6 +69,24 @@ def collision(model, reference, current, sample):
     return stats
 
 
+def force_at_rest(model, reference, current, sample, timeconst):
+    data, pad_lookup = pose(model, reference, current, sample)
+    geoms = list(pad_lookup)
+    original = model.geom_solref[geoms, 0].copy()
+    model.geom_solref[geoms, 0] = timeconst
+    try:
+        mujoco.mj_forward(model, data)
+        assert np.allclose(data.flexvert_xpos, current, atol=1e-12, rtol=0.)
+        effective = [float(c.solref[0]) for c in data.contact if c.efc_address >= 0 and 0 in c.flex
+                     and any(g in pad_lookup for g in c.geom)]
+        assert effective and np.allclose(effective, timeconst, atol=1e-12, rtol=0.)
+        forces, inner, active, _, _ = pad_reactions(model, data, pad_lookup)
+        return dict(contact_time_s=timeconst, inner_by_pad_N=inner.tolist(), loaded_contacts=active.tolist(),
+                    force_by_pad_N=forces.tolist(), net_vertical_pull_N=float(-forces[:, 2].sum()))
+    finally:
+        model.geom_solref[geoms, 0] = original
+
+
 def load_archived(case):
     model = mujoco.MjModel.from_binary_path(str(case / "model.mjb"))
     with (case / "curve.csv").open() as stream:
@@ -68,6 +96,9 @@ def load_archived(case):
 
 
 def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--contact-forces", action="store_true", help="solve fixed poses at zero initial velocity")
+    args = parser.parse_args()
     run = Path(__file__).parent
     coarse = run.parent / "rss2027-stage1-pe-offcenter-convergence-r1/fine-extended"
     refined = run / "refined-aperture"
@@ -91,11 +122,17 @@ def main():
         assert np.allclose(upsampled[shared_indices], frame, atol=1e-12, rtol=0.)
         reference_shape = interpolate(ref_a, face_a, frame, centroids)
         error = np.linalg.norm(reference_shape - upsampled[face_b].mean(axis=1), axis=1)
-        output.append(dict(pull_elapsed_s=float(row["t_s"]) - t0,
+        observation = dict(pull_elapsed_s=float(row["t_s"]) - t0,
                            aperture_centroid_error_max_m=float(error[near_pad].max()),
                            aperture_centroid_error_median_m=float(np.median(error[near_pad])),
                            grid_1_25_mm=collision(a, ref_a, frame, row),
-                           grid_0_625_mm=collision(b, ref_b, upsampled, row)))
+                           grid_0_625_mm=collision(b, ref_b, upsampled, row))
+        if args.contact_forces:
+            observation["forces_at_rest"] = {
+                name: [force_at_rest(model, reference, vertices, row, timeconst) for timeconst in (.001, .002)]
+                for name, model, reference, vertices in (("grid_1_25_mm", a, ref_a, frame),
+                                                          ("grid_0_625_mm", b, ref_b, upsampled))}
+        output.append(observation)
     print(json.dumps(dict(scope="Contact geometry on archived 1.25 mm poses", samples=output), indent=2))
 
 
