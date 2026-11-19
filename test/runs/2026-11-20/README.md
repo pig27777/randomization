@@ -20,6 +20,7 @@
 | [同态凸碰撞容差](bag/rss2027-stage1-ccd-parity-r1/) | 原 CPU 和 Warp 接触法向差异的容差敏感性 | 持锁执行本轮 `run_cases.sh`，再用 `check_normal_depth.py` | 0.1/1 μm 容差下，关键法向仍相差约 89°，设备原生法向与深度的投影不一致。 |
 | [隔离 Warp 法向修复](bag/rss2027-stage1-warp-film-normal-r1/) | 保留产生深度的 GJK/EPA 法向，原同态对照与完整在线居中侧抓 | 用 `create_overlay.py` 生成隔离版本，持锁执行 `run_parity.sh` 和条件 `run_trial.sh`，再执行 `analyze_trial.py` | 整袋完成 4.76965 s，墙钟 539.12 s，显存峰值 966 MiB，穿透 0.469 mm。[褶皱录像](bag/rss2027-stage1-warp-film-normal-r1/yam-warp-fold.mp4)。 |
 | [约 30% 布局的隔离版](bag/rss2027-stage1-warp-film-normal-30pct-r1/) | 同修正的另一内容物布局对照 | 持锁执行本轮 `run.sh` | 4.75966 s 完整通过，墙钟 579.86 s，穿透 0.813 mm，停止态保持包覆。 |
-| [纸板上缘进给](bag/rss2027-stage1-whole-bag-materials-r4/) | 只将纸板接近目标升高 16 mm | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 及 `run.sh paperboard <本轮目录>` | 入口通过，完整动作排队。 |
+| [纸板上缘进给](bag/rss2027-stage1-whole-bag-materials-r4/) | 只将纸板接近目标升高 16 mm | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 及 `run.sh paperboard <本轮目录>` | 完成 6.0969 s，悬停离台，穿透峰值 0.685 mm，最小单指力 6.98 N。 |
+| [牛皮纸与气泡膜上缘进给](bag/rss2027-stage1-whole-bag-upper-r1/) | 原各自基准参数下，对照同一 16 mm 高度变化 | 持锁执行材料首轮 `run.sh smoke <本轮目录>` 和各自完整动作 | 排队。 |
 | [PE 受控拉力](bag/rss2027-stage1-pe-force-pull-r1/) · [1 N 夹力对照](bag/rss2027-stage1-pe-force-pull-r2/) | 同参 PE 0.30 N 拉力反馈，对比 6.5 N 与 1.0 N 夹力 | 持锁执行首轮 `run.sh`。后者附 <本轮目录> 和 `1.0` | 6.5 N 有 0.1229 s 拉力达标窗，同期无整体滑移。1 N 组排队。 |
 | [闭环场景的批量设备短窗](bag/rss2027-stage1-yam-batch-reference-r1/) | 通过轨迹的三种姿态，1/16/64 世界 | 持锁执行本轮 `run.sh` | 排队。 |
