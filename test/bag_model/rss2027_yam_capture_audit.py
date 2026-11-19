@@ -78,9 +78,11 @@ def audit(trial, output):
     mujoco.mj_forward(model, data)
     reference = data.flexvert_xpos.copy()
     pads = [model.geom(f"{side}_pad").id for side in ("left", "right")]
+    left_pad_body = model.geom_bodyid[pads[0]]
     groups = [set(np.flatnonzero(model.geom_bodyid == model.geom_bodyid[geom])) for geom in pads]
     faces = model.flex_elem.reshape(-1, 3)
     rows, locator = [], []
+    max_axis_error = 0.
     phases = ("close", "lift", "lift_hold")
     if result["config"].get("pickup_release_seconds", 0.):
         phases += ("open",)
@@ -95,10 +97,13 @@ def audit(trial, output):
         axis /= np.linalg.norm(axis)
         contacts = frame_contacts(model, data, groups, axis)
         by_pad = [sum(c["pad"] == pad and c["inner"] for c in contacts) for pad in (0, 1)]
-        rotation = data.geom_xmat[pads[0]].reshape(3, 3)
-        # 20 mm wide, 40 mm high pads. The rail gap is between the inner faces.
+        # Use the finger frame. The mesh compiler rotates the pad's local axes.
+        rotation = data.xmat[left_pad_body].reshape(3, 3)
+        # Finger x spans the 20 mm pad width, y is the gap, and z spans 40 mm.
         # The rectangular volume includes the rounded corners as an upper bound.
         opening = sample["gap"]
+        if opening > 0.:
+            max_axis_error = max(max_axis_error, abs(1. - float(rotation[:, 1] @ axis)))
         half_extents = np.array([.010, opening / 2, .020])
         center = centers.mean(axis=0)
         intersecting = np.flatnonzero(triangle_box_intersections(
@@ -125,7 +130,8 @@ def audit(trial, output):
         writer.writerows(rows)
     (output / "capture-locations.json").write_text(json.dumps(locator, indent=2) + "\n")
     lift = [row for row in rows if row["phase"] == "lift"]
-    summary = dict(trial=str(trial), outcome=result["outcome"], sample_count=len(rows),
+    summary = dict(trial=str(trial), aperture_frame="left_finger_body", max_closing_axis_error=max_axis_error,
+                   outcome=result["outcome"], sample_count=len(rows),
                    bilateral_inner_candidates=sum(row["left_inner_candidates"] > 0
                                                   and row["right_inner_candidates"] > 0 for row in rows),
                    peak_aperture_material_length_m=max(row["aperture_material_length_m"] for row in rows),
@@ -136,7 +142,7 @@ def audit(trial, output):
                    last_close=next((row for row in reversed(rows) if row["phase"] == "close"), None),
                    first_lift=lift[0] if lift else None)
     (output / "capture-summary.json").write_text(json.dumps(summary, indent=2) + "\n")
-    print(json.dumps(summary, indent=2))
+    return summary
 
 
 def main():
@@ -144,7 +150,7 @@ def main():
     parser.add_argument("trial", type=Path)
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
-    audit(args.trial, args.output)
+    print(json.dumps(audit(args.trial, args.output), indent=2))
 
 
 if __name__ == "__main__":

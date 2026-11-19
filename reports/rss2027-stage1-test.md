@@ -33,7 +33,7 @@
 
 ## 整袋夹入诊断、同参 PE 与内容物装配
 
-最近检查时间 2026-11-20 02:23（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
+最近检查时间 2026-11-20 02:33（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。夹口膜量及依赖该量的事件见坐标复核行。
 
 | 检查 | 方法 | 结果 |
 | --- | --- | --- |
@@ -101,3 +101,6 @@
 | 气泡膜 135 mm 净空与筛查 | 持锁运行 `rss2027-stage1-bubble-clear-start-r2/run.sh`，回放闭合与提拉的 81 帧 | 静置指尖反力为零，完整侧抓 3.3772 s、峰值 0.177 mm，内容物留在高台、无夹入和正拉力。 |
 | 牛皮纸 10 mm 高度 | 持锁执行材料首轮 `run.sh kraft <本轮目录>`，核对原生最大穿透和首个提拉观测 | 峰值 1.591 mm 回到膜—膜，4.5017 s 双指失触，未通过离台。16 mm 高度净空复测已启动。 |
 | PE 入夹后卸压 | 持锁运行 `rss2027-stage1-pe-gather-relief-r1/run.sh`，回放夹力和局部节点 | 峰值 0.177 mm、零告警。起抬竖向压触由 0.812 降到 0.103 N，内侧合力由 0.825 降到 0.095 N，未建立正拉力。经定位成对隆起，偏移对照排队。 |
+| 整袋夹口坐标复核 | `.venv-physical-parcel/bin/python -B test/runs/2026-11-20/bag/rss2027-stage1-aperture-axis-r1/replay.py` | 29 条轨迹、31 份曲线、7,801 个观测。正开口指体 y 与闭合方向误差最大 $2.77\times10^{-12}$。时序、反力和触点一致。三档整袋 PE 脱手仍在 10.45–10.59 mm，纸板只有 22.06 mm 的完全脱手通过。[复算索引](../test/runs/2026-11-20/bag/rss2027-stage1-aperture-axis-r1/index.json)。 |
+| 试片 0.625 mm 偏移 | 持锁执行 `rss2027-stage1-pe-offcenter-gather-r1/run.sh`，先比对初始节点和拓扑，再检查夹口力、材料及提拉 | 775 个节点的参考和初始位置按预定偏移。细网格夹力达标 89.4 ms，双侧正拉力达标 192.9 ms，峰值 0.0812 N。0.25 s 内未脱手，网格和步长复核尚待。 |
+| 袋模型回归 | `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py` | 19 项通过，保留 `crossing_triangle` 测试夹具的预期告警。 |
