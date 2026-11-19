@@ -240,6 +240,8 @@ def run(args):
     if controlled_gather:
         phases = tuple((phase, args.gather_seconds if phase == "gather" else duration)
                        for phase, duration in phases)
+    if args.gather_only:
+        phases = phases[:3]
     row = np.flatnonzero(np.isclose(ref[:, 1], 0., atol=1e-12))
     reference_lengths = np.linalg.norm(np.diff(ref[row], axis=0), axis=1)
     local_pitch = [SIDE / args.cells / (2**args.refine_levels if args.refine_contact in (axis, "both") else 1)
@@ -390,7 +392,7 @@ def run(args):
                    traction_slip_candidate_t_s=float(time_s[traction_slip[0]]) if traction_slip else None,
                    traction_slip_candidate_force_N=float(tension[traction_slip[0]]) if traction_slip else None,
                    simulated_s=float(d.time), wall_s=time.perf_counter() - started,
-                   smoke_only=args.smoke, material_parameters_identified=False)
+                   smoke_only=args.smoke, gather_only=args.gather_only, material_parameters_identified=False)
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary), flush=True)
     return valid
@@ -414,6 +416,7 @@ def main():
     parser.add_argument("--pull-seconds", type=float, default=.5)
     parser.add_argument("--grip-target", type=float, help="prefold comparison using total inner normal force, in newtons")
     parser.add_argument("--gather-seconds", type=float, help="duration of pressure-controlled gathering for flat matched PE")
+    parser.add_argument("--gather-only", action="store_true", help="end after pressure-controlled gathering")
     parser.add_argument("--smoke", action="store_true")
     args = parser.parse_args()
     if args.cells < 4 or args.cells % 4:
@@ -436,6 +439,8 @@ def main():
     if args.gather_seconds is not None and (args.prefold or not args.match_whole_bag_pe or
                                            not np.isfinite(args.gather_seconds) or args.gather_seconds <= 0):
         parser.error("gather duration must be positive, finite, and used with flat matched PE")
+    if args.gather_only and args.gather_seconds is None:
+        parser.error("gather-only requires pressure-controlled gathering")
     if args.friction is None:
         args.friction = .8 if args.match_whole_bag_pe else .5
     if not 0 <= args.friction <= 1 or not np.isfinite(args.press_force) or args.press_force <= 0:

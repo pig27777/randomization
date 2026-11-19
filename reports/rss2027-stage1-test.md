@@ -33,7 +33,7 @@
 
 ## 整袋夹入诊断、同参 PE 与内容物装配
 
-最近检查时间 2026-11-19 23:24（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
+最近检查时间 2026-11-19 23:48（北京时间）。ubun，MuJoCo 4.0.1，GPU 在线入口使用 RTX 5090 与 MuJoCo Warp 4.0.1。正式动力学均持项目共享锁。
 
 | 检查 | 方法 | 结果 |
 | --- | --- | --- |
@@ -56,12 +56,13 @@
 | --- | --- | --- |
 | 整袋侧抓正对照 | 持锁执行 `rss2027-stage1-side-grasp-r1/run.sh`，回放核查夹入及导出提拉力—位移 | 8.50 s 试验覆盖 0.20 s 离台悬停，质心升高 146.57–158.59 mm，峰值拉力 5.049 N、原生穿透 0.484 mm、零告警。 |
 | 侧抓褶皱录像 | `render_rss2027_fold_video.py --edge 94 95 --start .32 --end 8.42 --highlight-time 7.42`；FFmpeg 完整解码并目检 | 1280×512、203 帧、25 fps，膜边角度 5.41°→106.49°。[视频](../test/runs/2026-11-19/bag/rss2027-stage1-side-grasp-r1/yam-side-fold.mp4)。 |
-| 同参 PE 整袋侧抓 | 持锁执行 `rss2027-stage1-side-grasp-matched-pe-r1/run.sh` 与 `half-step-r1/run.sh`，检查持压和包覆 | 100 μs 提拉时露角，原生穿透峰值 1.501 mm。50 μs 离台悬停、角点包覆，但原生峰值 1.113 mm 仍超预算。25 μs 与峰值触点采集已排队。 |
+| 同参 PE 整袋侧抓 | 持锁执行 `rss2027-stage1-side-grasp-matched-pe-r1/run.sh`、`half-step-r1/run.sh` 与 `fine-step-r1/run.sh`，检查包覆并归档峰值接触 | 100 μs 露角停止，50 μs 悬停但穿透超限，25 μs 通过。25 μs 悬停质心升高 143.18–155.90 mm，膜—膜穿透峰值 0.642 mm，独立膜—物几何无相交。匹配材质视频完整解码并目检。 |
 | 单轴网格与 1.25 mm 两轴网格 | 执行 `rss2027-stage1-pe-mesh-axes-r1/run_cases.sh` 和 `rss2027-stage1-pe-quarter-grid-r1/run.sh`，复用切向速度检查 | 单轴均达到夹持力，闭合轴加密使起拉膜长减少约 3 mm。定开口预褶的 2.5→1.25 mm 峰值、持时、脱开差小于 5%，触点起滑仍差 63%。 |
 | GPU 耗时分解 | 持锁执行 `rss2027_yam_warp_profile.py`，用 R4 两个状态帧分整图与两段图各 64 步 | `step2` 18.46–33.01 ms/步，完整反馈约 3.23–3.62 ms/步，零溢出。这些数据用于瓶颈定位，完整回合仍待测。 |
 | 3–5 s 基线 CPU 候选 | 执行 `rss2027-stage1-pickup-baseline-cpu-r1/run.sh` 和 `cpu-r2/run.sh` | 首个候选 6.50 s 仍在闭合；第二个以 200 μs 完成 4.226 s 抓取悬停，墙钟 82.15 s，穿透 0.697 mm，零告警。 |
-| 基线 GPU 200 μs | `rss2027-stage1-pickup-baseline-warp-r2/run.sh`，对停止态以 CPU 重算包覆几何 | 2.7604 s 提拉失败，墙钟 469.11 s、进程显存最高采样 966 MiB、零溢出。独立确认一个角点露出。同动作 100 μs CPU 与条件 GPU 待跑。 |
-| 牵引分组和穿透峰值记录 | 使用现有 1.25 mm 持载片状态和同参整袋记录状态做几何重建 | 两侧摩擦锥分类满足载荷量纲和包含关系，峰值触点可定位两片膜三角坐标。实际全过程记录待排队试验。 |
+| 基线 GPU 200 μs | `rss2027-stage1-pickup-baseline-warp-r2/run.sh`，对停止态以 CPU 重算包覆几何 | 2.7604 s 提拉失败，墙钟 469.11 s、进程显存最高采样 966 MiB、零溢出。独立确认一个角点露出。 |
+| 基线 100 μs CPU | `rss2027-stage1-pickup-baseline-cpu-r3/run.sh` 与接触回放 | 通过完整 4.2248 s，墙钟 151.49 s，穿透 0.367 mm，并取得逐步峰值记录。同配置 GPU 在线复测已启动。 |
+| 牵引分组和穿透峰值记录 | 使用已存持载片验证分组，25 μs 同参整袋实际记录峰值 | 两侧摩擦锥分类通过包含关系核对，同态峰值定位到闭合期膜面 3/151，并用原三角面投影复核。 |
 | 原生触点整体滑移 | 持锁执行 `rss2027-stage1-pe-traction-r1/run_cases.sh`，对比 2.5/1.25 mm 原生摩擦锥和有载切向速度 | 两档候选力 0.33756/0.29977 N，力差 11.2%；时刻 0.547/0.529 s，差 3.3%。力仍未过 10%。 |
-| 平坦稳压聚拢 | 持锁执行 `rss2027-stage1-pe-gather-force-r1/run.sh`，在未饱和采样窗回归 | 稳压原始最长窗口 0.4311 s，按 1 ms 压力/膜长采样的斜率候选 0.434 m/m。原始窗起止与网格、时间步复查已排队。 |
+| 平坦稳压聚拢 | 持锁执行 `rss2027-stage1-pe-gather-force-r1/run.sh`、`gather-force-r2/run_cases.sh` 与 `pe-gather-fine-grid-r1/run.sh`，在原始压力窗比对共同行程 | 5 mm 半步长差 0.15%；2.5→1.25 mm 共同行程斜率 0.67217→0.72519 m/m（差 7.89%），通过该工况的细网格复核。 |
 | 共享平台兼容 | `.venv-physical-parcel/bin/python -B test/bag_model/test_physical_parcel.py`，检查新增字段默认值和 Python 源码 | 19 项通过。 |

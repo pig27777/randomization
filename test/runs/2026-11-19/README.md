@@ -18,15 +18,15 @@
 | [rss2027-stage1-content-pair-r1](bag/rss2027-stage1-content-pair-r1/) | 同填充率同袋下的两组不同内容物尺寸与位置，完整 YAM 顶抓 | ubun CPU。持锁执行本轮 `run_cases.sh` | 压力达标时间 10.088/8.465 s，均未夹入。[报告](../../bag_model/RSS2027_STAGE1_REPORT.md#2026-11-19-同填充率的整袋动力学对照)。 |
 | [rss2027-stage1-pe-clamp-force-r1](bag/rss2027-stage1-pe-clamp-force-r1/) | 同参 PE，粗细网格的预褶施加 6.5 N 夹持力 | ubun CPU。持锁执行本轮 `run_cases.sh` | 夹持力均达标，夹口材料长度相差 3.43 mm，起滑候选未收敛。 |
 | [rss2027-stage1-side-grasp-r1](bag/rss2027-stage1-side-grasp-r1/) | 侧抓整袋正对照，复核 1 nm CCD 容差下的原生夹持 | ubun CPU。持锁执行本轮 `run.sh` | 通过夹入与离台悬停，穿透峰值 0.484 mm。[MuJoCo 褶皱录像](bag/rss2027-stage1-side-grasp-r1/yam-side-fold.mp4)。 |
-| [同参 PE 侧抓](bag/rss2027-stage1-side-grasp-matched-pe-r1/) · [50 μs](bag/rss2027-stage1-side-grasp-matched-pe-half-step-r1/) · [25 μs](bag/rss2027-stage1-side-grasp-matched-pe-fine-step-r1/) | 原侧抓整袋使用与试片匹配的 PE 膜和数值皮肤 | ubun CPU。持锁执行各自 `run.sh` | 100 μs 露角停止，50 μs 离台但峰值穿透 1.113 mm。25 μs 与峰值记录排队。 |
+| [同参 PE 侧抓](bag/rss2027-stage1-side-grasp-matched-pe-r1/) · [50 μs](bag/rss2027-stage1-side-grasp-matched-pe-half-step-r1/) · [25 μs](bag/rss2027-stage1-side-grasp-matched-pe-fine-step-r1/) | 原侧抓整袋使用与试片匹配的 PE 膜和数值皮肤 | ubun CPU。持锁执行各自 `run.sh` | 100 μs 露角，50 μs 离台但穿透超限，25 μs 通过。[同参 PE 褶皱录像](bag/rss2027-stage1-side-grasp-matched-pe-fine-step-r1/yam-pe-fold.mp4)。 |
 | [rss2027-stage1-pe-mesh-axes-r1](bag/rss2027-stage1-pe-mesh-axes-r1/) | 同 6.5 N 预褶，分别沿闭合轴或横向加密 | ubun CPU。持锁执行本轮 `run_cases.sh` | 两组均完成，闭合轴对起拉膜长的影响更大。[结果](../../bag_model/RSS2027_STAGE1_REPORT.md#单轴加密诊断计划)。 |
 | [rss2027-stage1-pe-quarter-grid-r1](bag/rss2027-stage1-pe-quarter-grid-r1/) | 定开口 PE 预褶，夹口两轴 1.25 mm | ubun CPU。持锁执行本轮 `run.sh` | 峰值、承载时长、脱开时刻差均小于 5%，起滑候选差 63%。 |
 | [GPU 整图计时](bag/rss2027-stage1-yam-warp-profile-r1/) · [两段图](bag/rss2027-stage1-yam-warp-profile-r2/) | R4 静置与闭合入口的短窗设备、反馈耗时 | ubun RTX 5090。持锁运行 `rss2027_yam_warp_profile.py`，第二次附 `--split-stages` | 两轮均零溢出，设备 `step2` 占主要成本。 |
 | [基线 CPU 第一候选](bag/rss2027-stage1-pickup-baseline-cpu-r1/) · [GPU 判定](bag/rss2027-stage1-pickup-baseline-warp-r1/) | YAM 侧抓、提拉、悬停算力对照 | ubun。两端持锁执行各自 `run.sh` | CPU 在 6.50 s 尚未进入抬升，GPU 条件未过。 |
 | [200 μs 基线 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r2/) · [GPU](bag/rss2027-stage1-pickup-baseline-warp-r2/) | 复用已验证侧抓起始姿态，缩短侧向插入与闭合 | ubun。两端持锁执行各自 `run.sh` | CPU 通过 4.226 s；GPU 在 2.7604 s 露角停止，显存采样最高 966 MiB。 |
-| [100 μs 基线 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r3/) · [条件 GPU](bag/rss2027-stage1-pickup-baseline-warp-r3/) | 同一算力工况减半步长并记录原生穿透峰值 | ubun。两端持锁执行各自 `run.sh` | 排队中。[计划](../../bag_model/RSS2027_STAGE1_REPORT.md#100-μs-算力工况复测计划)。 |
+| [100 μs 基线 CPU](bag/rss2027-stage1-pickup-baseline-cpu-r3/) · [在线 GPU](bag/rss2027-stage1-pickup-baseline-warp-r3/) | 同一算力工况减半步长并记录原生穿透峰值 | ubun。两端持锁执行各自 `run.sh` | CPU 通过 4.2248 s，GPU 已启动。[计划](../../bag_model/RSS2027_STAGE1_REPORT.md#100-μs-算力工况复测计划)。 |
 | [rss2027-stage1-pe-traction-r1](bag/rss2027-stage1-pe-traction-r1/) | 记录两级局部网格的内侧摩擦牵引及切向速度 | ubun CPU。持锁执行本轮 `run_cases.sh` | 完成，整体滑移候选力相差 11.2%。 |
-| [稳压收拢](bag/rss2027-stage1-pe-gather-force-r1/) · [分辨率复查](bag/rss2027-stage1-pe-gather-force-r2/) | 平坦余料慢速收拢，评估受控压力下的膜量增量 | ubun CPU。持锁执行各轮 `run.sh` / `run_cases.sh` | 首轮最长连续压力窗 0.4311 s，斜率候选 0.434，复查排队。 |
+| [稳压收拢](bag/rss2027-stage1-pe-gather-force-r1/) · [分辨率复查](bag/rss2027-stage1-pe-gather-force-r2/) · [1.25 mm 收拢](bag/rss2027-stage1-pe-gather-fine-grid-r1/) | 平坦余料慢速收拢，评估受控压力下的膜量增量 | ubun CPU。持锁执行各轮 `run.sh` / `run_cases.sh` | 半步长斜率差 0.15%，2.5→1.25 mm 共同行程差 7.89%。 |
 
 ## folded-clothes-6mm-r1：近满面薄层包裹
 

@@ -659,3 +659,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 200 μs CPU 短回合通过，4.226 s 模拟／82.15 s 墙钟；RTX 5090 同配置 2.760 s 露角停止，独立复核确认。
 - PE 原生整体滑移候选 0.338/0.300 N，网格差 11.2%；平坦稳压收拢的局部斜率初值 0.434。
 - 同参整袋 50 μs 离台且无露角，峰值穿透 1.113 mm。更细步长和收拢复查排队。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-19 Stage 1 同参 PE 整袋与细网格聚拢
+
+- 同参 PE 25 μs 整袋通过离台悬停，原生穿透 0.642 mm，峰值定位到闭合期两片膜三角面。[同参 PE 录像](../test/runs/2026-11-19/bag/rss2027-stage1-side-grasp-matched-pe-fine-step-r1/yam-pe-fold.mp4)。
+- PE 8 mm 余料、0.5 N 稳压收拢，2.5/1.25 mm 同行程斜率 0.672/0.725，差 7.9%。整体滑移的力差仍为 11.2%。
+- 100 μs CPU 短回合通过 4.2248 s、墙钟 151.49 s，100 μs GPU 在线对照已启动。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [任务检查](../reports/rss2027-stage1-test.md)。
