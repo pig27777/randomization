@@ -8,8 +8,8 @@ from unittest.mock import patch
 import mujoco
 import numpy as np
 
-from select_side_flap import (ADVANCE, backend, choose_open_route, open_route_candidates, physical_parcel,
-                              prepared_wrap, screen, shifted_target)
+from select_side_flap import (ADVANCE, backend, choose_open_route, local_pad_contacts, open_route_candidates,
+                              physical_parcel, prepared_wrap, screen, shifted_target)
 
 ROOT = ADVANCE.parents[2]
 RUN = ROOT / "fold-aligned-90-energy"
@@ -86,8 +86,9 @@ def main():
     mode.add_argument("--settled-entry", action="store_true")
     mode.add_argument("--backoff-entry", action="store_true")
     mode.add_argument("--rounded-pad", action="store_true")
+    mode.add_argument("--horizontal-entry", action="store_true")
     args = parser.parse_args()
-    if (args.settled_entry or args.backoff_entry or args.rounded_pad) and args.group != "0.60":
+    if (args.settled_entry or args.backoff_entry or args.rounded_pad or args.horizontal_entry) and args.group != "0.60":
         parser.error("The restored-entry control uses the settled 60% sample")
     if args.deeper_seat:
         if args.group != "0.90":
@@ -99,6 +100,9 @@ def main():
         return
     if args.rounded_pad:
         prepare_rounded_pad()
+        return
+    if args.horizontal_entry:
+        prepare_horizontal_entry()
         return
     directory, samples, half_depth = GROUPS[args.group]
     candidates = [sample_routes(directory, sample, half_depth, args.settled_entry) for sample in samples]
@@ -180,6 +184,52 @@ def prepare_rounded_pad():
     (output / "selection.json").write_text(json.dumps(source, indent=2, allow_nan=False) + "\n")
     for name in ("config.json", "smoke.json", "settle.json"):
         (output / name).write_bytes((prior / name).read_bytes())
+
+
+def prepare_horizontal_entry():
+    case = GROUPS["0.60"][0] / "sample-058"
+    prior = case / "side-open-rounded-pad"
+    source = json.loads((prior / "selection.json").read_bytes())
+    config = json.loads((prior / "config.json").read_bytes())
+    first_lift = json.loads((prior / "force-summary.json").read_bytes())["first_lift"]
+    contacts = json.loads((prior / "recording/capture-contacts.json").read_bytes())
+    sample = next(row for row in contacts if row["t_s"] == first_lift["t_s"])
+    normals = []
+    for pad in (0, 1):
+        components = [np.asarray(contact["normal_on_pad"]) * contact["force_contact_N"][0]
+                      for contact in sample["contacts"] if contact["pad"] == pad and contact["force_contact_N"][0] > .05]
+        normal = (2 * pad - 1) * np.sum(components, axis=0)
+        normals.append(normal / np.linalg.norm(normal))
+    yaw = np.deg2rad(97.5)
+    inward = np.array([-np.sin(yaw), np.cos(yaw), 0.])
+    up = np.array([0., 0., 1.])
+    source_shift = np.asarray(source["selected"]["shift_m"])
+    advance = source["selected"]["close_advance_m"]
+    evaluations = []
+    with local_pad_contacts({}, source["disabled_pad_geoms"]):
+        for tilt in (0., 5., 10., 15., 20., 25.):
+            angle = np.deg2rad(tilt)
+            closing = -np.sin(angle) * inward - np.cos(angle) * up
+            projections = np.asarray(normals) @ closing
+            height = config["side_start_distance"] * (np.sin(np.deg2rad(config["tilt"])) - np.sin(angle))
+            paths = []
+            for offset in (0., height):
+                try:
+                    result = screen(config | {"yaw": 97.5, "tilt": tilt}, source_shift + offset * up, advance)
+                except RuntimeError as error:
+                    if not str(error).startswith("YAM initial pose unreachable"):
+                        raise
+                    result = dict(status="initial_pose_unreachable", reason=str(error))
+                paths.append(dict(result, shift_vertical_m=float(offset)))
+                paths[-1].pop("trace", None)
+            evaluations.append(dict(tilt_deg=tilt, left_right_projection=projections.tolist(), paths=paths))
+    out = case / "side-open-horizontal"
+    out.mkdir(exist_ok=False)
+    viable = [row["tilt_deg"] for row in evaluations if min(row["left_right_projection"]) > .70
+              and any(path["status"] == "reachable" for path in row["paths"])]
+    proof = dict(source_time_s=first_lift["t_s"], yaw_deg=97.5, aligned_reachable_tilts_deg=viable,
+                 evaluations=evaluations)
+    (out / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
 
 
 if __name__ == "__main__":

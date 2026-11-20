@@ -49,14 +49,25 @@ def load_window(robot, comparison):
     return time[indices], np.asarray(commands), states[0], spec
 
 
+def aperture_observation(robot, measurement):
+    sim, gap = robot.sim, robot.gap()
+    model, data = sim.m, sim.d
+    pad = model.geom_bodyid[robot.pad_geom[0]]
+    center, axes, half = aperture_box(data, data.geom_xpos[robot.pad_geom], pad, gap)
+    triangles = ((data.flexvert_xpos - center) @ axes)[sim.parcel.envelope["faces"]]
+    spatial, projection = areas(triangles, half) if gap > 0. else (0., 0.)
+    pressure = max(0., sum(vector[2] for vector in measurement["force_on_fingers_N"]))
+    return dict(time_s=float(data.time), pressure_N=pressure, direct_support_N=measurement["direct_support_N"],
+                actual_gap_m=gap, extra_length_m=(spatial - projection) / (2. * half[0]),
+                penetration_mm=measurement["penetration_mm"])
+
+
 def replay(robot, dt, time, command, state, spec):
     sim = robot.sim
     model, data = sim.m, sim.d
     model.opt.timestep = dt
     mujoco.mj_setState(model, data, state, spec)
     backend.refresh(sim)
-    faces = sim.parcel.envelope["faces"]
-    pad = model.geom_bodyid[robot.pad_geom[0]]
     sample_steps = np.rint((time - time[0]) / dt).astype(int)
     samples, forces = [], []
     outcome = "complete"
@@ -77,13 +88,7 @@ def replay(robot, dt, time, command, state, spec):
             if failure or health["payload_geometry"]["intersecting_triangles"]:
                 outcome = "geometry gate"
                 break
-            gap = robot.gap()
-            center, axes, half = aperture_box(data, data.geom_xpos[robot.pad_geom], pad, gap)
-            triangles = ((data.flexvert_xpos - center) @ axes)[faces]
-            spatial, projection = areas(triangles, half) if gap > 0. else (0., 0.)
-            samples.append(dict(time_s=float(data.time), pressure_N=pressure, direct_support_N=direct,
-                                actual_gap_m=gap, extra_length_m=(spatial - projection) / (2. * half[0]),
-                                penetration_mm=depth))
+            samples.append(aperture_observation(robot, measurement))
         if step == sample_steps[-1]:
             break
         data.ctrl[:] = [np.interp(data.time, time, channel) for channel in command.T]

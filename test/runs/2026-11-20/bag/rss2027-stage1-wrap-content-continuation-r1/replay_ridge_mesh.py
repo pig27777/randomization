@@ -20,10 +20,7 @@ OUTPUT = CASE / "local-mesh-window"
 DT = .0000125
 
 
-def main():
-    parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--prepare", action="store_true")
-    args = parser.parse_args()
+def load_pair(prepare_only=False):
     result = json.loads((CASE / "recording/trial/result.json").read_bytes())
     reference = json.loads((CASE / "physical-comparison.json").read_bytes())
     height = json.loads((CASE / "height.json").read_bytes())
@@ -44,7 +41,7 @@ def main():
                         original_scene=saved_scene, get_config=lambda: original), \
             at_top_center(height["target_center_xy_m"]):
         fine_scene = partial(mesh.refined_scene, source=saved_scene, movable_support=False)
-        if args.prepare:
+        if prepare_only:
             OUTPUT.mkdir(exist_ok=False)
             with patch.object(mesh, "refined_scene", fine_scene):
                 mesh.prepare()
@@ -56,6 +53,17 @@ def main():
     if pressure["direct_support_N"] > .05:
         raise ValueError("The refined gripper directly loads the table in its initial state")
     refined_state = mesh.integration_state(fine.sim)
+    return coarse, fine, time, command, state, refined_state, spec
+
+
+def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--prepare", action="store_true")
+    args = parser.parse_args()
+    pair = load_pair(args.prepare)
+    if args.prepare:
+        return
+    coarse, fine, time, command, state, refined_state, spec = pair
     coarse_result = replay(coarse, DT, time, command, state, spec)
     refined_result = replay(fine, DT, time, command, refined_state, spec)
     fits = [run["fit"] for run in (coarse_result, refined_result)]
