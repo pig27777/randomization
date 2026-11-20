@@ -16,7 +16,7 @@ feed = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(feed)
 
 
-def record_flow(dt, duration, direction, begin_s=0.):
+def record_flow(dt, duration, direction, begin_s=0., *, force_vector=None, initial_load_N=0.):
     stride = round(.002 / dt)
     previous = None
     transitions = []
@@ -42,21 +42,24 @@ def record_flow(dt, duration, direction, begin_s=0.):
                                     tension_N=row["tension_N"], normal_N=row["left_inner_N"] + row["right_inner_N"]))
         previous = current
 
-    return (*replay.run(dt, duration + dt, direction, readout=sample), transitions)
+    return (*replay.run(dt, duration + dt, direction, force_vector, readout=sample,
+                        initial_load_N=initial_load_N), transitions)
 
 
-def summarize(result, rows, transitions):
+def summarize(result, rows, transitions, force_ratio=None):
     net = sum(row["entered_m"] - row["left_m"] for row in transitions)
     if transitions:
         np.testing.assert_allclose(net, transitions[-1]["final_m"] - transitions[0]["initial_m"], atol=1e-12, rtol=0.)
     start = result["sliding_onset"]
-    ratio = None
+    ratio = force_ratio
     qualifies = np.zeros(len(rows), dtype=bool)
-    if start is not None:
+    if ratio is None and start is not None:
         ratio = start["tension_N"] / (start["left_inner_N"] + start["right_inner_N"])
+    if ratio is not None:
         positive = rows[:, 3] - ratio * rows[:, 5:7].sum(axis=1)
-        positive[np.argmin(abs(rows[:, 0] - start["time_s"]))] = 0.
-        qualifies = (rows[:, 9] > 0.) & (positive > 0.) & (rows[:, 0] > start["time_s"])
+        qualifies = (rows[:, 9] > 0.) & (positive > 0.)
+        if force_ratio is None:
+            qualifies &= rows[:, 0] > start["time_s"]
     starts_ends = np.flatnonzero(np.diff(np.r_[False, qualifies, False])).reshape(-1, 2)
     longest = max((float(rows[b - 1, 0] - rows[a, 0]) for a, b in starts_ends), default=0.)
     for row in transitions:

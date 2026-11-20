@@ -2,7 +2,7 @@
 set -euo pipefail
 run_dir=$(dirname "$0")
 case_dir=$1
-recorder="$run_dir/../rss2027-stage1-randomized-top-local-mesh-r1/refine_parcel.py"
+recorder=${2:-"$run_dir/../rss2027-stage1-randomized-top-local-mesh-r1/refine_parcel.py"}
 python=.venv-physical-parcel/bin/python
 "$python" -B "$recorder" --config "$case_dir/smoke.json" --output "$case_dir/smoke" \
     --record-penetration-peaks > "$case_dir/smoke.log" 2>&1

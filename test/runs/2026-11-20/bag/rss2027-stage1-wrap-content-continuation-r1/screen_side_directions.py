@@ -1,6 +1,7 @@
 """Screen the same 60% parcel from alternative sides for a reachable YAM path."""
 
 import json
+from contextlib import nullcontext
 from pathlib import Path
 import sys
 from unittest.mock import patch
@@ -14,9 +15,22 @@ sys.path.insert(0, str(RUN.with_name("rss2027-stage1-randomized-top-local-mesh-r
 from refine_parcel import backend, physical_parcel, prepared_wrap  # noqa: E402
 
 
-def screen(config):
+def shifted_target(translation):
+    attach = backend.attach_robot
+
+    def shifted(*args, approach=None, **kwargs):
+        if approach is None:
+            raise ValueError("A translated approach requires a side grasp")
+        approach = approach | {"contact_point": np.asarray(approach["contact_point"]) + translation}
+        return attach(*args, approach=approach, **kwargs)
+
+    return patch.object(backend, "attach_robot", shifted)
+
+
+def screen(config, translation=None):
     cfg = backend.Config(**config)
-    with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
+    placement = shifted_target(translation) if translation is not None else nullcontext()
+    with placement, patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
     start = robot.initial_target
     insertion = start + .110 * robot.approach

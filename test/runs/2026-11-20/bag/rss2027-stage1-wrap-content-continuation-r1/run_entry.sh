@@ -7,8 +7,11 @@ python=.venv-physical-parcel/bin/python
 for case_dir in "$case_parent"/sample-???; do
     for mode in smoke settle; do
         result="$case_dir/$mode"
-        "$python" -B "$record" --config "$case_dir/$mode.json" --output "$result" \
-            --record-penetration-peaks > "$case_dir/$mode.log" 2>&1
+        if ! "$python" -B "$record" --config "$case_dir/$mode.json" --output "$result" \
+            --record-penetration-peaks > "$case_dir/$mode.log" 2>&1; then
+            printf '%s failed to start or complete %s, see %s/%s.log\n' "$case_dir" "$mode" "$case_dir" "$mode"
+            break
+        fi
         if ! "$python" -B - "$result/summary.json" <<'PY'
 import json
 from pathlib import Path

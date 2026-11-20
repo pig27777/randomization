@@ -147,14 +147,17 @@ def prepare(case, output, iterations, keep_strain_bound):
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--sample", choices=(61, 90), type=int)
+    parser.add_argument("--source-directory", type=Path, default=RUN / "randomized-entry")
+    parser.add_argument("--sample", type=int)
     parser.add_argument("--keep-strain-bound", action="store_true")
     args = parser.parse_args()
+    pattern = f"sample-{args.sample:03d}" if args.sample is not None else "sample-???"
+    cases = sorted(args.source_directory.glob(pattern))
+    if not cases:
+        parser.error(f"no matching preparation cases in {args.source_directory}")
     args.output.mkdir(exist_ok=False)
     summaries = []
-    for case in sorted((RUN / "randomized-entry").glob("sample-???")):
-        if args.sample is not None and case.name != f"sample-{args.sample:03d}":
-            continue
+    for case in cases:
         summary = prepare(case, args.output, 1500, args.keep_strain_bound)
         summaries.append(summary)
         print(summary["case"], summary["start"]["elastic_J"], summary["selected"], flush=True)
