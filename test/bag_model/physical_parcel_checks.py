@@ -60,6 +60,20 @@ def film_box_geometry(m, d, faces, geom):
                 geometric_depth_upper_m=depth_upper)
 
 
+def film_support_geometry(m, d, faces, geom):
+    """Measure film intrusion into a flat plane or a box-shaped support."""
+    if m.geom_type[geom] != mujoco.mjtGeom.mjGEOM_PLANE:
+        return film_box_geometry(m, d, faces, geom)
+    normal = d.geom_xmat[geom].reshape(3, 3)[:, 2]
+    distance = (d.flexvert_xpos - d.geom_xpos[geom]) @ normal
+    # A planar signed distance reaches its minimum at a triangle vertex.
+    face_depth = -distance[faces].min(axis=1)
+    depth = float(np.max(face_depth, initial=0.))
+    return dict(geom=m.geom(geom).name, intersecting_triangles=int(np.count_nonzero(face_depth > 0.)),
+                outside_corners=0, corner_winding=[], sampled_depth_m=depth,
+                geometric_depth_upper_m=depth)
+
+
 def film_payload_geometry(m, d, faces):
     """Audit payload faces independently of the native contact candidate list."""
     rows = []

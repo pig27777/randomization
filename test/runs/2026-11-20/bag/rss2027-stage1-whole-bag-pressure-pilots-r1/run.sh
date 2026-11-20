@@ -25,6 +25,10 @@ for name in "${cases[@]}"; do
             "$smoke" >/dev/null; then
             continue 2
         fi
+        if [ "${REQUIRE_CLEAR_APPROACH:-0}" = 1 ] && ! jq -e '.peaks.grip_N==0 and .peaks.down_N==0' "$smoke" >/dev/null; then
+            printf '%s has finger load before approach during %s\n' "$name" "$mode"
+            continue 2
+        fi
     done
     "$python" -B "$recorder" --config "$case_dir/config.json" --output "$case_dir/recording" \
         --record-penetration-peaks --record-capture-forces > "$case_dir/run.log" 2>&1

@@ -17,6 +17,7 @@ from bag_sim.bag_model import dihedrals  # noqa: E402
 from bag_sim.wrap import triangle_box_intersections, winding_number  # noqa: E402
 from bag_sim.make_edge_sealed_geometry import edge_sealed_geometry  # noqa: E402
 import physical_parcel_yam  # noqa: E402
+from physical_parcel_checks import film_support_geometry  # noqa: E402
 
 
 class PhysicalParcelTests(unittest.TestCase):
@@ -100,6 +101,20 @@ class PhysicalParcelTests(unittest.TestCase):
         self.assertTrue(triangle_box_intersections(vertices, faces, np.ones(3), np.zeros(3))[0])
         self.assertFalse(triangle_box_intersections(vertices + [0, 0, 2], faces,
                                                     np.ones(3), np.zeros(3))[0])
+
+    def test_plane_support_depth_uses_the_surface_not_its_render_size(self):
+        p = Parcel(replace(Config(), mode='empty', payload_mass=0.,
+                           geometry='geometry/kraft_edge_sealed_35.npz'))
+        table = p.m.geom('table').id
+        faces = p.envelope['faces']
+        clear = film_support_geometry(p.m, p.d, faces, table)
+        self.assertEqual(clear['geometric_depth_upper_m'], 0.)
+        self.assertEqual(clear['intersecting_triangles'], 0)
+        p.d.qpos[p.film_dofs[:, 2]] -= p.cfg.radius + .0015
+        mujoco.mj_fwdPosition(p.m, p.d)
+        entered = film_support_geometry(p.m, p.d, faces, table)
+        self.assertAlmostEqual(entered['geometric_depth_upper_m'], .0015)
+        self.assertGreater(entered['intersecting_triangles'], 0)
 
     def test_forward_matches_step_reactions_without_advancing(self):
         p = Parcel()

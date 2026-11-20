@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 run_dir=$(dirname "$0")
-case_dir="$run_dir/aligned"
+case_name=${1:-aligned}
+case_dir="$run_dir/$case_name"
 python=.venv-physical-parcel/bin/python
+record_flags=()
+if [ "$case_name" = clearance-matched ]; then
+    record_flags+=(--slope-clearance)
+fi
 for mode in smoke settle; do
     "$python" -B "$run_dir/record_creased.py" --config "$case_dir/$mode.json" --output "$case_dir/$mode" \
-        --record-penetration-peaks > "$case_dir/$mode.log" 2>&1
+        --record-penetration-peaks "${record_flags[@]}" > "$case_dir/$mode.log" 2>&1
     summary="$case_dir/$mode/summary.json"
     jq -c '{outcome,sim_time_s,peaks,warnings}' "$summary"
     jq -e '.outcome=="smoke_only" and .sim_time_s>=.config.smoke_seconds and
            .dimensions.film_vertices==142 and .warnings=={} and .peaks.penetration_mm<=1' "$summary" >/dev/null
+    if [ "$case_name" = clearance-matched ]; then
+        jq -e '.peaks.grip_N==0 and .peaks.down_N==0' "$summary" >/dev/null
+    fi
 done
 "$python" -B - "$case_dir" <<'PY'
 import json
@@ -34,7 +42,7 @@ height = float(points[:, 2].max() - points[outside, 2].max())
 raise SystemExit(height < .002)
 PY
 "$python" -B "$run_dir/record_creased.py" --config "$case_dir/config.json" --output "$case_dir/recording" \
-    --record-penetration-peaks --record-capture-forces > "$case_dir/run.log" 2>&1
+    --record-penetration-peaks --record-capture-forces "${record_flags[@]}" > "$case_dir/run.log" 2>&1
 if jq -e 'any(.[]; .phase == "close")' "$case_dir/recording/trial/trace.json" >/dev/null; then
     "$python" -B test/bag_model/rss2027_yam_capture_audit.py "$case_dir/recording/trial" "$case_dir/capture"
 fi

@@ -61,6 +61,14 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/series/kraft-0p3N/recording/trial"),
     ("kraft-top-0p8N", "kraft",
      "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/series/kraft-0p8N/recording/trial"),
+    ("pe-side-fill-60percent-raised", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-top-edge/recording/trial"),
+    ("bubble-top-random-027-prepared", "bubble",
+     "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/prepared-plane-series/bubble-027/recording/trial"),
+    ("paperboard-top-random-127-prepared", "paperboard",
+     "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/prepared-plane-series/paperboard-127/recording/trial"),
+    ("kraft-top-random-127-prepared", "kraft",
+     "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/prepared-plane-series/kraft-127/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
@@ -199,7 +207,7 @@ def main():
         "signed_pull_N": "Upward film load from the negated vertical component of both finger reactions.",
         "press_travel_m": "Measured downward tip travel relative to the first top pressure approach sample.",
         "native_bilateral_sliding": "Per-sample contact criterion; a sustained event is required for slip fitting.",
-        "scope": "Archived whole-bag measurements. Material slip displacement and an all-material fitted envelope are pending.",
+        "scope": "Archived whole-bag measurements. Converged material slip and an all-material fitted envelope are pending.",
     })
     data["load_ramps"] = dict(
         sample_columns=RAMP_COLUMNS + ("native_bilateral_sliding", "bilateral_held", "payload_load_displacement_m"),

@@ -11,7 +11,12 @@ import mujoco
 import numpy as np
 
 import physical_parcel_yam as backend
-from physical_parcel_checks import film_box_geometry, film_payload_geometry
+from physical_parcel_checks import film_payload_geometry, film_support_geometry
+
+
+def native_penetration(data):
+    contact = data.contact
+    return float(np.max(-contact.dist, where=contact.efc_address >= 0, initial=0.))
 
 
 def main():
@@ -36,30 +41,45 @@ def main():
     p.d = mujoco.MjData(p.m)
     p.film_dofs = p.node_dofs(p.m)
     backend.initialize_state(p, p.m, p.d, cfg)
+    faces = p.envelope["faces"]
+    table = p.m.geom("table").id
     trace = []
+    peak_native_depth = 0.
     started = time.perf_counter()
-    for step in range(round(args.seconds / cfg.dt)):
+    count = max(1, round(args.seconds / cfg.dt))
+    stride = max(1, round(.01 / cfg.dt))
+    for step in range(1, count + 1):
         p.step()
-        if step % max(1, round(.01 / cfg.dt)):
-            continue
-        p.forward()
-        payload = film_payload_geometry(p.m, p.d, p.envelope["faces"])
-        support = film_box_geometry(p.m, p.d, p.envelope["faces"], p.m.geom("table").id)
+        # The step's contact buffer describes the state just before integration.
+        native = native_penetration(p.d)
+        peak_native_depth = max(peak_native_depth, native)
         finite = bool(np.isfinite(p.d.qpos).all() and np.isfinite(p.d.qvel).all())
         warnings = int(p.d.warning.number.sum())
+        if step not in (1, count) and step % stride and finite and not warnings and native <= .001:
+            continue
+        payload = support = None
+        if finite and not warnings:
+            p.forward()
+            native = max(native, native_penetration(p.d))
+            peak_native_depth = max(peak_native_depth, native)
+            warnings = int(p.d.warning.number.sum())
+            payload = film_payload_geometry(p.m, p.d, faces)
+            support = film_support_geometry(p.m, p.d, faces, table)
         trace.append(dict(time_s=float(p.d.time), payload_geometry=payload, support_geometry=support,
-                          com=p.com().tolist(), finite=finite, warnings=warnings))
-        if not finite or warnings or payload["outside_corners"] or max(
+                          com=p.com().tolist(), finite=finite, warnings=warnings,
+                          native_penetration_m=native))
+        if not finite or warnings or native > .001 or payload["outside_corners"] or max(
                 payload["geometric_depth_upper_m"], support["geometric_depth_upper_m"]) > .001:
             (args.output / "trace.json").write_text(json.dumps(trace, indent=2))
-            raise RuntimeError(f"parcel preparation failed at {p.d.time}")
-    p.forward()
+            raise RuntimeError(f"parcel preparation failed at {p.d.time:.9g} s, "
+                               f"native depth {native:.6g} m; see {args.output / 'trace.json'}")
     state = args.output / "initial_state.npz"
     backend.save_initial_state(p, p.d, cfg, state)
     p.save(args.output / "model")
     result = dict(passed=True, machine=platform.node(), seconds=args.seconds,
                   wall_s=time.perf_counter()-started, source_sha256=hashes,
                   state=str(state), final_com=p.com().tolist(),
+                  peak_native_penetration_m=peak_native_depth,
                   peak_payload_depth_m=max(row["payload_geometry"]["geometric_depth_upper_m"] for row in trace),
                   peak_support_depth_m=max(row["support_geometry"]["geometric_depth_upper_m"] for row in trace))
     (args.output / "trace.json").write_text(json.dumps(trace, indent=2))
