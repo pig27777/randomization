@@ -69,7 +69,7 @@ def project_edge_band(target, groups):
         target[b] -= correction
 
 
-def prepare(case, output, iterations, keep_strain_bound):
+def prepare(case, output, iterations, keep_strain_bound, *, wall_gap_m=MIN_GAP):
     raw_cfg = json.loads((case / "smoke.json").read_bytes())
     cfg = backend.Config(**raw_cfg)
     with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
@@ -102,7 +102,7 @@ def prepare(case, output, iterations, keep_strain_bound):
             target = local + step_size * force
             if keep_strain_bound:
                 project_edge_band(target, edge_groups)
-            open_pairs(target, pairs, MIN_GAP)
+            open_pairs(target, pairs, wall_gap_m)
             candidate = project_step(local, target, normals, bounds, adjacent)
             candidate_potential, _, _ = energy.evaluate(candidate)
             gap = float(np.min(candidate[pairs[:, 0], 2] - candidate[pairs[:, 1], 2]))
@@ -110,7 +110,7 @@ def prepare(case, output, iterations, keep_strain_bound):
             if keep_strain_bound:
                 lengths = np.linalg.norm(candidate[energy.edge_a] - candidate[energy.edge_b], axis=1)
                 within_band = bool(np.max(abs(lengths / energy.edge_lengths - 1.)) <= .05)
-            if candidate_potential < potential and gap >= MIN_GAP - 1e-9 and within_band:
+            if candidate_potential < potential and gap >= wall_gap_m - 1e-9 and within_band:
                 local = candidate
                 step_size = min(step_size * 1.25, .002)
                 break
@@ -119,12 +119,12 @@ def prepare(case, output, iterations, keep_strain_bound):
             break
         if round_id % 50 == 0 or round_id == iterations:
             rows.append(assess(reference, local, item, pairs, energy, round_id))
-            if rows[-1]["enclosed"] and rows[-1]["wall_gap_m"] >= MIN_GAP - 1e-9:
+            if rows[-1]["enclosed"] and rows[-1]["wall_gap_m"] >= wall_gap_m - 1e-9:
                 best, final = local, rows[-1]
     if rows[-1]["iteration"] != round_id:
         latest = assess(reference, local, item, pairs, energy, round_id)
         rows.append(latest)
-        if latest["enclosed"] and latest["wall_gap_m"] >= MIN_GAP - 1e-9:
+        if latest["enclosed"] and latest["wall_gap_m"] >= wall_gap_m - 1e-9:
             best, final = local, latest
     improved = final["potential_J"] < rows[0]["potential_J"]
     if improved:

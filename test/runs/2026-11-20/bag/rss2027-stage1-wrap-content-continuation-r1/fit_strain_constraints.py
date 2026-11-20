@@ -37,7 +37,7 @@ def project_edge_band(points, group, axis, corrections):
     corrections[0][:], corrections[1][:] = -change, change
 
 
-def fit(start, reference, half, edges, adjacent, max_rounds):
+def fit(start, reference, half, edges, adjacent, max_rounds, *, wall_gap_m=MIN_GAP):
     normals, bound = separating_planes(start, half)
     directions = normals[adjacent].transpose(1, 0, 2)
     limits = np.where(adjacent >= 0, bound[adjacent], -np.inf).T
@@ -60,7 +60,7 @@ def fit(start, reference, half, edges, adjacent, max_rounds):
         for group, axis, residual in zip(groups, axes, edge_errors, strict=True):
             project_edge_band(points, group, axis, residual)
         front_z, back_z = points[front, 2] + wall_error, points[back, 2] - wall_error
-        adjust = .5 * np.maximum(MIN_GAP - (front_z - back_z), 0.)
+        adjust = .5 * np.maximum(wall_gap_m - (front_z - back_z), 0.)
         points[front, 2], points[back, 2] = front_z + adjust, back_z - adjust
         wall_error[:] = -adjust
         for direction, limit, residual in zip(directions, limits, plane_errors, strict=True):
@@ -71,7 +71,7 @@ def fit(start, reference, half, edges, adjacent, max_rounds):
         if i % 250 == 0:
             result = inspect(i)
             rows.append(result)
-            if result["enclosed"] and result["minimum_wall_gap_m"] >= MIN_GAP - 1e-9:
+            if result["enclosed"] and result["minimum_wall_gap_m"] >= wall_gap_m - 1e-9:
                 break
     return points, rows
 

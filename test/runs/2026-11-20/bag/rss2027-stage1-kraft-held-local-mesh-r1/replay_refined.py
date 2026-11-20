@@ -1,5 +1,6 @@
 """Repeat the suspended Kraft loading on a conforming jaw-local mesh."""
 
+from contextlib import nullcontext
 from dataclasses import replace
 from functools import partial
 import hashlib
@@ -114,12 +115,13 @@ def copy_joint_state(old, new, edges):
     new.d.time = old.d.time
 
 
-def refined_scene(source=original_scene):
+def refined_scene(source=original_scene, *, movable_support=True):
     coarse, frame, _ = source()
     old = coarse.sim
     cfg = replace(get_config(), geometry=GEOMETRY, initial_state=None, dt=COMPILED_DT)
-    with patch.object(backend, "parcel_world", partial(replay.world_with_movable_support, lower_floor=True)), \
-            patch.object(physical_parcel, "wrap_generic", prepared_wrap(GEOMETRY)):
+    support = (patch.object(backend, "parcel_world", partial(replay.world_with_movable_support, lower_floor=True))
+               if movable_support else nullcontext())
+    with support, patch.object(physical_parcel, "wrap_generic", prepared_wrap(GEOMETRY)):
         robot = backend.scene(cfg)
     new = robot.sim
     with np.load(ASSET) as asset:

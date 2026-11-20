@@ -30,7 +30,7 @@ def align_grid(cavity, offset, half):
     return reference
 
 
-def fold_surfaces(reference, offset, half, angle):
+def fold_surfaces(reference, offset, half, angle, wall_gap_m=MIN_GAP):
     local = reference[:, :2] - offset
     sign = np.sign(local)
     edge = np.clip(local, -half[:2], half[:2])
@@ -51,40 +51,40 @@ def fold_surfaces(reference, offset, half, angle):
     side[np.setdiff1d(upper, lower)] = 1.
     side[np.setdiff1d(lower, upper)] = -1.
     points = np.column_stack((edge + sign * shape, side * np.maximum(height, 0.)))
-    open_pairs(points, panel_pairs(reference, FACES, PANELS, [0], [3]), MIN_GAP)
+    open_pairs(points, panel_pairs(reference, FACES, PANELS, [0], [3]), wall_gap_m)
     return points
 
 
-def sample_fold(index, shape):
+def sample_fold(index, shape, *, radius_m=RADIUS_M, wall_gap_m=MIN_GAP):
     cavity = np.array([float(shape[f"inside_{axis}_m"]) for axis in "xy"])
     size = np.array([float(shape[f"payload_{axis}_m"]) for axis in "xyz"])
     offset = np.array([float(shape[f"offset_{axis}_m"]) for axis in "xy"])
-    half = size / 2. + RADIUS_M
+    half = size / 2. + radius_m
     reference = align_grid(cavity, offset, half + 5e-6)
     item = dict(half_size=half, position=np.zeros(3))
     rows = []
     best = None
     for angle in (86., 88., 90.):
-        seed = fold_surfaces(reference, offset, half + 5e-6, angle)
+        seed = fold_surfaces(reference, offset, half + 5e-6, angle, wall_gap_m)
         initial = measurements(reference, seed, EDGES, item)
         if initial["outside_corners"] or initial["intersecting_triangles"]:
             rows.append(dict(angle_deg=angle, initial=initial, fitted=None))
             continue
-        points, checks = fit(seed, reference, half, EDGES, ADJACENT, 1500)
+        points, checks = fit(seed, reference, half, EDGES, ADJACENT, 1500, wall_gap_m=wall_gap_m)
         final = checks[-1]
         rows.append(dict(angle_deg=angle, initial=initial, fitted=final))
-        if final["enclosed"] and final["minimum_wall_gap_m"] >= MIN_GAP - 1e-9:
+        if final["enclosed"] and final["minimum_wall_gap_m"] >= wall_gap_m - 1e-9:
             if best is None or final["maximum_edge_strain"] < best[0]:
                 best = final["maximum_edge_strain"], points, angle
     result = dict(sample=index, fill_fraction=float(shape["fill_fraction"]), source_geometry=shape, orientations=rows)
     return result, best, reference, cavity, size, offset
 
 
-def record_case(output, result, best, reference, cavity, size, offset):
+def record_case(output, result, best, reference, cavity, size, offset, *, radius_m=RADIUS_M, config=None):
     _, points, angle = best
     case = output / f"sample-{result['sample']:03d}"
     case.mkdir(exist_ok=False)
-    origin = np.r_[offset, RADIUS_M + .00015 - points[:, 2].min()]
+    origin = np.r_[offset, radius_m + .00015 - points[:, 2].min()]
     # Convert the physically sized grid to the archived asset's axis convention.
     scaled = reference[:, :2] * BASE_GRID_SIZE / cavity
     asset = case / "prepared_mesh.npz"
@@ -92,7 +92,8 @@ def record_case(output, result, best, reference, cavity, size, offset):
     np.savez_compressed(asset, vertices=vertices, reference_m=reference, current_m=points + origin,
                         faces=FACES, panel_ids=PANELS, payload_origin_m=origin,
                         payload_size_m=size, payload_offset_xy=offset)
-    config = json.loads((RUN / "equilibrated-entry/sample-061/smoke.json").read_bytes())
+    config = (json.loads((RUN / "equilibrated-entry/sample-061/smoke.json").read_bytes())
+              if config is None else config.copy())
     config.update(geometry=f"../{asset.resolve().relative_to(ROOT)}", bag_size=cavity.tolist(),
                   payload_size=size.tolist(), payload_offset_xy=offset.tolist())
     for name, seconds in (("smoke", .02), ("settle", .30)):

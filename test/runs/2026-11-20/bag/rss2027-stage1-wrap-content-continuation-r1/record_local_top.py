@@ -94,13 +94,39 @@ def integration_state(sim):
     return state
 
 
+def prepare_pressure_priority(case):
+    source = case.resolve()
+    target = source.with_name("ridge-pressure-priority")
+    target.mkdir(exist_ok=False)
+    height = json.loads((source / "height.json").read_bytes())
+    height["inward_speed_limit_m_s"] = .008
+    (target / "height.json").write_text(json.dumps(height, indent=2, allow_nan=False) + "\n")
+    for filename in ("smoke.json", "settle.json", "config.json"):
+        inputs = json.loads((source / filename).read_bytes())
+        inputs.update(simulation_seconds=25., wall_limit=2600.)
+        (target / filename).write_text(json.dumps(inputs, indent=2, allow_nan=False) + "\n")
+
+
 def record_with_braking_height(height=None):
     controller = FasterApproach
     if height is not None:
+        speed_limit = height.get("inward_speed_limit_m_s")
+        if speed_limit is not None and (not np.isfinite(speed_limit) or speed_limit <= 0.):
+            raise ValueError("The inward speed limit must be finite and positive")
+
         class LocalSurfacePress(FasterApproach):
             def __init__(self, target_N, surface_z):
                 np.testing.assert_allclose(surface_z, height["global_braking_surface_m"], atol=.0001, rtol=0.)
                 super().__init__(target_N, height["local_braking_surface_m"])
+
+            def closure_rate(self, nominal_m_s, force_N, support_N):
+                if speed_limit is None or nominal_m_s >= 0.:
+                    return nominal_m_s
+                lower, upper = .8 * self.target_N, 1.2 * self.target_N
+                if (support_N > self.support_limit_N or not lower <= force_N <= upper
+                        or not lower <= self.filtered_N <= upper):
+                    return 0.
+                return max(nominal_m_s, -speed_limit)
 
         controller = LocalSurfacePress
     center = height.get("target_center_xy_m") if height is not None else None
@@ -117,6 +143,8 @@ if __name__ == "__main__":
         prepare(Path(sys.argv[2]))
     elif sys.argv[1:2] == ["--prepare-current-case"] and len(sys.argv) == 3:
         prepare(Path(sys.argv[2]), use_current_case=True)
+    elif sys.argv[1:2] == ["--prepare-pressure-priority"] and len(sys.argv) == 3:
+        prepare_pressure_priority(Path(sys.argv[2]))
     else:
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument("--config", type=Path, required=True)

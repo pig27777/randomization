@@ -74,6 +74,9 @@ class NormalPress:
             velocity = float(np.clip(.002 * (self.filtered_N - self.target_N), -.002, .004))
         return z + dt * velocity
 
+    def closure_rate(self, nominal_m_s, force_N, support_N):
+        return nominal_m_s
+
 def vec(x):
     return ' '.join(format(float(v),'.17g') for v in np.asarray(x).ravel())
 
@@ -395,6 +398,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):
             gap_rate = np.clip((filtered.mean()-10)*cfg.closing_gain_m_per_N_s,-.05,.015)
+            if press is not None and phase == "close":
+                gap_rate = press.closure_rate(gap_rate, down, feedback["direct_support_N"])
             gap=float(np.clip(gap+gap_rate*dt,minimum_gap,.045))
             if phase=="close":
                 if press is not None:
