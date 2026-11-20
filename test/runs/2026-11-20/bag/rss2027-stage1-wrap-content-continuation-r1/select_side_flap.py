@@ -1,11 +1,13 @@
 """Aim a native YAM grasp at the 60% package's measured free film."""
 
 import argparse
+from contextlib import nullcontext
 import itertools
 import json
 from pathlib import Path
 import sys
 from unittest.mock import patch
+from xml.etree import ElementTree as ET
 
 import mujoco
 import numpy as np
@@ -17,6 +19,7 @@ from bag_sim.wrap import triangle_box_intersections  # noqa: E402
 
 REFERENCE = CASE / "side-wrist-clearance"
 TARGET = CASE / "side-film-margin"
+ADVANCE = CASE / "side-film-advance"
 BOX_CORNERS = np.array(list(itertools.product((-1., 1.), repeat=3)))
 BOX_FACES = np.array([(0, 1, 3), (0, 3, 2), (4, 6, 7), (4, 7, 5), (0, 4, 5), (0, 5, 1),
                       (2, 3, 7), (2, 7, 6), (0, 2, 6), (0, 6, 4), (1, 5, 7), (1, 7, 3)])
@@ -120,13 +123,39 @@ def advance_case():
     retained = chosen["span_equivalent_m"]
     first = max(range(len(retained) - 1), key=lambda i: min(retained[i], retained[i + 1]))
     interval = DEPTHS_M[first:first + 2]
-    case = CASE / "side-film-advance"
-    case.mkdir(exist_ok=False)
+    ADVANCE.mkdir(exist_ok=False)
     chosen = chosen | {"close_advance_m": sum(interval) / 2.}
     proof = dict(source_selection=str(TARGET / "selection.json"), close_advance_interval_m=interval, selected=chosen)
+    (ADVANCE / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
+    for filename in ("config.json", "smoke.json"):
+        (ADVANCE / filename).write_bytes((TARGET / filename).read_bytes())
+
+
+def contact_response_case():
+    case = CASE / "side-film-advance-corner-response"
+    case.mkdir(exist_ok=False)
+    proof = json.loads((ADVANCE / "selection.json").read_bytes())
+    proof["contact_response_s"] = {"right_round_1": .0005, "right_round_2": .0005}
     (case / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
     for filename in ("config.json", "smoke.json"):
-        (case / filename).write_bytes((TARGET / filename).read_bytes())
+        (case / filename).write_bytes((ADVANCE / filename).read_bytes())
+
+
+def corner_contact_response(times):
+    original = backend.compile_yam_model
+
+    def compile_model(parcel, built, xml):
+        model = original(parcel, built, xml)
+        root = ET.fromstring(built.xml)
+        for name, seconds in times.items():
+            geom = model.geom(name).id
+            np.testing.assert_array_equal(model.geom_solref[geom], [built.cfg.contact_time, 1.])
+            model.geom_solref[geom, 0] = seconds
+            root.find(f".//geom[@name='{name}']").set("solref", f"{seconds:.17g} 1")
+        built.xml = ET.tostring(root, encoding="unicode")
+        return model
+
+    return patch.object(backend, "compile_yam_model", compile_model)
 
 
 if __name__ == "__main__":
@@ -134,12 +163,16 @@ if __name__ == "__main__":
         prepare()
     elif sys.argv[1:] == ["--prepare-advance"]:
         advance_case()
+    elif sys.argv[1:] == ["--prepare-corner-response"]:
+        contact_response_case()
     else:
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument("--config", type=Path, required=True)
         args, _ = parser.parse_known_args()
-        chosen = json.loads((args.config.parent / "selection.json").read_bytes())["selected"]
+        proof = json.loads((args.config.parent / "selection.json").read_bytes())
+        chosen = proof["selected"]
         if chosen is None:
             raise ValueError("No physical target passed the side-flap geometry and YAM path checks")
-        with shifted_target(np.asarray(chosen["shift_m"]), chosen.get("close_advance_m")):
+        response = corner_contact_response(proof["contact_response_s"]) if "contact_response_s" in proof else nullcontext()
+        with response, shifted_target(np.asarray(chosen["shift_m"]), chosen.get("close_advance_m")):
             record()

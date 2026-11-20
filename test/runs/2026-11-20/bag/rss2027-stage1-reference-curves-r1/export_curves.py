@@ -99,6 +99,7 @@ RAMP_CASES = (
     ("bubble-130mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-130mm"),
     ("bubble-early-withdrawal", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-early-withdrawal"),
     ("pe-jaw-refined-load", "pe", "rss2027-stage1-pe-held-local-mesh-r1/full-action"),
+    ("bubble-fast-lift", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-fast-lift"),
 )
 RAMP_COLUMNS = (
     "t_s", "applied_load_N", "actual_gap_m", "tension_N", "support_N", "tip_z_m", "payload_com_z_m",

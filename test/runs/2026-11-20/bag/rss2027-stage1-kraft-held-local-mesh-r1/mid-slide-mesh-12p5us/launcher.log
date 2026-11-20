@@ -1,0 +1,23 @@
+coarse no_loss_before_limit 0.02532116759328329 {'beta_m_per_N_s': 0.003655847480927244, 'from_s': 0.002000000000066393, 'to_s': 0.016000000000531145, 'displacement_m': 0.00012786228443830675, 'residual_rms_m': 1.1148519394246807e-06}
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/replay_mid_slide_mesh.py", line 123, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/replay_mid_slide_mesh.py", line 119, in main
+    replay(case, source, original, setup, baseline, smoke, dt)
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/replay_mid_slide_mesh.py", line 70, in replay
+    refined = measure(case / name, scene, dt, horizon, original, ratio)
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/replay_mid_slide_mesh.py", line 47, in measure
+    native, values, transitions = record_flow(dt, horizon, original["load_mode"], force_vector=direction,
+                                  ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                load_origin_s=original["source_time_s"])
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-pe-held-load-step-r1/measure_aperture_flow.py", line 45, in record_flow
+    return (*replay.run(dt, duration + dt, direction, force_vector, readout=sample,
+             ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        load_origin_s=load_origin_s), transitions)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-kraft-held-load-step-r1/replay_held_load.py", line 116, in run
+    raise ValueError("Restored state is missing bilateral suspension")
+ValueError: Restored state is missing bilateral suspension

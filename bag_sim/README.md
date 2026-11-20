@@ -10,7 +10,7 @@
 - 内容物支持刚体、三段可弯曲体和可压缩体，袋与内容物的尺寸、质量和材料参数可随机化。
 - 载荷通过原生接触传递，盒体使用同形凸网格接触。抓取与录像接入 [`experience/`](../experience/README.md) 统一平台。
 
-材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。Stage 1 整袋侧抓有四类悬停工况通过原 1 mm 穿透门槛。同参 PE 用 25 μs，牛皮纸和纸板用 100 μs，气泡膜用 40 g 内容物与 200 μs 进行短程悬停。气泡膜在零载时撤离小台面及地面的对照中完成悬空脱手。[Stage 1 报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [袋模型报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
+材料为工程预设，气泡壁采用尚未标定的等效缓冲模型。Stage 1 整袋侧抓有四类悬停工况通过原 1 mm 穿透门槛。同参 PE 用 25 μs，牛皮纸和纸板用 100 μs。气泡膜用 40 g 内容物、200 μs 和 0.27 m/s 的提拉速度达到 0.20 s 双侧悬空预载。撤去零载支撑后完成竖向加力和脱手，左侧内载约在附加 0.61 N 时消失。[Stage 1 报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [袋模型报告](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
 
 牛皮纸撤离零载支撑后，100 μs 两档加载速率的悬空失触均约为附加 5.16 N。50 μs 完整回合出现双侧滑动采样，闭合膜自接触超过 1 mm，材料等效摩擦仍待验收。[牛皮纸加载对照](../test/runs/2026-11-20/bag/rss2027-stage1-kraft-load-ramp-clear-r1/load-ramp-comparison.json)。
 
