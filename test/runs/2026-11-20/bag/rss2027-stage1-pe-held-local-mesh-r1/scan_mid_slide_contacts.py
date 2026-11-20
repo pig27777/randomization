@@ -76,12 +76,48 @@ def scan(coarse, refined, pull):
                 closest_normal=normal_closest, samples=samples)
 
 
-def main():
-    parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("output", type=Path)
-    args = parser.parse_args()
-    if args.output.exists():
-        parser.error(f"Output already exists: {args.output}")
+def solver_study(robots, pull):
+    runs = []
+    modes = (("archived", None), ("strict", None), ("stiffer_0p9995", .9995), ("stiffer_0p9999", .9999))
+    for robot in robots:
+        sim = robot.sim
+        model, data = sim.m, sim.d
+        state = experiment.integration_state(sim)
+        spec = int(mujoco.mjtState.mjSTATE_INTEGRATION)
+        pads = sorted(set().union(*robot.pad_sets))
+        observations = []
+        for label, impedance in modes:
+            if label != "archived":
+                model.opt.iterations = max(100, int(model.opt.iterations))
+                model.opt.ls_iterations = max(100, int(model.opt.ls_iterations))
+                model.opt.tolerance = 1e-12
+            if impedance is not None:
+                model.geom_solimp[pads, :2] = impedance
+            mujoco.mj_setState(model, data, state, spec)
+            backend.refresh(sim)
+            contacts = [contact for contact in data.contact if set(contact.geom).intersection(pads)
+                        and 0 in contact.flex and contact.efc_address >= 0]
+            locations = [contact.pos.tolist() for contact in contacts]
+            if observations:
+                np.testing.assert_array_equal(locations, observations[0]["primary_contact_locations_m"])
+            observation = measure(robot, pull)
+            observation.update(mode=label, iterations=int(np.sum(data.solver_niter)),
+                               allowed_iterations=int(model.opt.iterations), tolerance=float(model.opt.tolerance),
+                               primary_contact_locations_m=locations,
+                               actual_primary_impedance=[float(data.efc_KBIP[c.efc_address, 2]) for c in contacts])
+            observations.append(observation)
+        runs.append(dict(vertices=model.nflexvert, observations=observations))
+    pair = []
+    for coarse, fine in zip(*(run["observations"] for run in runs), strict=True):
+        relative = np.asarray(fine["loads_N"]) / coarse["loads_N"] - 1.
+        usable = all(min(row["loads_N"]) > .001 and row["support_N"] <= .05 and row["penetration_mm"] <= 1.
+                     and not row["warnings"] for row in (coarse, fine))
+        pair.append(dict(mode=coarse["mode"], relative_difference=relative.tolist(),
+                         matched=bool(usable and np.max(np.abs(relative)) <= .1)))
+    return dict(runs=runs, comparisons=pair)
+
+
+def load_scenes():
     configure()
     source = SLIDE / "local-tangent-exact"
     native = json.loads((source / "dt-25us.json").read_bytes())["native_load"]
@@ -92,11 +128,29 @@ def main():
     coarse.sim.m.opt.timestep = native["dt_s"]
     with patch.multiple(experiment, ASSET=mesh, GEOMETRY=geometry, COMPILED_DT=native["dt_s"]):
         refined, _, _ = experiment.refined_scene(source=checkpoint)
-    result = scan(coarse, refined, np.asarray(native["force_direction"]))
-    result.update(source_sha256=fingerprint, force_direction=native["force_direction"])
+    # Refined geometry rebuilds the data; restore the archived rigid-body wrench.
+    wrench = coarse.sim.d.xfrc_applied[coarse.sim.payload_bodies].copy()
+    refined.sim.d.xfrc_applied[refined.sim.payload_bodies] = wrench
+    return coarse, refined, native, fingerprint, wrench
+
+
+def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("output", type=Path)
+    parser.add_argument("--solver-study", action="store_true")
+    args = parser.parse_args()
+    if args.output.exists():
+        parser.error(f"Output already exists: {args.output}")
+    coarse, refined, native, fingerprint, wrench = load_scenes()
+    pull = np.asarray(native["force_direction"])
+    result = solver_study((coarse, refined), pull) if args.solver_study else scan(coarse, refined, pull)
+    result.update(source_sha256=fingerprint, force_direction=native["force_direction"], payload_wrench=wrench.tolist())
     with args.output.open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
-    print(f"Matching normal loads: {result['normal_matches']}; all three loads: {result['full_matches']}", flush=True)
+    if args.solver_study:
+        print(result["comparisons"], flush=True)
+    else:
+        print(f"Matching normal loads: {result['normal_matches']}; all three loads: {result['full_matches']}", flush=True)
 
 
 if __name__ == "__main__":
