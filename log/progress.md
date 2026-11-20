@@ -1138,3 +1138,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 完整 YAM 抓取已接通左右指的运动输入和反作用力，2 ms 完成侧抓、悬停及松夹。
 - PE 近表面回合连续稳定悬停 2.848 s，后半段指尖离包裹顶面 20.99–23.26 mm。
 - 用较短的试件折边和低闭合位替代长探针几何。[工况报告](../test/low_order_parcel/YAM_PROXY_REPORT.md) · [测试报告](../reports/rss2027-stage2-yam-test.md)。
+
+### 2026-11-20 YAM 侧壁抓取与内容物随机化
+
+- 名义 PE 侧壁能离台 53.67 mm，0.5 mm 余料对照未捕获，两组的低速悬停均未过 0.20 s。
+- 三个随机化样本中，60% 样本最高离台 124.37 mm，30% 与 90% 样本均留在桌面。
+- [16.90 s 并排视频](../test/runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/yam-content-randomization.mp4)包含三组抓取与成功样本松夹后落桌。[工况报告](../test/low_order_parcel/YAM_PROXY_REPORT.md)。

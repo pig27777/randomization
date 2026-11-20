@@ -34,6 +34,12 @@ class Config(TrialConfig):
     fold_normal_stiffness_N_m: float = 1600.
     fold_free_length_m: float = .008
     fold_mount_spacing_m: float = .020
+    grasp_face: str = "top"
+    slack_budget_m: float | None = None
+    payload_size_m: tuple[float, float, float] = (.15, .20, .032)
+    payload_mass_kg: float | None = None
+    payload_offset_xy_m: tuple[float, float] = (0., 0.)
+    bag_inner_size_m: tuple[float, float] | None = None
 
 
 class ProxyYamSim(MuJoCoSim):
@@ -152,6 +158,10 @@ class ProxyYamSim(MuJoCoSim):
 
 
 def scene(cfg):
+    if cfg.grasp_face not in ("top", "side"):
+        raise ValueError("grasp_face must be top or side")
+    if cfg.slack_budget_m is not None and (not np.isfinite(cfg.slack_budget_m) or cfg.slack_budget_m < 0.):
+        raise ValueError("slack budget must be finite and nonnegative")
     if not all(np.isfinite(value) and value > 0 for value in
                (cfg.fold_width_m, cfg.fold_normal_stiffness_N_m, cfg.fold_free_length_m,
                 cfg.fold_mount_spacing_m)):
@@ -159,26 +169,70 @@ def scene(cfg):
     envelopes = ENVELOPES.read_bytes()
     nominal = json.loads(envelopes)["materials"]["pe"]["nominal"]
     nominal["proxy"]["L0"] = [cfg.fold_free_length_m] * 2
+    if cfg.payload_mass_kg is not None:
+        nominal["mass_kg"] = cfg.payload_mass_kg
+    size = np.asarray(cfg.payload_size_m, dtype=float)
+    shift = np.asarray(cfg.payload_offset_xy_m, dtype=float)
+    if size.shape != (3,) or not np.isfinite(size).all() or (size <= 0.).any():
+        raise ValueError("payload size must contain three finite positive lengths")
+    if shift.shape != (2,) or not np.isfinite(shift).all():
+        raise ValueError("payload offset must contain two finite lengths")
+    bag_center = np.array([-.25, .04])
+    center = bag_center + shift
+    fill = None
+    outline = ""
+    slack_m = cfg.slack_budget_m
+    if cfg.bag_inner_size_m is not None:
+        inner = np.asarray(cfg.bag_inner_size_m, dtype=float)
+        if inner.shape != (2,) or not np.isfinite(inner).all() or (inner <= 0.).any():
+            raise ValueError("bag interior must contain two finite positive lengths")
+        available = (inner - size[:2] - size[2]) / 2.
+        if (available < np.abs(shift) - 1e-12).any():
+            raise ValueError("payload and planar offset must fit inside the seams")
+        length, width = inner
+        optimum = length * width / (length + width + np.sqrt(length**2 - length * width + width**2))
+        fill = float(np.prod(size) / (optimum * np.prod(inner - optimum)))
+        section = max(0., float(available[1] + shift[1]))
+        slack_m = min(section, nominal["proxy"]["S_bag"] if slack_m is None else slack_m)
+        corners = [np.r_[bag_center + .5 * inner * sign, .001] for sign in
+                   ((-1, -1), (-1, 1), (1, 1), (1, -1))]
+        outline = "".join(f'<geom type="capsule" fromto="{vec([a, b])}" size=".0011" '
+                          'contype="0" conaffinity="0" rgba=".24 .69 .72 1"/>'
+                          for a, b in zip(corners, corners[1:] + corners[:1], strict=True))
     offset = (.003, 0., 0.)
-    parcel = MacroParcelSim.from_nominal(nominal, cfg.dt, com_offset=offset)
-    center = np.array([-.25, .04])
-    half = parcel.half_extents.numpy()
+    half = size / 2.
+    parcel = MacroParcelSim.from_nominal(nominal, cfg.dt, slack_m=slack_m, com_offset=offset, half_extents=half)
     if cfg.fold_mount_spacing_m > 2. * half[0]:
         raise ValueError("the two fold mounts must fit on the package top")
     parcel.mounts[0, :, 0] = parcel.mounts.new_tensor([-.5, .5]) * cfg.fold_mount_spacing_m - offset[0]
-    size = 2. * half
     mass = nominal["mass_kg"]
+    if cfg.grasp_face == "side":
+        parcel.mounts[0, :, 1] = -half[1]
+        parcel.mounts[0, :, 2] = half[2] - .010
+        pitch = np.deg2rad(25.)
+        direction = np.array([0., np.cos(pitch), -np.sin(pitch)])
+        # End insertion just outside the front wall at the upper part of the
+        # side film. The grasp site is behind the eventual distal pad edge.
+        contact_point = np.array([center[0], center[1] - half[1] - .012, size[2] - .005]) - .0255 * direction
+        lift_retract = .020
+    else:
+        pitch = np.deg2rad(35.)
+        direction = np.array([0., np.cos(pitch), -np.sin(pitch)])
+        # Leave room to insert before reaching the line between the top mounts.
+        contact_point = [center[0], center[1] - .020, size[2] + .023]
+        lift_retract = 0.
     xml = f'''
-    <mujoco model="YAM Stage 2 PE proxy">
+    <mujoco model="YAM Stage 2 PE {cfg.grasp_face} proxy">
       <option timestep="{cfg.dt}" integrator="implicitfast" gravity="0 0 -9.81"/>
       <worldbody>
         <light pos="-.4 -.4 .8" dir=".3 .4 -1" directional="true"/>
         <geom name="table" type="box" pos="0 0 -.025" size="1 .22 .025" rgba=".24 .28 .32 1"/>
+        {outline}
         <body name="parcel" pos="{vec([*center, half[2]])}" gravcomp="1">
           <freejoint name="parcel_pose"/>
           <geom name="package" type="box" pos="{vec(-np.array(offset))}" size="{vec(half)}"
                 mass="{mass}" contype="0" conaffinity="0" rgba=".72 .56 .33 1"/>
-          <geom name="seal" type="box" pos="-.003 0 .016" size=".020 .10 .00035"
+          <geom name="seal" type="box" pos="-.003 0 {half[2]}" size=".020 {half[1]} .00035"
                 mass="0" contype="0" conaffinity="0" rgba=".94 .78 .52 1"/>
           <site name="proxy_left" pos="{vec(parcel.mounts[0, 0])}" size=".0025" rgba=".13 .78 1 1"/>
           <site name="proxy_right" pos="{vec(parcel.mounts[0, 1])}" size=".0025" rgba="1 .49 .17 1"/>
@@ -186,14 +240,10 @@ def scene(cfg):
       </worldbody>
       <contact/><equality/>
     </mujoco>'''
-    pitch = np.deg2rad(35.)
-    direction = np.array([0., np.cos(pitch), -np.sin(pitch)])
     built = SimpleNamespace(xml=xml, desc=SimpleNamespace(), cfg=cfg, parcel=parcel, center=center,
-                            envelope_sha256=sha256(envelopes).hexdigest())
-    # Leave room to insert before the grasp reaches the line between the
-    # parcel's two tether mounts.
+                            envelope_sha256=sha256(envelopes).hexdigest(), fill_fraction=fill)
     approach = dict(direction=direction, closing=[-1., 0., 0.],
-                    contact_point=[center[0], center[1] - .020, size[2] + .023], close_advance_m=.1155)
+                    contact_point=contact_point, close_advance_m=.1155, lift_retract_m=lift_retract)
     robot = attach_robot(cfg, built, ProxyYamSim, center, size[2], size, mass, approach)
     robot.sim.bind_robot(robot)
     return robot
@@ -237,7 +287,8 @@ def summarize(trace):
 
 def dimensions(sim):
     return dict(nv=sim.m.nv, size_mm=(sim.robot.size * 1000.).tolist(), mass_kg=sim.robot.mass,
-                proxy_envelope_sha256=sim.built.envelope_sha256)
+                proxy_envelope_sha256=sim.built.envelope_sha256, fill_fraction=sim.built.fill_fraction,
+                slack_budget_mm=float(sim.parcel.proxy.params.S_bag[0, 0]) * 1000.)
 
 
 def source_files():

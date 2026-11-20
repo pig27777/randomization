@@ -24,9 +24,16 @@ def replay(run_dir):
         qpos, sample_time = trajectory["qpos"], trajectory["time"]
     if not np.array_equal(sample_time, [row["t"] for row in trace]):
         raise ValueError("The platform trace and saved poses are out of sync")
+    result = json.loads((run_dir / "result.json").read_bytes())
+    dims = result["dimensions"]
+    title = "Stage 2 PE proxy"
+    if dims.get("fill_fraction") is not None:
+        size = " x ".join(f"{value:.0f}" for value in dims["size_mm"])
+        title = f"PE {dims['fill_fraction']:.0%} fill  |  {size} mm  |  {dims['mass_kg'] * 1000:.0f} g"
     keys = SimpleQueue()
-    hover = next((i for i, row in enumerate(trace) if row["phase"] == "lift_hold"
-                  and row["proxy_longest_hover_s"] >= .20), len(trace) - 1)
+    holding = [i for i, row in enumerate(trace) if row["phase"] == "lift_hold"]
+    fallback = holding[len(holding) // 2] if holding else len(trace) - 1
+    hover = next((i for i in holding if trace[i]["proxy_longest_hover_s"] >= .20), fallback)
     index = hover
     playback_start = None
     closeup = False
@@ -65,7 +72,7 @@ def replay(run_dir):
                       for force, normal in zip(row["proxy_tension_N"], row["proxy_normal_N"], strict=True)]
             viewer.set_texts((None, mujoco.mjtGridPos.mjGRID_TOPLEFT,
                               "YAM linear_4310\nTime / phase\nLeft / blue\nRight / orange\nTable clearance\nPlayback",
-                              f"Stage 2 PE proxy\n{sample_time[i]:.2f} s  |  {row['phase']}\n{fields[0]}\n{fields[1]}\n"
+                              f"{title}\n{sample_time[i]:.2f} s  |  {row['phase']}\n{fields[0]}\n{fields[1]}\n"
                               f"{row['proxy_clearance_m'] * 1000:.1f} mm\n"
                               "Space: play/pause  |  R: start  |  H: hover  |  C: camera"))
             viewer.sync()

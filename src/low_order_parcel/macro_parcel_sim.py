@@ -90,13 +90,14 @@ class MacroParcelSim:
         self.mounts = like.new_tensor([(-.024, 0., hz), (.024, 0., hz)]) - com_offset[:, None, :]
 
     @classmethod
-    def from_nominal(cls, nominal, dt, *, slack_m=None, com_offset=(0., 0., 0.)):
+    def from_nominal(cls, nominal, dt, *, slack_m=None, com_offset=(0., 0., 0.),
+                     half_extents=(.075, .10, .016)):
         values = dict(nominal["proxy"])
         if slack_m is not None:
             values["S_bag"] = slack_m
         params = ProxyParams.from_scalars(values, dtype=torch.float64)
         return cls(LumpedContactProxy(params, dt), params.S_bag.new_tensor([[nominal["mass_kg"]]]),
-                   params.S_bag.new_tensor([com_offset]))
+                   params.S_bag.new_tensor([com_offset]), half_extents=half_extents)
 
     def initial_state(self) -> ParcelState:
         zero = torch.zeros_like(self.up)
