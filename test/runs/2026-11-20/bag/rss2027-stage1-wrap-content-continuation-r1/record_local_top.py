@@ -42,7 +42,7 @@ def surface_below_pad(model, data, name, triangles):
     return float(max(z) + model.flex_radius[0])
 
 
-def prepare(case):
+def prepare(case, use_current_case=False):
     trial = case / "settle/trial"
     result = json.loads((trial / "result.json").read_bytes())
     if (result["outcome"] != "smoke_only" or result["sim_time_s"] < .3 or result["warnings"]
@@ -60,30 +60,44 @@ def prepare(case):
     triangles = data.flexvert_xpos[faces]
     pad_heights = [surface_below_pad(model, data, name, triangles) for name in ("left_pad", "right_pad")]
     local_height = max(pad_heights)
-    target = case / "local-height"
-    target.mkdir(exist_ok=False)
     proof = dict(source_time_s=result["sim_time_s"], global_braking_surface_m=original,
                  settled_pad_surfaces_m=pad_heights, local_braking_surface_m=local_height,
                  difference_m=original - local_height)
+    if use_current_case:
+        with (case / "press-braking-height.json").open("x") as stream:
+            stream.write(json.dumps(proof, indent=2, allow_nan=False) + "\n")
+        return
+    target = case / "local-height"
+    target.mkdir(exist_ok=False)
     (target / "height.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
     inputs = json.loads((case / "smoke.json").read_bytes())
     for name, seconds in (("smoke", .02), ("settle", .30), ("config", 0.)):
         (target / f"{name}.json").write_text(json.dumps(inputs | {"smoke_seconds": seconds}, indent=2) + "\n")
 
 
-if __name__ == "__main__":
-    if sys.argv[1:2] == ["--prepare"] and len(sys.argv) == 3:
-        prepare(Path(sys.argv[2]))
-    else:
-        parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument("--config", type=Path, required=True)
-        args, _ = parser.parse_known_args()
-        height = json.loads((args.config.parent / "height.json").read_bytes())
-
+def record_with_braking_height(height=None):
+    controller = FasterApproach
+    if height is not None:
         class LocalSurfacePress(FasterApproach):
             def __init__(self, target_N, surface_z):
                 np.testing.assert_allclose(surface_z, height["global_braking_surface_m"], atol=.0001, rtol=0.)
                 super().__init__(target_N, height["local_braking_surface_m"])
 
-        with patch.object(protocol, "NormalPress", LocalSurfacePress):
-            record()
+        controller = LocalSurfacePress
+    with patch.object(protocol, "NormalPress", controller):
+        record()
+
+
+if __name__ == "__main__":
+    if sys.argv[1:2] == ["--prepare"] and len(sys.argv) == 3:
+        prepare(Path(sys.argv[2]))
+    elif sys.argv[1:2] == ["--prepare-current-case"] and len(sys.argv) == 3:
+        prepare(Path(sys.argv[2]), use_current_case=True)
+    else:
+        parser = argparse.ArgumentParser(add_help=False)
+        parser.add_argument("--config", type=Path, required=True)
+        parser.add_argument("--output", type=Path, required=True)
+        args, _ = parser.parse_known_args()
+        source = args.config.parent / "height.json"
+        record_with_braking_height(json.loads(source.read_bytes()))
+        (args.output / "press-braking-height.json").write_bytes(source.read_bytes())

@@ -1,15 +1,20 @@
 """Drive the standard top approach from a geometrically prepared package."""
 
+import argparse
+import json
 from pathlib import Path
-import sys
-from unittest.mock import patch
 
-RUN = Path(__file__).resolve().parent
-sys.path.insert(0, str(RUN.with_name("rss2027-stage1-top-ridge-selection-r1")))
-from record_faster_approach import FasterApproach, protocol  # noqa: E402
-from record_ridge import refine_parcel  # noqa: E402
+from record_local_top import record_with_braking_height
 
 
 if __name__ == "__main__":
-    with patch.object(protocol, "NormalPress", FasterApproach):
-        refine_parcel.main()
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--config", type=Path)
+    parser.add_argument("--output", type=Path)
+    args, _ = parser.parse_known_args()
+    companion = args.config.with_name("press-braking-height.json") if args.config else None
+    if companion and companion.is_file():
+        record_with_braking_height(json.loads(companion.read_bytes()))
+        (args.output / companion.name).write_bytes(companion.read_bytes())
+    else:
+        record_with_braking_height()
