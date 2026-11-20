@@ -1,6 +1,7 @@
 """Compare measured membrane capture and sustained support-free loads."""
 
 import argparse
+import csv
 import json
 from pathlib import Path
 
@@ -9,6 +10,7 @@ import numpy as np
 
 from record_local_top import RUN, backend
 from replay_ridge_window import aperture_box, aperture_material_areas, areas
+from summarize_capture_forces import resolve
 
 BASE = RUN / "pe-capture-travel"
 ORIGINAL = RUN.with_name("rss2027-stage1-pickup-baseline-cpu-r4") / "recording/trial"
@@ -39,6 +41,24 @@ def film_at_lift(trial, lift):
                 first_lift_reference_excess_m=float((reference_area - projection) / width))
 
 
+def hold_observation(case):
+    records = read(case, "recording/capture-contacts.json")
+    hold = [resolve(row) for row in records if row["phase"] == "lift_hold"]
+    if not hold:
+        return None
+    unsupported = [row for row in hold if row["support_N"] <= .05]
+    positive = [row for row in unsupported if row["tension_N"] > .001]
+    normals = np.asarray([row["standard_inner_normal_N"] for row in positive]).reshape(-1, 2)
+    with (case / "capture/capture-audit.csv").open(newline="") as stream:
+        retained = [float(row["aperture_material_length_m"]) for row in csv.DictReader(stream)
+                    if row["phase"] == "lift_hold"]
+    return dict(samples=len(hold), unsupported_samples=len(unsupported), positive_pull_samples=len(positive),
+                bilateral_standard_samples=int((normals > .001).all(axis=1).sum()),
+                standard_contact_missing_each=(normals <= .001).sum(axis=0).tolist(),
+                actual_gap_range_m=[min(row["gap_m"] for row in hold), max(row["gap_m"] for row in hold)],
+                reference_membrane_range_m=[min(retained), max(retained)] if retained else None)
+
+
 def observation(case):
     trial = case / "recording/trial"
     result = read(trial, "result.json")
@@ -56,6 +76,7 @@ def observation(case):
     intact = all(not row["payload_geometry"]["outside_corners"] and not row["payload_geometry"]["intersecting_triangles"]
                  for row in trace)
     summary.update(actual_initial_close_advance_m=float(advance), sustained_positive_unsupported_bilateral_s=held,
+                   hold_observation=hold_observation(case),
                    intact=intact, accepted=bool(result["outcome"] == "pickup_ok" and held >= .20 - 1e-9
                                                 and intact and not result["warnings"] and summary["peak_penetration_mm"] <= 1.))
     lift = capture["first_lift"]

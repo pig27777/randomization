@@ -18,7 +18,38 @@ CLOSURE_S = .20
 SPEED_M_S = .008
 
 
-def run(robot, dt, preload_limit_s, closure_s):
+class CenteredPress(protocol.NormalPress):
+    proportional_gain = .012
+    integral_gain = .020
+    integral_limit_N_s = .08
+    start_band_N = (.48, .52)
+    feed_margin_N = .05
+
+    def __init__(self, target_N, surface_z):
+        super().__init__(target_N, surface_z)
+        self.integral_N_s = 0.
+
+    def move(self, z, tip_z, force_N, support_N, dt, approach):
+        original_z = super().move(z, tip_z, force_N, support_N, dt, approach)
+        if support_N > self.support_limit_N:
+            self.integral_N_s = 0.
+            return original_z
+        error_N = self.filtered_N - self.target_N
+        limit = self.integral_limit_N_s
+        integral = min(limit, max(-limit, self.integral_N_s + error_N * dt))
+        proportional = self.proportional_gain * error_N
+        velocity = proportional + self.integral_gain * integral
+        if -.002 <= velocity <= .004 or (velocity > .004 and error_N < 0.) or (velocity < -.002 and error_N > 0.):
+            self.integral_N_s = integral
+        velocity = proportional + self.integral_gain * self.integral_N_s
+        return z + dt * min(.004, max(-.002, velocity))
+
+    def closure_rate(self, nominal_m_s, force_N, support_N):
+        margin = min(force_N - .4, .6 - force_N, self.filtered_N - .4, .6 - self.filtered_N)
+        return nominal_m_s * min(1., max(0., margin / self.feed_margin_N))
+
+
+def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False):
     sim = robot.sim
     m, d = sim.m, sim.d
     m.opt.timestep = dt
@@ -30,13 +61,17 @@ def run(robot, dt, preload_limit_s, closure_s):
     mujoco.mj_fwdPosition(m, robot.kin)
     target = robot.kin.site_xpos[robot.site].copy()
     gap = 2. * d.ctrl[robot.gripper]
-    press = protocol.NormalPress(TARGET_N, protocol.tips(robot).mean(axis=0)[2])
+    press_type = CenteredPress if centered_control else protocol.NormalPress
+    press = press_type(TARGET_N, protocol.tips(robot).mean(axis=0)[2])
+    start_low, start_high = CenteredPress.start_band_N if centered_control else (.4, .6)
     load_start = None
     consecutive = 0
     stride = round(.020 / dt)
+    closure_stride = round(.010 / dt) if centered_control else stride
     closure_steps = round(closure_s / dt)
     preload_steps = round(preload_limit_s / dt)
     preload, samples = [], []
+    pressure_streak_start = None
     outcome = "preload timeout"
     for step in range(preload_steps + closure_steps + 1):
         feedback = backend.measure(robot)
@@ -53,25 +88,39 @@ def run(robot, dt, preload_limit_s, closure_s):
         qualified = .4 <= down <= .6 and support <= .05
         tip_z = protocol.tips(robot).mean(axis=0)[2]
         target[2] = press.move(target[2], tip_z, down, support, dt, approach=False)
+        in_band = qualified and .4 <= press.filtered_N <= .6
         if load_start is None:
             if step % stride == 0:
                 preload.append(dict(time_s=float(d.time), pressure_N=down, direct_support_N=support))
+                if centered_control:
+                    preload[-1]["filtered_pressure_N"] = press.filtered_N
                 if step % (stride * 25) == 0:
                     print(f"{m.nflexvert} nodes at {step * dt:.3f} s preload, {down:.6f} N", flush=True)
-            consecutive = consecutive + 1 if qualified and .4 <= press.filtered_N <= .6 else 0
+            consecutive = consecutive + 1 if qualified and start_low <= press.filtered_N <= start_high else 0
             if consecutive >= round(press.hold_s / dt):
                 load_start = step
             elif step >= preload_steps:
                 break
         if load_start is not None:
             elapsed = step - load_start
-            if elapsed % stride == 0:
-                samples.append(aperture_observation(robot, feedback))
+            if centered_control:
+                if not in_band:
+                    pressure_streak_start = None
+                elif pressure_streak_start is None:
+                    pressure_streak_start = float(d.time)
+            if elapsed % closure_stride == 0:
+                observation = aperture_observation(robot, feedback)
+                if centered_control:
+                    observation.update(filtered_pressure_N=press.filtered_N,
+                                       pressure_streak_start_s=pressure_streak_start)
+                    if elapsed % (closure_stride * 20) == 0:
+                        print(f"{m.nflexvert} nodes at {elapsed * dt:.3f} s closure, {down:.6f} N", flush=True)
+                samples.append(observation)
             if elapsed == closure_steps:
                 outcome = "complete"
                 break
-            if qualified and .4 <= press.filtered_N <= .6:
-                gap -= SPEED_M_S * dt
+            if in_band:
+                gap -= press.closure_rate(SPEED_M_S, down, support) * dt
         robot.command(target, gap)
         sim.step()
     return dict(outcome=outcome, preload_s=load_start * dt if load_start is not None else None,
@@ -80,10 +129,13 @@ def run(robot, dt, preload_limit_s, closure_s):
 
 def pressure_spans(rows):
     inward = rows[0]["actual_gap_m"] - np.asarray([row["actual_gap_m"] for row in rows])
-    eligible = [.4 <= row["pressure_N"] <= .6 and row["direct_support_N"] <= .05 for row in rows]
+    streaks = [row.get("pressure_streak_start_s", 0.) for row in rows]
+    eligible = [.4 <= row["pressure_N"] <= .6 and row["direct_support_N"] <= .05 and streak is not None
+                for row, streak in zip(rows, streaks, strict=True)]
     for start, end in np.flatnonzero(np.diff(np.r_[False, eligible, False])).reshape(-1, 2):
-        turns = np.flatnonzero(np.diff(inward[start:end]) <= 0.) + start + 1
-        bounds = np.r_[start, turns, end]
+        pressure_interruptions = np.not_equal(streaks[start + 1:end], streaks[start:end - 1])
+        breaks = np.flatnonzero((np.diff(inward[start:end]) <= 0.) | pressure_interruptions) + start + 1
+        bounds = np.r_[start, breaks, end]
         for a, b in zip(bounds[:-1], bounds[1:], strict=True):
             if b - a >= 3:
                 yield inward[a:b], rows[a:b]
@@ -139,6 +191,7 @@ def main():
     parser.add_argument("--step-us", type=float, choices=(12.5, 25.), default=DT * 1e6)
     parser.add_argument("--preload-limit-s", type=float, default=PRELOAD_LIMIT_S)
     parser.add_argument("--closure-s", type=float, default=CLOSURE_S)
+    parser.add_argument("--centered-control", action="store_true")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if any(not np.isfinite(value) or value < .020 for value in (args.preload_limit_s, args.closure_s)):
@@ -146,11 +199,19 @@ def main():
     case = args.case.resolve()
     dt = args.step_us / 1e6
     coarse, refined, *_ = load_pair(case=case, timestep=dt)
-    runs = [run(robot, dt, args.preload_limit_s, args.closure_s) for robot in (coarse, refined)]
+    runs = [run(robot, dt, args.preload_limit_s, args.closure_s, centered_control=args.centered_control)
+            for robot in (coarse, refined)]
     comparison = fit_common(runs)
     result = dict(dt_s=dt, mesh_vertices=[coarse.sim.m.nflexvert, refined.sim.m.nflexvert],
                   pressure_target_N=TARGET_N, preload_limit_s=args.preload_limit_s, closure_s=args.closure_s,
                   runs=runs, comparison=comparison)
+    if args.centered_control:
+        result["controller"] = dict(proportional_gain_m_per_N_s=CenteredPress.proportional_gain,
+                                    integral_gain_m_per_N_s2=CenteredPress.integral_gain,
+                                    integral_limit_N_s=CenteredPress.integral_limit_N_s,
+                                    start_band_N=CenteredPress.start_band_N,
+                                    feed_margin_N=CenteredPress.feed_margin_N,
+                                    closure_sample_s=.010)
     output = args.output or case / "local-mesh-window/matched-pressure.json"
     with output.open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")

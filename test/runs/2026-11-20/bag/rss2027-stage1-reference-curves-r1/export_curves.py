@@ -105,6 +105,8 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/pe-capture-travel/original-advance/recording/trial"),
     ("pe-capture-advance-7p5mm", "pe",
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/pe-capture-travel/advance-7p5mm/recording/trial"),
+    ("pe-capture-advance-11p25mm", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/pe-capture-travel/advance-11p25mm/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
