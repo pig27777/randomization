@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-run_dir=$(dirname "$0")
+source_dir=$(dirname "$0")
+run_dir=${1:-$source_dir}
 python=.venv-physical-parcel/bin/python
-"$python" -B "$run_dir/record_ridge.py" --config "$run_dir/smoke.json" --output "$run_dir/smoke" > "$run_dir/smoke.log" 2>&1
+"$python" -B "$source_dir/record_ridge.py" --config "$run_dir/smoke.json" --output "$run_dir/smoke" > "$run_dir/smoke.log" 2>&1
 "$python" -B - "$run_dir/smoke/summary.json" <<'PY'
 import json
 from pathlib import Path
@@ -14,7 +15,7 @@ assert not result["warnings"] and result["dimensions"]["film_vertices"] == 318
 assert result["peaks"]["penetration_mm"] <= 1.
 assert result["normal_press"]["peak_direct_support_N"] <= .05
 PY
-"$python" -B "$run_dir/record_ridge.py" --config "$run_dir/config.json" --output "$run_dir/recording" \
+"$python" -B "$source_dir/record_ridge.py" --config "$run_dir/config.json" --output "$run_dir/recording" \
     --record-penetration-peaks > "$run_dir/run.log" 2>&1
 if "$python" -B - "$run_dir/recording/trial/trace.json" <<'PY'
 import json

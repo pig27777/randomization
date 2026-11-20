@@ -72,6 +72,25 @@ def project_step(previous, proposed, normals, distances, adjacent):
     return previous + scale[:, None] * velocity
 
 
+def edge_targets(reference, edges):
+    return [(a, b, np.linalg.norm(reference[b] - reference[a], axis=1))
+            for a, b in (group.T for group in edge_colors(edges))]
+
+
+def relax_once(local, half, groups, pairs, adjacent, strain_band=0.):
+    normals, distance = separating_planes(local, half)
+    proposed = local.copy()
+    for a, b, target in groups:
+        delta = proposed[b] - proposed[a]
+        length = np.linalg.norm(delta, axis=1)
+        bounded = np.clip(length, target * (1. - strain_band), target * (1. + strain_band))
+        correction = .45 * ((length - bounded) / np.maximum(length, 1e-12))[:, None] * delta
+        proposed[a] += correction
+        proposed[b] -= correction
+    open_pairs(proposed, pairs, MIN_GAP)
+    return project_step(local, proposed, normals, distance, adjacent)
+
+
 def run_case(sample, row):
     reference = np.column_stack((-ASSET_VERTICES[:, 1], ASSET_VERTICES[:, 0], ASSET_VERTICES[:, 2]))
     reference[:, :2] *= [float(row[f"inside_{axis}_m"]) / original for axis, original in zip("xy", (.35, .25))]
@@ -88,22 +107,12 @@ def run_case(sample, row):
     adjacent = incident_faces()
     center, half = item["position"], item["half_size"]
     local = assembled - center
-    groups = [(a, b, np.linalg.norm(reference[b] - reference[a], axis=1)) for a, b in
-              (group.T for group in edge_colors(edges))]
+    groups = edge_targets(reference, edges)
     best = local
     best_strain = before["maximum_edge_strain"]
     checkpoints = []
     for tick in range(1, ITERATIONS + 1):
-        normals, distance = separating_planes(local, half)
-        proposed = local.copy()
-        for a, b, target in groups:
-            delta = proposed[b] - proposed[a]
-            length = np.linalg.norm(delta, axis=1)
-            correction = .45 * ((length - target) / np.maximum(length, 1e-12))[:, None] * delta
-            proposed[a] += correction
-            proposed[b] -= correction
-        open_pairs(proposed, pairs, MIN_GAP)
-        local = project_step(local, proposed, normals, distance, adjacent)
+        local = relax_once(local, half, groups, pairs, adjacent)
         if tick % 20:
             continue
         check = measurements(reference, local + center, edges, item)

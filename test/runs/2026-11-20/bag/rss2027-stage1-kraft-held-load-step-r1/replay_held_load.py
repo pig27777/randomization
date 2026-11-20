@@ -156,6 +156,7 @@ def main():
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--extract", action="store_true")
     parser.add_argument("--direction", choices=("vertical", "jaw-tangent"), default="vertical")
+    parser.add_argument("--step-us", type=int, nargs="+", choices=(25, 50, 100), default=(100, 50))
     args = parser.parse_args()
     if args.extract:
         extract_state()
@@ -163,7 +164,8 @@ def main():
     if args.output is None:
         parser.error("specify an output directory")
     args.output.mkdir(exist_ok=False)
-    for dt in (.0001, .00005):
+    for step_us in args.step_us:
+        dt = step_us / 1e6
         result, rows = run(dt, .02 if args.smoke else 2.4, args.direction)
         stem = args.output / f"dt-{round(dt * 1e6)}us"
         stem.with_suffix(".json").write_text(json.dumps(result, indent=2) + "\n")
