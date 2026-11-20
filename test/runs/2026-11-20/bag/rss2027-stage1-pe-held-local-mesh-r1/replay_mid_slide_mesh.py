@@ -38,6 +38,21 @@ def original_mid_slide(setup, source):
     return robot, count, hashlib.sha256(state.tobytes()).hexdigest()
 
 
+def continued_preload(scene, archive):
+    robot, frame, original = scene()
+    report = json.loads(archive.with_suffix(".json").read_bytes())
+    if report["source_sha256"] != original or report["outcome"] != "no_continuous_suspension":
+        raise ValueError("The archived precursor must be the original 221-node relaxation")
+    sim = robot.sim
+    ctrl = sim.d.ctrl.copy()
+    with np.load(archive.with_suffix(".npz")) as saved:
+        state = saved["final_state"]
+    mujoco.mj_setState(sim.m, sim.d, state, int(mujoco.mjtState.mjSTATE_INTEGRATION))
+    np.testing.assert_array_equal(sim.d.ctrl, ctrl)
+    np.testing.assert_array_equal(sim.d.xfrc_applied, 0.)
+    return robot, frame, hashlib.sha256(state.tobytes()).hexdigest()
+
+
 _ORIGINAL_SCENE = experiment.original_scene
 
 
@@ -90,10 +105,11 @@ def main():
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--prepare", action="store_true")
     mode.add_argument("--relax-preload", action="store_true")
+    mode.add_argument("--continue-relax", action="store_true")
     parser.add_argument("--material", choices=("pe", "kraft"), default="pe")
     parser.add_argument("--step-us", type=float, choices=(12.5, 25.))
     args = parser.parse_args()
-    if args.relax_preload and (args.material != "kraft" or args.step_us != 12.5):
+    if (args.relax_preload or args.continue_relax) and (args.material != "kraft" or args.step_us != 12.5):
         parser.error("Use --material kraft --step-us 12.5 with the archived 221-node grid")
     if args.material == "kraft":
         case, source = KRAFT / "mid-slide-mesh", KRAFT / "local-tangent"
@@ -120,10 +136,15 @@ def main():
             scene = partial(experiment.refined_scene, source=setup)
             with patch.object(experiment, "original_scene", setup), patch.object(experiment, "refined_scene", scene):
                 experiment.prepare()
-        elif args.relax_preload:
-            output = case / "preload"
+        elif args.relax_preload or args.continue_relax:
+            scene = partial(experiment.refined_scene, source=physical_scene)
+            if args.continue_relax:
+                scene = partial(continued_preload, scene, case / "preload/dt-12p5us")
+                output, duration = case / "preload-extension", .75
+            else:
+                output, duration = case / "preload", .45
             output.mkdir(exist_ok=False)
-            settle_suspension(dt, output, partial(experiment.refined_scene, source=physical_scene))
+            settle_suspension(dt, output, scene, duration_s=duration)
         else:
             replay(case, source, original, setup, baseline, smoke, dt)
 

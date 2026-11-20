@@ -70,19 +70,20 @@ def prepare(case):
     (case / "preparation.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
 
 
-def execute(case, *, half_step=False, fast=False):
+def execute(case, *, half_step=False, alternate_rate=None):
     robot, _, _ = scene()
     dt = float(robot.sim.m.opt.timestep)
     direction, rate = None, replay.RATE
-    if half_step or fast:
+    if half_step or alternate_rate is not None:
         native = json.loads((case / "recording/summary.json").read_bytes())["native_load"]
         np.testing.assert_equal(dt, native["dt_s"])
         direction = np.asarray(native["force_direction"])
         if half_step:
             dt /= 2
+            folder = "half-step"
         else:
-            rate = 20.
-        case = case / ("half-step" if half_step else "fast-ramp")
+            rate, folder = alternate_rate
+        case = case / folder
         case.mkdir(exist_ok=False)
     for name, duration in (("smoke", .020), ("recording", 12. / rate)):
         output = case / name
@@ -120,15 +121,19 @@ if __name__ == "__main__":
     command.add_argument("--compare-steps", action="store_true")
     command.add_argument("--half-step", action="store_true")
     command.add_argument("--fast-ramp", action="store_true")
+    command.add_argument("--slow-ramp", action="store_true")
     args = parser.parse_args()
     if args.compare_steps and args.material != "paperboard":
         parser.error("The archived comparison window is for paperboard")
     if (args.half_step or args.fast_ramp) and args.material != "bubble":
         parser.error("The half-step and fast-ramp whole-history controls are for bubble film")
+    if args.slow_ramp and args.material != "paperboard":
+        parser.error("The 2.5 N/s control uses the archived paperboard source")
     case = setup(args.material)
     if args.prepare:
         prepare(case)
     elif args.compare_steps:
         compare_steps(case)
     else:
-        execute(case, half_step=args.half_step, fast=args.fast_ramp)
+        alternate_rate = (20., "fast-ramp") if args.fast_ramp else (2.5, "slow-ramp") if args.slow_ramp else None
+        execute(case, half_step=args.half_step, alternate_rate=alternate_rate)

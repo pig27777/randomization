@@ -31,6 +31,8 @@ def box(model, data, name):
     geom = model.geom(name)
     pos = data.geom_xpos[geom.id].copy()
     rotation = data.geom_xmat[geom.id].reshape(3, 3).copy()
+    if model.geom_type[geom.id] == mujoco.mjtGeom.mjGEOM_PLANE:
+        return pos, None, rotation, None
     half = geom.size.copy()
     corners = (BOX_CORNERS * half) @ rotation.T + pos
     return pos, half, rotation, corners
@@ -38,6 +40,9 @@ def box(model, data, name):
 
 def intersects_box(volume, center, rotation, extent):
     pos, half, axes, corners = volume
+    if half is None:
+        normal = axes[:, 2]
+        return (center - pos) @ normal <= extent @ abs(rotation.T @ normal)
     if np.all(abs((center - pos) @ axes) < half):
         return True
     return bool(triangle_box_intersections(corners, BOX_FACES, extent, center, rotation).any())
@@ -167,7 +172,7 @@ def old_open_contact():
                          data.flexvert_xpos, model.flex_elem.reshape(-1, 3), obstacles)
 
 
-def open_route_candidates(config, settled_qpos, prior):
+def open_route_candidates(config, settled_qpos, prior=None):
     cfg = backend.Config(**config)
     with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
@@ -182,7 +187,7 @@ def open_route_candidates(config, settled_qpos, prior):
     reference = robot.sim.parcel.envelope["reference"]
     faces = robot.sim.parcel.envelope["faces"]
     obstacles = [box(model, data, name) for name in ("payload_geom_0", "table")]
-    check = prior["yaw_deg"] == cfg.yaw and prior["tilt_deg"] == cfg.tilt
+    check = prior is not None and prior["yaw_deg"] == cfg.yaw and prior["tilt_deg"] == cfg.tilt
     original = (swept_fingers(pads, prior["shift_m"], prior["close_advance_m"] * robot.approach,
                               points, faces, obstacles) if check else None)
     up = np.array([0., 0., 1.])
@@ -205,6 +210,23 @@ def open_route_candidates(config, settled_qpos, prior):
             rows.append(dict(yaw_deg=cfg.yaw, tilt_deg=cfg.tilt, shift_m=shift.tolist(),
                              close_advance_m=float(depth), paired_depth_score_m=paired))
     return rows, original
+
+
+def choose_open_route(config, scored):
+    scored.sort(key=lambda row: row["paired_depth_score_m"], reverse=True)
+    for row in scored:
+        cfg = config | {"yaw": row["yaw_deg"], "tilt": row["tilt_deg"]}
+        try:
+            path = screen(cfg, np.asarray(row["shift_m"]), row["close_advance_m"])
+        except RuntimeError as error:
+            if not str(error).startswith(("YAM initial pose unreachable", "initial film contact penetration")):
+                raise
+            row["path"] = str(error)
+            continue
+        row["path"] = path["status"]
+        if path["status"] == "reachable":
+            return cfg, row | {"path_check": {key: value for key, value in path.items() if key != "trace"}}
+    return config, None
 
 
 def prepare_open_route():
@@ -230,21 +252,7 @@ def prepare_open_route():
     if (baseline is None or not any(row["finger"] == "right_pad" and row["film_faces"] for row in baseline)
             or not any(row["finger"] == "right_pad" and 0 in row["film_faces"] for row in actual)):
         raise ValueError("The old static sweep and recorded stop must identify the right-finger collision")
-    scored.sort(key=lambda row: row["paired_depth_score_m"], reverse=True)
-    selected = None
-    for row in scored:
-        cfg = config | {"yaw": row["yaw_deg"], "tilt": row["tilt_deg"]}
-        try:
-            path = screen(cfg, np.asarray(row["shift_m"]), row["close_advance_m"])
-        except RuntimeError as error:
-            if not str(error).startswith(("YAM initial pose unreachable", "initial film contact penetration")):
-                raise
-            row["path"] = str(error)
-            continue
-        row["path"] = path["status"]
-        if path["status"] == "reachable":
-            selected = row | {"path_check": {key: value for key, value in path.items() if key != "trace"}}
-            break
+    cfg, selected = choose_open_route(config, scored)
     OPEN_ROUTE.mkdir(exist_ok=False)
     proof = dict(source_time_s=time, predicted_gap_m=.008, old_open_sweep_conflicts=baseline,
                  old_actual_stop_conflicts=actual,
@@ -253,6 +261,23 @@ def prepare_open_route():
     if selected:
         for filename, seconds in (("config.json", 0.), ("smoke.json", .02)):
             (OPEN_ROUTE / filename).write_text(json.dumps(cfg | {"smoke_seconds": seconds}, indent=2) + "\n")
+
+
+def prepare_retracted_lift():
+    case = CASE / "side-film-outward-lift"
+    source = json.loads((OPEN_ROUTE / "selection.json").read_bytes())
+    config = json.loads((OPEN_ROUTE / "config.json").read_bytes())
+    first_lift = json.loads((OPEN_ROUTE / "capture/capture-summary.json").read_bytes())["first_lift"]
+    if not first_lift or not first_lift["aperture_material_length_m"] > 0.:
+        raise ValueError("The retraction comparison requires original film in the aperture at the lift transition")
+    chosen = source["selected"] | {"lift_retract_m": .060}
+    path = screen(config, np.asarray(chosen["shift_m"]), chosen["close_advance_m"], chosen["lift_retract_m"])
+    case.mkdir(exist_ok=False)
+    proof = dict(selected=chosen, original_first_lift=first_lift, lift_path_check=path)
+    (case / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
+    if path["status"] == "reachable":
+        for name in ("config.json", "smoke.json", "settle.json"):
+            (case / name).write_bytes((OPEN_ROUTE / name).read_bytes())
 
 
 def contact_response_case():
@@ -289,6 +314,8 @@ if __name__ == "__main__":
         advance_case()
     elif sys.argv[1:] == ["--prepare-open-route"]:
         prepare_open_route()
+    elif sys.argv[1:] == ["--prepare-outward-lift"]:
+        prepare_retracted_lift()
     elif sys.argv[1:] == ["--prepare-corner-response"]:
         contact_response_case()
     else:
@@ -300,5 +327,6 @@ if __name__ == "__main__":
         if chosen is None:
             raise ValueError("No physical target passed the side-flap geometry and YAM path checks")
         response = corner_contact_response(proof["contact_response_s"]) if "contact_response_s" in proof else nullcontext()
-        with response, shifted_target(np.asarray(chosen["shift_m"]), chosen.get("close_advance_m")):
+        with response, shifted_target(np.asarray(chosen["shift_m"]), chosen.get("close_advance_m"),
+                                      chosen.get("lift_retract_m", 0.)):
             record()

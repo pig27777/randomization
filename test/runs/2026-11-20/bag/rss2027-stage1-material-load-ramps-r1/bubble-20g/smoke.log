@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/../rss2027-stage1-kraft-load-ramp-r1/record_load_ramp.py", line 174, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/../rss2027-stage1-kraft-load-ramp-r1/record_load_ramp.py", line 151, in main
+    result = run(backend, config, args.output / "trial", on_sample=observe, on_penetration_peak=observe_peak)
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/protocol.py", line 263, in run
+    robot = backend.scene(cfg)
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/../rss2027-stage1-kraft-load-ramp-r1/record_load_ramp.py", line 81, in with_load
+    robot = scene(cfg)
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/physical_parcel_yam.py", line 250, in scene
+    robot = attach_robot(cfg, built, sim_factory, np.array(p.cfg.center), top,
+                        np.array([*cfg.bag_size, height]),
+                        p.cfg.payload_mass + p.envelope["masses"].sum(), approach=approach)
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/protocol.py", line 150, in attach_robot
+    robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/robot.py", line 70, in __init__
+    self.sim = fixture['sim_factory'](built)
+               ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/physical_parcel_yam.py", line 100, in __init__
+    initialize_state(self.parcel, self.m, self.d, built.cfg)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/physical_parcel_yam.py", line 210, in initialize_state
+    raise ValueError("prepared state uses a different parcel or support configuration")
+ValueError: prepared state uses a different parcel or support configuration

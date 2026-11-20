@@ -79,6 +79,8 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-082/local-height/recording/trial"),
     ("pe-top-fill-90percent-076-ridge", "pe",
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-076/ridge-rotated/recording/trial"),
+    ("pe-side-fill-60percent-open-route", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-open-route/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",

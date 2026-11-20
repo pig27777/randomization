@@ -13,9 +13,10 @@ RUN = Path(__file__).resolve().parent
 CASE = RUN / "equilibrated-entry/sample-061"
 sys.path.insert(0, str(RUN.with_name("rss2027-stage1-randomized-top-local-mesh-r1")))
 from refine_parcel import backend, physical_parcel, prepared_wrap  # noqa: E402
+from experience.yam_platform.protocol import retracted_lift_displacement  # noqa: E402
 
 
-def shifted_target(translation, close_advance_m=None):
+def shifted_target(translation, close_advance_m=None, lift_retract_m=0.):
     attach = backend.attach_robot
 
     def shifted(*args, approach=None, **kwargs):
@@ -24,20 +25,28 @@ def shifted_target(translation, close_advance_m=None):
         approach = approach | {"contact_point": np.asarray(approach["contact_point"]) + translation}
         if close_advance_m is not None:
             approach["close_advance_m"] = close_advance_m
+        if lift_retract_m:
+            approach["lift_retract_m"] = lift_retract_m
         return attach(*args, approach=approach, **kwargs)
 
     return patch.object(backend, "attach_robot", shifted)
 
 
-def screen(config, translation=None, advance_m=.110):
+def screen(config, translation=None, advance_m=.110, lift_retract_m=0.):
     cfg = backend.Config(**config)
-    placement = shifted_target(translation) if translation is not None else nullcontext()
+    placement = shifted_target(translation, lift_retract_m=lift_retract_m) if translation is not None else nullcontext()
     with placement, patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
     start = robot.initial_target
     insertion = start + advance_m * robot.approach
-    targets = np.vstack((np.linspace(start, insertion, 34),
-                         np.linspace(insertion, insertion + [0., 0., cfg.lift_height], 71)[1:]))
+    if lift_retract_m:
+        length = cfg.lift_height + lift_retract_m * (1. + robot.approach[2])
+        travel = np.r_[np.linspace(0., lift_retract_m, 20)[1:], np.linspace(lift_retract_m, length, 71)[1:]]
+        lift = [insertion + retracted_lift_displacement(robot.approach, lift_retract_m, cfg.lift_height, x)
+                for x in travel]
+    else:
+        lift = np.linspace(insertion, insertion + [0., 0., cfg.lift_height], 71)[1:]
+    targets = np.vstack((np.linspace(start, insertion, 34), lift))
     jacp, jacr = np.zeros((3, robot.sim.m.nv)), np.zeros((3, robot.sim.m.nv))
     rows = []
     for target in targets:

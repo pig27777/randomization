@@ -287,7 +287,7 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
 
 旧构型与 box 路径的 GPU 最大已测 8192 环境、9032.73 环境步/s，9216 环境建图耗尽显存，每轮 1.25 ms 仿真。当前 142 节点凸网格整袋在隔离 Warp 法向修复版上通过两种内容物布局的单环境 YAM 在线抓取，仿真 4.76–4.77 s、墙钟 539–580 s，峰值采样显存 966 MiB。64 环境的固定指令窗口已通过，完整动作批量容量与闭环吞吐仍待测。[整袋算力验收](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [历史容量与主题结果](../test/bag_model/PHYSICAL_PARCEL_REPORT.md)。
 
-仓库原 200 节点网格在相同包裹准备与完整侧抓配置下，40 μs 的 CPU 和 Warp 均通过。CPU 仿真 4.7766 s、墙钟 562.55 s。RTX 5090 仿真 4.77256 s、墙钟 4,263.54 s，峰值采样显存 966 MiB。固定 60% 样本通过 0.30 s 静置，现有顶部及三种侧向动作均为空夹。对齐内容物折边再降低原生弹性能后，三种原 90% 包裹通过 25 μs、0.30 s 静置，峰值穿透为 0.159–0.406 mm，完整包覆。[整袋 Stage 1 记录](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [高填充准备态](../test/runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/)。
+仓库原 200 节点网格在相同包裹准备与完整侧抓配置下，40 μs 的 CPU 和 Warp 均通过。CPU 仿真 4.7766 s、墙钟 562.55 s。RTX 5090 仿真 4.77256 s、墙钟 4,263.54 s，峰值采样显存 966 MiB。固定 60% 的新侧缘动作在第一次起抬有 14.93 mm 等效膜量及双侧内载，随后在包裹仍受支撑时失触。对齐内容物折边再降低原生弹性能后，三种原 90% 包裹通过 25 μs、0.30 s 静置，峰值穿透为 0.159–0.406 mm，完整包覆。这三种原形状均已选出可达的侧缘位置。[整袋 Stage 1 记录](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [高填充准备态](../test/runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/)。
 
 同一悬空 PE 整袋沿夹面的半步长试验，零支撑且完全包覆的共同窗口内，两档都出现双侧滑动和膜净退出。起滑拉力相差 48.44%，滑移率候选相差 87.81%，该方向仍待收敛。原 189 节点细分缩短局部接触响应后，数值深度降至 1 mm 内，仍发生局部露角。[时间步对照](../test/runs/2026-11-20/bag/rss2027-stage1-pe-held-load-step-r1/tangent-prefix/comparison.json) · [细网格局部响应](../test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/contact-response/)。
 

@@ -145,6 +145,11 @@ def attach_robot(cfg,built,sim_factory,center,top,size,mass,approach=None):
         close_advance = approach.get("close_advance_m")
         if close_advance is not None and (not np.isfinite(close_advance) or close_advance <= 0.):
             raise ValueError("side close advance must be positive and finite")
+        lift_retract = approach.get("lift_retract_m", 0.)
+        if not np.isfinite(lift_retract) or lift_retract < 0.:
+            raise ValueError("side lift retraction must be finite and nonnegative")
+        if lift_retract and (not cfg.pickup_only or n[2] >= 0. or -lift_retract * n[2] > cfg.lift_height):
+            raise ValueError("side lift retraction requires pickup-only and an upward path within the lift height")
         rotation = np.column_stack([np.cross(c, n), c, n])
         target = np.asarray(approach["contact_point"], float) - .10*n
     robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))
@@ -158,6 +163,7 @@ def attach_robot(cfg,built,sim_factory,center,top,size,mass,approach=None):
     if approach is not None:
         robot.approach, robot.approach_extent = n, float(abs(np.asarray(size) @ n))
         robot.close_advance_m = close_advance
+        robot.lift_retract_m = lift_retract
     return robot
 
 
@@ -166,6 +172,14 @@ def tips(robot):
     m,d = robot.sim.m,robot.sim.d
     # Local pad z points toward the palm, so the distal edge lies at -20mm.
     return np.array([d.geom_xpos[g] - d.geom_xmat[g].reshape(3,3)[:,2]*.020 for g in robot.pad_geom])
+
+
+def retracted_lift_displacement(approach, retraction_m, height_m, travel_m):
+    """Follow the outward approach axis, then finish the commanded rise vertically."""
+    withdrawal = min(retraction_m, travel_m)
+    displacement = -withdrawal * approach
+    displacement[2] += min(height_m + retraction_m * approach[2], travel_m - withdrawal)
+    return displacement
 
 
 
@@ -294,6 +308,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
     approach=getattr(robot,"approach",None)
     close_advance = getattr(robot, "close_advance_m", None)
     approach_origin = tips(robot).mean(0) if close_advance is not None else None
+    lift_retract = getattr(robot, "lift_retract_m", 0.)
+    lift_length = cfg.lift_height + lift_retract * (1. + approach[2]) if lift_retract else cfg.lift_height
     press = None
     if cfg.press_target_N is not None:
         if approach is not None:
@@ -395,8 +411,12 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                         outcome,reason="grasp_fail","v1.3 pinch eligibility absent at end of close"
                     lift_site=target.copy(); lift_object=sim.com().copy()
             elif phase=="lift":
-                target=lift_site+np.array([0.,0.,min(cfg.lift_height,cfg.lift_speed_m_s*elapsed)])
-                next_phase="lift_hold" if elapsed>=cfg.lift_height/cfg.lift_speed_m_s else None
+                travel = cfg.lift_speed_m_s * elapsed
+                if lift_retract:
+                    target = lift_site + retracted_lift_displacement(approach, lift_retract, cfg.lift_height, travel)
+                else:
+                    target=lift_site+np.array([0.,0.,min(cfg.lift_height,travel)])
+                next_phase="lift_hold" if elapsed>=lift_length/cfg.lift_speed_m_s else None
             elif phase=="lift_hold":
                 pickup_end = "open" if release_ramp else "done"
                 next_phase=(pickup_end if cfg.pickup_only else "carry") if elapsed>=cfg.lift_hold_seconds else None
@@ -545,6 +565,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
             target_N=press.target_N, band_N=[.8 * press.target_N, 1.2 * press.target_N],
             required_hold_s=press.hold_s, achieved_hold_s=press.band_s, target_reached=press.reached,
             peak_N=press.peak_N, peak_direct_support_N=press.peak_direct_support_N)
+    if lift_retract:
+        result["side_lift_retraction_m"] = lift_retract
     (output/"result.json").write_text(json.dumps(result,indent=2))
     print(json.dumps({k:result[k] for k in ("outcome","reason","phase","sim_time_s","peaks","model_metrics")}),flush=True)
     return result

@@ -12,7 +12,7 @@ RUN = Path(__file__).resolve().parent
 BASE_HOLD_S = .20
 
 
-def check(dt, output, scene, *, adjust_gripper=None):
+def check(dt, output, scene, *, adjust_gripper=None, duration_s=.45):
     robot, frame, fingerprint = scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
@@ -22,7 +22,7 @@ def check(dt, output, scene, *, adjust_gripper=None):
     longest = 0.
     rows = []
     status = "no_continuous_suspension"
-    for index in range(round(.45 / dt)):
+    for index in range(round(duration_s / dt)):
         time = float(sim.d.time) - start
         gap = robot.gap()
         if adjust_gripper is not None:
