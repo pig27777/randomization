@@ -291,6 +291,8 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
 
 同一悬空 PE 整袋沿夹面的半步长试验，零支撑且完全包覆的共同窗口内，两档都出现双侧滑动和膜净退出。起滑拉力相差 48.44%，滑移率候选相差 87.81%，该方向仍待收敛。原 189 节点细分缩短局部接触响应后，数值深度降至 1 mm 内，仍发生局部露角。[时间步对照](../test/runs/2026-11-20/bag/rss2027-stage1-pe-held-load-step-r1/tangent-prefix/comparison.json) · [细网格局部响应](../test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/contact-response/)。
 
+从同一个真实滑动中间态分别继续 25 和 12.5 μs，PE 在 56 ms 内均净退出约 0.596 mm，滑移率候选相差 2.76%。该结果通过受控滑动段的时间步检查，完整加载起滑仍有时间步依赖。两种固定 90% 的不同包裹已完成 0.5 N 压力及起抬动作，均保持包覆并为空夹。[同态滑动中段](../test/runs/2026-11-20/bag/rss2027-stage1-pe-held-load-step-r1/local-tangent-exact/comparison.json) · [两种高填充布局](../test/runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/)。
+
 ### 最外缘封口袋（2026-11-16）
 
 `geometry/kraft_edge_sealed_35.npz` 从原袋正反片生成，四周最外轮廓合并为34个共享封边节点，142节点、280三角面，闭合定向网格。参考态为两片平膜，面积0.175 m²；默认面密度对应21 g。生成入口为 `python -B bag_sim/make_edge_sealed_geometry.py`，物理模型通过 `Config(geometry="geometry/kraft_edge_sealed_35.npz")` 选择，YAM适配器使用同名参数。
