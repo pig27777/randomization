@@ -1,0 +1,159 @@
+{
+  "machine": "ubun",
+  "device": "NVIDIA GeForce RTX 5090",
+  "torch_version": "2.7.1+cu128",
+  "cuda_version": "12.8",
+  "dt_s": 0.002,
+  "nominal_config_sha256": "1c194cfa7d2b269453629621c37359e8c53c9c384532e9075c1b029410bf73a2",
+  "mode": "complete 4.77 s proxy side-grasp and hover on CUDA Graph; four nominal materials",
+  "stage1_reference": {
+    "mode": "archived single-world complete articulated YAM with deformable shell",
+    "rss2027-stage1-warp-film-normal-r1": {
+      "wall_s": 539.1218043459812,
+      "sim_time_s": 4.76964807510376,
+      "dt_s": 0.0002
+    },
+    "rss2027-stage1-warp-film-normal-30pct-r1": {
+      "wall_s": 579.8630625560181,
+      "sim_time_s": 4.759658336639404,
+      "dt_s": 0.0002
+    },
+    "rss2027-stage1-pickup-200-warp-r1": {
+      "wall_s": 4263.540467242012,
+      "sim_time_s": 4.7725629806518555,
+      "dt_s": 4e-05
+    }
+  },
+  "high_fidelity_batch_reference": {
+    "mode": "64 physics steps at an archived hold; no full-grasp inference",
+    "worlds": 8000,
+    "sim_seconds_per_wall_second": 3.7071817748599267,
+    "file": "test/runs/2026-11-20/bag/yam-batch-full-grasp-r1/probe-8000-200us/benchmark.json"
+  },
+  "cases": [
+    {
+      "worlds": 512,
+      "steps_per_world": 2385,
+      "simulated_s_per_world": 4.7700000000000005,
+      "wall_s": 1.005638419999741,
+      "device_timed_s": 1.0055393676757813,
+      "setup_s": 0.41762261698022485,
+      "capture_s": 0.021259196975734085,
+      "env_steps_per_s": 1214273.4164833464,
+      "sim_seconds_per_wall_second": 2428.546832966693,
+      "verified_pickups": 512,
+      "verified_by_material": {
+        "pe": 128,
+        "kraft": 128,
+        "bubble": 128,
+        "paperboard": 128
+      },
+      "pickups_per_hour": 1832865.5343144853,
+      "min_final_continuous_hold_s": 3.0020000000000002,
+      "nonfinite_worlds": 0,
+      "peak_tension_N": 1.2024269104003906,
+      "sampled_process_gpu_memory_mib": 812,
+      "peak_torch_reserved_mib": 168.0,
+      "aggregate_pickup_speedup_vs_stage1": {
+        "rss2027-stage1-warp-film-normal-r1": 274482.7149953295,
+        "rss2027-stage1-warp-film-normal-30pct-r1": 295225.28388360277,
+        "rss2027-stage1-pickup-200-warp-r1": 2170693.4379341556
+      },
+      "passed": true,
+      "physical_throughput_ratio_vs_high_fidelity_hold_probe": 655.0924611886488
+    },
+    {
+      "worlds": 2048,
+      "steps_per_world": 2385,
+      "simulated_s_per_world": 4.7700000000000005,
+      "wall_s": 1.0207943359855562,
+      "device_timed_s": 1.0206834716796875,
+      "setup_s": 0.031559389957692474,
+      "capture_s": 0.020921927993185818,
+      "env_steps_per_s": 4784979.528010541,
+      "sim_seconds_per_wall_second": 9569.959056021082,
+      "verified_pickups": 2048,
+      "verified_by_material": {
+        "pe": 512,
+        "kraft": 512,
+        "bubble": 512,
+        "paperboard": 512
+      },
+      "pickups_per_hour": 7222610.608317797,
+      "min_final_continuous_hold_s": 3.0020000000000002,
+      "nonfinite_worlds": 0,
+      "peak_tension_N": 1.2024269104003906,
+      "sampled_process_gpu_memory_mib": 1038,
+      "peak_torch_reserved_mib": 554.0,
+      "aggregate_pickup_speedup_vs_stage1": {
+        "rss2027-stage1-warp-film-normal-r1": 1081629.6842346434,
+        "rss2027-stage1-warp-film-normal-30pct-r1": 1163368.085274651,
+        "rss2027-stage1-pickup-200-warp-r1": 8553859.057692882
+      },
+      "passed": true,
+      "physical_throughput_ratio_vs_high_fidelity_hold_probe": 2581.464745246455
+    },
+    {
+      "worlds": 4096,
+      "steps_per_world": 2385,
+      "simulated_s_per_world": 4.7700000000000005,
+      "wall_s": 1.0486899450188503,
+      "device_timed_s": 1.0485850830078125,
+      "setup_s": 0.03895266802283004,
+      "capture_s": 0.020224212028551847,
+      "env_steps_per_s": 9315393.979318075,
+      "sim_seconds_per_wall_second": 18630.78795863615,
+      "verified_pickups": 4096,
+      "verified_by_material": {
+        "pe": 1024,
+        "kraft": 1024,
+        "bubble": 1024,
+        "paperboard": 1024
+      },
+      "pickups_per_hour": 14060972.044253698,
+      "min_final_continuous_hold_s": 3.0020000000000002,
+      "nonfinite_worlds": 0,
+      "peak_tension_N": 1.2024269104003906,
+      "sampled_process_gpu_memory_mib": 1322,
+      "peak_torch_reserved_mib": 1044.0,
+      "aggregate_pickup_speedup_vs_stage1": {
+        "rss2027-stage1-warp-film-normal-r1": 2105715.727599015,
+        "rss2027-stage1-warp-film-normal-30pct-r1": 2264843.975582084,
+        "rss2027-stage1-pickup-200-warp-r1": 16652645.36650952
+      },
+      "passed": true,
+      "physical_throughput_ratio_vs_high_fidelity_hold_probe": 5025.593318617375
+    },
+    {
+      "worlds": 8192,
+      "steps_per_world": 2385,
+      "simulated_s_per_world": 4.7700000000000005,
+      "wall_s": 1.1188363819965161,
+      "device_timed_s": 1.1187335205078126,
+      "setup_s": 0.043660994968377054,
+      "capture_s": 0.022606003971304744,
+      "env_steps_per_s": 17462714.222016457,
+      "sim_seconds_per_wall_second": 34925.428444032914,
+      "verified_pickups": 8192,
+      "verified_by_material": {
+        "pe": 2048,
+        "kraft": 2048,
+        "bubble": 2048,
+        "paperboard": 2048
+      },
+      "pickups_per_hour": 26358813.920024842,
+      "min_final_continuous_hold_s": 3.0020000000000002,
+      "nonfinite_worlds": 0,
+      "peak_tension_N": 1.2024269104003906,
+      "sampled_process_gpu_memory_mib": 1870,
+      "peak_torch_reserved_mib": 2002.0,
+      "aggregate_pickup_speedup_vs_stage1": {
+        "rss2027-stage1-warp-film-normal-r1": 3947392.0336065996,
+        "rss2027-stage1-warp-film-normal-30pct-r1": 4245695.1569471685,
+        "rss2027-stage1-pickup-200-warp-r1": 31217186.060146656
+      },
+      "passed": true,
+      "physical_throughput_ratio_vs_high_fidelity_hold_probe": 9421.018597166723
+    }
+  ]
+}

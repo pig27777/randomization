@@ -131,3 +131,4 @@
 | 运行 | 对象与问题 | 命令 | 状态 |
 | --- | --- | --- | --- |
 | [2 ms 结果](../stage2_freeze/alignment_report.json) · [1 ms 结果](../stage2_freeze/dt-1ms/alignment_report.json) | 双指柔索代理与刚体底座，四材质六类对齐 | 持锁执行 `src/low_order_parcel/verify_stage2_alignment.py`，1 ms 增加 `--dt .001` 和专用输出路径 | `ubun` CPU，两档各通过六类门禁。[冻结报告](../../../docs/STAGE2_FREEZE_REPORT.md) · [命令与回归](../../../reports/rss2027-stage2-test.md) |
+| [百万步检查](../stage2_freeze/milestone2/stress.log) · [完整 GPU 计时](../stage2_freeze/milestone2/cuda-throughput.json) | Milestone 2 的 D／E | 持锁运行单测 `-k million` 和 `benchmark_stage2_cuda.py --worlds 512 2048 4096 8192` | `ubun`，两物理步长各 100 万步通过。RTX 5090 上四档全验收，8,192 路 4.77 s 回合墙钟 1.119 s。 |

@@ -21,3 +21,14 @@ flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B -m unittest disco
 重跑对齐时用 `--output` 指定新的空目录。脱手绝对值的主要偏差在气泡膜，PE 在 11.25 mm 进给档的持续双侧承载偏长。耗时为同机器 CPU 单环境实际探针回合。
 
 [冻结报告和偏差明细](../docs/STAGE2_FREEZE_REPORT.md) · [2 ms JSON](../test/runs/stage2_freeze/alignment_report.json) · [1 ms JSON](../test/runs/stage2_freeze/dt-1ms/alignment_report.json)
+
+## Milestone 2 补充验收
+
+2026-11-20 19:29，北京时间，`ubun`。A、B、C 的通过记录见上。D 真正对每个基础步长运行一百万次状态递推，两档各 16 路。E 使用已有的 `egoallo` CUDA 环境，PyTorch 2.7.1+cu128，验证过 RTX 5090 的 sm_120。首次隔离环境下载超时，随后查到已有兼容环境并停止下载。一次动作生成器拆分漏带动作切换时间，修复后重新执行两档六类对齐，均通过。
+
+```sh
+flock /tmp/claude-gpu.lock env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_stage2_proxy.py -k million -v
+flock /tmp/claude-gpu.lock env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /home/ubuntu/miniconda3/envs/egoallo/bin/python -B test/low_order_parcel/benchmark_stage2_cuda.py --output test/runs/stage2_freeze/milestone2/cuda-throughput.json --worlds 512 2048 4096 8192
+```
+
+压力测试两档均通过，共 191.22 s。GPU 四档均完成 2,385 步／4.77 s，零非有限环境，全部达到 0.20 s 悬停门槛。8,192 路整批 1.119 s，17,462,714 环境步/s，PyTorch 预留峰值 2,002 MiB。使用同一探针与 CPU 四材质批次复核，最短末段悬停均为 3.002 s。以上为代理的完整抓取和悬停探针，训练和回合重置另有开销。[压力测试日志](../test/runs/stage2_freeze/milestone2/stress.log) · [完整 GPU 结果](../test/runs/stage2_freeze/milestone2/cuda-throughput.json)

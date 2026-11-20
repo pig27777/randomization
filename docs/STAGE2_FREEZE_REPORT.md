@@ -58,3 +58,28 @@ B 验收后再联调宏观底座，A 与 C 均通过后记录冻结接口和实�
 - `MacroParcelSim(proxy, mass_kg, com_offset, *, half_extents=..., table_friction=...)` 的 `step(state, action) -> ParcelStep` 以刚体位姿推进，返回世界轴下绕指尖中点的腕部六维力／力矩、台面支撑和净空。标准探针为 `run_top_press`、`run_side_grasp_and_hover`、`run_controlled_release`、`run_suspended_load_ramp`。
 
 [Stage 2 配置](../configs/proxy_material_envelopes.yaml) · [既有回归及复现命令](../reports/rss2027-stage2-test.md)
+
+## Milestone 2 补充验收计划
+
+按用户要求优先补原里程碑的 D、E 两项。D 在现有极端动作测试中将实际递推从每档 100,000 次扩至 1,000,000 次，固定 16 路和种子，对 1 ms 与 2 ms 各运行一次。每步验证状态和力有限、余料守恒及滑移单调，保留原张力上限和必须实际经历滑移、单指释放的条件。
+
+E 复用 `MacroParcelSim.step` 与同一个 4.77 s 侧抓探针，RTX 5090 上运行 512／2,048／4,096／8,192 路各一次计时，采用 2 ms 步长、float32、四种材料循环排列，保留抓持、抬升、至少 0.20 s 连续稳定悬停和状态有限指标。预热和建图单独计时，正式区间用 CUDA 同步，采集实际批次墙钟、有效抓取数、环境步/s、仿真秒/墙钟秒和峰值显存。相对高保真单环境保留聚合吞吐倍率及工作负载范围；抓取验收失败的环境不计有效吞吐。两项都通过后再进入下一里程碑。
+
+### D 百万步极端动作
+
+1 和 2 ms 各执行 1,000,000 次实际状态递推，每次 16 路。逐步检查通过，零非有限、零负余料，持续满足全局余料上限与单调滑移。两档分别记录 123,756／1,805,932 次单指释放，极端输入的峰值张力为 6,091.981／6,089.687 N，低于该输入的理论上限 6,600 N。总用时 191.22 s。[压力测试日志](../test/runs/stage2_freeze/milestone2/stress.log)
+
+### E 完整 GPU 回合
+
+RTX 5090，PyTorch 2.7.1+cu128。每路共 2,385 步、4.77 s。GPU 端在每步累计有限性及合格悬停状态。四档均达到 100% 有效抓取，最短末段连续悬停 3.002 s。表内计时包含回放调度和 GPU 运行，预热和建图单列在 JSON 中。[完整计时与复现输入](../test/runs/stage2_freeze/milestone2/cuda-throughput.json)
+
+| 环境数 | 有效抓取数 | 整批墙钟 s | 环境步/s | 仿真秒/墙钟秒 | 显存采样 MiB |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 512 | 512 | 1.006 | 1,214,273 | 2,428.55 | 812 |
+| 2,048 | 2,048 | 1.021 | 4,784,980 | 9,569.96 | 1,038 |
+| 4,096 | 4,096 | 1.049 | 9,315,394 | 18,630.79 | 1,322 |
+| 8,192 | 8,192 | 1.119 | 17,462,714 | 34,925.43 | 1,870 |
+
+8,192 路 PyTorch 预留显存峰值 2,002 MiB。JSON 给出相对已存高保真单路完整 YAM 的聚合有效回合倍率，以及相对 8,000 路高保真悬停短窗的物理时间吞吐倍率。高保真批量对照只有 64 步悬停，低阶负荷为名义材质的刚体与接触代理探针，两种倍率都须保留工作负载边界。表内计时来自一次 4.77 s 的批次，尚无含训练、域随机化和回合重置的吞吐。[8,000 路高保真短窗](../test/runs/2026-11-20/bag/yam-batch-full-grasp-r1/probe-8000-200us/benchmark.json)
+
+Milestone 2 已通过。重用完整动作生成器后的 CPU 对齐在两档步长仍各完成六类门禁。[1 ms 回归](../test/runs/stage2_freeze/milestone2/cpu-alignment-regression-1ms/alignment_report.json) · [2 ms 回归](../test/runs/stage2_freeze/milestone2/cpu-alignment-regression/alignment_report.json)
