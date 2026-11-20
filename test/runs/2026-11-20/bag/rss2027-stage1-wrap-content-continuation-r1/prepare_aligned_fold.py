@@ -103,11 +103,13 @@ def record_case(output, result, best, reference, cavity, size, offset):
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("output", type=Path)
-    parser.add_argument("--all", action="store_true", help="check all 32 original 90% samples")
+    parser.add_argument("--group", choices=("0.60", "0.90"), default="0.90")
+    parser.add_argument("--all", action="store_true", help="check all 32 original samples in the group")
     args = parser.parse_args()
     with DESIGN.open(newline="") as stream:
-        entries = [(i, row) for i, row in enumerate(csv.DictReader(stream), 1) if row["group"] == "0.90"]
-    keys = ("slack_x_minus_m", "slack_x_plus_m", "slack_y_minus_m", "slack_y_plus_m")
+        entries = [(i, row) for i, row in enumerate(csv.DictReader(stream), 1) if row["group"] == args.group]
+    keys = (("slack_x_plus_m",) if args.group == "0.60" else
+            ("slack_x_minus_m", "slack_x_plus_m", "slack_y_minus_m", "slack_y_plus_m"))
     ranked = sorted(entries, key=lambda item: min(float(item[1][key]) for key in keys), reverse=True)
     args.output.mkdir(exist_ok=False)
     results = []
