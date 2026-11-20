@@ -71,7 +71,8 @@ class OpeningServo:
         return self.reference_m + min(limit, max(-limit, correction))
 
 
-def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False, matched_opening=False):
+def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False, matched_opening=False,
+        preload_opening_tolerance_m=OpeningServo.start_tolerance_m):
     sim = robot.sim
     m, d = sim.m, sim.d
     m.opt.timestep = dt
@@ -117,7 +118,7 @@ def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False, matche
             start_qualified = qualified and start_low <= press.filtered_N <= start_high
             if opening:
                 start_qualified = (start_qualified and start_low <= down <= start_high
-                                   and abs(robot.gap() - opening.reference_m) <= opening.start_tolerance_m)
+                                   and abs(robot.gap() - opening.reference_m) <= preload_opening_tolerance_m)
             if step % stride == 0:
                 preload.append(dict(time_s=float(d.time), pressure_N=down, direct_support_N=support))
                 if centered_control:
@@ -239,17 +240,24 @@ def main():
     parser.add_argument("--closure-s", type=float, default=CLOSURE_S)
     parser.add_argument("--centered-control", action="store_true")
     parser.add_argument("--matched-opening", action="store_true", help="track the same physical opening from preload")
+    parser.add_argument("--preload-opening-tolerance-mm", type=float)
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if any(not np.isfinite(value) or value < .020 for value in (args.preload_limit_s, args.closure_s)):
         parser.error("Preload and closure budgets must be finite and at least 20 ms")
     if args.matched_opening and not args.centered_control:
         parser.error("Matching actual openings requires --centered-control")
+    tolerance = OpeningServo.start_tolerance_m
+    if args.preload_opening_tolerance_mm is not None:
+        value = args.preload_opening_tolerance_mm
+        if not args.matched_opening or not np.isfinite(value) or value <= 0:
+            parser.error("A positive preload opening tolerance requires --matched-opening")
+        tolerance = value / 1000.
     case = args.case.resolve()
     dt = args.step_us / 1e6
     coarse, refined, *_ = load_pair(case=case, timestep=dt)
     runs = [run(robot, dt, args.preload_limit_s, args.closure_s, centered_control=args.centered_control,
-                matched_opening=args.matched_opening)
+                matched_opening=args.matched_opening, preload_opening_tolerance_m=tolerance)
             for robot in (coarse, refined)]
     comparison = fit_common(runs)
     result = dict(dt_s=dt, mesh_vertices=[coarse.sim.m.nflexvert, refined.sim.m.nflexvert],
@@ -267,7 +275,7 @@ def main():
         result["controller"].update(opening_proportional_gain=OpeningServo.proportional_gain,
                                     opening_integral_gain_per_s=OpeningServo.integral_gain_per_s,
                                     opening_command_limit_m=OpeningServo.limit_m,
-                                    opening_start_tolerance_m=OpeningServo.start_tolerance_m,
+                                    opening_start_tolerance_m=tolerance,
                                     closing_rate_center_half_width_N=.020,
                                     closing_rate_zero_error_N=.055)
     output = args.output or case / "local-mesh-window/matched-pressure.json"

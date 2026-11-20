@@ -1110,3 +1110,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 仅保留七对共有主指垫触点，原生力差仍为 74%–79%。
 - 117 条中点约束在原细档质量下复现切向拉力至 0.15%，双侧内法向分别偏高 67.2%／89.2%。近似粗档质量分配无合格结果。
 - 同一外载、膜质量及质心均已复核，聚拢与滑脱仍待正式验收。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [测试报告](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-20 Stage 1 冻结及 Milestone 1
+
+- 最后聚拢按相同实际开口得到 0.021／0.797 mm 参考余长增长，原网格收敛门槛仍未满足。
+- 18:54 经用户确认冻结；切向完整续跑已停止，保留有出处的 59 条动作和 14 条加载曲线。
+- 生成 [Milestone 1 材料包络](../policy/rss2027/proxy_material_envelopes.yaml)，参数先验与冻结样本注明来源。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [包络测试报告](../reports/rss2027-milestone1-test.md)。

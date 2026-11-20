@@ -9,6 +9,7 @@ import mujoco
 import numpy as np
 
 from scan_mid_slide_contacts import RUN, backend, load_scenes, measure
+from compare_contact_mobility import solve_contact_subset
 
 
 def tie_midpoints(spec, old_count, edges):
@@ -44,7 +45,7 @@ def preserve_coarse_mass(coarse, fine, fine_nodes, edges):
     return shared
 
 
-def forward_variant(robot, spec, mass, pull):
+def forward_variant(robot, spec, mass, pull, excluded):
     source = robot.sim
     old_model, old_data = source.m, source.d
     rebuilt = spec.compile()
@@ -65,7 +66,7 @@ def forward_variant(robot, spec, mass, pull):
         np.testing.assert_allclose(data.flexvert_xpos, old_data.flexvert_xpos, atol=1e-12, rtol=0.)
         np.testing.assert_array_equal(data.qvel, old_data.qvel)
         np.testing.assert_array_equal(data.xfrc_applied, old_data.xfrc_applied)
-        result = measure(robot, pull)
+        result = solve_contact_subset(robot, pull, excluded)[1] if excluded else measure(robot, pull)
     nodes = rebuilt.flex_vertbodyid
     center = np.average(data.flexvert_xpos, axis=0, weights=mass[nodes])
     old_center = np.average(old_data.flexvert_xpos, axis=0, weights=old_model.body_mass[nodes])
@@ -79,6 +80,7 @@ def forward_variant(robot, spec, mass, pull):
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--shared-contacts", type=Path, help="Reuse a verified contact pairing for this saved state")
     args = parser.parse_args()
     compile_model = backend.Parcel.compile_model
     sources = []
@@ -96,18 +98,26 @@ def main():
         backend.refresh(robot.sim)
     baseline = measure(coarse, pull)
     original = measure(fine, pull)
+    excluded = []
+    if args.shared_contacts:
+        pairing = json.loads(args.shared_contacts.read_bytes())
+        if pairing["source_sha256"] != fingerprint or pairing["payload_wrench"] != wrench.tolist():
+            raise ValueError("The contact pairing is from a different state or applied load")
+        shared = pairing["shared_contact_study"]
+        baseline, original = (shared[mesh][1] for mesh in ("coarse", "fine"))
+        excluded = original["excluded_contact_ids"]
     model = fine.sim.m
     nodes = model.flex_vertbodyid
     with np.load(RUN / "mid-slide-mesh/prepared_mesh.npz") as mesh:
         edges = mesh["old_edges"]
     spec = mujoco.MjSpec.from_string(xml)
-    reference = forward_variant(fine, spec, model.body_mass, pull)
+    reference = forward_variant(fine, spec, model.body_mass, pull, excluded)
     np.testing.assert_allclose(reference["loads_N"], original["loads_N"], atol=1e-8, rtol=0.)
     tie_midpoints(spec, coarse.sim.m.nflexvert, edges)
     shared_mass = preserve_coarse_mass(coarse.sim.m, model, nodes, edges)
     runs = {}
     for label, mass in (("original_refined_mass", model.body_mass), ("coarse_mass_distribution", shared_mass)):
-        result = forward_variant(fine, spec, mass, pull)
+        result = forward_variant(fine, spec, mass, pull, excluded)
         assert result["active_equalities"] == 3 * len(edges)
         assert result["max_midpoint_residual_m"] < 1e-10
         relative = np.asarray(result["loads_N"]) / baseline["loads_N"] - 1.
