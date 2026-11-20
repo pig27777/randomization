@@ -8,7 +8,7 @@ import mujoco
 import numpy as np
 
 from record_local_top import protocol
-from replay_ridge_mesh import DT, OUTPUT, load_pair
+from replay_ridge_mesh import CASE, DT, load_pair
 from replay_ridge_window import aperture_observation, backend
 
 TARGET_N = .5
@@ -17,11 +17,11 @@ CLOSURE_S = .20
 SPEED_M_S = .008
 
 
-def run(robot, preload_limit_s, closure_s):
+def run(robot, dt, preload_limit_s, closure_s):
     sim = robot.sim
     m, d = sim.m, sim.d
-    m.opt.timestep = DT
-    robot.control_period_steps = round(.010 / DT)
+    m.opt.timestep = dt
+    robot.control_period_steps = round(.010 / dt)
     feedforward = d.qfrc_bias[robot.dofs] - d.qfrc_gravcomp[robot.dofs]
     robot.qtarget = d.ctrl[robot.act] - feedforward / m.actuator_gainprm[robot.act, 0]
     robot.kin.qpos[:] = d.qpos
@@ -32,9 +32,9 @@ def run(robot, preload_limit_s, closure_s):
     press = protocol.NormalPress(TARGET_N, protocol.tips(robot).mean(axis=0)[2])
     load_start = None
     consecutive = 0
-    stride = round(.020 / DT)
-    closure_steps = round(closure_s / DT)
-    preload_steps = round(preload_limit_s / DT)
+    stride = round(.020 / dt)
+    closure_steps = round(closure_s / dt)
+    preload_steps = round(preload_limit_s / dt)
     preload, samples = [], []
     outcome = "preload timeout"
     for step in range(preload_steps + closure_steps + 1):
@@ -51,14 +51,14 @@ def run(robot, preload_limit_s, closure_s):
                 break
         qualified = .4 <= down <= .6 and support <= .05
         tip_z = protocol.tips(robot).mean(axis=0)[2]
-        target[2] = press.move(target[2], tip_z, down, support, DT, approach=False)
+        target[2] = press.move(target[2], tip_z, down, support, dt, approach=False)
         if load_start is None:
             if step % stride == 0:
                 preload.append(dict(time_s=float(d.time), pressure_N=down, direct_support_N=support))
                 if step % (stride * 25) == 0:
-                    print(f"{m.nflexvert} nodes at {step * DT:.3f} s preload, {down:.6f} N", flush=True)
+                    print(f"{m.nflexvert} nodes at {step * dt:.3f} s preload, {down:.6f} N", flush=True)
             consecutive = consecutive + 1 if qualified and .4 <= press.filtered_N <= .6 else 0
-            if consecutive >= round(press.hold_s / DT):
+            if consecutive >= round(press.hold_s / dt):
                 load_start = step
             elif step >= preload_steps:
                 break
@@ -70,10 +70,10 @@ def run(robot, preload_limit_s, closure_s):
                 outcome = "complete"
                 break
             if qualified and .4 <= press.filtered_N <= .6:
-                gap -= SPEED_M_S * DT
+                gap -= SPEED_M_S * dt
         robot.command(target, gap)
         sim.step()
-    return dict(outcome=outcome, preload_s=load_start * DT if load_start is not None else None,
+    return dict(outcome=outcome, preload_s=load_start * dt if load_start is not None else None,
                 preload=preload, samples=samples)
 
 
@@ -131,19 +131,24 @@ def fit_common(runs):
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--case", type=Path, default=CASE)
+    parser.add_argument("--step-us", type=float, choices=(12.5, 25.), default=DT * 1e6)
     parser.add_argument("--preload-limit-s", type=float, default=PRELOAD_LIMIT_S)
     parser.add_argument("--closure-s", type=float, default=CLOSURE_S)
-    parser.add_argument("--output", type=Path, default=OUTPUT / "matched-pressure.json")
+    parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if any(not np.isfinite(value) or value < .020 for value in (args.preload_limit_s, args.closure_s)):
         parser.error("Preload and closure budgets must be finite and at least 20 ms")
-    coarse, refined, *_ = load_pair()
-    runs = [run(robot, args.preload_limit_s, args.closure_s) for robot in (coarse, refined)]
+    case = args.case.resolve()
+    dt = args.step_us / 1e6
+    coarse, refined, *_ = load_pair(case=case, timestep=dt)
+    runs = [run(robot, dt, args.preload_limit_s, args.closure_s) for robot in (coarse, refined)]
     comparison = fit_common(runs)
-    result = dict(dt_s=DT, mesh_vertices=[coarse.sim.m.nflexvert, refined.sim.m.nflexvert],
+    result = dict(dt_s=dt, mesh_vertices=[coarse.sim.m.nflexvert, refined.sim.m.nflexvert],
                   pressure_target_N=TARGET_N, preload_limit_s=args.preload_limit_s, closure_s=args.closure_s,
                   runs=runs, comparison=comparison)
-    with args.output.open("x") as stream:
+    output = args.output or case / "local-mesh-window/matched-pressure.json"
+    with output.open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
     print([trial["outcome"] for trial in runs], comparison, flush=True)
 

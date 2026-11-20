@@ -1,6 +1,8 @@
 """Repeat a measured YAM gathering window at two native time steps."""
 
+import argparse
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import mujoco
@@ -14,19 +16,19 @@ from rss2027_yam_capture_audit import aperture_material_areas
 CASE = RUN / "fold-aligned-60-side-energy/sample-058/ridge-height"
 
 
-def assemble():
-    trial = CASE / "recording/trial"
+def assemble(case=CASE):
+    trial = case / "recording/trial"
     result = json.loads((trial / "result.json").read_bytes())
-    height = json.loads((CASE / "height.json").read_bytes())
+    height = json.loads((case / "height.json").read_bytes())
     cfg = backend.Config(**result["config"])
-    with at_top_center(height["target_center_xy_m"]), \
+    with at_top_center(height["target_center_xy_m"], height.get("top_reference_m")), \
             patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
     return robot
 
 
-def load_window(robot, comparison):
-    trial = CASE / "recording/trial"
+def load_window(robot, comparison, case=CASE):
+    trial = case / "recording/trial"
     trace = json.loads((trial / "trace.json").read_bytes())
     fit = comparison["fold_window"]
     with np.load(trial / "trajectory.npz") as archive:
@@ -102,8 +104,10 @@ def replay(robot, dt, time, command, state, spec):
     if outcome == "complete":
         x = samples[1]["actual_gap_m"] - np.array([row["actual_gap_m"] for row in samples[1:]])
         y = np.array([row["extra_length_m"] for row in samples[1:]])
+        reference = np.array([row["reference_excess_m"] for row in samples[1:]])
         values = np.asarray(forces)
         growth = float(y[-1] - y[0])
+        reference_growth = float(reference[-1] - reference[0])
         in_band = (values[:, 0] >= .4) & (values[:, 0] <= .6) & (values[:, 1] <= .05)
         sampled_band = all(.4 <= row["pressure_N"] <= .6 and row["direct_support_N"] <= .05 for row in samples[1:])
         monotonic = bool(np.all(np.diff(x) > 0.))
@@ -112,16 +116,22 @@ def replay(robot, dt, time, command, state, spec):
                    mean_pressure_N=float(np.mean([row["pressure_N"] for row in samples[1:]])),
                    pressure_band_all_steps=bool(in_band.all()),
                    slope_m_per_m=float(np.polyfit(x, y, 1)[0]) if monotonic else None,
-                   eligible=bool(sampled_band and monotonic and growth >= .00025))
+                   eligible=bool(sampled_band and monotonic and growth >= .00025),
+                   reference_growth_m=reference_growth,
+                   reference_slope_m_per_m=float(np.polyfit(x, reference, 1)[0]) if monotonic else None,
+                   reference_eligible=bool(sampled_band and monotonic and reference_growth >= .00025))
     return dict(dt_s=dt, outcome=outcome, fit=fit, samples=samples)
 
 
 def main():
-    original = json.loads((CASE / "physical-comparison.json").read_bytes())
-    first = assemble()
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--case", type=Path, default=CASE)
+    case = parser.parse_args().case.resolve()
+    original = json.loads((case / "physical-comparison.json").read_bytes())
+    first = assemble(case)
     dt = float(first.sim.m.opt.timestep)
-    arguments = load_window(first, original)
-    runs = [replay(robot, step, *arguments) for robot, step in ((first, dt), (assemble(), dt / 2.))]
+    arguments = load_window(first, original, case)
+    runs = [replay(robot, step, *arguments) for robot, step in ((first, dt), (assemble(case), dt / 2.))]
     slopes = [run["fit"]["slope_m_per_m"] if run["fit"] else None for run in runs]
     original_slope = original["fold_window"]["slope_m_per_m"]
     relatives = [value / original_slope - 1. if value is not None else None for value in slopes]
@@ -132,9 +142,16 @@ def main():
             changes[key] = runs[1]["fit"][key] / runs[0]["fit"][key] - 1.
     passed = (paired is not None and abs(paired) <= .10 and abs(relatives[0]) <= .10
               and bool(changes) and all(abs(change) <= .10 for change in changes.values()))
+    reference_changes = {}
+    if all(run["fit"] and run["fit"]["reference_eligible"] for run in runs):
+        for key in ("reference_growth_m", "reference_slope_m_per_m", "displacement_m"):
+            if runs[0]["fit"][key]:
+                reference_changes[key] = runs[1]["fit"][key] / runs[0]["fit"][key] - 1.
+    reference_passed = len(reference_changes) == 3 and all(abs(change) <= .10 for change in reference_changes.values())
     result = dict(original_slope_m_per_m=original_slope, changes_from_original=relatives,
-                  relative_half_step=paired, half_step_geometry_changes=changes, passed=passed, runs=runs)
-    with (CASE / "local-step-comparison.json").open("x") as stream:
+                  relative_half_step=paired, half_step_geometry_changes=changes, passed=passed,
+                  reference_relative_change=reference_changes, reference_passed=reference_passed, runs=runs)
+    with (case / "local-step-comparison.json").open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
     print(passed, relatives, paired, flush=True)
 

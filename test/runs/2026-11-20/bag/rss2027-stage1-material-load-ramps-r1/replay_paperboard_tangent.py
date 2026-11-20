@@ -1,11 +1,13 @@
 """Pull a verified paperboard or bubble-film suspension along its native jaw tangent."""
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 import sys
 from unittest.mock import patch
 
+import mujoco
 import numpy as np
 
 RUN = Path(__file__).resolve().parent
@@ -115,6 +117,54 @@ def compare_steps(case):
                       1.590, 1.604, ratio)
 
 
+def hold_mid_slide(case, *, quarter_step=False):
+    full = case / "recording"
+    reference = json.loads((full / "summary.json").read_bytes())
+    compared = case / "half-step"
+    fit = json.loads((compared / "comparison.json").read_bytes())
+    with np.load(compared / "mid-slide-state.npz") as archive:
+        state = archive["integration_state"]
+        spec = int(archive["spec"])
+        prefix = int(archive["matched_prefix_steps"])
+    fingerprint = hashlib.sha256(state.tobytes()).hexdigest()
+    if fingerprint != fit["native_state_sha256"]:
+        raise ValueError("The paperboard mid-slide state does not match the verified replay")
+    with np.load(full / "native-load.npz") as archive:
+        first = archive["rows"][prefix]
+    load_N = float(first[1])
+    native = reference["native_load"]
+    direction = np.asarray(native["force_direction"])
+    ratio = reference["material_flow"]["candidate_force_ratio"]
+    output = case / ("constant-load-25us" if quarter_step else "constant-load")
+    output.mkdir(exist_ok=False)
+
+    def held():
+        robot, _, _ = scene()
+        mujoco.mj_setState(robot.sim.m, robot.sim.d, state, spec)
+        return robot, prefix, fingerprint
+
+    def profile(_robot, _elapsed, _direction):
+        return load_N
+
+    trials = []
+    steps = (native["dt_s"] / 4.,) if quarter_step else (native["dt_s"], native["dt_s"] / 2.)
+    for dt in steps:
+        with patch.object(replay, "held_scene", held):
+            result, rows, transitions = record_flow(dt, .12, native["load_mode"], force_vector=direction,
+                                                    load_profile=profile)
+        np.testing.assert_array_equal(rows[:, 1], load_N)
+        if dt == native["dt_s"]:
+            np.testing.assert_array_equal(rows[0, 1:9], first[1:9])
+        flow = summarize(result, rows, transitions, force_ratio=ratio)
+        beta = estimate_beta(result, flow)
+        label = f"dt-{dt * 1e6:g}us"
+        np.savez_compressed(output / f"{label}.npz", columns=np.asarray(replay.FIELDS), rows=rows)
+        trials.append(dict(native_load=result, material_flow=flow, beta_candidate=beta))
+    report = dict(source_window_s=fit["original_start_s"], constant_force_N=load_N, trials=trials)
+    (output / "comparison.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
+    print([(trial["native_load"]["outcome"], trial["beta_candidate"]) for trial in trials], flush=True)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--material", choices=tuple(MATERIAL_SOURCES), default="paperboard")
@@ -124,8 +174,10 @@ if __name__ == "__main__":
     command.add_argument("--half-step", action="store_true")
     command.add_argument("--fast-ramp", action="store_true")
     command.add_argument("--slow-ramp", action="store_true")
+    command.add_argument("--constant-load", action="store_true")
+    command.add_argument("--constant-load-quarter-step", action="store_true")
     args = parser.parse_args()
-    if args.compare_steps and args.material != "paperboard":
+    if (args.compare_steps or args.constant_load or args.constant_load_quarter_step) and args.material != "paperboard":
         parser.error("The archived comparison window is for paperboard")
     if (args.half_step or args.fast_ramp) and args.material != "bubble":
         parser.error("The half-step and fast-ramp whole-history controls are for bubble film")
@@ -136,6 +188,8 @@ if __name__ == "__main__":
         prepare(case)
     elif args.compare_steps:
         compare_steps(case)
+    elif args.constant_load or args.constant_load_quarter_step:
+        hold_mid_slide(case, quarter_step=args.constant_load_quarter_step)
     else:
         alternate_rate = (20., "fast-ramp") if args.fast_ramp else (2.5, "slow-ramp") if args.slow_ramp else None
         execute(case, half_step=args.half_step, alternate_rate=alternate_rate)

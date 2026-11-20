@@ -52,25 +52,49 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--case", type=Path, default=CASE)
     parser.add_argument("--output", type=Path, help="save a new screen without changing the source run")
+    parser.add_argument("--observed-contents", action="store_true", help="center the search on the settled rigid body")
+    parser.add_argument("--approach-time-s", type=float, help="use an archived approach pose before any sampled finger load")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--rotate", action="store_true", help="turn the same package 180 degrees on its support")
     mode.add_argument("--yaw-scan", action="store_true", help="compare 12 top-gripper headings on the same parcel")
     args = parser.parse_args()
     case = args.case.resolve()
-    trial = case / "settle/trial"
+    trial = case / ("settle/trial" if args.approach_time_s is None else "recording/trial")
     result = json.loads((trial / "result.json").read_bytes())
     config = case / "config.json"
     cfg = json.loads(config.read_bytes()) if config.is_file() else result["config"]
     body_size = np.asarray(cfg["payload_size"][:2])
     offset = np.asarray(cfg["payload_offset_xy"])
-    if (result["outcome"] != "smoke_only" or result["sim_time_s"] < .3 or result["warnings"]
-            or result["peaks"]["grip_N"] or result["peaks"]["down_N"] or result["peaks"]["penetration_mm"] > 1.):
-        raise ValueError("The ridge search requires a clean settled parcel")
+    source_time = result["sim_time_s"]
+    if args.approach_time_s is None:
+        if (result["outcome"] != "smoke_only" or source_time < .3 or result["warnings"]
+                or result["peaks"]["grip_N"] or result["peaks"]["down_N"] or result["peaks"]["penetration_mm"] > 1.):
+            raise ValueError("The ridge search requires a clean settled parcel")
     model = mujoco.MjModel.from_binary_path(str(trial / "model.mjb"))
     data = mujoco.MjData(model)
     with np.load(trial / "trajectory.npz") as archive:
-        data.qpos[:] = archive["final_qpos"]
+        if args.approach_time_s is None:
+            data.qpos[:] = archive["final_qpos"]
+        else:
+            index = int(np.argmin(abs(archive["time"] - args.approach_time_s)))
+            trace = json.loads((trial / "trace.json").read_bytes())
+            source_time = float(archive["time"][index])
+            prefix = trace[:index + 1]
+            if (abs(source_time - args.approach_time_s) > cfg["dt"] or prefix[-1]["phase"] != "approach"
+                    or any(not row["finite"] or row["warnings"] or row["penetration_mm"] > 1.
+                           or any(row["contact_magnitude_each_N"])
+                           or row["payload_geometry"]["outside_corners"] or row["payload_geometry"]["intersecting_triangles"]
+                           for row in prefix)):
+                raise ValueError("The requested approach frame has no verified contact-free geometry prefix")
+            data.qpos[:] = archive["qpos"][index]
         mujoco.mj_fwdPosition(model, data)
+    if args.observed_contents:
+        if cfg["mode"] != "rigid":
+            parser.error("The observed position search requires one rigid payload")
+        body = int(model.geom("payload_geom_0").bodyid[0])
+        offset = data.xpos[body, :2] - CENTER
+        rotation = data.xmat[body].reshape(3, 3)
+        body_size = (abs(rotation) @ np.asarray(cfg["payload_size"]))[:2]
     triangles = data.flexvert_xpos[model.flex_elem.reshape(-1, 3)]
     name = "ridge-yaw-scan" if args.yaw_scan else "ridge-rotated" if args.rotate else "ridge-height"
     target = args.output.resolve() if args.output is not None else case / name
@@ -84,7 +108,8 @@ def main():
             asset[key][..., :2] *= -1.
         rotated = target / "prepared_mesh.npz"
         np.savez_compressed(rotated, **asset)
-        cfg.update(geometry=f"../{rotated.relative_to(ROOT)}", payload_offset_xy=offset.tolist())
+        cfg.update(geometry=f"../{rotated.relative_to(ROOT)}",
+                   payload_offset_xy=(-np.asarray(cfg["payload_offset_xy"])).tolist())
     axes = [np.linspace(-size / 2 - .01, size / 2 + .01, 18) for size in body_size]
     yaws = list(range(0, 180, 15)) if args.yaw_scan else [cfg.get("yaw", 0.)]
     footprints = [row for yaw, x, y in itertools.product(yaws, *axes)
@@ -117,20 +142,25 @@ def main():
             if not str(error).startswith(("YAM initial pose unreachable", "initial film contact penetration")):
                 raise
             check = dict(status="initial_pose_unavailable", reason=str(error))
+        except ValueError as error:
+            if not str(error).endswith("contains no membrane"):
+                raise
+            check = dict(status="open_pad_footprint_has_no_membrane", reason=str(error))
         candidate["path"] = check
         if check["status"] == "reachable":
             selected = candidate | dict(settled_pad_surfaces_m=heights)
             cfg["yaw"] = candidate["yaw_deg"]
             break
-    report = dict(source_case=case.relative_to(ROOT).as_posix(),
+    report = dict(source_case=case.relative_to(ROOT).as_posix(), source_time_s=source_time,
                   package_rotation_deg=180. if args.rotate else 0., yaws_deg=yaws,
+                  search_center_xy_m=(CENTER + offset).tolist(), search_body_xy_size_m=body_size.tolist(),
                   footprint_count=len(footprints), balanced_count=len(balanced),
                   best_balanced=max(balanced, key=lambda row: row["ridge_over_pads_m"], default=None),
                   candidates=candidates, selected=selected)
     (target / "selection.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
     if selected is None:
         return
-    height = dict(source_time_s=result["sim_time_s"],
+    height = dict(source_time_s=source_time,
                   global_braking_surface_m=float(robot.initial_target[2] - config.press_start_offset_m),
                   settled_pad_surfaces_m=selected["settled_pad_surfaces_m"],
                   local_braking_surface_m=max(selected["settled_pad_surfaces_m"]),

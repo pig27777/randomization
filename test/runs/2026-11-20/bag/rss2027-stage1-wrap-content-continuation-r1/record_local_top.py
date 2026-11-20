@@ -44,13 +44,14 @@ def surface_below_pad(model, data, name, triangles, shift_xy=(0., 0.)):
     return float(max(z) + model.flex_radius[0])
 
 
-def at_top_center(center):
+def at_top_center(center, top_reference_m=None):
     attach = backend.attach_robot
 
     def shifted(cfg, built, factory, _center, top, size, mass, approach=None):
         if approach is not None or cfg.grasp_face != "top":
             raise ValueError("A measured top center requires a top grasp")
-        return attach(cfg, built, factory, np.asarray(center), top, size, mass)
+        reference = top if top_reference_m is None else top_reference_m
+        return attach(cfg, built, factory, np.asarray(center), reference, size, mass)
 
     return patch.object(backend, "attach_robot", shifted)
 
