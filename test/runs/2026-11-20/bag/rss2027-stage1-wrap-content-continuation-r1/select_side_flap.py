@@ -304,7 +304,7 @@ def contact_response_case():
         (case / filename).write_bytes((ADVANCE / filename).read_bytes())
 
 
-def corner_contact_response(times):
+def local_pad_contacts(times, disabled=()):
     original = backend.compile_yam_model
 
     def compile_model(parcel, built, xml):
@@ -315,6 +315,12 @@ def corner_contact_response(times):
             np.testing.assert_array_equal(model.geom_solref[geom], [built.cfg.contact_time, 1.])
             model.geom_solref[geom, 0] = seconds
             root.find(f".//geom[@name='{name}']").set("solref", f"{seconds:.17g} 1")
+        for name in disabled:
+            geom = model.geom(name).id
+            if not (model.geom_contype[geom] or model.geom_conaffinity[geom]):
+                raise ValueError(f"The original contact mask is already off for {name}")
+            model.geom_contype[geom] = model.geom_conaffinity[geom] = 0
+            root.find(f".//geom[@name='{name}']").attrib.update(contype="0", conaffinity="0")
         built.xml = ET.tostring(root, encoding="unicode")
         return model
 
@@ -340,7 +346,9 @@ if __name__ == "__main__":
         chosen = proof["selected"]
         if chosen is None:
             raise ValueError("No physical target passed the side-flap geometry and YAM path checks")
-        response = corner_contact_response(proof["contact_response_s"]) if "contact_response_s" in proof else nullcontext()
+        times = proof.get("contact_response_s", {})
+        disabled = proof.get("disabled_pad_geoms", ())
+        response = local_pad_contacts(times, disabled) if times or disabled else nullcontext()
         with response, shifted_target(np.asarray(chosen["shift_m"]), chosen.get("close_advance_m"),
                                       chosen.get("lift_retract_m", 0.)):
             record()

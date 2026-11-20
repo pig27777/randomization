@@ -18,6 +18,7 @@ from refine_parcel import backend, main as record  # noqa: E402
 from rss2027_yam_capture_audit import clip_plane  # noqa: E402
 
 PAD_HALF_FOOTPRINT_M = [.010, .004]
+INTEGRATION_SPEC = int(mujoco.mjtState.mjSTATE_INTEGRATION)
 
 
 def surface_below_pad(model, data, name, triangles, shift_xy=(0., 0.)):
@@ -87,6 +88,12 @@ def prepare(case, use_current_case=False):
         (target / f"{name}.json").write_text(json.dumps(inputs | {"smoke_seconds": seconds}, indent=2) + "\n")
 
 
+def integration_state(sim):
+    state = np.empty(mujoco.mj_stateSize(sim.m, INTEGRATION_SPEC))
+    mujoco.mj_getState(sim.m, sim.d, state, INTEGRATION_SPEC)
+    return state
+
+
 def record_with_braking_height(height=None):
     controller = FasterApproach
     if height is not None:
@@ -98,7 +105,10 @@ def record_with_braking_height(height=None):
         controller = LocalSurfacePress
     center = height.get("target_center_xy_m") if height is not None else None
     placement = at_top_center(center) if center is not None else nullcontext()
-    with placement, patch.object(protocol, "NormalPress", controller):
+    save_state = height is not None and height.get("record_integration_state", False)
+    state_recording = (patch.multiple(backend, create=True, STATE_SPEC=INTEGRATION_SPEC,
+                                      record_state=integration_state) if save_state else nullcontext())
+    with placement, patch.object(protocol, "NormalPress", controller), state_recording:
         record()
 
 

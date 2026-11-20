@@ -85,8 +85,9 @@ def main():
     mode.add_argument("--deeper-seat", action="store_true")
     mode.add_argument("--settled-entry", action="store_true")
     mode.add_argument("--backoff-entry", action="store_true")
+    mode.add_argument("--rounded-pad", action="store_true")
     args = parser.parse_args()
-    if (args.settled_entry or args.backoff_entry) and args.group != "0.60":
+    if (args.settled_entry or args.backoff_entry or args.rounded_pad) and args.group != "0.60":
         parser.error("The restored-entry control uses the settled 60% sample")
     if args.deeper_seat:
         if args.group != "0.90":
@@ -95,6 +96,9 @@ def main():
         return
     if args.backoff_entry:
         prepare_backoff_entry()
+        return
+    if args.rounded_pad:
+        prepare_rounded_pad()
         return
     directory, samples, half_depth = GROUPS[args.group]
     candidates = [sample_routes(directory, sample, half_depth, args.settled_entry) for sample in samples]
@@ -160,6 +164,22 @@ def prepare_backoff_entry():
     if path["status"] == "reachable":
         for name, seconds in (("config", 0.), ("smoke", .020), ("settle", .30)):
             (output / f"{name}.json").write_text(json.dumps(config | {"smoke_seconds": seconds}, indent=2) + "\n")
+
+
+def prepare_rounded_pad():
+    case = GROUPS["0.60"][0] / "sample-058"
+    prior = case / "side-open-backoff-route"
+    source = json.loads((prior / "selection.json").read_bytes())
+    force = json.loads((prior / "force-summary.json").read_bytes())
+    first_lift = force["first_lift"]
+    if first_lift is None or "right_pad_edge_b" not in first_lift["colliders"] or force["bilateral_samples"]:
+        raise ValueError("The rounded-pad comparison requires the archived unilateral legacy-edge contact")
+    source["disabled_pad_geoms"] = [f"{side}_pad_edge_{edge}" for side in ("left", "right") for edge in ("a", "b")]
+    output = case / "side-open-rounded-pad"
+    output.mkdir(exist_ok=False)
+    (output / "selection.json").write_text(json.dumps(source, indent=2, allow_nan=False) + "\n")
+    for name in ("config.json", "smoke.json", "settle.json"):
+        (output / name).write_bytes((prior / name).read_bytes())
 
 
 if __name__ == "__main__":
