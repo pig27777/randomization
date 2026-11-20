@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/replay_refined_pe.py", line 18, in <module>
+    experiment.main()
+    ~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-kraft-held-local-mesh-r1/replay_refined.py", line 146, in main
+    replay.main()
+    ~~~~~~~~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-kraft-held-load-step-r1/replay_held_load.py", line 181, in main
+    result, rows = run(dt, .02 if args.smoke else 2.4, mode, vector)
+                   ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-20/bag/rss2027-stage1-kraft-held-load-step-r1/replay_held_load.py", line 114, in run
+    raise ValueError("Restored state is missing bilateral suspension")
+ValueError: Restored state is missing bilateral suspension

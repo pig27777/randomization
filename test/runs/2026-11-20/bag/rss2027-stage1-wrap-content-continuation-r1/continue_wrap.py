@@ -86,6 +86,7 @@ def main():
     parser.add_argument("--extra-final-steps", type=int, default=0)
     parser.add_argument("--box-clearance-mm", type=float, default=0.)
     parser.add_argument("--save-highest", type=int, nargs="+", choices=CASES, default=[])
+    parser.add_argument("--groups", choices=("0.60", "0.90"), nargs="+")
     args = parser.parse_args()
     if not 0. <= args.strain_band < .05:
         parser.error("--strain-band must be within [0, 0.05)")
@@ -95,10 +96,20 @@ def main():
         parser.error("--box-clearance-mm must be finite and nonnegative")
     with DESIGN.open(newline="") as stream:
         design = list(csv.DictReader(stream))
+    samples = CASES
+    if args.groups:
+        samples = [index for index, row in enumerate(design, 1) if row["group"] in args.groups]
     results = []
-    for sample in CASES:
-        case = evaluate(sample, design, args.output, args.strain_band, args.extra_final_steps,
-                        args.box_clearance_mm * 1e-3, sample in args.save_highest)
+    for sample in samples:
+        try:
+            case = evaluate(sample, design, args.output, args.strain_band, args.extra_final_steps,
+                            args.box_clearance_mm * 1e-3, sample in args.save_highest)
+        except ValueError as error:
+            if not args.groups or not str(error).startswith(("Content does not fit inside",
+                    "Starting triangle has no exterior halfspace", f"Sample {sample} lost enclosure at level")):
+                raise
+            case = dict(sample=sample, target_fill=float(design[sample - 1]["fill_fraction"]),
+                        status="enclosure_failed", reason=str(error), stages=[])
         results.append(case)
         print(json.dumps({k: v for k, v in case.items() if k != "stages"}), flush=True)
     with (args.output / "summary.json").open("x") as stream:
@@ -109,6 +120,8 @@ def main():
             result["extra_final_steps"] = args.extra_final_steps
         if args.box_clearance_mm:
             result["box_clearance_mm"] = args.box_clearance_mm
+        if args.groups:
+            result["groups"] = args.groups
         stream.write(json.dumps(result, indent=2) + "\n")
 
 

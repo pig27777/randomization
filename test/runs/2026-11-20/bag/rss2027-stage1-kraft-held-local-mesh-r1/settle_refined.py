@@ -1,4 +1,4 @@
-"""Check whether an unchanged YAM command establishes suspension after refinement."""
+"""Check suspension while holding a recorded YAM actuator command."""
 
 import json
 from pathlib import Path
@@ -12,8 +12,8 @@ RUN = Path(__file__).resolve().parent
 BASE_HOLD_S = .20
 
 
-def check(dt, output):
-    robot, frame, fingerprint = refined_scene()
+def check(dt, output, scene):
+    robot, frame, fingerprint = scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
     command = sim.d.ctrl.copy()
@@ -48,7 +48,7 @@ def check(dt, output):
     np.testing.assert_array_equal(sim.d.ctrl, command)
     np.testing.assert_array_equal(sim.d.xfrc_applied, 0.)
     data = np.asarray(rows)
-    stem = output / f"dt-{round(dt * 1e6)}us"
+    stem = output / ("dt-" + f"{dt * 1e6:g}".replace(".", "p") + "us")
     names = ("time_s", "actual_gap_m", "left_inner_N", "right_inner_N", "tension_N",
              "support_N", "penetration_mm", "bilateral")
     np.savez_compressed(stem.with_suffix(".npz"), rows=data, columns=np.asarray(names),
@@ -62,11 +62,11 @@ def check(dt, output):
     print(json.dumps(result), flush=True)
 
 
-def main():
-    output = RUN / "free-relaxation"
+def main(run_dir=RUN, timesteps=(.00005, .000025), scene=refined_scene):
+    output = run_dir / "free-relaxation"
     output.mkdir(exist_ok=False)
-    for dt in (.00005, .000025):
-        check(dt, output)
+    for dt in timesteps:
+        check(dt, output, scene)
 
 
 if __name__ == "__main__":

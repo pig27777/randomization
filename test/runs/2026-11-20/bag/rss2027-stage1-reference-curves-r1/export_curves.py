@@ -28,6 +28,8 @@ CASES = (
     ("pe-top-0p3N", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-pressure-sweep-r1/low/refined/recording/trial"),
     ("pe-top-0p8N", "pe", "2026-11-20/bag/rss2027-stage1-randomized-top-pressure-sweep-r1/high/refined/recording/trial"),
     ("pe-top-ridge", "pe", "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/long-approach/recording/trial"),
+    ("pe-top-ridge-relief", "pe",
+     "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/closure-relief/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
@@ -46,6 +48,7 @@ RAMP_CASES = (
     ("paperboard-rounded-pad", "paperboard", "rss2027-stage1-material-load-ramps-r1/paperboard-rounded-pad"),
     ("bubble-127mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble"),
     ("bubble-130mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-130mm"),
+    ("bubble-early-withdrawal", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-early-withdrawal"),
 )
 RAMP_COLUMNS = (
     "t_s", "applied_load_N", "actual_gap_m", "tension_N", "support_N", "tip_z_m", "payload_com_z_m",
