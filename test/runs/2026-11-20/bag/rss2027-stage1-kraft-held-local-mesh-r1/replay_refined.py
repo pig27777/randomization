@@ -113,8 +113,8 @@ def copy_joint_state(old, new, edges):
     new.d.time = old.d.time
 
 
-def refined_scene():
-    coarse, frame, _ = original_scene()
+def refined_scene(source=original_scene):
+    coarse, frame, _ = source()
     old = coarse.sim
     cfg = replace(get_config(), geometry=GEOMETRY, initial_state=None, dt=.00005)
     with patch.object(backend, "parcel_world", partial(replay.world_with_movable_support, lower_floor=True)), \

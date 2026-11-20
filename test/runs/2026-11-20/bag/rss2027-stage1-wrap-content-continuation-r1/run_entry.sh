@@ -2,7 +2,7 @@
 set -euo pipefail
 run_dir=$(dirname "$0")
 case_parent=${1:-$run_dir/accepted-cases}
-record="$run_dir/../rss2027-stage1-randomized-top-local-mesh-r1/refine_parcel.py"
+record=${2:-$run_dir/../rss2027-stage1-randomized-top-local-mesh-r1/refine_parcel.py}
 python=.venv-physical-parcel/bin/python
 for number in 074 078; do
     case_dir="$case_parent/sample-$number"

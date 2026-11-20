@@ -156,7 +156,7 @@ def main():
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--extract", action="store_true")
     parser.add_argument("--direction", choices=("vertical", "jaw-tangent"), default="vertical")
-    parser.add_argument("--step-us", type=int, nargs="+", choices=(25, 50, 100), default=(100, 50))
+    parser.add_argument("--step-us", type=float, nargs="+", choices=(12.5, 25, 50, 100), default=(100, 50))
     args = parser.parse_args()
     if args.extract:
         extract_state()
@@ -167,7 +167,7 @@ def main():
     for step_us in args.step_us:
         dt = step_us / 1e6
         result, rows = run(dt, .02 if args.smoke else 2.4, args.direction)
-        stem = args.output / f"dt-{round(dt * 1e6)}us"
+        stem = args.output / ("dt-" + f"{step_us:g}".replace(".", "p") + "us")
         stem.with_suffix(".json").write_text(json.dumps(result, indent=2) + "\n")
         np.savez_compressed(stem.with_suffix(".npz"), columns=np.asarray(FIELDS), rows=rows)
         with stem.with_suffix(".csv").open("x", newline="") as stream:

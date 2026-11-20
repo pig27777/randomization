@@ -34,6 +34,22 @@ COLUMNS = (
     "support_N", "signed_pull_N", "grip_each_N", "force_on_fingers_world_N", "left_inner_candidates",
     "right_inner_candidates", "native_bilateral_sliding", "penetration_mm",
 )
+RAMP_CASES = (
+    ("kraft-fixed-fast", "kraft", "rss2027-stage1-kraft-load-ramp-r1"),
+    ("kraft-fixed-slow", "kraft", "rss2027-stage1-kraft-load-ramp-slow-r1"),
+    ("kraft-clear-fast", "kraft", "rss2027-stage1-kraft-load-ramp-clear-fast-r1"),
+    ("kraft-clear-slow", "kraft", "rss2027-stage1-kraft-load-ramp-clear-r1"),
+    ("kraft-clear-half-step", "kraft", "rss2027-stage1-kraft-load-ramp-half-step-r1"),
+    ("pe-matched-load", "pe", "rss2027-stage1-material-load-ramps-r1/pe"),
+    ("paperboard-legacy-edges", "paperboard", "rss2027-stage1-material-load-ramps-r1/paperboard"),
+    ("paperboard-rounded-pad", "paperboard", "rss2027-stage1-material-load-ramps-r1/paperboard-rounded-pad"),
+    ("bubble-127mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble"),
+    ("bubble-130mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-130mm"),
+)
+RAMP_COLUMNS = (
+    "t_s", "applied_load_N", "actual_gap_m", "tension_N", "support_N", "tip_z_m", "payload_com_z_m",
+    "left_inner_N", "right_inner_N", "left_sliding_N", "right_sliding_N", "max_finger_contact_N",
+)
 
 
 def load_csv(path):
@@ -106,6 +122,32 @@ def export_case(label, material, path, axis_index):
     return meta
 
 
+def export_ramp(label, material, path):
+    recording = RUN.parent / path / "recording"
+    raw = load_csv(recording / "load-curve.csv")
+    check = load_json(recording / "load-check.json")
+    result = load_json(recording / "trial/result.json")
+    if len(raw) != check["samples"]:
+        raise ValueError(f"Ramp sample count disagrees for {label}")
+    start = check["load_start_s"]
+    origin = next((float(row["payload_com_z_m"]) for time, row in raw.items() if start is not None and time >= start), None)
+    previous = None
+    samples = []
+    for time, row in raw.items():
+        if previous is not None and abs(time - previous - .002) > result["config"]["dt"] / 2:
+            raise ValueError(f"Incorrect time interval in {label}")
+        expected = min(check["ramp_limit_N"], max(0., (time - start) * check["ramp_rate_N_s"])) if start is not None else 0.
+        if abs(float(row["applied_load_N"]) - expected) > 1e-10:
+            raise ValueError(f"Incorrect load at {time} in {label}")
+        displacement = origin - float(row["payload_com_z_m"]) if origin is not None and time >= start else None
+        samples.append([float(row[k]) for k in RAMP_COLUMNS] + [row["native_bilateral_sliding"] == "True",
+                         row["bilateral_held"] == "True", displacement])
+        previous = time
+    return dict(id=label, material=material, trial=(recording / "trial").relative_to(ROOT).as_posix(),
+                config=result["config"], outcome=result["outcome"], reason=result["reason"], warnings=result["warnings"],
+                peak_penetration_mm=result["peaks"]["penetration_mm"], measurement=check, samples=samples)
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--output", type=Path, default=RUN / "stage1_whole_bag_data.json")
@@ -118,6 +160,10 @@ def main():
         "native_bilateral_sliding": "Per-sample contact criterion; a sustained event is required for slip fitting.",
         "scope": "Archived whole-bag measurements. Material slip displacement and an all-material fitted envelope are pending.",
     })
+    data["load_ramps"] = dict(
+        sample_columns=RAMP_COLUMNS + ("native_bilateral_sliding", "bilateral_held", "payload_load_displacement_m"),
+        cases=[export_ramp(*case) for case in RAMP_CASES],
+    )
     with args.output.open("x") as stream:
         stream.write(json.dumps(data, allow_nan=False, separators=(",", ":")) + "\n")
 
