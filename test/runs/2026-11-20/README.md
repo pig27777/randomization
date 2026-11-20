@@ -137,3 +137,9 @@
 - `rss2027-yam-heterogeneous-scaling-r1`。`ubun`，RTX 5090，142 节点 PE 类整袋，200 μs，Warp 4.0.1 膜法向隔离版。比较闭合末段和悬停的异质设备吞吐。
 - 仓库根目录运行 `flock /tmp/claude-gpu.lock bash test/runs/2026-11-20/bag/rss2027-yam-heterogeneous-scaling-r1/prepare.sh`。随后运行 `flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/runs/2026-11-20/bag/rss2027-yam-heterogeneous-scaling-r1/scan.py`。
 - 补录通过，扫描 54/54 窗口有效，4,096 路较慢阶段 4.091 仿真秒/墙钟秒。[汇总 JSON](bag/rss2027-yam-heterogeneous-scaling-r1/summary.json)。[计划与结果](../../bag_model/YAM_BATCH_GRASP_REPORT.md#2026-11-20-异质环境闭合与悬停扩展扫描) · [运行目录](bag/rss2027-yam-heterogeneous-scaling-r1/)
+
+## 12,000 路异质整袋 GPU 验证
+
+- `ubun` RTX 5090，142 节点、200 μs，复用 [4,096 路复跑轨迹](bag/rss2027-yam-heterogeneous-scaling-r1/recording/trial/trajectory.npz)。标准、紧凑及额外缩小 CCD 临时槽的 CUDA Graph 三档显存不足。逐步提交的紧凑档两阶段 6/6 窗口通过，悬停为 4.439 仿真秒/墙钟秒。
+- 在仓库根目录执行 `flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/runs/2026-11-20/bag/rss2027-yam-12000-worlds-r1/run.py`。第二次追加 `--output <r2> --ccd-capacity 128`，第三次追加 `--output <r3> --ccd-capacity 128 --eager`。输出目录为该日期的对应运行目录，每次复跑使用新运行标识。
+- [首轮两档](bag/rss2027-yam-12000-worlds-r1/summary.json) · [缩小 CCD 后的 CUDA Graph](bag/rss2027-yam-12000-worlds-r2/summary.json) · [逐步提交汇总](bag/rss2027-yam-12000-worlds-r3/summary.json) · [主题报告](../../bag_model/YAM_BATCH_GRASP_REPORT.md#2026-11-20-12000-路异质环境显存与吞吐验证)

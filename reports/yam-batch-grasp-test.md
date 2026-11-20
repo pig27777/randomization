@@ -25,3 +25,18 @@
 | JSON 独立复核、Python 语法、`bash -n` 和 `git diff --check` | 核对 18 个配置、54 个窗的时钟、吞吐换算、中位值、零溢出和世界间触点差异。通过。 |
 
 扫描在用户给定的 4,096 路上限结束，仍有 17.4% 吞吐增长。回合当量以 4.77 s 归一化，完整并行闭环和训练成本仍待实测。[运行目录](../test/runs/2026-11-20/bag/rss2027-yam-heterogeneous-scaling-r1/) · [试验报告](../test/bag_model/YAM_BATCH_GRASP_REPORT.md#2026-11-20-异质环境闭合与悬停扩展扫描)
+
+## 2026-11-20 12,000 路验证
+
+最近检查于 2026-11-20 20:01（台北时间）。`ubun`，RTX 5090，32,607 MiB，驱动 580.178.04，Warp 1.19.0，MuJoCo 和隔离 MuJoCo Warp 4.0.1。模型、位姿、扰动种子和 1 mm 验收沿用前轮。
+
+| 方法 | 结果 |
+| --- | --- |
+| 持锁执行本轮 `run.py`，分别采用上一轮标准和紧凑缓冲 | 两次世界分配通过。标准档首个闭合步凸碰撞临时分配失败。紧凑档首次 CUDA Graph 启动失败。 |
+| `run.py --output <r2> --ccd-capacity 128` | 首步成功，首次 CUDA Graph 启动仍报显存不足。 |
+| `run.py --output <r3> --ccd-capacity 128 --eager` | 关闭 CUDA Graph 后，闭合和悬停的 6/6 窗口有效。零溢出，最大穿透 0.203 mm，较慢阶段 4.439 仿真秒/墙钟秒。 |
+| `nvidia-smi --query-compute-apps=timestamp,pid,used_gpu_memory --format=csv,noheader,nounits --loop-ms=200` | 正式运行中悬停进程峰值采样 15,866 MiB。闭合运行中点查为同值。 |
+| 单环境闭合 CUDA Graph 回归 | 原配置、三个窗口全部通过，中位 71.76 环境步/s。 |
+| Python 解析、JSON 独立复核和差异检查 | 确认 3 个显存失败日志、6 个有效窗的时钟与吞吐换算、扰动接触差异和 515 个运行中显存样本。通过。 |
+
+12,000 路通过范围为两个 12.8 ms 原生接触窗口。图执行、完整回合和训练吞吐的范围见 [本轮结果](../test/bag_model/YAM_BATCH_GRASP_REPORT.md#2026-11-20-12000-路异质环境显存与吞吐验证)。可复现命令及三次采样入口见 [当日索引](../test/runs/2026-11-20/README.md#12000-路异质整袋-gpu-验证)。

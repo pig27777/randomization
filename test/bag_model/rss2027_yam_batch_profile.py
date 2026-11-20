@@ -15,12 +15,14 @@ from physical_parcel_yam_warp import WarpParcelSim
 from bag_sim.physical_parcel_gpu import bending, contact_health, state_health
 
 
-SCALING_WORLDS = (1, 16, 64, 128, 256, 512, 1024, 2048, 4096)
+SCALING_WORLDS = (1, 16, 64, 128, 256, 512, 1024, 2048, 4096, 12000)
 SCALING_CAPACITY = dict(nconmax=384, njmax=1200, njmax_nnz=24576)
+COMPACT_CAPACITY = dict(nconmax=256, njmax=768, njmax_nnz=16384)
 EPISODE_SECONDS = 4.77
 
 
-def profile(trial, phase, worlds, *, scaling=False):
+def profile(trial, phase, worlds, *, scaling_capacity=None, eager=False):
+    scaling = scaling_capacity is not None
     config = cpu.Config(**json.loads((trial / "config.json").read_text()))
     trace = json.loads((trial / "trace.json").read_text())
     indices = [i for i, row in enumerate(trace) if row["phase"] == phase]
@@ -45,8 +47,10 @@ def profile(trial, phase, worlds, *, scaling=False):
     steps = 64
     with wp.ScopedDevice(sim.device):
         model = mjw.put_model(sim.m)
-        capacity = SCALING_CAPACITY if scaling else dict(nconmax=2048, njmax=8192)
+        capacity = scaling_capacity if scaling else dict(nconmax=2048, njmax=8192)
+        print(f"Allocating {worlds} worlds with {capacity}", flush=True)
         gpu = mjw.put_data(sim.m, data, nworld=worlds, naconmax=capacity["nconmax"] * worlds, **capacity)
+        print("World buffers allocated", flush=True)
         film_inputs = [gpu.flexvert_xpos, gpu.qvel, wp.array(sim.film_dofs[:, 0], dtype=int),
                        wp.array(parcel.hinges, dtype=wp.vec4i), wp.array(parcel.rest_angles, dtype=float),
                        wp.array(parcel.hinge_stiffness, dtype=float), wp.array(parcel.hinge_damping, dtype=float),
@@ -65,9 +69,15 @@ def profile(trial, phase, worlds, *, scaling=False):
 
         if scaling:
             memory_samples = [sim.telemetry()["process_memory_mib"]]
+            print(f"Process memory after allocation: {memory_samples[-1]} MiB", flush=True)
         step()
-        with wp.ScopedCapture(device=sim.device) as capture:
-            step()
+        advance = step
+        if not eager:
+            with wp.ScopedCapture(device=sim.device) as capture:
+                step()
+
+            def advance():
+                wp.capture_launch(capture.graph)
 
         def measure():
             for metric in (bits, invalid, iterations, contacts, penetration):
@@ -75,7 +85,7 @@ def profile(trial, phase, worlds, *, scaling=False):
             wp.synchronize_device(sim.device)
             started = time.perf_counter()
             for _ in range(steps):
-                wp.capture_launch(capture.graph)
+                advance()
             wp.synchronize_device(sim.device)
             elapsed = time.perf_counter() - started
             sim.overflow = int(np.bitwise_or.reduce(bits.numpy()))
@@ -94,13 +104,14 @@ def profile(trial, phase, worlds, *, scaling=False):
             return measure()
 
         for _ in range(8):
-            wp.capture_launch(capture.graph)
+            advance()
         wp.synchronize_device(sim.device)
         memory_samples.append(sim.telemetry()["process_memory_mib"])
         warmup_overflow = int(np.bitwise_or.reduce(bits.numpy()))
         payload = int(sim.m.joint("payload_free").qposadr[0])
         repeats = []
         for seed in (20261120, 20261121, 20261122):
+            print(f"Timing {phase} with seed {seed}", flush=True)
             jitter = np.random.default_rng(seed).uniform(-1., 1., (worlds, 3))
             qpos = np.broadcast_to(pose, gpu.qpos.shape).astype(np.float32)
             ctrl = np.broadcast_to(data.ctrl, gpu.ctrl.shape).astype(np.float32)
@@ -125,6 +136,7 @@ def profile(trial, phase, worlds, *, scaling=False):
         valid = not warmup_overflow and len(repeats) == 3 and all(row["valid"] for row in repeats)
         median = float(np.median([row["env_steps_per_s"] for row in repeats])) if valid else None
         return dict(phase=phase, worlds=worlds, dt_s=config.dt, capacity=capacity, repeats=repeats,
+                    execution="eager" if eager else "cuda_graph",
                     valid=valid, median_env_steps_per_s=median,
                     sim_sec_per_wall_sec=median * config.dt if valid else None,
                     episode_equivalents_per_hour=3600 * median * config.dt / EPISODE_SECONDS if valid else None,
@@ -142,12 +154,25 @@ def main():
     parser.add_argument("--phase", required=True, choices=("settle", "close", "lift_hold"))
     parser.add_argument("--worlds", required=True, type=int, choices=SCALING_WORLDS)
     parser.add_argument("--scaling", action="store_true", help="Run three perturbed windows for the scaling scan")
+    parser.add_argument("--compact-capacity", action="store_true",
+                        help="Use the contact and constraint capacities of the 8,000-world probe")
+    parser.add_argument("--ccd-capacity", type=int, help="Set the CCD scratch slots per world")
+    parser.add_argument("--eager", action="store_true", help="Launch GPU steps directly without capturing a graph")
     args = parser.parse_args()
     if not args.scaling and args.worlds not in (1, 16, 64):
         parser.error("world counts above 64 require --scaling")
+    if args.compact_capacity and not args.scaling:
+        parser.error("--compact-capacity requires --scaling")
     if args.output.exists():
         raise FileExistsError(args.output)
-    result = profile(args.trial, args.phase, args.worlds, scaling=args.scaling)
+    capacity = None
+    if args.scaling:
+        capacity = (COMPACT_CAPACITY if args.compact_capacity else SCALING_CAPACITY).copy()
+    if args.ccd_capacity is not None:
+        if capacity is None or not 1 <= args.ccd_capacity <= capacity["nconmax"]:
+            parser.error("--ccd-capacity requires --scaling and must be within the contact capacity")
+        capacity["nccdmax"] = args.ccd_capacity
+    result = profile(args.trial, args.phase, args.worlds, scaling_capacity=capacity, eager=args.eager)
     with args.output.open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
 
