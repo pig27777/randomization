@@ -32,6 +32,8 @@ def main():
         parser.error("close-up camera angles must be finite and elevation in [-90, 90] degrees")
     if args.output.exists():
         raise FileExistsError(args.output)
+    result = json.loads((args.run / "result.json").read_text())
+    top_grasp = result["config"].get("grasp_face") == "top"
     model, data, poses, times, _, rows = load_yam_recording(args.run)
     if not times[0] <= args.start < args.highlight_time < args.end <= times[-1]:
         parser.error("start, highlight and end must be ordered times within the recording")
@@ -65,9 +67,10 @@ def main():
     detail.azimuth, detail.elevation, detail.distance = args.detail_azimuth, args.detail_elevation, .20
     args.output.parent.mkdir(parents=True, exist_ok=True)
     font = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
+    overview = "YAM 下压与闭合" if top_grasp else "YAM 侧夹与提拉"
     filters = ",".join(f"drawtext=fontfile={font}:text={title}:x={x}:y=16:fontsize=25:"
                        "fontcolor=white:box=1:boxcolor=black@0.62:boxborderw=8"
-                       for title, x in (("YAM 侧夹与提拉", 18), ("褶皱近景", width + 18)))
+                       for title, x in ((overview, 18), ("褶皱近景", width + 18)))
     command = [args.ffmpeg, "-n", "-hide_banner", "-loglevel", "error", "-f", "rawvideo",
                "-pixel_format", "rgb24", "-video_size", f"{2 * width}x{height}",
                "-framerate", str(fps), "-i", "pipe:0", "-vf", filters, "-c:v", "libx264",

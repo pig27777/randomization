@@ -906,3 +906,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - 同参 PE 和去旧侧缘的纸板各有 101 帧预载，分别在附加 7.890、7.710 N 无支撑失触。双侧滑动最长 28、6 ms，PE 同悬空状态逐步复测排队。
 - 牛皮纸局部细分在同一曲面带来新自接触，原 11 个位置逐一复放均由正向拉力转为反向。
 - 整袋数据合并 17 条动作和 10 条加载曲线，高填充半步长仍超过 1 mm。[曲线](../test/runs/2026-11-20/bag/rss2027-stage1-reference-curves-r1/stage1_whole_bag_data.json) · [测试报告](../reports/rss2027-stage1-test.md)。
+
+### 2026-11-20 Stage 1 顶部褶皱与 PE 逐步滑动
+
+- 已测顶部聚拢的空间面积差折合 9.87 mm，首起抬仍有 4.44 mm 等效膜量，未建立正向捕获。原轨迹的折角 64.29°→97.19°。[褶皱录像](../test/runs/2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/long-approach/yam-top-fold.mp4)。
+- PE 固定悬空状态 25／12.5 μs 的起滑拉力差 1.21%，两档后续露角。局部加密试验已准备。
+- 牛皮纸 172 节点零载松弛恢复连续双侧承载，两档峰值均低于 1 mm。用同一已松弛状态加载排队。[阶段报告](../test/bag_model/RSS2027_STAGE1_REPORT.md) · [测试报告](../reports/rss2027-stage1-test.md)。

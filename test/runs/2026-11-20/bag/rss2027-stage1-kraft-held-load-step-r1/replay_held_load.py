@@ -68,7 +68,7 @@ def jaw_axis(robot):
     return inward / np.linalg.norm(inward), (left + right) / 2.
 
 
-def run(dt, limit, load_mode):
+def run(dt, limit, load_mode, force_vector=None):
     robot, index, fingerprint = held_scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
@@ -78,7 +78,9 @@ def run(dt, limit, load_mode):
     mujoco.mj_fwdPosition(sim.m, sim.d)
     closing, pad_center = jaw_axis(robot)
     down = np.array([0., 0., -1.])
-    if load_mode == "jaw-tangent":
+    if force_vector is not None:
+        direction = force_vector
+    elif load_mode == "jaw-tangent":
         outward = sim.com() - pad_center
         projected = outward - (outward @ closing) * closing
         if np.linalg.norm(projected) < 1e-6:
@@ -156,6 +158,7 @@ def main():
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--extract", action="store_true")
     parser.add_argument("--direction", choices=("vertical", "jaw-tangent"), default="vertical")
+    parser.add_argument("--force-vector", type=float, nargs=3)
     parser.add_argument("--step-us", type=float, nargs="+", choices=(12.5, 25, 50, 100), default=(100, 50))
     args = parser.parse_args()
     if args.extract:
@@ -163,10 +166,19 @@ def main():
         return
     if args.output is None:
         parser.error("specify an output directory")
+    vector = None
+    mode = args.direction
+    if args.force_vector is not None:
+        vector = np.array(args.force_vector)
+        norm = np.linalg.norm(vector)
+        if not np.isfinite(norm) or norm <= 0. or args.direction != "vertical":
+            parser.error("--force-vector requires a nonzero finite direction without --direction")
+        vector /= norm
+        mode = "world-vector"
     args.output.mkdir(exist_ok=False)
     for step_us in args.step_us:
         dt = step_us / 1e6
-        result, rows = run(dt, .02 if args.smoke else 2.4, args.direction)
+        result, rows = run(dt, .02 if args.smoke else 2.4, mode, vector)
         stem = args.output / ("dt-" + f"{step_us:g}".replace(".", "p") + "us")
         stem.with_suffix(".json").write_text(json.dumps(result, indent=2) + "\n")
         np.savez_compressed(stem.with_suffix(".npz"), columns=np.asarray(FIELDS), rows=rows)

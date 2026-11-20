@@ -22,6 +22,7 @@ from rss2027_yam_capture_audit import aperture_box  # noqa: E402
 
 ASSET = RUN / "prepared_mesh.npz"
 GEOMETRY = "../" + ASSET.relative_to(ROOT).as_posix()
+COMPILED_DT = .00005
 original_scene = replay.held_scene
 backend = replay.backend
 
@@ -116,7 +117,7 @@ def copy_joint_state(old, new, edges):
 def refined_scene(source=original_scene):
     coarse, frame, _ = source()
     old = coarse.sim
-    cfg = replace(get_config(), geometry=GEOMETRY, initial_state=None, dt=.00005)
+    cfg = replace(get_config(), geometry=GEOMETRY, initial_state=None, dt=COMPILED_DT)
     with patch.object(backend, "parcel_world", partial(replay.world_with_movable_support, lower_floor=True)), \
             patch.object(physical_parcel, "wrap_generic", prepared_wrap(GEOMETRY)):
         robot = backend.scene(cfg)

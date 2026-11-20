@@ -1,6 +1,7 @@
 """Change just the observed dominant support or payload contact normal response."""
 
 import argparse
+import os
 from pathlib import Path
 import sys
 from unittest.mock import patch
@@ -18,6 +19,9 @@ def main():
     parser.add_argument("--config", required=True, type=Path)
     args, _ = parser.parse_known_args()
     name = DOMINANT[args.config.parent.name]
+    response = float(os.environ.get("RSS2027_PROBE_CONTACT_TIME_S", ".0005"))
+    if response not in (.0005, .00025):
+        raise ValueError("Expected the planned 0.5 or 0.25 ms diagnostic")
     backend = refine_parcel.backend
     build = backend.parcel_world
 
@@ -31,7 +35,7 @@ def main():
             raise ValueError(f"MuJoCo assembly missing {name}")
         if tuple(map(float, geom.get("solref", ".001 1").split())) != (.001, 1.):
             raise ValueError(f"Unexpected original contact response for {name}")
-        geom.set("solref", ".0005 1")
+        geom.set("solref", f"{response} 1")
         return parcel, ET.tostring(root, encoding="unicode")
 
     with patch.object(backend, "parcel_world", stiffer_contact):

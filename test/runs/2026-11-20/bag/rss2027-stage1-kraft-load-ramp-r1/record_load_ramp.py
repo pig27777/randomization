@@ -34,6 +34,8 @@ def main():
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--load-rate", type=float, default=LOAD_RATE_N_S, help="applied force ramp in N/s")
     parser.add_argument("--withdraw-supports", action="store_true", help="lower the unloaded shelf and floor at loading")
+    parser.add_argument("--withdraw-before-preload", action="store_true",
+                        help="withdraw at the first unloaded bilateral hold, then start the preload clock")
     parser.add_argument("--disable-legacy-pad-edges", action="store_true",
                         help="test only the standard rounded pad without overlapping legacy edges")
     args = parser.parse_args()
@@ -46,11 +48,14 @@ def main():
         parser.error("--load-rate must be finite and positive")
     if args.withdraw_supports and config.support_height <= 0.:
         parser.error("support withdrawal requires the raised shelf and separate floor")
+    if args.withdraw_before_preload and not args.withdraw_supports:
+        parser.error("--withdraw-before-preload requires --withdraw-supports")
     if args.smoke:
         config = replace(config, smoke_seconds=.02)
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / "recorder_source.py").write_bytes(Path(__file__).read_bytes())
     hold_seen = False
+    support_clear = not args.withdraw_supports
     load_start = stable_since = next_readout = None
     rows, raw, peaks = [], [], []
     previous_phase = None
@@ -89,7 +94,7 @@ def main():
         payload = int(sim.payload_bodies[0])
 
         def load_step():
-            nonlocal load_start, stable_since, next_readout
+            nonlocal load_start, stable_since, next_readout, support_clear
             if not hold_seen:
                 step()
                 return
@@ -109,8 +114,11 @@ def main():
             tension = -sum(reaction[2] for reaction in force["force_on_fingers_N"])
             held = min(normal) > .001 and tension > .001 and force["support_N"] <= .05
             stable_since = (time if stable_since is None else stable_since) if held else None
+            if args.withdraw_before_preload and held and not support_clear and withdraw(sim, time, force):
+                support_clear = True
+                stable_since = time + cfg.dt
             if load_start is None and stable_since is not None and time - stable_since >= BASE_HOLD_S - cfg.dt / 2:
-                if not args.withdraw_supports or withdraw(sim, time, force):
+                if support_clear or (not args.withdraw_before_preload and withdraw(sim, time, force)):
                     load_start = time + cfg.dt
                     print(json.dumps(dict(load_start_s=load_start)), flush=True)
             candidate = bool(held and load > 0. and (sliding >= .5 * normal).all())
@@ -149,6 +157,8 @@ def main():
                   max_added_load_N=max((row["applied_load_N"] for row in rows), default=0.),
                   max_observed_tension_N=max((row["tension_N"] for row in rows), default=0.),
                   first_sustained_bilateral_sliding=rows[events[0]] if events else None)
+    if args.withdraw_before_preload:
+        metric["withdrawal_before_preload"] = True
     for name, data in (("summary.json", result), ("load-check.json", metric), ("penetration-peaks.json", peaks),
                        ("load-contacts.json", raw)):
         (args.output / name).write_text(json.dumps(data, indent=2) + "\n")
