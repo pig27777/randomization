@@ -15,12 +15,12 @@ from measure_tangent_flow import estimate_beta
 COARSE = RUN / "tangent-prefix/dt-25us"
 START_S = 1.142
 END_S = 1.200
-DT = .000025
 
 
 def extract(archive, native):
+    dt = native["dt_s"]
     spec = int(mujoco.mjtState.mjSTATE_INTEGRATION)
-    step = round(START_S / DT)
+    step = round(START_S / dt)
     recorded = None
 
     def sample(robot, i, _row):
@@ -32,7 +32,7 @@ def extract(archive, native):
         mujoco.mj_getState(model, data, recorded, spec)
         np.testing.assert_allclose(data.time - native["source_time_s"], START_S, atol=1e-9, rtol=0.)
 
-    result, rows = replay.run(DT, START_S, "jaw-tangent", readout=sample)
+    result, rows = replay.run(dt, START_S, "jaw-tangent", readout=sample)
     with np.load(COARSE / "native-load.npz") as original:
         np.testing.assert_array_equal(rows, original["rows"][:step])
     if recorded is None or result["outcome"] != "no_loss_before_limit":
@@ -54,6 +54,7 @@ def main():
     state, spec, count = extract(args.output / "mid-slide-state.npz", native)
     digest = hashlib.sha256(state.tobytes()).hexdigest()
     direction = np.asarray(native["force_direction"])
+    dt_original = native["dt_s"]
     ratio = reference["material_flow"]["candidate_force_ratio"]
     results = []
 
@@ -62,10 +63,15 @@ def main():
         mujoco.mj_setState(robot.sim.m, robot.sim.d, state, spec)
         return robot, count, digest
 
-    for label, dt in (("25", DT), ("12p5", DT / 2.)):
+    for label, dt in (("25", dt_original), ("12p5", dt_original / 2.)):
         with patch.object(replay, "held_scene", mid_slide_scene):
             load, rows, transitions = record_flow(dt, END_S - START_S, "jaw-tangent", force_vector=direction,
-                                                  initial_load_N=START_S * native["rate_N_s"])
+                                                  load_origin_s=native["source_time_s"])
+        if label == "25":
+            with np.load(COARSE / "native-load.npz") as original:
+                source = original["rows"][count:count + len(rows)]
+            np.testing.assert_array_equal(rows[:, 1:9], source[:, 1:9])
+            np.testing.assert_array_equal(rows[1:, 9:], source[1:, 9:])
         flow = summarize(load, rows, transitions, force_ratio=ratio)
         beta = estimate_beta(load, flow)
         report = dict(native_load=load, material_flow=flow, beta_candidate=beta)

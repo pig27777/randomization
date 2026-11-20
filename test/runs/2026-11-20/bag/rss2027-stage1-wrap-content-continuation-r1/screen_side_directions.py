@@ -15,13 +15,15 @@ sys.path.insert(0, str(RUN.with_name("rss2027-stage1-randomized-top-local-mesh-r
 from refine_parcel import backend, physical_parcel, prepared_wrap  # noqa: E402
 
 
-def shifted_target(translation):
+def shifted_target(translation, close_advance_m=None):
     attach = backend.attach_robot
 
     def shifted(*args, approach=None, **kwargs):
         if approach is None:
             raise ValueError("A translated approach requires a side grasp")
         approach = approach | {"contact_point": np.asarray(approach["contact_point"]) + translation}
+        if close_advance_m is not None:
+            approach["close_advance_m"] = close_advance_m
         return attach(*args, approach=approach, **kwargs)
 
     return patch.object(backend, "attach_robot", shifted)

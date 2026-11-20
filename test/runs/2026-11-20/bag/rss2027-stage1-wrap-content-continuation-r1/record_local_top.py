@@ -1,6 +1,7 @@
 """Set YAM's pre-contact braking height from the actual open-pad footprints."""
 
 import argparse
+from contextlib import nullcontext
 import json
 from pathlib import Path
 import sys
@@ -13,19 +14,19 @@ RUN = Path(__file__).resolve().parent
 sys.path[:0] = [str(RUN.with_name("rss2027-stage1-top-ridge-selection-r1")),
                str(RUN.with_name("rss2027-stage1-randomized-top-local-mesh-r1"))]
 from record_faster_approach import FasterApproach, protocol  # noqa: E402
-from refine_parcel import main as record  # noqa: E402
+from refine_parcel import backend, main as record  # noqa: E402
 from rss2027_yam_capture_audit import clip_plane  # noqa: E402
 
 PAD_HALF_FOOTPRINT_M = [.010, .004]
 
 
-def surface_below_pad(model, data, name, triangles):
+def surface_below_pad(model, data, name, triangles, shift_xy=(0., 0.)):
     pad = model.geom(name)
     axes = data.xmat[int(pad.bodyid[0])].reshape(3, 3)
     if np.linalg.norm(axes[2, :2]) > .01:
         raise ValueError("The measured footprint assumes a vertical pinch frame")
     local = triangles.copy()
-    local[:, :, :2] = (local[:, :, :2] - data.geom_xpos[pad.id, :2]) @ axes[:2, :2]
+    local[:, :, :2] = (local[:, :, :2] - data.geom_xpos[pad.id, :2] - shift_xy) @ axes[:2, :2]
     half = np.asarray(PAD_HALF_FOOTPRINT_M)
     candidates = (local[:, :, :2].min(axis=1) < half).all(axis=1)
     candidates &= (local[:, :, :2].max(axis=1) > -half).all(axis=1)
@@ -40,6 +41,17 @@ def surface_below_pad(model, data, name, triangles):
     if not z:
         raise ValueError(f"The projected footprint of {name} contains no membrane")
     return float(max(z) + model.flex_radius[0])
+
+
+def at_top_center(center):
+    attach = backend.attach_robot
+
+    def shifted(cfg, built, factory, _center, top, size, mass, approach=None):
+        if approach is not None or cfg.grasp_face != "top":
+            raise ValueError("A measured top center requires a top grasp")
+        return attach(cfg, built, factory, np.asarray(center), top, size, mass)
+
+    return patch.object(backend, "attach_robot", shifted)
 
 
 def prepare(case, use_current_case=False):
@@ -84,7 +96,9 @@ def record_with_braking_height(height=None):
                 super().__init__(target_N, height["local_braking_surface_m"])
 
         controller = LocalSurfacePress
-    with patch.object(protocol, "NormalPress", controller):
+    center = height.get("target_center_xy_m") if height is not None else None
+    placement = at_top_center(center) if center is not None else nullcontext()
+    with placement, patch.object(protocol, "NormalPress", controller):
         record()
 
 

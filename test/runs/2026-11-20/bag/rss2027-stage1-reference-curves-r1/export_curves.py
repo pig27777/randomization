@@ -71,6 +71,10 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/prepared-plane-series/kraft-127/recording/trial"),
     ("pe-side-fill-60percent-cleared", "pe",
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-wrist-clearance/recording/trial"),
+    ("pe-top-fill-90percent-076", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-076/recording/trial"),
+    ("pe-side-fill-60percent-film-margin", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-margin/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",

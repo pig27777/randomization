@@ -112,9 +112,28 @@ def prepare():
             (TARGET / f"{name}.json").write_text(json.dumps(settings | {"smoke_seconds": seconds}, indent=2) + "\n")
 
 
+def advance_case():
+    original = json.loads((TARGET / "selection.json").read_bytes())
+    chosen = original["selected"]
+    if chosen is None:
+        raise ValueError("No selected film margin has an admissible insertion interval")
+    retained = chosen["span_equivalent_m"]
+    first = max(range(len(retained) - 1), key=lambda i: min(retained[i], retained[i + 1]))
+    interval = DEPTHS_M[first:first + 2]
+    case = CASE / "side-film-advance"
+    case.mkdir(exist_ok=False)
+    chosen = chosen | {"close_advance_m": sum(interval) / 2.}
+    proof = dict(source_selection=str(TARGET / "selection.json"), close_advance_interval_m=interval, selected=chosen)
+    (case / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
+    for filename in ("config.json", "smoke.json"):
+        (case / filename).write_bytes((TARGET / filename).read_bytes())
+
+
 if __name__ == "__main__":
     if sys.argv[1:] == ["--prepare"]:
         prepare()
+    elif sys.argv[1:] == ["--prepare-advance"]:
+        advance_case()
     else:
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument("--config", type=Path, required=True)
@@ -122,5 +141,5 @@ if __name__ == "__main__":
         chosen = json.loads((args.config.parent / "selection.json").read_bytes())["selected"]
         if chosen is None:
             raise ValueError("No physical target passed the side-flap geometry and YAM path checks")
-        with shifted_target(np.asarray(chosen["shift_m"])):
+        with shifted_target(np.asarray(chosen["shift_m"]), chosen.get("close_advance_m")):
             record()

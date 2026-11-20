@@ -16,7 +16,7 @@ feed = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(feed)
 
 
-def record_flow(dt, duration, direction, begin_s=0., *, force_vector=None, initial_load_N=0.):
+def record_flow(dt, duration, direction, begin_s=0., *, force_vector=None, load_origin_s=None):
     stride = round(.002 / dt)
     previous = None
     transitions = []
@@ -43,7 +43,7 @@ def record_flow(dt, duration, direction, begin_s=0., *, force_vector=None, initi
         previous = current
 
     return (*replay.run(dt, duration + dt, direction, force_vector, readout=sample,
-                        initial_load_N=initial_load_N), transitions)
+                        load_origin_s=load_origin_s), transitions)
 
 
 def summarize(result, rows, transitions, force_ratio=None):

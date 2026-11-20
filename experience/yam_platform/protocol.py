@@ -142,6 +142,9 @@ def attach_robot(cfg,built,sim_factory,center,top,size,mass,approach=None):
         c = np.asarray(approach["closing"], float)
         if abs(np.linalg.norm(n)-1) > 1e-9 or abs(np.linalg.norm(c)-1) > 1e-9 or abs(n @ c) > 1e-9:
             raise ValueError("approach direction and closing must be orthonormal")
+        close_advance = approach.get("close_advance_m")
+        if close_advance is not None and (not np.isfinite(close_advance) or close_advance <= 0.):
+            raise ValueError("side close advance must be positive and finite")
         rotation = np.column_stack([np.cross(c, n), c, n])
         target = np.asarray(approach["contact_point"], float) - .10*n
     robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))
@@ -154,6 +157,7 @@ def attach_robot(cfg,built,sim_factory,center,top,size,mass,approach=None):
     robot.size, robot.mass = size,mass
     if approach is not None:
         robot.approach, robot.approach_extent = n, float(abs(np.asarray(size) @ n))
+        robot.close_advance_m = close_advance
     return robot
 
 
@@ -288,6 +292,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
     state_times=[]
     contact_tip_z=None
     approach=getattr(robot,"approach",None)
+    close_advance = getattr(robot, "close_advance_m", None)
+    approach_origin = tips(robot).mean(0) if close_advance is not None else None
     press = None
     if cfg.press_target_N is not None:
         if approach is not None:
@@ -327,7 +333,7 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
             peaks[key]=max(peaks[key],feedback[key])
         if grip20 > (25 if cfg.category=="bendable" else 15):
             outcome,reason="over_squeeze","v2.2 category grip threshold"
-        if press is not None and feedback["penetration_mm"] > 1.:
+        if (press is not None or close_advance is not None) and feedback["penetration_mm"] > 1.:
             outcome,reason="sim_fail","film contact penetration exceeds 1 mm"
         if phase=="settle":
             if elapsed>=.3:
@@ -364,7 +370,11 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                 speed=cfg.side_insert_speed_m_s if contacted else .05
                 if contacted:depth=max(0.,float((tip_mid-contact_tip)@approach))
                 target+=approach*speed*dt
-                next_phase="close" if depth>=min(.015,.6*robot.approach_extent) or (contacted and down>=20) else None
+                if close_advance is None:
+                    arrived = depth >= min(.015, .6 * robot.approach_extent)
+                else:
+                    arrived = contacted and float((tip_mid - approach_origin) @ approach) >= close_advance
+                next_phase="close" if arrived or (contacted and down>=20) else None
             if press is None and elapsed>8:
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):
@@ -464,10 +474,13 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
             peaks["tracking_mm"]=max(peaks["tracking_mm"],tracking)
             pressure_trace = {} if press is None else dict(down_N=down, press_band_s=press.band_s,
                                                            filtered_down_N=press.filtered_N)
-            trace.append(dict(t=float(d.time),phase=phase,com=sim.com().tolist(),tip_mid=tips(robot).mean(0).tolist(),
+            sampled_tip = tips(robot).mean(0)
+            side_trace = {} if close_advance is None else dict(
+                side_advance_m=float((sampled_tip - approach_origin) @ approach), side_close_advance_m=close_advance)
+            trace.append(dict(t=float(d.time),phase=phase,com=sim.com().tolist(),tip_mid=sampled_tip.tolist(),
                               gap=robot.gap(),command_gap=gap,grip_N=float(filtered.mean()),spring_N=spring_force,
                               attached=pinch.active is not None,pinch_load_N=pinch.load,**health,
-                              tracking_mm=tracking,**backend.measure(robot),**pressure_trace))
+                              tracking_mm=tracking,**backend.measure(robot),**pressure_trace,**side_trace))
             if not np.all(np.isfinite(d.qpos)) or not np.all(np.isfinite(d.qvel)):
                 outcome,reason="sim_fail","nonfinite state"
             elif model_failure:
