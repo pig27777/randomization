@@ -49,7 +49,7 @@ def prepare():
     pad = sim.m.geom_bodyid[robot.pad_geom[0]]
     center, basis, bounds = aperture_box(sim.d, sim.d.geom_xpos[robot.pad_geom], pad, robot.gap())
     bounds += [.010, .010, .012]
-    with np.load(physical_parcel.HERE / cfg.geometry) as asset:
+    with np.load(physical_parcel.HERE / sim.parcel.cfg.geometry) as asset:
         raw, faces, panels = [asset[name] for name in ("vertices", "faces", "panel_ids")]
     triangles = ((world - center) @ basis)[faces]
     selected = np.all(triangles.max(axis=1) >= -bounds, axis=1)
