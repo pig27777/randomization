@@ -34,6 +34,8 @@ def main():
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--load-rate", type=float, default=LOAD_RATE_N_S, help="applied force ramp in N/s")
     parser.add_argument("--withdraw-supports", action="store_true", help="lower the unloaded shelf and floor at loading")
+    parser.add_argument("--disable-legacy-pad-edges", action="store_true",
+                        help="test only the standard rounded pad without overlapping legacy edges")
     args = parser.parse_args()
     config = backend.Config(**json.loads(args.config.read_bytes()))
     if config.mode != "rigid" or config.pinch_coeff or not config.pickup_only or config.pickup_release_seconds:
@@ -73,6 +75,16 @@ def main():
     def with_load(cfg):
         robot = scene(cfg)
         sim = robot.sim
+        if args.disable_legacy_pad_edges:
+            names = [f"{side}_pad_edge_{edge}" for side in ("left", "right") for edge in ("a", "b")]
+            indices = [sim.m.geom(name).id for name in names]
+            disabled = {name: [int(sim.m.geom_contype[i]), int(sim.m.geom_conaffinity[i])]
+                        for name, i in zip(names, indices, strict=True)}
+            if not all(a or b for a, b in disabled.values()):
+                raise ValueError("Expected all four upstream pad edges to have enabled collision")
+            sim.m.geom_contype[indices] = 0
+            sim.m.geom_conaffinity[indices] = 0
+            (args.output / "disabled-legacy-pad-edges.json").write_text(json.dumps(disabled, indent=2) + "\n")
         step = sim.step
         payload = int(sim.payload_bodies[0])
 

@@ -53,3 +53,5 @@
 | [其他三类整袋悬空加载](bag/rss2027-stage1-material-load-ramps-r1/) | 同一 5 N/s 规程用于气泡膜、纸板及同参 PE 已有侧抓 | 执行本轮自带共享锁的 `run.sh`。气泡膜 130 mm 另持锁执行牛皮纸入口并传该子目录 | 气泡膜 127 和 130 mm 有效预载 0.124、0.122 s。纸板零支撑悬空，缺双侧内载。同参 PE 运行中。 |
 | [保持包覆的内容物尺寸延续](bag/rss2027-stage1-wrap-content-continuation-r1/) | 保持原封边、袋形、偏置、长宽高比例，体积逐级接近原目标 | `continue_wrap.py` 默认和 `--strain-band .04`。持锁执行 `run_entry.sh` 验证较高填充两个实际入选尺寸 | 静态通过 84.92% 和 70.85%。50 μs 入口分别在膜—内容物和膜—台面穿透超限。25 μs 对照排队。 |
 | [悬空牛皮纸的局部加密](bag/rss2027-stage1-kraft-held-local-mesh-r1/) | 保持悬空状态、材料和输入，夹口三角面作共形细分 | 先执行 `replay_refined.py --prepare`，持锁运行 `replay_refined.py <新目录> --direction jaw-tangent --step-us 50 25`，先加 `--smoke` | 局部边长 34.08→17.04 mm，位置和面积不变。短入口及完整加载排队。 |
+| [纸板载荷几何来源](bag/rss2027-stage1-material-load-ramps-r1/paperboard/contact-geometries.json) | 检查 YAM 总夹力反馈是否来自 20 × 40 mm 指垫 | `check_paperboard_contacts.py` 复放同一状态；对照持锁运行原加载入口并附 `--disable-legacy-pad-edges` | 右指的 11.55 N 实际来自原侧缘。关闭原四侧缘的对照排队。 |
+| [随机整袋的面积与剖面余料](bag/rss2027-stage1-geometric-slack-budget-r1/) | 用已有 128 个输入解析计算两片袋内腔面积与盒体表面积之差 | `.venv-physical-parcel/bin/python -B <本轮目录>/estimate.py` | 固定 90% 的 32 个样本仍有 31–606 cm² 面积余量上界，单侧剖面余量跨 0.01–15.42 mm。 |
