@@ -43,18 +43,27 @@ def film_at_lift(trial, lift):
 
 def hold_observation(case):
     records = read(case, "recording/capture-contacts.json")
-    hold = [resolve(row) for row in records if row["phase"] == "lift_hold"]
+    native = [row for row in records if row["phase"] == "lift_hold"]
+    hold = [resolve(row) for row in native]
     if not hold:
         return None
     unsupported = [row for row in hold if row["support_N"] <= .05]
     positive = [row for row in unsupported if row["tension_N"] > .001]
     normals = np.asarray([row["standard_inner_normal_N"] for row in positive]).reshape(-1, 2)
+    without_right_inner = {row["t_s"] for row in positive if row["standard_inner_normal_N"][1] <= .001}
+    right_auxiliary_tensions = [
+        -sum(contact["force_on_finger_N"][2] for contact in row["contacts"]
+             if contact["pad"] == 1 and not contact["standard_pad"])
+        for row in native if row["t_s"] in without_right_inner
+    ]
     with (case / "capture/capture-audit.csv").open(newline="") as stream:
         retained = [float(row["aperture_material_length_m"]) for row in csv.DictReader(stream)
                     if row["phase"] == "lift_hold"]
     return dict(samples=len(hold), unsupported_samples=len(unsupported), positive_pull_samples=len(positive),
                 bilateral_standard_samples=int((normals > .001).all(axis=1).sum()),
                 standard_contact_missing_each=(normals <= .001).sum(axis=0).tolist(),
+                mean_right_auxiliary_pull_without_right_inner_N=(float(np.mean(right_auxiliary_tensions))
+                                                                 if right_auxiliary_tensions else None),
                 actual_gap_range_m=[min(row["gap_m"] for row in hold), max(row["gap_m"] for row in hold)],
                 reference_membrane_range_m=[min(retained), max(retained)] if retained else None)
 

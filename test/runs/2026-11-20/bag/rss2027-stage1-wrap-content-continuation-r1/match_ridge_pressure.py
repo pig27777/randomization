@@ -49,7 +49,29 @@ class CenteredPress(protocol.NormalPress):
         return nominal_m_s * min(1., max(0., margin / self.feed_margin_N))
 
 
-def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False):
+class OpeningServo:
+    start_tolerance_m = .00010
+    proportional_gain = 1.5
+    integral_gain_per_s = 8.
+    limit_m = .004
+
+    def __init__(self, actual_m, command_m):
+        self.reference_m = actual_m
+        self.integral_m = min(self.limit_m, max(-self.limit_m, command_m - actual_m))
+
+    def command(self, actual_m, dt):
+        error_m = self.reference_m - actual_m
+        limit = self.limit_m
+        proportional = self.proportional_gain * error_m
+        integral = min(limit, max(-limit, self.integral_m + self.integral_gain_per_s * error_m * dt))
+        correction = proportional + integral
+        if abs(correction) <= limit or correction * error_m < 0.:
+            self.integral_m = integral
+        correction = proportional + self.integral_m
+        return self.reference_m + min(limit, max(-limit, correction))
+
+
+def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False, matched_opening=False):
     sim = robot.sim
     m, d = sim.m, sim.d
     m.opt.timestep = dt
@@ -61,6 +83,8 @@ def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False):
     mujoco.mj_fwdPosition(m, robot.kin)
     target = robot.kin.site_xpos[robot.site].copy()
     gap = 2. * d.ctrl[robot.gripper]
+    opening = OpeningServo(robot.gap(), gap) if matched_opening else None
+    initial_opening = opening.reference_m if opening else None
     press_type = CenteredPress if centered_control else protocol.NormalPress
     press = press_type(TARGET_N, protocol.tips(robot).mean(axis=0)[2])
     start_low, start_high = CenteredPress.start_band_N if centered_control else (.4, .6)
@@ -90,13 +114,19 @@ def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False):
         target[2] = press.move(target[2], tip_z, down, support, dt, approach=False)
         in_band = qualified and .4 <= press.filtered_N <= .6
         if load_start is None:
+            start_qualified = qualified and start_low <= press.filtered_N <= start_high
+            if opening:
+                start_qualified = (start_qualified and start_low <= down <= start_high
+                                   and abs(robot.gap() - opening.reference_m) <= opening.start_tolerance_m)
             if step % stride == 0:
                 preload.append(dict(time_s=float(d.time), pressure_N=down, direct_support_N=support))
                 if centered_control:
                     preload[-1]["filtered_pressure_N"] = press.filtered_N
+                if opening:
+                    preload[-1]["actual_gap_m"] = robot.gap()
                 if step % (stride * 25) == 0:
                     print(f"{m.nflexvert} nodes at {step * dt:.3f} s preload, {down:.6f} N", flush=True)
-            consecutive = consecutive + 1 if qualified and start_low <= press.filtered_N <= start_high else 0
+            consecutive = consecutive + 1 if start_qualified else 0
             if consecutive >= round(press.hold_s / dt):
                 load_start = step
             elif step >= preload_steps:
@@ -115,20 +145,34 @@ def run(robot, dt, preload_limit_s, closure_s, *, centered_control=False):
                                        pressure_streak_start_s=pressure_streak_start)
                     if elapsed % (closure_stride * 20) == 0:
                         print(f"{m.nflexvert} nodes at {elapsed * dt:.3f} s closure, {down:.6f} N", flush=True)
+                if opening:
+                    observation["reference_gap_m"] = opening.reference_m
                 samples.append(observation)
             if elapsed == closure_steps:
                 outcome = "complete"
                 break
             if in_band:
-                gap -= press.closure_rate(SPEED_M_S, down, support) * dt
+                rate = press.closure_rate(SPEED_M_S, down, support)
+                if opening:
+                    error_N = max(abs(down - TARGET_N), abs(press.filtered_N - TARGET_N))
+                    rate *= min(1., max(0., (.055 - error_N) / .035))
+                    opening.reference_m -= rate * dt
+                else:
+                    gap -= rate * dt
+        if opening:
+            gap = opening.command(robot.gap(), dt)
         robot.command(target, gap)
         sim.step()
-    return dict(outcome=outcome, preload_s=load_start * dt if load_start is not None else None,
-                preload=preload, samples=samples)
+    result = dict(outcome=outcome, preload_s=load_start * dt if load_start is not None else None,
+                  preload=preload, samples=samples)
+    if opening:
+        result["preload_gap_reference_m"] = initial_opening
+    return result
 
 
-def pressure_spans(rows):
-    inward = rows[0]["actual_gap_m"] - np.asarray([row["actual_gap_m"] for row in rows])
+def pressure_spans(rows, *, absolute_gap=False):
+    origin = 0. if absolute_gap else rows[0]["actual_gap_m"]
+    inward = origin - np.asarray([row["actual_gap_m"] for row in rows])
     streaks = [row.get("pressure_streak_start_s", 0.) for row in rows]
     eligible = [.4 <= row["pressure_N"] <= .6 and row["direct_support_N"] <= .05 and streak is not None
                 for row, streak in zip(rows, streaks, strict=True)]
@@ -141,11 +185,11 @@ def pressure_spans(rows):
                 yield inward[a:b], rows[a:b]
 
 
-def fit_common(runs):
+def fit_common(runs, *, absolute_gap=False):
     if any(run["outcome"] != "complete" for run in runs):
         return None
     intervals = []
-    for traces in product(*(pressure_spans(run["samples"]) for run in runs)):
+    for traces in product(*(pressure_spans(run["samples"], absolute_gap=absolute_gap) for run in runs)):
         low, high = max(x[0] for x, _ in traces), min(x[-1] for x, _ in traces)
         if high > low:
             intervals.append((low, high, traces))
@@ -181,7 +225,9 @@ def fit_common(runs):
     reference_passed = (len(reference_changes) == 2 and all(fit["reference_eligible"] for fit in fits)
                         and all(abs(change) <= .10 for change in reference_changes.values())
                         and abs(changes["pressure_N"]) <= .10)
-    return dict(common_travel_interval_m=[float(low), float(high)], fits=fits, relative_change=changes, passed=passed,
+    interval = (dict(common_absolute_gap_interval_m=[float(-high), float(-low)]) if absolute_gap
+                else dict(common_travel_interval_m=[float(low), float(high)]))
+    return dict(**interval, fits=fits, relative_change=changes, passed=passed,
                 reference_relative_change=reference_changes, reference_passed=reference_passed)
 
 
@@ -192,14 +238,18 @@ def main():
     parser.add_argument("--preload-limit-s", type=float, default=PRELOAD_LIMIT_S)
     parser.add_argument("--closure-s", type=float, default=CLOSURE_S)
     parser.add_argument("--centered-control", action="store_true")
+    parser.add_argument("--matched-opening", action="store_true", help="track the same physical opening from preload")
     parser.add_argument("--output", type=Path)
     args = parser.parse_args()
     if any(not np.isfinite(value) or value < .020 for value in (args.preload_limit_s, args.closure_s)):
         parser.error("Preload and closure budgets must be finite and at least 20 ms")
+    if args.matched_opening and not args.centered_control:
+        parser.error("Matching actual openings requires --centered-control")
     case = args.case.resolve()
     dt = args.step_us / 1e6
     coarse, refined, *_ = load_pair(case=case, timestep=dt)
-    runs = [run(robot, dt, args.preload_limit_s, args.closure_s, centered_control=args.centered_control)
+    runs = [run(robot, dt, args.preload_limit_s, args.closure_s, centered_control=args.centered_control,
+                matched_opening=args.matched_opening)
             for robot in (coarse, refined)]
     comparison = fit_common(runs)
     result = dict(dt_s=dt, mesh_vertices=[coarse.sim.m.nflexvert, refined.sim.m.nflexvert],
@@ -212,6 +262,14 @@ def main():
                                     start_band_N=CenteredPress.start_band_N,
                                     feed_margin_N=CenteredPress.feed_margin_N,
                                     closure_sample_s=.010)
+        result["absolute_gap_comparison"] = fit_common(runs, absolute_gap=True)
+    if args.matched_opening:
+        result["controller"].update(opening_proportional_gain=OpeningServo.proportional_gain,
+                                    opening_integral_gain_per_s=OpeningServo.integral_gain_per_s,
+                                    opening_command_limit_m=OpeningServo.limit_m,
+                                    opening_start_tolerance_m=OpeningServo.start_tolerance_m,
+                                    closing_rate_center_half_width_N=.020,
+                                    closing_rate_zero_error_N=.055)
     output = args.output or case / "local-mesh-window/matched-pressure.json"
     with output.open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
