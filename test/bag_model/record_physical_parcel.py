@@ -4,6 +4,7 @@ from importlib import import_module
 import json
 from pathlib import Path
 import time
+from unittest.mock import patch
 
 import mujoco
 import numpy as np
@@ -31,11 +32,15 @@ def penetration_peak(robot, phase):
                 pos_m=contact.pos.tolist(), normal=contact.frame[:3].tolist(), sides=sides)
 
 
-def release_contacts(robot):
+def release_contacts(robot, *, include_all_fingers=False):
     model, data = robot.sim.m, robot.sim.d
     flex = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_FLEX, "bag")
-    pads = {int(geom): i for i, core in enumerate(robot.pad_geom)
-            for geom in np.flatnonzero(model.geom_bodyid == model.geom_bodyid[core])}
+    pad_bodies = model.geom_bodyid[robot.pad_geom]
+    if include_all_fingers:
+        pads = {int(geom): i for i, group in enumerate(robot.all_finger_sets) for geom in group}
+    else:
+        pads = {int(geom): i for i, body in enumerate(pad_bodies)
+                for geom in np.flatnonzero(model.geom_bodyid == body)}
     left, right = data.geom_xpos[robot.pad_geom]
     axis = right - left
     axis /= max(np.linalg.norm(axis), 1e-12)
@@ -47,17 +52,24 @@ def release_contacts(robot):
             continue
         film_slot = list(contact.flex).index(flex)
         pad_slot = 1 - film_slot
-        pad = pads.get(int(contact.geom[pad_slot]))
+        geom = int(contact.geom[pad_slot])
+        pad = pads.get(geom)
         if pad is None:
             continue
         mujoco.mj_contactForce(model, data, index, local_force)
         normal = (2 * pad_slot - 1) * contact.frame[:3]
-        records.append(dict(pad=pad, element=int(contact.elem[film_slot]), vertex=int(contact.vert[film_slot]),
-                            inner=bool((2 * pad - 1) * (normal @ axis) > .7), normal_on_pad=normal.tolist(),
-                            pos_m=contact.pos.tolist(), force_contact_N=local_force[:3].tolist(),
-                            friction=contact.friction[:2].tolist(),
-                            tangent_constraint_velocity_m_s=data.efc_vel[address + 1:address + 3].tolist()
-                            if contact.dim == 3 else []))
+        row = dict(pad=pad, element=int(contact.elem[film_slot]), vertex=int(contact.vert[film_slot]),
+                   inner=bool((2 * pad - 1) * (normal @ axis) > .7), normal_on_pad=normal.tolist(),
+                   pos_m=contact.pos.tolist(), force_contact_N=local_force[:3].tolist(),
+                   friction=contact.friction[:2].tolist(),
+                   tangent_constraint_velocity_m_s=data.efc_vel[address + 1:address + 3].tolist()
+                   if contact.dim == 3 else [])
+        if include_all_fingers:
+            body = int(model.geom_bodyid[geom])
+            world = (2 * pad_slot - 1) * (contact.frame.reshape(3, 3).T @ local_force[:3])
+            row.update(geom=model.geom(geom).name, body=model.body(body).name,
+                       standard_pad=bool(body == pad_bodies[pad]), force_on_finger_N=world.tolist())
+        records.append(row)
     return records
 
 
@@ -67,7 +79,10 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--engine", choices=("cpu", "warp"), default="cpu")
     parser.add_argument("--record-penetration-peaks", action="store_true")
+    parser.add_argument("--record-capture-forces", action="store_true")
     args = parser.parse_args()
+    if args.record_capture_forces and args.engine != "cpu":
+        parser.error("--record-capture-forces requires the CPU contact buffer")
     backend = (physical_parcel_yam if args.engine == "cpu" else
                import_module("physical_parcel_yam_warp"))
     cfg = backend.Config(**json.loads(args.config.read_text()))
@@ -79,6 +94,7 @@ def main():
     device_samples = []
     penetration_events = []
     release_samples = []
+    capture_samples = []
 
     def observe(robot, row):
         nonlocal last, previous_phase
@@ -102,8 +118,45 @@ def main():
     def observe_peak(robot, phase):
         penetration_events.append(penetration_peak(robot, phase))
 
-    result = run(backend, cfg, args.output / "trial", on_sample=observe,
-                 on_penetration_peak=observe_peak if args.record_penetration_peaks else None)
+    run_args = dict(on_sample=observe,
+                    on_penetration_peak=observe_peak if args.record_penetration_peaks else None)
+    if args.record_capture_forces:
+        native_scene = backend.scene
+        stride = max(1, round(.002 / cfg.dt))
+        capture_phases = {"close", "lift", "lift_hold"}
+        active_phases = {"approach", *capture_phases}
+
+        def capture_scene(config):
+            robot = native_scene(config)
+            data = robot.sim.d
+            native_step = robot.sim.step
+
+            def capture_step():
+                t = float(data.time)
+                if previous_phase in active_phases and round(t / cfg.dt) % stride == 0:
+                    # Read the same native contact buffer as the shared controller.
+                    feedback = backend.measure(robot)
+                    capture_samples.append(dict(t_s=t, gap_m=robot.gap(),
+                                                command_gap_m=2. * float(data.ctrl[robot.gripper]),
+                                                contacts=release_contacts(robot, include_all_fingers=True), **feedback))
+                native_step()
+
+            robot.sim.step = capture_step
+            return robot
+
+        with patch.object(backend, "scene", capture_scene):
+            result = run(backend, cfg, args.output / "trial", **run_args)
+        ranges = [*result["phases"], dict(phase=result["phase"],
+                  start_s=result["phases"][-1]["end_s"] if result["phases"] else 0., end_s=result["sim_time_s"])]
+        selected = []
+        for interval in ranges:
+            if interval["phase"] in capture_phases:
+                selected.extend(dict(phase=interval["phase"], **row) for row in capture_samples
+                                if interval["start_s"] <= row["t_s"] < interval["end_s"])
+        if selected:
+            (args.output / "capture-contacts.json").write_text(json.dumps(selected, separators=(",", ":")) + "\n")
+    else:
+        result = run(backend, cfg, args.output / "trial", **run_args)
     if args.record_penetration_peaks:
         (args.output / "penetration-peaks.json").write_text(json.dumps(penetration_events, indent=2) + "\n")
     if release_samples:
