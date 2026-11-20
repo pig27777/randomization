@@ -14,17 +14,19 @@ from measure_aperture_flow import record_flow, replay, summarize  # noqa: E402
 from measure_tangent_flow import estimate_beta  # noqa: E402
 from replay_local_tangent import replay_window  # noqa: E402
 
+MATERIAL_SOURCES = {"paperboard": "paperboard-rounded-pad", "bubble": "bubble-fast-lift",
+                    "bubble-20g": "bubble-20g-prepared"}
+
 
 def setup(material):
-    source_name = "paperboard-rounded-pad" if material == "paperboard" else "bubble-fast-lift"
-    replay.SOURCE = RUN / source_name / "recording"
+    replay.SOURCE = RUN / MATERIAL_SOURCES[material] / "recording"
     case = RUN / f"{material}-tangent"
     replay.CHECKPOINT = case / "held-state.npz"
     return case
 
 
 def scene():
-    if replay.SOURCE.parent.name == "bubble-fast-lift":
+    if replay.SOURCE.parent.name != MATERIAL_SOURCES["paperboard"]:
         return _HELD_SCENE()
     backend = replay.backend
     assemble = backend.scene
@@ -115,7 +117,7 @@ def compare_steps(case):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--material", choices=("paperboard", "bubble"), default="paperboard")
+    parser.add_argument("--material", choices=tuple(MATERIAL_SOURCES), default="paperboard")
     command = parser.add_mutually_exclusive_group()
     command.add_argument("--prepare", action="store_true")
     command.add_argument("--compare-steps", action="store_true")

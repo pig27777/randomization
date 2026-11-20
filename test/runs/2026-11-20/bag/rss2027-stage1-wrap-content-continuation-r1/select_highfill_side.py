@@ -1,5 +1,6 @@
 """Find an open-finger YAM approach to one of three settled 90% parcels."""
 
+import argparse
 import itertools
 import json
 
@@ -44,6 +45,12 @@ def sample_routes(sample):
 
 
 def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--deeper-seat", action="store_true")
+    args = parser.parse_args()
+    if args.deeper_seat:
+        prepare_deeper_seat()
+        return
     candidates = [sample_routes(sample) for sample in SAMPLES]
     best = max((item for item in candidates if item[2]["selected"]),
                key=lambda item: item[2]["selected"]["paired_depth_score_m"], default=None)
@@ -57,6 +64,30 @@ def main():
         (output / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
         for name, seconds in (("config", 0.), ("smoke", .020), ("settle", .30)):
             (output / f"{name}.json").write_text(json.dumps(config | {"smoke_seconds": seconds}, indent=2) + "\n")
+
+
+def prepare_deeper_seat():
+    case = RUN / "sample-066"
+    prior = case / "side-open-route"
+    source = json.loads((prior / "selection.json").read_bytes())
+    config = json.loads((prior / "config.json").read_bytes())
+    original = source["selected"]
+    raw = json.loads((prior / "force-summary.json").read_bytes())
+    if raw["bilateral_samples"] > 0 or raw["first_lift"] is None:
+        raise ValueError("The seating comparison requires the archived unilateral lift")
+    with np.load(case / "settle/trial/trajectory.npz") as archive:
+        qpos = archive["final_qpos"]
+    options, _ = open_route_candidates(config, qpos)
+    deeper = [row for row in options if abs(row["close_advance_m"] - .075) < 1e-9
+              and np.linalg.norm(np.asarray(row["shift_m"]) - original["shift_m"]) < 1e-9]
+    _, selected = choose_open_route(config, deeper)
+    output = case / "side-open-route-deeper"
+    output.mkdir(exist_ok=False)
+    proof = dict(source, selected=selected, original_close_advance_m=original["close_advance_m"])
+    (output / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
+    if selected:
+        for name in ("config.json", "smoke.json", "settle.json"):
+            (output / name).write_bytes((prior / name).read_bytes())
 
 
 if __name__ == "__main__":

@@ -7,9 +7,9 @@
 | 交付项 | 已验证 | 待验收 |
 | --- | --- | --- |
 | YAM 整袋算力 | 142 节点、200 μs，RTX 5090 在线完整抓取两种内容物布局，墙钟 539–580 s。仓库原 200 节点资产同准备态、40 μs 的完整侧抓均通过。CPU 墙钟 562.55 s，RTX 5090 墙钟 4,263.54 s，两档 GPU 峰值采样显存均为 966 MiB。[142 节点 GPU](../runs/2026-11-20/bag/rss2027-stage1-warp-film-normal-r1/benchmark.json) · [200 节点 CPU](../runs/2026-11-20/bag/rss2027-stage1-pickup-200-cpu-r2/benchmark.json) · [200 节点 GPU](../runs/2026-11-20/bag/rss2027-stage1-pickup-200-warp-r1/benchmark.json) | 现有实测包含单环境完整闭环与批量设备短窗，批量完整并行闭环吞吐仍待实测。 |
-| 四类整袋曲线 | 四类均有悬停、悬空脱手及 0.3、0.5、0.8 N 顶部压力。46 条整袋动作和 13 条预载或加载曲线覆盖含固定 60% 和 90% 的多种包裹。PE 与牛皮纸的同一滑动中段通过时间步长对照。纸板测得切向滑移和脱手，气泡膜在 0.20 s 悬空预载后完成竖向加力。[整袋 JSON](../runs/2026-11-20/bag/rss2027-stage1-reference-curves-r1/stage1_whole_bag_data.json) · [三档压力](../runs/2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/pressure-series-comparison.json) | 待补跨形状余料的定量捕获、完整切向路径的起滑收敛和实际滑移的网格收敛。 |
+| 四类整袋曲线 | 四类均有悬停、悬空脱手及 0.3、0.5、0.8 N 顶部压力。47 条整袋动作和 14 条预载或加载曲线覆盖含固定 60% 和 90% 的多种包裹。PE 与牛皮纸的同一滑动中段通过时间步长对照。纸板测得切向滑移和脱手，气泡膜两档质量均在 0.20 s 悬空预载后完成竖向加力。[整袋 JSON](../runs/2026-11-20/bag/rss2027-stage1-reference-curves-r1/stage1_whole_bag_data.json) · [三档压力](../runs/2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/pressure-series-comparison.json) | 待补跨形状余料的定量捕获、完整切向路径的起滑收敛和实际滑移的网格收敛。 |
 | 低阶参数物理包络 | PE 平膜 8 mm／0.5 N、偏移 0.625 mm 的聚拢斜率约 0.781–0.815 m/m，通过独立步长和夹口网格验收。1.25 mm 网格两档步长的起滑力变化 0.54%。[三档聚拢](../runs/2026-11-20/bag/rss2027-stage1-pe-aperture-refinement-r1/gather-three-way.json) · [完整拉拔对照](../runs/2026-11-20/bag/rss2027-stage1-pe-aperture-refinement-r1/comparison-refined.json) | 夹口从 1.25 加密至 0.625 mm 后，起滑力变化 35.8%。捕获阈值、摩擦、刚度和滑移率仍缺网格收敛，四类材料参数包络未通过总体验收。 |
-| 几何随机化 | 128 个独立几何包含尺寸、四边封口和内容物长宽高及位置。原 32 个 90% 均已静态包覆，其中 3 种在 25 μs 下完成 0.30 s，峰值穿透 0.159–0.406 mm。两种不同 90% 布局通过 0.5 N 原压力带，闭合和起抬全程包覆。固定 60% 新侧抓的首起抬有 14.93 mm 实际等效膜量。[完整 90% 静态覆盖](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-screen/summary.json) · [60% 夹口](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-open-route/capture/capture-summary.json) | 60% 进膜后仍受支撑并脱手。90% 顶抓为空夹，侧缘动作在验证。跨形状动力学通过率与余料捕获待确认。 |
+| 几何随机化 | 128 个独立几何包含尺寸、四边封口和内容物长宽高及位置。原 32 个 90% 均已静态包覆，其中 3 种在 25 μs 下完成 0.30 s，峰值穿透 0.159–0.406 mm。两种不同 90% 布局通过 0.5 N 原压力带，闭合和起抬全程包覆。固定 60% 与 90% 侧抓首起抬实测等效膜量分别为 14.93 和 0.57 mm。[完整 90% 静态覆盖](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-screen/summary.json) · [60% 夹口](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-open-route/capture/capture-summary.json) · [90% 原生内载](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-066/side-open-route/force-summary.json) | 60% 进膜后仍受支撑并脱手。90% 顶抓为空夹，侧抓仅右指建立标准内载。跨形状动力学通过率与余料捕获待确认。 |
 
 ### 整袋参数映射记录
 
@@ -19,7 +19,7 @@
 | 捕获阈值 $s_{\mathrm{crit}}$ | 膜脊提前起抬保有 8.44 mm 参考等效膜量及原生接触候选，合力仍向下。同参侧抓的首起抬约有 80.16 mm 参考等效膜量和 0.616 N 正拉力。[提前起抬](../runs/2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/earlier-lift/capture/capture-summary.json) · [完整整袋曲线](../runs/2026-11-20/bag/rss2027-stage1-reference-curves-r1/stage1_whole_bag_data.json) | 两种姿态的膜量与力路径不同，临界膜量需要同形状的压力与余料对照。 |
 | 等效静摩擦 $\mu_{\mathrm{eff}}$ | PE 同姿态竖直拉拔起滑力比为 1.125／1.220。加载方向在闭合轴上的投影约 94%。牛皮纸细网格切向加载两档起滑力比分别为 0.816／1.799。[PE](../runs/2026-11-20/bag/rss2027-stage1-pe-held-load-step-r1/recording/) · [牛皮纸](../runs/2026-11-20/bag/rss2027-stage1-kraft-held-local-mesh-r1/settled-recording/) | PE 的同态起滑载荷通过步长对照，牛皮纸同路径尚未通过。等效比受法向几何及两侧夹力影响，材料包络待验收。 |
 | 渐进滑移率 $\beta$ | PE 与牛皮纸在同一实际滑动中间态的半步长斜率分别相差 2.76% 和 1.11%。纸板的切向窗得到 0.002659 m/(N·s) 单档候选。[PE 同态](../runs/2026-11-20/bag/rss2027-stage1-pe-held-load-step-r1/local-tangent-exact/comparison.json) · [牛皮纸同态](../runs/2026-11-20/bag/rss2027-stage1-kraft-held-local-mesh-r1/local-tangent/comparison.json) · [纸板](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/paperboard-tangent/recording/summary.json) | PE 181 节点网格未复现合格正超载窗，完整加载起滑及网格收敛待确认。气泡膜缺合格持续加载窗口。 |
-| 有效刚度 $k$ | PE、纸板及慢拉牛皮纸的代表斜率为 136.5、632.7 和 251.2 N/m。相同牛皮纸在共同外载区间的快慢斜率为 1,090.9 和 246.5 N/m。气泡膜在 52 点预滑动窗得到 11.69 N/m，$R^2=0.747$。[有效刚度实测窗口](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/stiffness-comparison.json) | 刚度包含包裹形状及指垫的加载响应，牛皮纸有明显速率依赖。四类的步长、网格收敛仍待确认。 |
+| 有效刚度 $k$ | PE、纸板及慢拉牛皮纸的代表斜率为 136.5、632.7 和 251.2 N/m。相同牛皮纸在共同外载区间的快慢斜率为 1,090.9 和 246.5 N/m。同形状气泡膜内容物为 40／20 g 时，代表竖向斜率为 11.69／9.69 N/m。[有效刚度实测窗口](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/stiffness-comparison.json) | 刚度包含包裹形状及指垫的加载响应。牛皮纸有明显速率依赖，气泡膜两档的拟合 $R^2$ 为 0.747／0.708。四类的步长、网格收敛仍待确认。 |
 
 同参试片仍用于局部接触诊断。PE 8 mm 余料／0.5 N 的偏置斜率 0.781–0.815 m/m 通过步长与局部网格复核。试片的捕获膜量、摩擦比、滑移率和刚度目前仍有网格敏感性。[聚拢对照](../runs/2026-11-20/bag/rss2027-stage1-pe-aperture-refinement-r1/gather-three-way.json) · [网格差异](../runs/2026-11-20/bag/rss2027-stage1-pe-aperture-refinement-r1/mechanism-check.json) · [滑移率](../runs/2026-11-20/bag/rss2027-stage1-pe-offcenter-convergence-r1/comparison-overload.json) · [刚度](../runs/2026-11-20/bag/rss2027-stage1-pe-aperture-width-r1/audit.json)
 
@@ -1171,11 +1171,17 @@ PE 的 5 N/s 斜率 136.5 N/m 与原检查一致，纸板同档得到 632.7 N/m�
 
 2.098 s 由接近切入闭合，首个双侧内载在 2.362 s，分别为 1.918／1.884 N。首次起抬的真实开口约 7.72 mm，夹口有 14.93 mm 参考膜量。5.752 s 在双侧仍有 3.314／3.844 N 内载时达到向上拉力 1.153 N，支撑仍为 0.282 N。1852 个原生力样本均未出现合格的双侧悬空区间。5.802 s 双指失触累计 50 ms 停止，数值峰值 0.764 mm，零告警。此样本确实发生进膜和双侧承载，随后的带支撑抽离不能用于悬空滑移率。[实际夹口膜](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-open-route/capture/capture-summary.json) · [实际内载和净向上力](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-open-route/force-summary.json)
 
+从 MuJoCo 模型读得膜和内容物的重力共 2.012 N。在正拉力最高的同一帧，按实际接触法向与原摩擦锥计算，向上合力的固定姿态上界为 1.615 N。仅将这一瞬时上界重算为统一摩擦系数 0.90 时约为 1.961 N。此结果定位该时刻圆角施力的方向限制，可与起抬改向后的真实接触轨迹比较。
+
 本轮比较原竖直起抬与同一闭合后的切向回撤。对通过数值并已真实夹入的 60% 包裹，保持完整 YAM 原闭合，起抬先沿原进给反方向回撤 60 mm，方向垂直于闭合轴。这会产生约 25.36 mm 初段抬升，再竖直补足原 350 mm 高度，两段末端速度用原 0.18 m/s。目标是让受夹膜先承受指面内拉力，检验竖直起抬时膜退出而包裹仍部分着台的现象。仅为本侧抓适配器提供显式选项。先核查含转折的完整路径可达及原标准，再各做一次 20 ms、0.30 s 零力入口和正式动作。比较起抬前实际夹口、连续双侧悬空、最大拉力、支撑和包覆。
 
 另在已通过 25 μs、0.30 s 动态静置的原 90% 样本 66、76、82 上各做一次静态开口扫掠和 YAM 逆解筛选。直接复用每个样本的静置终态和原袋、封边、内容物、质量及偏置。每个样本检查 6 个偏航和 3 个俯仰，排序按同一 8 mm 实际夹口且进给偏差 ±2 mm 的最小参考膜量。优先保留原始形状中可达、无自碰且开放路径不扫过膜或内容物的候选。选出者按原数值和真实夹持标准复验，静态筛选结果只用于选位。
 
 样本 66／76／82 的首选路径预测膜量分别为 22.60／13.49／19.52 mm。以样本 66 的 85° 偏航、15° 俯仰和实测进给 70 mm 做一次 20 ms、0.30 s 零指端力和条件完整侧抓。同批三个样本的真实内容物尺寸分别约 340 × 110 × 95、200 × 217 × 101、274 × 138 × 92 mm，保持各自的封边、偏置和原 90% 体积填充，质量均为 200 g。[三种 90% 的侧缘几何筛选](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/side-open-screen.json)
+
+样本 66 在 2.365 s 进入闭合，闭合段最大参考膜量 44.80 mm，首次起抬余 0.575 mm。1,622 个原生力样本中左主指垫始终没有标准内载。闭合中段至首抬的代表帧，双侧碰撞都在离主指垫中心约 18 mm 的前缘，左侧法向在闭合轴上的投影约 0.50，右侧约 0.85。向上拉力最多 0.982 N，随后在包裹仍有支持时失触。峰值穿透 0.393 mm、零告警。[90% 样本 66 实测夹口](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-066/side-open-route/capture/capture-summary.json) · [原生接触力](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-066/side-open-route/force-summary.json)
+
+同一通道在 75 mm 的开口扫掠仍合格，附近 ±2 mm 的最小参考膜量约 21.87 mm。80 mm 已出现扫掠冲突。追加一次仅将实测闭合起点从 70 推进至 75 mm 的对照，保持原 YAM、指垫、袋与内容物。在动态数据里对齐接触处的本地前缘偏移、首次左标准内载、初抬膜量和悬空。20 ms、0.30 s 零指端力和 1 mm 门槛沿用，作为左侧触点是否深入指面的检验。
 
 80.04% 的短入口在 0.775 ms 达到 1.076 mm，仍未通过。对该有净空且应变合格的形状单独做一轮慢速动力学制备。用同一网格与 25 μs，从 1% 刚度及零重力开始，在 0.12 s 内逐步恢复原膜刚度、铰链刚度及重力，再在原材料上静置 0.18 s。逐步记录未变更的 1 mm 原生门槛，并在检查点核对包覆和告警。通过者保存原参数下的准备态，用未改动的整袋 YAM 重新做 20 ms 与 0.30 s；失败者定位首次数值或几何失效。[80.04% 约束能量入口](../runs/2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/strain-constrained-entry/sample-090/smoke/summary.json)
 
@@ -1270,6 +1276,10 @@ PE 的 5 N/s 斜率 136.5 N/m 与原检查一致，纸板同档得到 632.7 N/m�
 
 首个 20 g 入口被准备态的质量签名拒绝，因为复制的状态来自 40 g。保留此失败记录，按原流程为 20 g 独立制备 0.50 s，沿用原袋与支撑配置，制备通过 1 mm 与完整包覆后才接入 YAM。对比报告同时保留两档准备态的实际质心和峰值深度。[20 g 输入签名失败](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/bubble-20g/smoke.log)
 
+独立制备 20 g 通过，0.50 s 峰值穿透 0.519 mm。YAM 快速提拉的正式回合通过 0.20 s 预载并撤离零载支撑，连续实际双侧跨度 0.320 s，与 40 g 相同。竖向附加 0.599 N 的采样仍有双侧承载，0.609 N 均没有左内载。20 g 此时也失去右内载，40 g 右侧还有 0.481 N。两档均未得到连续 10 ms 双侧滑动。20 g 撤台时刻第 268 帧可独立复放，追加相同 200 μs、切向 5 N/s 的一次入口及条件完整回合，考查改变重量后切向失触或滑动是否变化。[20 g 准备态](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/bubble-20g-prepared/preparation/result.json) · [20 g 竖向力—位移](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/bubble-20g-prepared/recording/load-check.json)
+
+按原竖向拟合入口，20 g 的 54 点得到 9.689 N/m、$R^2=0.708$，40 g 的 52 点得到 11.685 N/m、$R^2=0.747$。20 g 第 268 帧精确再现两侧反力，内法向为 3.704／3.542 N，初始峰值深度 0.701 mm、零支撑，切向回合已排队。[相同拟合规程](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/stiffness-comparison.json) · [20 g 切向输入](../runs/2026-11-20/bag/rss2027-stage1-material-load-ramps-r1/bubble-20g-tangent/preparation.json)
+
 ## 整袋力—位移数据集
 
 把已完成的 10 条 2 ms 整袋预载或渐增加载单独作为同一 JSON 中的曲线组。每条保留原压力、正向牵引、实际开口、附加载荷、支撑、原生双侧读数和内容物在施力方向的相对位移。只有记录了启动时刻的试验填写相对位移。导出核对原输入、接触状态时间、撤离前后门槛与原 17 条动作曲线一致性。
@@ -1311,6 +1321,8 @@ PE 的 5 N/s 斜率 136.5 N/m 与原检查一致，纸板同档得到 632.7 N/m�
 追加气泡膜 0.27 m/s 提拉的 190 个竖向预载和加载时刻，累计 13 条预载或加载曲线、9,205 个时刻。原有动作及加载曲线保持逐项一致。
 
 追加固定 60% 新侧抓的 291 个时刻，含进膜、承载、包裹仍有台面支持时失触。累计 46 条动作共 23,327 个时刻。前缀的动作及加载曲线逐项一致。
+
+追加原 90% 样本 66 的侧抓 281 个时刻，以及同形气泡膜 20 g 预载和加载 189 个时刻。累计 47 条动作共 23,608 个时刻，加载或预载 14 条共 9,394 个时刻，原有曲线前缀逐项一致。
 
 将八条已归档的完整 YAM 曲线转成 Stage 1 JSON 参考数据。包括空袋顶抓、两个同填充率带载顶抓、同参 PE 侧抓、PE 类和纸板、牛皮纸、气泡膜的松夹。按时间对齐力、真实夹口、回放膜量、指端与内容物变化和原生滑动证据。闭合行程以首个闭合样本为零点，提拉行程以首个提拉样本为零点。缺失的压力或原生滑动字段保持为空，不从内容物位移反推膜的滑移。检查原力、时间和开口逐样本一致，阶段内位移零点、时间单调以及原结果的脱手证据均可复现。数据涵盖现有较薄膜与硬挺袋的代表曲线，仍按当前材料与力学条件审核覆盖。
 

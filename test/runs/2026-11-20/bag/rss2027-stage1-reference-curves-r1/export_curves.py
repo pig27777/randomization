@@ -81,6 +81,8 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-076/ridge-rotated/recording/trial"),
     ("pe-side-fill-60percent-open-route", "pe",
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side-film-open-route/recording/trial"),
+    ("pe-side-fill-90percent-066-open-route", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-90-energy/sample-066/side-open-route/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
@@ -102,6 +104,7 @@ RAMP_CASES = (
     ("bubble-early-withdrawal", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-early-withdrawal"),
     ("pe-jaw-refined-load", "pe", "rss2027-stage1-pe-held-local-mesh-r1/full-action"),
     ("bubble-fast-lift", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-fast-lift"),
+    ("bubble-fast-lift-20g", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-20g-prepared"),
 )
 RAMP_COLUMNS = (
     "t_s", "applied_load_N", "actual_gap_m", "tension_N", "support_N", "tip_z_m", "payload_com_z_m",
