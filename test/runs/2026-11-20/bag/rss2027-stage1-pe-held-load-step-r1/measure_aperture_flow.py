@@ -16,7 +16,7 @@ feed = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(feed)
 
 
-def measure(dt, original):
+def record_flow(dt, duration, direction, begin_s=0.):
     stride = round(.002 / dt)
     previous = None
     transitions = []
@@ -24,7 +24,7 @@ def measure(dt, original):
     def sample(robot, index, values):
         nonlocal previous
         time = values[0]
-        if index % stride or not .46 <= time <= .56 + dt / 2:
+        if index % stride or not begin_s <= time <= duration + dt / 2:
             return
         row = dict(zip(replay.FIELDS, values, strict=True), t=time, phase="load", step=index)
         sim = robot.sim
@@ -42,18 +42,21 @@ def measure(dt, original):
                                     tension_N=row["tension_N"], normal_N=row["left_inner_N"] + row["right_inner_N"]))
         previous = current
 
-    result, rows = replay.run(dt, .56 + dt, "vertical", readout=sample)
-    with np.load(original.with_suffix(".npz")) as archive:
-        archived = archive["rows"]
-    np.testing.assert_array_equal(rows, archived[:len(rows)])
+    return (*replay.run(dt, duration + dt, direction, readout=sample), transitions)
+
+
+def summarize(result, rows, transitions):
     net = sum(row["entered_m"] - row["left_m"] for row in transitions)
-    np.testing.assert_allclose(net, transitions[-1]["final_m"] - transitions[0]["initial_m"], atol=1e-12, rtol=0.)
-    assert result["outcome"] == "no_loss_before_limit" and result["end_health"]["payload_geometry"]["outside_corners"] == 0
+    if transitions:
+        np.testing.assert_allclose(net, transitions[-1]["final_m"] - transitions[0]["initial_m"], atol=1e-12, rtol=0.)
     start = result["sliding_onset"]
-    ratio = start["tension_N"] / (start["left_inner_N"] + start["right_inner_N"])
-    positive = rows[:, 3] - ratio * rows[:, 5:7].sum(axis=1)
-    positive[np.argmin(abs(rows[:, 0] - start["time_s"]))] = 0.
-    qualifies = (rows[:, 9] > 0.) & (positive > 0.) & (rows[:, 0] > start["time_s"])
+    ratio = None
+    qualifies = np.zeros(len(rows), dtype=bool)
+    if start is not None:
+        ratio = start["tension_N"] / (start["left_inner_N"] + start["right_inner_N"])
+        positive = rows[:, 3] - ratio * rows[:, 5:7].sum(axis=1)
+        positive[np.argmin(abs(rows[:, 0] - start["time_s"]))] = 0.
+        qualifies = (rows[:, 9] > 0.) & (positive > 0.) & (rows[:, 0] > start["time_s"])
     starts_ends = np.flatnonzero(np.diff(np.r_[False, qualifies, False])).reshape(-1, 2)
     longest = max((float(rows[b - 1, 0] - rows[a, 0]) for a, b in starts_ends), default=0.)
     for row in transitions:
@@ -61,12 +64,23 @@ def measure(dt, original):
         row["positive_overload_with_bilateral_slip"] = bool(qualifies[a:b + 1].all())
         row["native_bilateral_sliding_through_interval"] = bool(rows[a:b + 1, 9].all())
         row["net_material_withdrawal_m"] = row["left_m"] - row["entered_m"]
+        if row["positive_overload_with_bilateral_slip"]:
+            row["overload_integral_Ns"] = float(np.trapezoid(positive[a:b + 1], rows[a:b + 1, 0]))
     slip = [row for row in transitions if row["native_bilateral_sliding_through_interval"]]
-    return dict(dt_s=dt, compared_native_steps=len(rows), source_sha256=result["source_state_sha256"],
+    return dict(dt_s=result["dt_s"], compared_native_steps=len(rows), source_sha256=result["source_state_sha256"],
                 onset=start, candidate_force_ratio=ratio, longest_bilateral_positive_overload_s=longest,
                 sample_period_s=.002, total_signed_withdrawal_m=float(-net),
                 sliding_interval_count=len(slip), signed_withdrawal_during_bilateral_slip_m=float(
                     sum(row["net_material_withdrawal_m"] for row in slip)), transitions=transitions)
+
+
+def measure(dt, original):
+    result, rows, transitions = record_flow(dt, .56, "vertical", begin_s=.46)
+    with np.load(original.with_suffix(".npz")) as archive:
+        archived = archive["rows"]
+    np.testing.assert_array_equal(rows, archived[:len(rows)])
+    assert result["outcome"] == "no_loss_before_limit" and result["end_health"]["payload_geometry"]["outside_corners"] == 0
+    return summarize(result, rows, transitions)
 
 
 def main():
