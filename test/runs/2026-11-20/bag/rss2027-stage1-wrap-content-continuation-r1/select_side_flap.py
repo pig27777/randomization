@@ -24,6 +24,7 @@ BOX_CORNERS = np.array(list(itertools.product((-1., 1.), repeat=3)))
 BOX_FACES = np.array([(0, 1, 3), (0, 3, 2), (4, 6, 7), (4, 7, 5), (0, 4, 5), (0, 5, 1),
                       (2, 3, 7), (2, 7, 6), (0, 2, 6), (0, 6, 4), (1, 5, 7), (1, 7, 3)])
 DEPTHS_M = (.078, .089, .100, .111)
+OPEN_ROUTE = CASE / "side-film-open-route"
 
 
 def box(model, data, name):
@@ -40,6 +41,14 @@ def intersects_box(volume, center, rotation, extent):
     if np.all(abs((center - pos) @ axes) < half):
         return True
     return bool(triangle_box_intersections(corners, BOX_FACES, extent, center, rotation).any())
+
+
+def capture_length(points, reference, faces, obstacles, center, axes, extent):
+    if any(intersects_box(volume, center, axes, extent) for volume in obstacles):
+        return 0.
+    clipped = faces[triangle_box_intersections(points, faces, extent, center, axes)]
+    local = (points[clipped] - center) @ axes
+    return float(aperture_material_areas(local, reference[clipped], extent)[1] / .020)
 
 
 def candidates(config, settled_qpos):
@@ -64,13 +73,7 @@ def candidates(config, settled_qpos):
         span_lengths = []
         for depth in DEPTHS_M:
             at = center + shift + depth * robot.approach
-            if any(intersects_box(volume, at, axes, extent) for volume in obstacles):
-                span_lengths.append(0.)
-                continue
-            clipped = faces[triangle_box_intersections(points, faces, extent, at, axes)]
-            local = (points[clipped] - at) @ axes
-            _, rest_area = aperture_material_areas(local, reference[clipped], extent)
-            span_lengths.append(float(rest_area / .020))
+            span_lengths.append(capture_length(points, reference, faces, obstacles, at, axes, extent))
         score = max(min(a, b) for a, b in zip(span_lengths[:-1], span_lengths[1:], strict=True))
         yield dict(yaw_deg=cfg.yaw, tilt_deg=cfg.tilt, shift_m=shift.tolist(),
                    span_equivalent_m=span_lengths, paired_depth_score_m=score)
@@ -131,6 +134,127 @@ def advance_case():
         (ADVANCE / filename).write_bytes((TARGET / filename).read_bytes())
 
 
+def swept_fingers(pads, shift, motion, points, faces, obstacles):
+    hit = []
+    for name, origin, axes in pads:
+        # This envelope contains each rounded face over the entire straight open approach.
+        half = np.array([.010, .004, .020]) + .00025 + .5 * abs(motion @ axes)
+        center = origin + shift + .5 * motion
+        film = np.flatnonzero(triangle_box_intersections(points, faces, half, center, axes))
+        rigid = [i for i, box in enumerate(obstacles) if intersects_box(box, center, axes, half)]
+        if len(film) or rigid:
+            hit.append(dict(finger=name, film_faces=film.tolist(), rigid_boxes=rigid))
+    return hit
+
+
+def finger_frames(model, data):
+    return [(name, data.geom_xpos[model.geom(name).id].copy(),
+             data.xmat[model.body(name).id].reshape(3, 3).copy()) for name in ("left_pad", "right_pad")]
+
+
+def old_open_contact():
+    trial = ADVANCE.with_name("side-film-advance-corner-half-step") / "recording/trial"
+    saved = json.loads((trial / "result.json").read_bytes())
+    cfg = backend.Config(**saved["config"])
+    with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
+        robot = backend.scene(cfg)
+    model, data = robot.sim.m, robot.sim.d
+    with np.load(trial / "trajectory.npz") as archive:
+        data.qpos[:] = archive["final_qpos"]
+    mujoco.mj_fwdPosition(model, data)
+    obstacles = [box(model, data, name) for name in ("payload_geom_0", "table")]
+    return swept_fingers(finger_frames(model, data), np.zeros(3), np.zeros(3),
+                         data.flexvert_xpos, model.flex_elem.reshape(-1, 3), obstacles)
+
+
+def open_route_candidates(config, settled_qpos, prior):
+    cfg = backend.Config(**config)
+    with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
+        robot = backend.scene(cfg)
+    model, data = robot.sim.m, robot.sim.d
+    mujoco.mj_fwdPosition(model, data)
+    pads = finger_frames(model, data)
+    center = np.mean([row[1] for row in pads], axis=0)
+    axes, extent = pads[0][2], np.array([.010, .004, .020])
+    data.qpos[:] = settled_qpos
+    mujoco.mj_fwdPosition(model, data)
+    points = data.flexvert_xpos.copy()
+    reference = robot.sim.parcel.envelope["reference"]
+    faces = robot.sim.parcel.envelope["faces"]
+    obstacles = [box(model, data, name) for name in ("payload_geom_0", "table")]
+    check = prior["yaw_deg"] == cfg.yaw and prior["tilt_deg"] == cfg.tilt
+    original = (swept_fingers(pads, prior["shift_m"], prior["close_advance_m"] * robot.approach,
+                              points, faces, obstacles) if check else None)
+    up = np.array([0., 0., 1.])
+    lateral = np.cross(up, robot.approach)
+    lateral /= np.linalg.norm(lateral)
+    rows = []
+    for across, height, depth in itertools.product(np.arange(-.060, .061, .005),
+                                                  np.arange(-.030, .041, .005),
+                                                  np.arange(.050, .111, .005)):
+        shift = across * lateral + height * up
+        motion = depth * robot.approach
+        target = center + shift + motion
+        length = capture_length(points, reference, faces, obstacles, target, axes, extent)
+        if length <= 0. or swept_fingers(pads, shift, motion + .002 * robot.approach, points, faces, obstacles):
+            continue
+        paired = min(length, *[capture_length(points, reference, faces, obstacles,
+                                               target + delta * robot.approach, axes, extent)
+                               for delta in (-.002, .002)])
+        if paired > 0.:
+            rows.append(dict(yaw_deg=cfg.yaw, tilt_deg=cfg.tilt, shift_m=shift.tolist(),
+                             close_advance_m=float(depth), paired_depth_score_m=paired))
+    return rows, original
+
+
+def prepare_open_route():
+    configs = json.loads((REFERENCE / "collision-screen.json").read_bytes())["paths"]
+    config = json.loads((ADVANCE / "config.json").read_bytes())
+    prior = json.loads((ADVANCE / "selection.json").read_bytes())["selected"]
+    trial = ADVANCE / "recording/trial/trajectory.npz"
+    with np.load(trial) as archive:
+        index = int(np.argmin(abs(archive["time"] - .3)))
+        time = float(archive["time"][index])
+        settled = archive["qpos"][index]
+    np.testing.assert_allclose(time, .3, atol=3e-5, rtol=0.)
+    scored = []
+    baseline = None
+    for row in configs:
+        if row["status"] == "reachable":
+            cfg = config | {"yaw": row["yaw_deg"], "tilt": row["tilt_deg"]}
+            choices, control = open_route_candidates(cfg, settled, prior)
+            scored.extend(choices)
+            if control is not None:
+                baseline = control
+    actual = old_open_contact()
+    if (baseline is None or not any(row["finger"] == "right_pad" and row["film_faces"] for row in baseline)
+            or not any(row["finger"] == "right_pad" and 0 in row["film_faces"] for row in actual)):
+        raise ValueError("The old static sweep and recorded stop must identify the right-finger collision")
+    scored.sort(key=lambda row: row["paired_depth_score_m"], reverse=True)
+    selected = None
+    for row in scored:
+        cfg = config | {"yaw": row["yaw_deg"], "tilt": row["tilt_deg"]}
+        try:
+            path = screen(cfg, np.asarray(row["shift_m"]), row["close_advance_m"])
+        except RuntimeError as error:
+            if not str(error).startswith(("YAM initial pose unreachable", "initial film contact penetration")):
+                raise
+            row["path"] = str(error)
+            continue
+        row["path"] = path["status"]
+        if path["status"] == "reachable":
+            selected = row | {"path_check": {key: value for key, value in path.items() if key != "trace"}}
+            break
+    OPEN_ROUTE.mkdir(exist_ok=False)
+    proof = dict(source_time_s=time, predicted_gap_m=.008, old_open_sweep_conflicts=baseline,
+                 old_actual_stop_conflicts=actual,
+                 selected=selected, candidates=scored)
+    (OPEN_ROUTE / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
+    if selected:
+        for filename, seconds in (("config.json", 0.), ("smoke.json", .02)):
+            (OPEN_ROUTE / filename).write_text(json.dumps(cfg | {"smoke_seconds": seconds}, indent=2) + "\n")
+
+
 def contact_response_case():
     case = CASE / "side-film-advance-corner-response"
     case.mkdir(exist_ok=False)
@@ -163,6 +287,8 @@ if __name__ == "__main__":
         prepare()
     elif sys.argv[1:] == ["--prepare-advance"]:
         advance_case()
+    elif sys.argv[1:] == ["--prepare-open-route"]:
+        prepare_open_route()
     elif sys.argv[1:] == ["--prepare-corner-response"]:
         contact_response_case()
     else:

@@ -29,13 +29,13 @@ def shifted_target(translation, close_advance_m=None):
     return patch.object(backend, "attach_robot", shifted)
 
 
-def screen(config, translation=None):
+def screen(config, translation=None, advance_m=.110):
     cfg = backend.Config(**config)
     placement = shifted_target(translation) if translation is not None else nullcontext()
     with placement, patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
     start = robot.initial_target
-    insertion = start + .110 * robot.approach
+    insertion = start + advance_m * robot.approach
     targets = np.vstack((np.linspace(start, insertion, 34),
                          np.linspace(insertion, insertion + [0., 0., cfg.lift_height], 71)[1:]))
     jacp, jacr = np.zeros((3, robot.sim.m.nv)), np.zeros((3, robot.sim.m.nv))

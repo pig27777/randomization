@@ -12,6 +12,7 @@ import numpy as np
 
 from replay_refined_pe import RUN, configure, experiment
 from replay_settled import settled_scene
+from settle_refined import check as settle_suspension
 
 SLIDE = RUN.with_name("rss2027-stage1-pe-held-load-step-r1")
 sys.path.insert(0, str(SLIDE))
@@ -86,10 +87,14 @@ def replay(case, source, original, setup, baseline, smoke_duration, dt):
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--prepare", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--prepare", action="store_true")
+    mode.add_argument("--relax-preload", action="store_true")
     parser.add_argument("--material", choices=("pe", "kraft"), default="pe")
     parser.add_argument("--step-us", type=float, choices=(12.5, 25.))
     args = parser.parse_args()
+    if args.relax_preload and (args.material != "kraft" or args.step_us != 12.5):
+        parser.error("Use --material kraft --step-us 12.5 with the archived 221-node grid")
     if args.material == "kraft":
         case, source = KRAFT / "mid-slide-mesh", KRAFT / "local-tangent"
         original = json.loads((KRAFT / "settled-recording/dt-50us.json").read_bytes())
@@ -115,6 +120,10 @@ def main():
             scene = partial(experiment.refined_scene, source=setup)
             with patch.object(experiment, "original_scene", setup), patch.object(experiment, "refined_scene", scene):
                 experiment.prepare()
+        elif args.relax_preload:
+            output = case / "preload"
+            output.mkdir(exist_ok=False)
+            settle_suspension(dt, output, partial(experiment.refined_scene, source=physical_scene))
         else:
             replay(case, source, original, setup, baseline, smoke, dt)
 

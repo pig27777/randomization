@@ -6,7 +6,6 @@ from pathlib import Path
 import sys
 from unittest.mock import patch
 
-import mujoco
 import numpy as np
 
 RUN = Path(__file__).resolve().parent
@@ -71,14 +70,25 @@ def prepare(case):
     (case / "preparation.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
 
 
-def execute(case):
+def execute(case, *, half_step=False, fast=False):
     robot, _, _ = scene()
     dt = float(robot.sim.m.opt.timestep)
-    for name, duration in (("smoke", .020), ("recording", 2.40)):
+    direction, rate = None, replay.RATE
+    if half_step or fast:
+        native = json.loads((case / "recording/summary.json").read_bytes())["native_load"]
+        np.testing.assert_equal(dt, native["dt_s"])
+        direction = np.asarray(native["force_direction"])
+        if half_step:
+            dt /= 2
+        else:
+            rate = 20.
+        case = case / ("half-step" if half_step else "fast-ramp")
+        case.mkdir(exist_ok=False)
+    for name, duration in (("smoke", .020), ("recording", 12. / rate)):
         output = case / name
         output.mkdir(exist_ok=False)
-        with patch.object(replay, "held_scene", scene):
-            result, rows, transitions = record_flow(dt, duration, "jaw-tangent")
+        with patch.multiple(replay, held_scene=scene, RATE=rate):
+            result, rows, transitions = record_flow(dt, duration, "jaw-tangent", force_vector=direction)
         flow = summarize(result, rows, transitions)
         beta = estimate_beta(result, flow)
         report = dict(native_load=result, material_flow=flow, beta_candidate=beta)
@@ -108,13 +118,17 @@ if __name__ == "__main__":
     command = parser.add_mutually_exclusive_group()
     command.add_argument("--prepare", action="store_true")
     command.add_argument("--compare-steps", action="store_true")
+    command.add_argument("--half-step", action="store_true")
+    command.add_argument("--fast-ramp", action="store_true")
     args = parser.parse_args()
     if args.compare_steps and args.material != "paperboard":
         parser.error("The archived comparison window is for paperboard")
+    if (args.half_step or args.fast_ramp) and args.material != "bubble":
+        parser.error("The half-step and fast-ramp whole-history controls are for bubble film")
     case = setup(args.material)
     if args.prepare:
         prepare(case)
     elif args.compare_steps:
         compare_steps(case)
     else:
-        execute(case)
+        execute(case, half_step=args.half_step, fast=args.fast_ramp)

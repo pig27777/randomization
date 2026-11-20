@@ -1,5 +1,6 @@
 """Compare the whole-bag load and separation slopes using the existing native criteria."""
 
+import argparse
 import json
 from pathlib import Path
 
@@ -51,6 +52,9 @@ def shared_force_ramp(fast, slow):
 
 
 def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--output", type=Path, default=RUN / "stiffness-comparison.json")
+    args = parser.parse_args()
     source = json.loads(DATA.read_bytes())["load_ramps"]
     results, data = [], {}
     for case in source["cases"]:
@@ -60,7 +64,7 @@ def main():
     matched = shared_force_ramp(data["kraft-clear-fast"], data["kraft-clear-slow"])
     report = dict(measurement="world-vertical tip-to-payload separation versus native finger tension",
                   sample_period_s=.002, windows_by_case=results, kraft_common_loading_force=matched)
-    with (RUN / "stiffness-comparison.json").open("x") as stream:
+    with args.output.open("x") as stream:
         stream.write(json.dumps(report, indent=2, allow_nan=False) + "\n")
 
 
