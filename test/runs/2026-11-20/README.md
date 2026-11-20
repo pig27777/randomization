@@ -74,3 +74,4 @@
 | [原 60% 顶抓](bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/) · [原 90% 约束投影](bag/rss2027-stage1-wrap-content-continuation-r1/fit90/) | 固定 60% 低能量状态，固定 90% 两种尺寸的包覆与应变 | 60% 持锁执行 `record_prepared_top.py`；90% 执行 `fit_strain_constraints.py` | 60% 压力及数值合格而空夹，侧抓排队。90% 最接近原门槛的终态最大边应变为 7.49%。 |
 | [固定 60% 侧抓](bag/rss2027-stage1-wrap-content-continuation-r1/equilibrated-entry/sample-061/side/capture/capture-summary.json) | 同低能量制备的原居中侧抓，比较其后按内容物上沿抬高 | 持锁执行对应配置的 YAM，`run_side.sh <目录>` 复用入口 | 居中侧抓峰值 0.764 mm、起抬无膜，抬高 13.644 mm 的对照排队。 |
 | [预成褶空袋](bag/rss2027-stage1-empty-creased-r1/aligned/preparation.json) | 原 142 节点双膜片保留边长，嵌入已压痕 70° 坡面，固定 PE 膜参数 | `record_creased.py --prepare` 后持锁执行同目录 `run.sh` | 可达姿态的 33.84 mm 初始膜脊装配通过，正式静置和条件夹持排队。 |
+| [跨材料六种几何](bag/rss2027-stage1-whole-bag-pressure-pilots-r1/slack-series/) | 固定 0.5 N，同类不同袋、四边封口及内容物 | 持锁执行 `run.sh` 指定六个形状。初始接触复核使用 `run_prepared_shapes.sh` | 三例入口膜—物过深停止，三例达到压力后空夹，需核对其提前接触影响。 |
