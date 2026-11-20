@@ -58,4 +58,4 @@
 
 三组用于展示几何与质量变化，分别保留抽样与动作轨迹。完整视频同步显示接近、闭合、提拉、停留和松夹。60% 组在原协议释放判定后从同一状态继续步进并录制落桌。
 
-[三组并排视频](../runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/yam-content-randomization.mp4) · [初态和抬升对照图](../runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/mujoco-comparison.png) · [抽样清单](../runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/samples.json)
+[初态和抬升对照图](../runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/mujoco-comparison.png) · [抽样清单](../runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/samples.json)

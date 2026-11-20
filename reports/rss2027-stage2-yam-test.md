@@ -32,4 +32,4 @@ ffmpeg -v error -xerror -i "$out/yam-content-randomization.mp4" -f null -
 
 检查代理的余料守恒、几何捕获和滑移耗散。录像为 1648 × 552、20 fps、338 帧、16.90 s，H.264 全片解码无错误。抽看 13.15 s 画面与原生 MuJoCo 60% 工况。三次回放里有一次离台，两次未夹住。60% 工况悬停阶段的连续低速窗为 16 ms，低于 0.20 s。
 
-[完整 MP4](../test/runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/yam-content-randomization.mp4) · [工况数据](../test/low_order_parcel/YAM_PROXY_REPORT.md#内容物随机化结果)
+MP4 保存在本地，复现命令见上。[工况数据](../test/low_order_parcel/YAM_PROXY_REPORT.md#内容物随机化结果)

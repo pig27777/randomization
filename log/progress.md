@@ -1143,4 +1143,4 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 
 - 名义 PE 侧壁能离台 53.67 mm，0.5 mm 余料对照未捕获，两组的低速悬停均未过 0.20 s。
 - 三个随机化样本中，60% 样本最高离台 124.37 mm，30% 与 90% 样本均留在桌面。
-- [16.90 s 并排视频](../test/runs/2026-11-20/bag/rss2027-stage2-yam-content-video-r1/yam-content-randomization.mp4)包含三组抓取与成功样本松夹后落桌。[工况报告](../test/low_order_parcel/YAM_PROXY_REPORT.md)。
+- 保存三组抓取轨迹与成功样本松夹后落桌的补录轨迹。[工况报告](../test/low_order_parcel/YAM_PROXY_REPORT.md)。
