@@ -65,6 +65,7 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("output", type=Path, nargs="?")
     parser.add_argument("--extract", action="store_true")
+    parser.add_argument("--shorten-dominant-contact", action="store_true")
     args = parser.parse_args()
     if args.extract:
         extract_checkpoint()
@@ -79,9 +80,25 @@ def main():
     load_start = json.loads((RECORDING / "load-check.json").read_bytes())["load_start_s"]
     initial_load = replay.RATE * (start - load_start)
     for tag, dt in (("25", .000025), ("12p5", .0000125)):
-        with patch.object(replay, "held_scene", held_scene):
+        changed = None
+
+        def probe_scene():
+            nonlocal changed
+            robot, frame, digest = held_scene()
+            if args.shorten_dominant_contact:
+                model = robot.sim.m
+                name = "left_pad" if tag == "25" else "bag self-contact"
+                response = model.geom_solref[model.geom("left_pad").id] if tag == "25" else model.flex_solref[0]
+                np.testing.assert_allclose(response, [.001, 1.], atol=1e-12, rtol=0.)
+                response[0] = .0005
+                changed = dict(contact=name, original_time_s=.001, replay_time_s=.0005)
+            return robot, frame, digest
+
+        with patch.object(replay, "held_scene", probe_scene):
             result, rows = replay.run(dt, .09, "vertical", initial_load_N=initial_load)
         result["initial_load_N"] = initial_load
+        if changed is not None:
+            result["changed_contact_response"] = changed
         filename = args.output / f"dt-{tag}us"
         filename.with_suffix(".json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
         np.savez_compressed(filename.with_suffix(".npz"), columns=np.asarray(replay.FIELDS), rows=rows)
