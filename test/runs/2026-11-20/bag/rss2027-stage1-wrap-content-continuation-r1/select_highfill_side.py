@@ -87,6 +87,7 @@ def main():
     mode.add_argument("--backoff-entry", action="store_true")
     mode.add_argument("--rounded-pad", action="store_true")
     mode.add_argument("--horizontal-entry", action="store_true")
+    mode.add_argument("--measured-entry", action="store_true", help="screen two new 90% sides with the measured opening")
     args = parser.parse_args()
     if (args.settled_entry or args.backoff_entry or args.rounded_pad or args.horizontal_entry) and args.group != "0.60":
         parser.error("The restored-entry control uses the settled 60% sample")
@@ -104,19 +105,24 @@ def main():
     if args.horizontal_entry:
         prepare_horizontal_entry()
         return
+    if args.measured_entry and args.group != "0.90":
+        parser.error("The measured-opening rescreen uses the original 90% samples")
     directory, samples, half_depth = GROUPS[args.group]
-    candidates = [sample_routes(directory, sample, half_depth, args.settled_entry) for sample in samples]
+    if args.measured_entry:
+        samples = (76, 82)
+    include_edges = args.settled_entry or args.measured_entry
+    candidates = [sample_routes(directory, sample, half_depth, include_edges) for sample in samples]
     best = max((item for item in candidates if item[2]["selected"]),
                key=lambda item: item[2]["selected"]["paired_depth_score_m"], default=None)
     report = dict(samples=[row[2] for row in candidates], best_sample=best[2]["sample"] if best else None)
-    prefix = "side-open-settled" if args.settled_entry else "side-open"
+    prefix = "side-open-measured" if args.measured_entry else "side-open-settled" if args.settled_entry else "side-open"
     with (directory / f"{prefix}-screen.json").open("x") as stream:
         stream.write(json.dumps(report, indent=2, allow_nan=False) + "\n")
     if best:
         case, config, proof = best
         output = case / f"{prefix}-route"
         output.mkdir(exist_ok=False)
-        if args.settled_entry:
+        if include_edges:
             config = restore_settled_payload(case, config, output, proof["selected"])
         (output / "selection.json").write_text(json.dumps(proof, indent=2, allow_nan=False) + "\n")
         for name, seconds in (("config", 0.), ("smoke", .020), ("settle", .30)):

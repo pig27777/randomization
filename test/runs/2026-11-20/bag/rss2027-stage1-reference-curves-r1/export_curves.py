@@ -93,6 +93,10 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-60-side-energy/sample-058/ridge-height/recording/trial"),
     ("pe-side-fill-60percent-058-rounded-pad", "pe",
      "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-60-side-energy/sample-058/side-open-rounded-pad/recording/trial"),
+    ("pe-top-fill-60percent-058-pressure-priority", "pe",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-60-side-energy/sample-058/ridge-pressure-priority/recording/trial"),
+    ("kraft-top-fill-60percent-058-ridge-45", "kraft",
+     "2026-11-20/bag/rss2027-stage1-wrap-content-continuation-r1/fold-aligned-60-materials-clearance/raised-entry/kraft/sample-058/ridge-yaw-scan/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",

@@ -189,6 +189,7 @@ def open_route_candidates(config, settled_qpos, prior=None, *, capture_half_dept
     with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
     model, data = robot.sim.m, robot.sim.d
+    data.qpos[robot.fingers] = settled_qpos[robot.fingers]
     mujoco.mj_fwdPosition(model, data)
     pads = finger_frames(model, data)
     center = np.mean([row[1] for row in pads], axis=0)

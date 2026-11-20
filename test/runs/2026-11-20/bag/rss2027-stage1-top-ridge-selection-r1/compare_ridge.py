@@ -42,14 +42,14 @@ def fold_window(surface, band):
                 r_squared=float(1. - np.square(residual).sum() / np.square(y - y.mean()).sum()))
 
 
-def summarize(name, path):
+def summarize(name, path, material="pe"):
     trial = path / "recording/trial"
     result = load_json(trial / "result.json")
     summary = {"outcome": result["outcome"], "reason": result["reason"], "peaks": result["peaks"],
                "pressure": result["normal_press"]}
     if not (path / "capture/capture-audit.csv").exists():
         return summary
-    record = export_case(name, "pe", trial.relative_to(ROOT / "test/runs"), {})
+    record = export_case(name, material, trial.relative_to(ROOT / "test/runs"), {})
     positions = replay(record, {name: i for i, name in enumerate(COLUMNS)})
     surface = read_case(path)
     with (path / "capture/capture-audit.csv").open(newline="") as stream:

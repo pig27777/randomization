@@ -134,7 +134,12 @@ def record_with_braking_height(height=None):
     save_state = height is not None and height.get("record_integration_state", False)
     state_recording = (patch.multiple(backend, create=True, STATE_SPEC=INTEGRATION_SPEC,
                                       record_state=integration_state) if save_state else nullcontext())
-    with placement, patch.object(protocol, "NormalPress", controller), state_recording:
+    disabled = height.get("disabled_pad_geoms", ()) if height is not None else ()
+    geometry = nullcontext()
+    if disabled:
+        from select_side_flap import local_pad_contacts
+        geometry = local_pad_contacts({}, disabled)
+    with placement, patch.object(protocol, "NormalPress", controller), state_recording, geometry:
         record()
 
 

@@ -1,6 +1,8 @@
 """Compare two gathering meshes at the same observed normal pressure and travel."""
 
+import argparse
 import json
+from pathlib import Path
 
 import mujoco
 import numpy as np
@@ -15,7 +17,7 @@ CLOSURE_S = .20
 SPEED_M_S = .008
 
 
-def run(robot):
+def run(robot, preload_limit_s, closure_s):
     sim = robot.sim
     m, d = sim.m, sim.d
     m.opt.timestep = DT
@@ -31,8 +33,8 @@ def run(robot):
     load_start = None
     consecutive = 0
     stride = round(.020 / DT)
-    closure_steps = round(CLOSURE_S / DT)
-    preload_steps = round(PRELOAD_LIMIT_S / DT)
+    closure_steps = round(closure_s / DT)
+    preload_steps = round(preload_limit_s / DT)
     preload, samples = [], []
     outcome = "preload timeout"
     for step in range(preload_steps + closure_steps + 1):
@@ -53,6 +55,8 @@ def run(robot):
         if load_start is None:
             if step % stride == 0:
                 preload.append(dict(time_s=float(d.time), pressure_N=down, direct_support_N=support))
+                if step % (stride * 25) == 0:
+                    print(f"{m.nflexvert} nodes at {step * DT:.3f} s preload, {down:.6f} N", flush=True)
             consecutive = consecutive + 1 if qualified and .4 <= press.filtered_N <= .6 else 0
             if consecutive >= round(press.hold_s / DT):
                 load_start = step
@@ -126,12 +130,20 @@ def fit_common(runs):
 
 
 def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--preload-limit-s", type=float, default=PRELOAD_LIMIT_S)
+    parser.add_argument("--closure-s", type=float, default=CLOSURE_S)
+    parser.add_argument("--output", type=Path, default=OUTPUT / "matched-pressure.json")
+    args = parser.parse_args()
+    if any(not np.isfinite(value) or value < .020 for value in (args.preload_limit_s, args.closure_s)):
+        parser.error("Preload and closure budgets must be finite and at least 20 ms")
     coarse, refined, *_ = load_pair()
-    runs = [run(robot) for robot in (coarse, refined)]
+    runs = [run(robot, args.preload_limit_s, args.closure_s) for robot in (coarse, refined)]
     comparison = fit_common(runs)
     result = dict(dt_s=DT, mesh_vertices=[coarse.sim.m.nflexvert, refined.sim.m.nflexvert],
-                  pressure_target_N=TARGET_N, runs=runs, comparison=comparison)
-    with (OUTPUT / "matched-pressure.json").open("x") as stream:
+                  pressure_target_N=TARGET_N, preload_limit_s=args.preload_limit_s, closure_s=args.closure_s,
+                  runs=runs, comparison=comparison)
+    with args.output.open("x") as stream:
         stream.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
     print([trial["outcome"] for trial in runs], comparison, flush=True)
 

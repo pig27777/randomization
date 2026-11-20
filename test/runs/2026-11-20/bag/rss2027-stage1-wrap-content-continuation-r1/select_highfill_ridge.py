@@ -1,6 +1,7 @@
 """Find a reachable natural ridge on a settled whole-bag pressure reference."""
 
 import argparse
+from contextlib import nullcontext
 import itertools
 import json
 from pathlib import Path
@@ -17,10 +18,14 @@ CASE = RUN / "fold-aligned-90-energy/sample-076"
 ROOT = RUN.parents[4]
 
 
-def check_path(config, center, film_height):
-    cfg = backend.Config(**config)
-    with at_top_center(center), patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
-        robot = backend.scene(cfg)
+def top_robot(cfg, center):
+    wrap = (patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry))
+            if cfg.geometry.endswith("/prepared_mesh.npz") else nullcontext())
+    with at_top_center(center), wrap:
+        return backend.scene(cfg)
+
+
+def check_path(cfg, robot, center, film_height):
     start = robot.initial_target
     tip_offset = start[2] - protocol.tips(robot).mean(axis=0)[2]
     seating = np.r_[center, film_height + tip_offset - .003]
@@ -46,7 +51,10 @@ def check_path(config, center, film_height):
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--case", type=Path, default=CASE)
-    parser.add_argument("--rotate", action="store_true", help="turn the same package 180 degrees on its support")
+    parser.add_argument("--output", type=Path, help="save a new screen without changing the source run")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--rotate", action="store_true", help="turn the same package 180 degrees on its support")
+    mode.add_argument("--yaw-scan", action="store_true", help="compare 12 top-gripper headings on the same parcel")
     args = parser.parse_args()
     case = args.case.resolve()
     trial = case / "settle/trial"
@@ -55,18 +63,17 @@ def main():
     cfg = json.loads(config.read_bytes()) if config.is_file() else result["config"]
     body_size = np.asarray(cfg["payload_size"][:2])
     offset = np.asarray(cfg["payload_offset_xy"])
-    if result["outcome"] != "smoke_only" or result["sim_time_s"] < .3 or result["peaks"]["grip_N"]:
+    if (result["outcome"] != "smoke_only" or result["sim_time_s"] < .3 or result["warnings"]
+            or result["peaks"]["grip_N"] or result["peaks"]["down_N"] or result["peaks"]["penetration_mm"] > 1.):
         raise ValueError("The ridge search requires a clean settled parcel")
     model = mujoco.MjModel.from_binary_path(str(trial / "model.mjb"))
     data = mujoco.MjData(model)
     with np.load(trial / "trajectory.npz") as archive:
-        data.qpos[:] = archive["qpos"][0]
-        mujoco.mj_fwdPosition(model, data)
-        global_height = float(data.flexvert_xpos[:, 2].max() + model.flex_radius[0])
         data.qpos[:] = archive["final_qpos"]
         mujoco.mj_fwdPosition(model, data)
     triangles = data.flexvert_xpos[model.flex_elem.reshape(-1, 3)]
-    target = case / ("ridge-rotated" if args.rotate else "ridge-height")
+    name = "ridge-yaw-scan" if args.yaw_scan else "ridge-rotated" if args.rotate else "ridge-height"
+    target = args.output.resolve() if args.output is not None else case / name
     target.mkdir(exist_ok=False)
     if args.rotate:
         triangles[:, :, :2] = 2. * CENTER - triangles[:, :, :2]
@@ -79,19 +86,33 @@ def main():
         np.savez_compressed(rotated, **asset)
         cfg.update(geometry=f"../{rotated.relative_to(ROOT)}", payload_offset_xy=offset.tolist())
     axes = [np.linspace(-size / 2 - .01, size / 2 + .01, 18) for size in body_size]
-    candidates = [row for x, y in itertools.product(*axes)
-                  if (row := position(CENTER + offset + [x, y], cfg.get("yaw", 0.), triangles)) is not None
-                  and row["pad_height_difference_m"] <= .002 and row["ridge_over_pads_m"] >= .002]
+    yaws = list(range(0, 180, 15)) if args.yaw_scan else [cfg.get("yaw", 0.)]
+    footprints = [row for yaw, x, y in itertools.product(yaws, *axes)
+                  if (row := position(CENTER + offset + [x, y], yaw, triangles)) is not None]
+    balanced = [row for row in footprints if row["pad_height_difference_m"] <= .002]
+    candidates = [row for row in balanced if row["ridge_over_pads_m"] >= .002]
     candidates.sort(key=lambda row: -row["ridge_over_pads_m"])
     selected = None
     for candidate in candidates:
-        shift = np.asarray(candidate["center_xy_m"]) - CENTER
-        heights = [surface_below_pad(model, data, name, triangles, shift) for name in ("left_pad", "right_pad")]
-        if abs(heights[0] - heights[1]) > .002:
-            candidate["path"] = {"status": "uneven_open_pad_surfaces", "pad_surfaces_m": heights}
-            continue
+        center = np.asarray(candidate["center_xy_m"])
+        config = backend.Config(**(cfg | {"yaw": candidate["yaw_deg"]}))
         try:
-            check = check_path(cfg, candidate["center_xy_m"], max(heights))
+            if args.yaw_scan:
+                robot = top_robot(config, center)
+                robot.sim.d.qpos[robot.fingers] = config.grasp_opening_m / 2.
+                mujoco.mj_fwdPosition(robot.sim.m, robot.sim.d)
+                footprint = robot.sim.m, robot.sim.d, np.zeros(2)
+            else:
+                footprint = model, data, center - CENTER
+            native_model, native_data, shift = footprint
+            heights = [surface_below_pad(native_model, native_data, name, triangles, shift)
+                       for name in ("left_pad", "right_pad")]
+            if abs(heights[0] - heights[1]) > .002:
+                candidate["path"] = {"status": "uneven_open_pad_surfaces", "pad_surfaces_m": heights}
+                continue
+            if not args.yaw_scan:
+                robot = top_robot(config, center)
+            check = check_path(config, robot, center, max(heights))
         except RuntimeError as error:
             if not str(error).startswith(("YAM initial pose unreachable", "initial film contact penetration")):
                 raise
@@ -99,15 +120,23 @@ def main():
         candidate["path"] = check
         if check["status"] == "reachable":
             selected = candidate | dict(settled_pad_surfaces_m=heights)
+            cfg["yaw"] = candidate["yaw_deg"]
             break
-    report = dict(package_rotation_deg=180. if args.rotate else 0., candidates=candidates, selected=selected)
+    report = dict(source_case=case.relative_to(ROOT).as_posix(),
+                  package_rotation_deg=180. if args.rotate else 0., yaws_deg=yaws,
+                  footprint_count=len(footprints), balanced_count=len(balanced),
+                  best_balanced=max(balanced, key=lambda row: row["ridge_over_pads_m"], default=None),
+                  candidates=candidates, selected=selected)
     (target / "selection.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n")
     if selected is None:
         return
-    height = dict(source_time_s=result["sim_time_s"], global_braking_surface_m=global_height,
+    height = dict(source_time_s=result["sim_time_s"],
+                  global_braking_surface_m=float(robot.initial_target[2] - config.press_start_offset_m),
                   settled_pad_surfaces_m=selected["settled_pad_surfaces_m"],
                   local_braking_surface_m=max(selected["settled_pad_surfaces_m"]),
                   target_center_xy_m=selected["center_xy_m"])
+    if args.yaw_scan:
+        height["record_integration_state"] = True
     (target / "height.json").write_text(json.dumps(height, indent=2, allow_nan=False) + "\n")
     for name, seconds in (("config", 0.), ("smoke", .02), ("settle", .30)):
         inputs = cfg | {"smoke_seconds": seconds, "wall_limit": 1800.}
