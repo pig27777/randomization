@@ -9,6 +9,7 @@ import numpy as np
 from record_local_top import RUN, at_top_center, backend
 from refine_parcel import physical_parcel, prepared_wrap
 from measure_surface_excess import aperture_box, areas
+from rss2027_yam_capture_audit import aperture_material_areas
 
 CASE = RUN / "fold-aligned-60-side-energy/sample-058/ridge-height"
 
@@ -54,11 +55,15 @@ def aperture_observation(robot, measurement):
     model, data = sim.m, sim.d
     pad = model.geom_bodyid[robot.pad_geom[0]]
     center, axes, half = aperture_box(data, data.geom_xpos[robot.pad_geom], pad, gap)
-    triangles = ((data.flexvert_xpos - center) @ axes)[sim.parcel.envelope["faces"]]
+    faces = sim.parcel.envelope["faces"]
+    triangles = ((data.flexvert_xpos - center) @ axes)[faces]
     spatial, projection = areas(triangles, half) if gap > 0. else (0., 0.)
+    reference = aperture_material_areas(triangles, sim.parcel.envelope["reference"][faces], half)[1] if gap > 0. else 0.
+    width = 2. * half[0]
     pressure = max(0., sum(vector[2] for vector in measurement["force_on_fingers_N"]))
     return dict(time_s=float(data.time), pressure_N=pressure, direct_support_N=measurement["direct_support_N"],
-                actual_gap_m=gap, extra_length_m=(spatial - projection) / (2. * half[0]),
+                actual_gap_m=gap, extra_length_m=(spatial - projection) / width,
+                reference_length_m=reference / width, reference_excess_m=(reference - projection) / width,
                 penetration_mm=measurement["penetration_mm"])
 
 

@@ -96,20 +96,33 @@ def fit_common(runs):
     fits = []
     for x, data in traces:
         values = np.interp(positions, x, [row["extra_length_m"] for row in data])
+        reference = np.interp(positions, x, [row["reference_excess_m"] for row in data])
         pressure = np.interp(positions, x, [row["pressure_N"] for row in data])
         times = np.interp((low, high), x, [row["time_s"] for row in data])
         duration = float(times[1] - times[0])
         growth = float(values[-1] - values[0])
+        reference_growth = float(reference[-1] - reference[0])
         fits.append(dict(duration_s=duration, growth_m=growth, pressure_N=float(pressure.mean()),
                          slope_m_per_m=float(np.polyfit(positions, values, 1)[0]),
-                         eligible=duration >= .020 - 1e-9 and growth >= .00025))
+                         eligible=duration >= .020 - 1e-9 and growth >= .00025,
+                         reference_growth_m=reference_growth,
+                         reference_slope_m_per_m=float(np.polyfit(positions, reference, 1)[0]),
+                         reference_eligible=duration >= .020 - 1e-9 and reference_growth >= .00025))
     changes = {}
     for field in ("growth_m", "slope_m_per_m", "pressure_N"):
         if fits[0][field]:
             changes[field] = fits[1][field] / fits[0][field] - 1.
+    reference_changes = {}
+    for field in ("reference_growth_m", "reference_slope_m_per_m"):
+        if fits[0][field]:
+            reference_changes[field] = fits[1][field] / fits[0][field] - 1.
     passed = (len(changes) == 3 and all(fit["eligible"] for fit in fits)
               and all(abs(change) <= .10 for change in changes.values()))
-    return dict(common_travel_interval_m=[float(low), float(high)], fits=fits, relative_change=changes, passed=passed)
+    reference_passed = (len(reference_changes) == 2 and all(fit["reference_eligible"] for fit in fits)
+                        and all(abs(change) <= .10 for change in reference_changes.values())
+                        and abs(changes["pressure_N"]) <= .10)
+    return dict(common_travel_interval_m=[float(low), float(high)], fits=fits, relative_change=changes, passed=passed,
+                reference_relative_change=reference_changes, reference_passed=reference_passed)
 
 
 def main():
