@@ -34,6 +34,10 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/earlier-lift/recording/trial"),
     ("pe-top-ridge-faster-approach", "pe",
      "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/faster-approach/recording/trial"),
+    ("pe-top-anchored-sweep", "pe",
+     "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/anchored-sweep/recording/trial"),
+    ("pe-top-seated-close", "pe",
+     "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/seated-close/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",

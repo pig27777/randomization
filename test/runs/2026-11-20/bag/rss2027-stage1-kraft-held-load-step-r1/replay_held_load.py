@@ -68,7 +68,7 @@ def jaw_axis(robot):
     return inward / np.linalg.norm(inward), (left + right) / 2.
 
 
-def run(dt, limit, load_mode, force_vector=None):
+def run(dt, limit, load_mode, force_vector=None, *, readout=None):
     robot, index, fingerprint = held_scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
@@ -110,6 +110,8 @@ def run(dt, limit, load_mode, force_vector=None):
         sliding_now = i > 0 and bilateral and tension > .001 and (sliding >= .5 * normal).all()
         axial_load = float(load * (direction @ jaw_axis(robot)[0]))
         rows.append((elapsed, load, gap, tension, support, *normal, *sliding, sliding_now, grip, depth, axial_load))
+        if readout is not None:
+            readout(robot, i, rows[-1])
         if i == 0 and (not bilateral or force @ down <= .001):
             raise ValueError("Restored state is missing bilateral suspension")
         if depth > 1. or sim.d.warning.number.any():

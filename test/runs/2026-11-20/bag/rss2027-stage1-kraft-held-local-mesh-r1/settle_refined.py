@@ -12,7 +12,7 @@ RUN = Path(__file__).resolve().parent
 BASE_HOLD_S = .20
 
 
-def check(dt, output, scene):
+def check(dt, output, scene, *, adjust_gripper=None):
     robot, frame, fingerprint = scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
@@ -25,10 +25,13 @@ def check(dt, output, scene):
     for index in range(round(.45 / dt)):
         time = float(sim.d.time) - start
         gap = robot.gap()
+        if adjust_gripper is not None:
+            adjust_gripper(robot, gap, dt)
         sim.step()
         contacts = contact_loads(robot)
-        rows.append((time, gap, *contacts["inner_N"], contacts["tension_N"],
-                     contacts["support_N"], contacts["penetration_mm"], contacts["qualified"]))
+        row = (time, gap, *contacts["inner_N"], contacts["tension_N"],
+               contacts["support_N"], contacts["penetration_mm"], contacts["qualified"])
+        rows.append(row if adjust_gripper is None else (*row, sim.d.ctrl[robot.gripper]))
         if sim.d.warning.number.any() or contacts["penetration_mm"] > 1.:
             status = "numerical_gate"
             break
@@ -45,12 +48,15 @@ def check(dt, output, scene):
                 break
         else:
             run_start = None
-    np.testing.assert_array_equal(sim.d.ctrl, command)
+    unchanged = np.arange(len(command)) != robot.gripper if adjust_gripper is not None else slice(None)
+    np.testing.assert_array_equal(sim.d.ctrl[unchanged], command[unchanged])
     np.testing.assert_array_equal(sim.d.xfrc_applied, 0.)
     data = np.asarray(rows)
     stem = output / ("dt-" + f"{dt * 1e6:g}".replace(".", "p") + "us")
     names = ("time_s", "actual_gap_m", "left_inner_N", "right_inner_N", "tension_N",
              "support_N", "penetration_mm", "bilateral")
+    if adjust_gripper is not None:
+        names += ("gripper_command_m",)
     np.savez_compressed(stem.with_suffix(".npz"), rows=data, columns=np.asarray(names),
                         final_state=integration_state(sim))
     result = dict(dt_s=dt, source_frame=frame, source_sha256=fingerprint, outcome=status, physics_steps=len(rows),

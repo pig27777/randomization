@@ -10,7 +10,7 @@ import numpy as np
 
 RUN = Path(__file__).resolve().parent
 sys.path.insert(0, str(RUN.with_name("rss2027-stage1-randomized-wrap-tangent-r1")))
-from relax_tangent import edge_targets, incident_faces, MIN_GAP, relax_once  # noqa: E402
+from relax_tangent import edge_targets, incident_faces, MIN_GAP, relax_once, separating_planes  # noqa: E402
 from project_volume import ASSET_VERTICES, DESIGN, FACES, PANELS, RADIUS, measurements  # noqa: E402
 from bag_sim.legacy.contents import normalize_contents  # noqa: E402
 from bag_sim.wrap import panel_pairs, wrap_generic  # noqa: E402
@@ -20,7 +20,23 @@ GROWTH_LEVELS = 32
 STEPS_PER_LEVEL = 80
 
 
-def evaluate(sample, design, destination, strain_band, extra_final_steps, clearance_m, save_highest):
+def grow_near_contents(local, previous_half, new_half, adjacent):
+    normals, bounds = separating_planes(local, previous_half)
+    bounds += abs(normals) @ (new_half - previous_half)
+    directions = normals[adjacent]
+    limits = np.where(adjacent >= 0, bounds[adjacent], -np.inf)
+    proposed = local.copy()
+    for _ in range(32):
+        for direction, limit in zip(directions.transpose(1, 0, 2), limits.T, strict=True):
+            violation = np.maximum(limit - np.einsum("ij,ij->i", proposed, direction), 0.)
+            proposed += violation[:, None] * direction
+        distances = np.einsum("nki,ni->nk", directions, proposed)
+        if float(np.max(limits - distances)) <= 1e-10:
+            return proposed
+    return None
+
+
+def evaluate(sample, design, destination, strain_band, extra_final_steps, clearance_m, save_highest, local_growth=False):
     row = design[sample - 1]
     width = np.array([float(row[f"inside_{axis}_m"]) for axis in "xy"])
     offset = np.array([float(row[f"offset_{axis}_m"]) for axis in "xy"])
@@ -45,9 +61,16 @@ def evaluate(sample, design, destination, strain_band, extra_final_steps, cleara
     previous_scale = base
     best = best_pose = None
     for level, scale in enumerate(np.linspace(base, 1., GROWTH_LEVELS + 1)):
-        local = local * (scale / previous_scale)
-        previous_scale = scale
         half = target * scale / 2. + clearance_m
+        if local_growth and level:
+            proposed = grow_near_contents(local, item["half_size"], half, adjacent)
+            if proposed is None:
+                result.setdefault("levels_needing_global_scale", []).append(level)
+                proposed = local * (scale / previous_scale)
+            local = proposed
+        else:
+            local = local * (scale / previous_scale)
+        previous_scale = scale
         item["half_size"] = half
         steps = STEPS_PER_LEVEL + (extra_final_steps if level == GROWTH_LEVELS else 0)
         for _ in range(steps):
@@ -87,6 +110,7 @@ def main():
     parser.add_argument("--box-clearance-mm", type=float, default=0.)
     parser.add_argument("--save-highest", type=int, nargs="+", choices=CASES, default=[])
     parser.add_argument("--groups", choices=("0.60", "0.90"), nargs="+")
+    parser.add_argument("--local-growth", action="store_true")
     args = parser.parse_args()
     if not 0. <= args.strain_band < .05:
         parser.error("--strain-band must be within [0, 0.05)")
@@ -103,7 +127,7 @@ def main():
     for sample in samples:
         try:
             case = evaluate(sample, design, args.output, args.strain_band, args.extra_final_steps,
-                            args.box_clearance_mm * 1e-3, sample in args.save_highest)
+                            args.box_clearance_mm * 1e-3, sample in args.save_highest, args.local_growth)
         except ValueError as error:
             if not args.groups or not str(error).startswith(("Content does not fit inside",
                     "Starting triangle has no exterior halfspace", f"Sample {sample} lost enclosure at level")):
@@ -122,6 +146,8 @@ def main():
             result["box_clearance_mm"] = args.box_clearance_mm
         if args.groups:
             result["groups"] = args.groups
+        if args.local_growth:
+            result["local_growth"] = True
         stream.write(json.dumps(result, indent=2) + "\n")
 
 
