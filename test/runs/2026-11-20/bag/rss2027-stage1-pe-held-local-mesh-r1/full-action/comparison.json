@@ -1,0 +1,105 @@
+{
+  "mesh_vertices": [
+    142,
+    189
+  ],
+  "cases": {
+    "coarse": {
+      "dt_s": 2.5e-05,
+      "rate_N_s": 5.0,
+      "numerical_ok": true,
+      "peak_penetration_mm": 0.8429296848985464,
+      "peak_tension_N": 12.119415906104248,
+      "outcome": "grasp_fail",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "samples": 914,
+      "ramp_started": true,
+      "withdrawal": {
+        "support_z_m": [
+          -0.425,
+          -0.5
+        ],
+        "floor_clearance_at_withdrawal_m": 0.245384706935742,
+        "outside_corners": 0,
+        "intersecting_triangles": 0
+      },
+      "both_sliding_samples": 24,
+      "continuous_bilateral_s": 0.028000000000929504,
+      "first_sustained_bilateral_sliding": {
+        "t_s": 8.874025000013704,
+        "applied_load_N": 2.569875000085311,
+        "actual_gap_m": 0.006702069435971167,
+        "tension_N": 6.087166113886688,
+        "left_inner_N": 3.6711955446864044,
+        "right_inner_N": 1.869494795920724,
+        "left_sliding_N": 3.6711955446864044,
+        "right_sliding_N": 1.869494795920724,
+        "native_bilateral_sliding": true,
+        "bilateral_held": true,
+        "support_N": 0.0,
+        "tip_z_m": 0.5074607025538604,
+        "payload_com_z_m": 0.29098493853696517,
+        "max_finger_contact_N": 10.619493274387855
+      },
+      "final_loss_sample": {
+        "t_s": "9.938025000049025",
+        "applied_load_N": "7.889875000261917",
+        "actual_gap_m": "0.009833103464178134",
+        "tension_N": "-0.0",
+        "left_inner_N": "0.0",
+        "right_inner_N": "0.0",
+        "left_sliding_N": "0.0",
+        "right_sliding_N": "0.0",
+        "native_bilateral_sliding": "False",
+        "bilateral_held": "False",
+        "support_N": "0.0",
+        "tip_z_m": "0.48333531957500275",
+        "payload_com_z_m": "0.23524002011324632",
+        "max_finger_contact_N": "0.0"
+      },
+      "peak_support_through_loss_N": 0.0,
+      "unsupported_loss": true,
+      "qualified_preload_samples": 101,
+      "onset": {
+        "applied_load_N": 2.569875000085311,
+        "actual_gap_m": 0.006702069435971167,
+        "tension_N": 6.087166113886688,
+        "left_inner_N": 3.6711955446864044,
+        "right_inner_N": 1.869494795920724,
+        "force_ratio": 1.0986295460828226
+      }
+    },
+    "fine": {
+      "dt_s": 2.5e-05,
+      "rate_N_s": 5.0,
+      "numerical_ok": false,
+      "peak_penetration_mm": 1.4252571892798318,
+      "peak_tension_N": 11.292957559154795,
+      "outcome": "sim_fail",
+      "reason": "film/payload geometry exceeds 1 mm or exposes a payload corner",
+      "samples": 470,
+      "ramp_started": true,
+      "withdrawal": {
+        "support_z_m": [
+          -0.425,
+          -0.5
+        ],
+        "floor_clearance_at_withdrawal_m": 0.23516421250440894,
+        "outside_corners": 1,
+        "intersecting_triangles": 1
+      },
+      "both_sliding_samples": 3,
+      "continuous_bilateral_s": 0.004000000000132786,
+      "first_sustained_bilateral_sliding": null,
+      "final_loss_sample": null,
+      "peak_support_through_loss_N": null,
+      "unsupported_loss": false,
+      "qualified_preload_samples": 101,
+      "onset": null
+    }
+  },
+  "onset": null,
+  "detachment": {
+    "comparable": false
+  }
+}

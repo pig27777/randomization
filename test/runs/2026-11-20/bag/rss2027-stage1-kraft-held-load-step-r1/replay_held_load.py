@@ -68,7 +68,7 @@ def jaw_axis(robot):
     return inward / np.linalg.norm(inward), (left + right) / 2.
 
 
-def run(dt, limit, load_mode, force_vector=None, *, readout=None):
+def run(dt, limit, load_mode, force_vector=None, *, readout=None, initial_load_N=0.):
     robot, index, fingerprint = held_scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
@@ -95,7 +95,7 @@ def run(dt, limit, load_mode, force_vector=None, *, readout=None):
     wall_start = time.perf_counter()
     for i in range(round(limit / dt)):
         elapsed = float(sim.d.time) - start
-        load = RATE * elapsed
+        load = initial_load_N + RATE * elapsed
         gap = robot.gap()
         sim.d.xfrc_applied[payload, :3] = load * direction
         sim.step()

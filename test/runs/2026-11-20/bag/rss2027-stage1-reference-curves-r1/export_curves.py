@@ -44,6 +44,7 @@ CASES = (
     ("paperboard-top-0p5N", "paperboard",
      "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/paperboard/recording/trial"),
     ("kraft-top-0p5N", "kraft", "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/kraft/recording/trial"),
+    ("pe-jaw-refined-189", "pe", "2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/full-action/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
@@ -63,6 +64,7 @@ RAMP_CASES = (
     ("bubble-127mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble"),
     ("bubble-130mm", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-130mm"),
     ("bubble-early-withdrawal", "bubble", "rss2027-stage1-material-load-ramps-r1/bubble-early-withdrawal"),
+    ("pe-jaw-refined-load", "pe", "rss2027-stage1-pe-held-local-mesh-r1/full-action"),
 )
 RAMP_COLUMNS = (
     "t_s", "applied_load_N", "actual_gap_m", "tension_N", "support_N", "tip_z_m", "payload_com_z_m",
