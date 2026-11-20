@@ -32,12 +32,15 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--step-us", type=float, choices=(25., 12.5), default=25.)
+    parser.add_argument("--duration-s", type=float, default=2.4)
     args = parser.parse_args()
+    if not np.isfinite(args.duration_s) or not 0. < args.duration_s <= 2.4:
+        parser.error("the loading duration must be in (0, 2.4] seconds")
     replay.SOURCE = RUN.with_name("rss2027-stage1-material-load-ramps-r1") / "pe/recording"
     replay.CHECKPOINT = RUN / "held-state.npz"
     args.output.mkdir(exist_ok=False)
     dt = args.step_us * 1e-6
-    result, rows, samples = record_flow(dt, .02 if args.smoke else 2.4, "jaw-tangent")
+    result, rows, samples = record_flow(dt, .02 if args.smoke else args.duration_s, "jaw-tangent")
     readout = summarize(result, rows, samples)
     estimate = estimate_beta(result, readout)
     report = dict(native_load=result, beta_candidate=estimate, material_flow=readout)
