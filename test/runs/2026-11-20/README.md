@@ -124,3 +124,10 @@
 | [共享接触集合](bag/rss2027-stage1-pe-held-local-mesh-r1/mid-slide-mesh/contact-shared-manifold.json) · [同质量运动对照](bag/rss2027-stage1-pe-held-local-mesh-r1/mid-slide-mesh/interpolated-contact-study.json) | 从同一 PE 滑动态对照原生接触配置与中点自由度 | 持锁 `compare_contact_mobility.py --paired-only`、`compare_interpolated_contacts.py` | ubun，七对共享接触仍有 74%–79% 力差。117 条中点约束使原细档质量的切向拉力相近，双侧内载仍超差。 |
 | [共享触点与中点约束](bag/rss2027-stage1-pe-held-local-mesh-r1/mid-slide-mesh/interpolated-shared-contact-study.json) | 比较同一悬空态的额外触点和中点约束 | 持锁 `compare_interpolated_contacts.py --shared-contacts` | ubun，细档切向载荷低 88.0%，两侧内载同样超过 10%，无动态验收候选。 |
 | [同实际开口末轮](bag/rss2027-stage1-wrap-content-continuation-r1/pe-faster-ridge-source/local-mesh-window/paired-absolute-opening.json) · [切向探索入口](bag/rss2027-stage1-pe-held-local-mesh-r1/full-action/tangent-replay/smoke/summary.json) | PE 最后聚拢对照和撤台后切向入口 | 持锁 `match_ridge_pressure.py --centered-control --matched-opening --preload-opening-tolerance-mm .15 --closure-s 1.05 --preload-limit-s 2.0`、`replay_refined_tangent.py --smoke` | ubun，聚拢未通过跨网格，短入口峰值 0.065 mm，切向完整回合已按用户冻结中止。 |
+| [完整 YAM 并行测速](../../bag_model/YAM_BATCH_GRASP_REPORT.md) · [数据目录](bag/yam-batch-full-grasp-r1/) | 冻结 142 节点资产的 8,000 路入口和完整抓取吞吐 | 持锁 `test/bag_model/rss2027_yam_batch_grasp.py` | ubun。200 Hz 完整入口在 0.025 s 失效。200 μs 悬停短窗 18,536 环境步/s，完整 8,000 路动作已启动。 |
+
+## Stage 2 双指低阶代理
+
+| 运行 | 对象与问题 | 命令 | 状态 |
+| --- | --- | --- | --- |
+| [2 ms 结果](../stage2_freeze/alignment_report.json) · [1 ms 结果](../stage2_freeze/dt-1ms/alignment_report.json) | 双指柔索代理与刚体底座，四材质六类对齐 | 持锁执行 `src/low_order_parcel/verify_stage2_alignment.py`，1 ms 增加 `--dt .001` 和专用输出路径 | `ubun` CPU，两档各通过六类门禁。[冻结报告](../../../docs/STAGE2_FREEZE_REPORT.md) · [命令与回归](../../../reports/rss2027-stage2-test.md) |
