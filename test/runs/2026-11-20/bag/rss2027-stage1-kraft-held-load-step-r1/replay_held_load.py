@@ -162,12 +162,15 @@ def main():
     parser.add_argument("--direction", choices=("vertical", "jaw-tangent"), default="vertical")
     parser.add_argument("--force-vector", type=float, nargs=3)
     parser.add_argument("--step-us", type=float, nargs="+", choices=(12.5, 25, 50, 100), default=(100, 50))
+    parser.add_argument("--duration-s", type=float, default=2.4)
     args = parser.parse_args()
     if args.extract:
         extract_state()
         return
     if args.output is None:
         parser.error("specify an output directory")
+    if not np.isfinite(args.duration_s) or not 0. < args.duration_s <= 2.4:
+        parser.error("the loading duration must be in (0, 2.4] seconds")
     vector = None
     mode = args.direction
     if args.force_vector is not None:
@@ -180,7 +183,7 @@ def main():
     args.output.mkdir(exist_ok=False)
     for step_us in args.step_us:
         dt = step_us / 1e6
-        result, rows = run(dt, .02 if args.smoke else 2.4, mode, vector)
+        result, rows = run(dt, .02 if args.smoke else args.duration_s, mode, vector)
         stem = args.output / ("dt-" + f"{step_us:g}".replace(".", "p") + "us")
         stem.with_suffix(".json").write_text(json.dumps(result, indent=2) + "\n")
         np.savez_compressed(stem.with_suffix(".npz"), columns=np.asarray(FIELDS), rows=rows)

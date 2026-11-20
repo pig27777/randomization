@@ -49,7 +49,7 @@ COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
     "closure_displacement_m", "aperture_reference_length_m", "lift_displacement_m", "payload_com_z_m",
     "support_N", "signed_pull_N", "grip_each_N", "force_on_fingers_world_N", "left_inner_candidates",
-    "right_inner_candidates", "native_bilateral_sliding", "penetration_mm",
+    "right_inner_candidates", "native_bilateral_sliding", "penetration_mm", "tip_z_m", "press_travel_m",
 )
 RAMP_CASES = (
     ("kraft-fixed-fast", "kraft", "rss2027-stage1-kraft-load-ramp-r1"),
@@ -102,6 +102,8 @@ def export_case(label, material, path, axis_index):
     samples = []
     close_origin = next((row["gap"] for row in trace if row["phase"] == "close"), None)
     lift_origin = next((row["tip_mid"][2] for row in trace if row["phase"] == "lift"), None)
+    press_origin = next((row["tip_mid"][2] for row in trace
+                         if row["phase"] == "approach" and row.get("down_N") is not None), None)
     lift_phases = ("lift", "lift_hold", "open")
     for row in trace:
         time, phase = row["t"], row["phase"]
@@ -115,12 +117,14 @@ def export_case(label, material, path, axis_index):
         native = traction.get(time)
         close_s = close_origin - row["gap"] if phase == "close" else None
         lift_s = row["tip_mid"][2] - lift_origin if phase in lift_phases and lift_origin is not None else None
+        tip_z = row["tip_mid"][2]
+        press_s = press_origin - tip_z if phase == "approach" and press_origin is not None else None
         samples.append([time, phase, row.get("down_N"), row.get("direct_support_N"), row["gap"],
                         row["command_gap"], close_s, float(a["aperture_material_length_m"]) if a else None,
                         lift_s, row["com"][2] if result["config"]["mode"] != "empty" else None,
                         row["support_N"], tension, grip, row["force_on_fingers_N"],
                         int(a["left_inner_candidates"]) if a else None, int(a["right_inner_candidates"]) if a else None,
-                        native["bilateral_sliding"] == "True" if native else None, row["penetration_mm"]])
+                        native["bilateral_sliding"] == "True" if native else None, row["penetration_mm"], tip_z, press_s])
 
     if release and release["first_final_contact_loss_sample"] is not None:
         release_time = float(release["first_final_contact_loss_sample"]["t_s"])
@@ -175,6 +179,7 @@ def main():
     data = dict(stage=1, complete=False, sample_columns=COLUMNS, cases=cases, notes={
         "aperture_reference_length_m": "Total clipped reference area divided by finger width; sums all layers.",
         "signed_pull_N": "Upward film load from the negated vertical component of both finger reactions.",
+        "press_travel_m": "Measured downward tip travel relative to the first top pressure approach sample.",
         "native_bilateral_sliding": "Per-sample contact criterion; a sustained event is required for slip fitting.",
         "scope": "Archived whole-bag measurements. Material slip displacement and an all-material fitted envelope are pending.",
     })
