@@ -32,3 +32,16 @@ flock /tmp/claude-gpu.lock env OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 /home/ub
 ```
 
 压力测试两档均通过，共 191.22 s。GPU 四档均完成 2,385 步／4.77 s，零非有限环境，全部达到 0.20 s 悬停门槛。8,192 路整批 1.119 s，17,462,714 环境步/s，PyTorch 预留峰值 2,002 MiB。使用同一探针与 CPU 四材质批次复核，最短末段悬停均为 3.002 s。以上为代理的完整抓取和悬停探针，训练和回合重置另有开销。[压力测试日志](../test/runs/stage2_freeze/milestone2/stress.log) · [完整 GPU 结果](../test/runs/stage2_freeze/milestone2/cuda-throughput.json)
+
+## 双指代理的 MuJoCo 回放
+
+2026-11-20 19:38，北京时间，`ubun`。选用冻结 PE 参数、3 mm 偏心和 2 ms 步长，生成一次悬空加载回合。检查录制位置和姿态可用于回放，并确认原生窗口能显示单侧承载帧。
+
+```sh
+run_dir=test/runs/2026-11-20/bag/rss2027-stage2-proxy-ui-r1
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv-physical-parcel/bin/python -B test/low_order_parcel/view_stage2_proxy.py "$run_dir" --check
+MUJOCO_GL=glfw .venv-physical-parcel/bin/python -B test/low_order_parcel/view_stage2_proxy.py "$run_dir"
+```
+
+检查通过。录制包含 2,950 帧，右侧 4.014 s 脱手，左侧 4.108 s 脱手。首次打开时，MuJoCo Python 绑定拒绝可视化柔索的空参数。显式传入数组后，原生窗口成功显示，并验证了回放及返回单侧承载帧的快捷键。截图为 1706 × 960。在 4.060 s，左侧张力 7.19 N，右侧 0 N。UI 使用简化包裹几何显示代理的位姿、承载和滑移。
+[原生窗口截图](../test/runs/2026-11-20/bag/rss2027-stage2-proxy-ui-r1/mujoco-proxy-ui.png)
