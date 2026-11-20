@@ -131,3 +131,9 @@
 | 运行 | 对象与问题 | 命令 | 状态 |
 | --- | --- | --- | --- |
 | [2 ms 结果](../stage2_freeze/alignment_report.json) · [1 ms 结果](../stage2_freeze/dt-1ms/alignment_report.json) | 双指柔索代理与刚体底座，四材质六类对齐 | 持锁执行 `src/low_order_parcel/verify_stage2_alignment.py`，1 ms 增加 `--dt .001` 和专用输出路径 | `ubun` CPU，两档各通过六类门禁。[冻结报告](../../../docs/STAGE2_FREEZE_REPORT.md) · [命令与回归](../../../reports/rss2027-stage2-test.md) |
+
+## 142 节点异质 GPU 扩展扫描
+
+- `rss2027-yam-heterogeneous-scaling-r1`。`ubun`，RTX 5090，142 节点 PE 类整袋，200 μs，Warp 4.0.1 膜法向隔离版。比较闭合末段和悬停的异质设备吞吐。
+- 仓库根目录运行 `flock /tmp/claude-gpu.lock bash test/runs/2026-11-20/bag/rss2027-yam-heterogeneous-scaling-r1/prepare.sh`。随后运行 `flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/runs/2026-11-20/bag/rss2027-yam-heterogeneous-scaling-r1/scan.py`。
+- 补录通过，扫描 54/54 窗口有效，4,096 路较慢阶段 4.091 仿真秒/墙钟秒。[汇总 JSON](bag/rss2027-yam-heterogeneous-scaling-r1/summary.json)。[计划与结果](../../bag_model/YAM_BATCH_GRASP_REPORT.md#2026-11-20-异质环境闭合与悬停扩展扫描) · [运行目录](bag/rss2027-yam-heterogeneous-scaling-r1/)

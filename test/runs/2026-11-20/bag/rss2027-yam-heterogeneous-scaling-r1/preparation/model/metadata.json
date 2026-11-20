@@ -1,0 +1,90 @@
+{
+  "config": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.3326220518110015,
+      0.2385586838827861
+    ],
+    "payload_size": [
+      0.10029524206522866,
+      0.08064179506196759,
+      0.03256293275570878
+    ],
+    "payload_mass": 0.34803719106121356,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "mode": "rigid",
+    "areal_mass": 0.16433147456506605,
+    "membrane": 1240.7146961055262,
+    "poisson": 0.3,
+    "bending": 4.234031921732393e-06,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.4052621588287628,
+    "material_thickness": 0.00019304227183560626,
+    "rayleigh": 0.0003944166060075295,
+    "radius": 0.0005,
+    "friction": 0.4465135706395541,
+    "joint_stiffness": 0.09027357274800496,
+    "joint_damping": 0.003,
+    "compression_k1": 800.0,
+    "compression_k2": 20000.0,
+    "compression_damping": 1.0,
+    "timestep": 0.0002,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      -0.25,
+      0.04
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere",
+    "payload_offset_xy": [
+      0.0,
+      0.0
+    ]
+  },
+  "geometry": {
+    "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+    "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+    "vertices": 142,
+    "triangles": 280,
+    "edges": 420,
+    "reference_area_m2": 0.15869975782084883,
+    "film_mass_kg": 0.02607936521581896,
+    "min_reference_edge_m": 0.033262205181100124,
+    "max_reference_edge_m": 0.04762150646843955,
+    "preparation": {
+      "maximum_edge_strain": 0.01039866858470273,
+      "minimum_wall_gap_m": 0.006923486882745612,
+      "method": "generic front/back plateau + projections + wall gap",
+      "box_face_clearance": true,
+      "box_seam_clearance": false,
+      "payload_intersecting_triangles": 0,
+      "payload_corner_winding": [
+        1.0,
+        1.0,
+        1.0,
+        1.0000000000000002,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "nq": 433,
+  "nv": 432,
+  "neq": 0,
+  "payload_collision": "native convex mesh, exact eight-vertex boxes",
+  "bending": "reference dihedral energy, existing bag_model gradient",
+  "compression_axis": "segment-local -z"
+}
