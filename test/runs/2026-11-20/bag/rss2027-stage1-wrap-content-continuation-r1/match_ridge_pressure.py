@@ -1,6 +1,7 @@
 """Compare two gathering meshes at the same observed normal pressure and travel."""
 
 import argparse
+from itertools import product
 import json
 from pathlib import Path
 
@@ -77,25 +78,28 @@ def run(robot, dt, preload_limit_s, closure_s):
                 preload=preload, samples=samples)
 
 
+def pressure_spans(rows):
+    inward = rows[0]["actual_gap_m"] - np.asarray([row["actual_gap_m"] for row in rows])
+    eligible = [.4 <= row["pressure_N"] <= .6 and row["direct_support_N"] <= .05 for row in rows]
+    for start, end in np.flatnonzero(np.diff(np.r_[False, eligible, False])).reshape(-1, 2):
+        turns = np.flatnonzero(np.diff(inward[start:end]) <= 0.) + start + 1
+        bounds = np.r_[start, turns, end]
+        for a, b in zip(bounds[:-1], bounds[1:], strict=True):
+            if b - a >= 3:
+                yield inward[a:b], rows[a:b]
+
+
 def fit_common(runs):
     if any(run["outcome"] != "complete" for run in runs):
         return None
-    traces = []
-    for trial in runs:
-        rows = trial["samples"]
-        eligible = [.4 <= row["pressure_N"] <= .6 and row["direct_support_N"] <= .05 for row in rows]
-        spans = np.flatnonzero(np.diff(np.r_[False, eligible, False])).reshape(-1, 2)
-        span = max(spans, key=lambda pair: pair[1] - pair[0], default=None)
-        if span is None or span[1] - span[0] < 3:
-            return None
-        data = rows[span[0]:span[1]]
-        x = rows[0]["actual_gap_m"] - np.asarray([row["actual_gap_m"] for row in data])
-        if (np.diff(x) <= 0.).any():
-            return None
-        traces.append((x, data))
-    low, high = max(x[0] for x, _ in traces), min(x[-1] for x, _ in traces)
-    if high <= low:
+    intervals = []
+    for traces in product(*(pressure_spans(run["samples"]) for run in runs)):
+        low, high = max(x[0] for x, _ in traces), min(x[-1] for x, _ in traces)
+        if high > low:
+            intervals.append((low, high, traces))
+    if not intervals:
         return None
+    low, high, traces = max(intervals, key=lambda interval: interval[1] - interval[0])
     positions = np.linspace(low, high, 5)
     fits = []
     for x, data in traces:

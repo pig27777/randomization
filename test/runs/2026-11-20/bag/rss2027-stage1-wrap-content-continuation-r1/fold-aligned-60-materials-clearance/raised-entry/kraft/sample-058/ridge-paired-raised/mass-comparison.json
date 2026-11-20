@@ -1,0 +1,91 @@
+{
+  "fixed_target": true,
+  "varied_field": "payload_mass",
+  "config_press_start_offset_m": 0.17,
+  "observations": [
+    {
+      "contents_mass_kg": 0.05,
+      "outcome": "grasp_fail",
+      "reason": "normal force target not held before approach timeout",
+      "total_samples": 766,
+      "normal_press": {
+        "target_N": 0.5,
+        "band_N": [
+          0.4,
+          0.6
+        ],
+        "required_hold_s": 0.01,
+        "achieved_hold_s": 0.0,
+        "target_reached": false,
+        "peak_N": 0.7672267057757414,
+        "peak_direct_support_N": 0.0
+      },
+      "max_penetration_mm": 0.7112097133607894,
+      "first_close_s": null,
+      "first_lift_s": null
+    },
+    {
+      "contents_mass_kg": 0.2,
+      "outcome": "grasp_fail",
+      "reason": "both fingertip contacts/connection lost >50ms",
+      "total_samples": 514,
+      "normal_press": {
+        "target_N": 0.5,
+        "band_N": [
+          0.4,
+          0.6
+        ],
+        "required_hold_s": 0.01,
+        "achieved_hold_s": 0.010049999999999967,
+        "target_reached": true,
+        "peak_N": 17.572400198806356,
+        "peak_direct_support_N": 0.0
+      },
+      "max_penetration_mm": 0.7321566661498848,
+      "first_close_s": 4.200049999996881,
+      "first_lift_s": 10.000049999983364,
+      "actual_lift_peak": {
+        "t_s": 10.127999999983066,
+        "phase": "lift",
+        "gap_m": 0.013005521546894933,
+        "command_gap_m": -0.0,
+        "tension_N": 2.2078349862716165,
+        "support_N": 1.9962953855328873,
+        "standard_inner_normal_N": [
+          15.671084584310789,
+          16.988749777642745
+        ],
+        "residual_N": 0.0,
+        "colliders": {
+          "left_round_6": [
+            0.0630544911830766,
+            -4.856034574605391,
+            4.919089065788468
+          ],
+          "left_round_7": [
+            0.06305449118290518,
+            -4.856034574592127,
+            4.919089065775032
+          ],
+          "right_round_5": [
+            1.0408630019531344,
+            -4.640615291158008,
+            5.681478293111143
+          ],
+          "right_round_6": [
+            1.0408630019525003,
+            -4.640615291155504,
+            5.681478293108004
+          ]
+        },
+        "fixed_contact_friction_bound": {
+          "normal_down_N": 18.99329973151103,
+          "native_mu_upper_N": 2.2292147963585585,
+          "upper_at_mu_0p9_N": 4.882029112342256,
+          "uniform_mu_for_zero_tension": 0.715967929495588
+        }
+      },
+      "longest_positive_unsupported_bilateral_s": 0.0
+    }
+  ]
+}
