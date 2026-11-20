@@ -68,7 +68,8 @@ def jaw_axis(robot):
     return inward / np.linalg.norm(inward), (left + right) / 2.
 
 
-def run(dt, limit, load_mode, force_vector=None, *, readout=None, initial_load_N=0., load_origin_s=None):
+def run(dt, limit, load_mode, force_vector=None, *, readout=None, initial_load_N=0., load_origin_s=None,
+        load_profile=None):
     robot, index, fingerprint = held_scene()
     sim = robot.sim
     sim.m.opt.timestep = dt
@@ -95,7 +96,10 @@ def run(dt, limit, load_mode, force_vector=None, *, readout=None, initial_load_N
     wall_start = time.perf_counter()
     for i in range(round(limit / dt)):
         elapsed = float(sim.d.time) - start
-        load = initial_load_N + RATE * elapsed if load_origin_s is None else RATE * (float(sim.d.time) - load_origin_s)
+        if load_profile is not None:
+            load = load_profile(robot, elapsed, direction)
+        else:
+            load = initial_load_N + RATE * elapsed if load_origin_s is None else RATE * (float(sim.d.time) - load_origin_s)
         gap = robot.gap()
         sim.d.xfrc_applied[payload, :3] = load * direction
         sim.step()
@@ -143,7 +147,8 @@ def run(dt, limit, load_mode, force_vector=None, *, readout=None, initial_load_N
         return dict(zip(FIELDS, rows[i].tolist(), strict=True))
 
     loss = loss_at if outcome == "detached" and np.max(rows[:loss_at + 1, 4]) <= .05 else None
-    result = dict(dt_s=dt, rate_N_s=RATE, source_frame=index, source_time_s=start, source_state_sha256=fingerprint,
+    result = dict(dt_s=dt, rate_N_s=RATE if load_profile is None else None, source_frame=index,
+                  source_time_s=start, source_state_sha256=fingerprint,
                   force_direction=direction.tolist(), initial_closing_axis=closing.tolist(), load_mode=load_mode,
                   actuator_input=control.tolist(), physics_steps=len(rows), outcome=outcome,
                   wall_s=time.perf_counter() - wall_start, first=sample(0), end_health=health,

@@ -141,9 +141,9 @@ def advance_case():
 
 def swept_fingers(pads, shift, motion, points, faces, obstacles):
     hit = []
-    for name, origin, axes in pads:
+    for name, origin, axes, extent in pads:
         # This envelope contains each rounded face over the entire straight open approach.
-        half = np.array([.010, .004, .020]) + .00025 + .5 * abs(motion @ axes)
+        half = extent + .00025 + .5 * abs(motion @ axes)
         center = origin + shift + .5 * motion
         film = np.flatnonzero(triangle_box_intersections(points, faces, half, center, axes))
         rigid = [i for i, box in enumerate(obstacles) if intersects_box(box, center, axes, half)]
@@ -154,7 +154,19 @@ def swept_fingers(pads, shift, motion, points, faces, obstacles):
 
 def finger_frames(model, data):
     return [(name, data.geom_xpos[model.geom(name).id].copy(),
-             data.xmat[model.body(name).id].reshape(3, 3).copy()) for name in ("left_pad", "right_pad")]
+             data.xmat[model.body(name).id].reshape(3, 3).copy(), np.array([.010, .004, .020]))
+            for name in ("left_pad", "right_pad")]
+
+
+def supplementary_finger_frames(robot):
+    model, data = robot.sim.m, robot.sim.d
+    for all_geoms, standard in zip(robot.all_finger_sets, robot.pad_sets, strict=True):
+        for geom in sorted(all_geoms - standard):
+            if model.geom_contype[geom] or model.geom_conaffinity[geom]:
+                axes = data.geom_xmat[geom].reshape(3, 3).copy()
+                offset, extent = model.geom_aabb[geom].reshape(2, 3)
+                center = data.geom_xpos[geom] + offset @ axes.T
+                yield model.geom(geom).name, center, axes, extent.copy()
 
 
 def old_open_contact():
@@ -172,7 +184,7 @@ def old_open_contact():
                          data.flexvert_xpos, model.flex_elem.reshape(-1, 3), obstacles)
 
 
-def open_route_candidates(config, settled_qpos, prior=None):
+def open_route_candidates(config, settled_qpos, prior=None, *, capture_half_depth_m=.020, include_pad_edges=False):
     cfg = backend.Config(**config)
     with patch.object(physical_parcel, "wrap_generic", prepared_wrap(cfg.geometry)):
         robot = backend.scene(cfg)
@@ -180,7 +192,9 @@ def open_route_candidates(config, settled_qpos, prior=None):
     mujoco.mj_fwdPosition(model, data)
     pads = finger_frames(model, data)
     center = np.mean([row[1] for row in pads], axis=0)
-    axes, extent = pads[0][2], np.array([.010, .004, .020])
+    axes, extent = pads[0][2], np.array([.010, .004, capture_half_depth_m])
+    if include_pad_edges:
+        pads.extend(supplementary_finger_frames(robot))
     data.qpos[:] = settled_qpos
     mujoco.mj_fwdPosition(model, data)
     points = data.flexvert_xpos.copy()

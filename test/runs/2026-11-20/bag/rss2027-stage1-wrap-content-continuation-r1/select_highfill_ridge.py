@@ -1,8 +1,9 @@
-"""Find a reachable natural ridge on the 90% whole-bag pressure reference."""
+"""Find a reachable natural ridge on a settled whole-bag pressure reference."""
 
 import argparse
 import itertools
 import json
+from pathlib import Path
 from unittest.mock import patch
 
 import mujoco
@@ -44,11 +45,14 @@ def check_path(config, center, film_height):
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--case", type=Path, default=CASE)
     parser.add_argument("--rotate", action="store_true", help="turn the same package 180 degrees on its support")
     args = parser.parse_args()
-    trial = CASE / "settle/trial"
+    case = args.case.resolve()
+    trial = case / "settle/trial"
     result = json.loads((trial / "result.json").read_bytes())
-    cfg = json.loads((CASE / "config.json").read_bytes())
+    config = case / "config.json"
+    cfg = json.loads(config.read_bytes()) if config.is_file() else result["config"]
     body_size = np.asarray(cfg["payload_size"][:2])
     offset = np.asarray(cfg["payload_offset_xy"])
     if result["outcome"] != "smoke_only" or result["sim_time_s"] < .3 or result["peaks"]["grip_N"]:
@@ -62,7 +66,7 @@ def main():
         data.qpos[:] = archive["final_qpos"]
         mujoco.mj_fwdPosition(model, data)
     triangles = data.flexvert_xpos[model.flex_elem.reshape(-1, 3)]
-    target = CASE / ("ridge-rotated" if args.rotate else "ridge-height")
+    target = case / ("ridge-rotated" if args.rotate else "ridge-height")
     target.mkdir(exist_ok=False)
     if args.rotate:
         triangles[:, :, :2] = 2. * CENTER - triangles[:, :, :2]
