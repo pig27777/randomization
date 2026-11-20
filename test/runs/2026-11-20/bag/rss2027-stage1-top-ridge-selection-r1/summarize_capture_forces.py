@@ -11,6 +11,7 @@ def resolve(sample):
     world = np.zeros((2, 3))
     inner = np.zeros(2)
     colliders = {}
+    normal_down = tangent_scale = native_tangent_bound = 0.
     for contact in sample["contacts"]:
         pad = contact["pad"]
         force = np.asarray(contact["force_on_finger_N"])
@@ -20,15 +21,27 @@ def resolve(sample):
             inner[pad] += normal
         geometry = colliders.setdefault(contact["geom"], np.zeros(3))
         # Upward forces are positive on the membrane.
-        normal_z = -normal * contact["normal_on_pad"][2]
+        z = contact["normal_on_pad"][2]
+        normal_z = -normal * z
         geometry += (-force[2], normal_z, -force[2] - normal_z)
+        tangent = normal * np.sqrt(max(0., 1. - z * z))
+        normal_down -= normal_z
+        tangent_scale += tangent
+        native_tangent_bound += max(contact["friction"]) * tangent
     residual = float(np.max(np.abs(world - sample["force_on_fingers_N"])))
     if residual > 1e-10:
         raise ValueError(f"Native finger reactions disagree at {sample['t_s']}: {residual} N")
+    tension = -float(world[:, 2].sum())
+    if tension > native_tangent_bound - normal_down + 1e-8:
+        raise ValueError(f"Observed tension exceeded its friction-cone bound at {sample['t_s']}")
+    bound = dict(normal_down_N=normal_down, native_mu_upper_N=native_tangent_bound - normal_down,
+                 upper_at_mu_0p9_N=.9 * tangent_scale - normal_down,
+                 uniform_mu_for_zero_tension=max(0., normal_down / tangent_scale) if tangent_scale > 0. else None)
     return dict(t_s=sample["t_s"], phase=sample["phase"], gap_m=sample["gap_m"],
-                command_gap_m=sample["command_gap_m"], tension_N=-float(world[:, 2].sum()),
+                command_gap_m=sample["command_gap_m"], tension_N=tension,
                 support_N=sample["support_N"], standard_inner_normal_N=inner.tolist(),
-                residual_N=residual, colliders={name: force.tolist() for name, force in colliders.items()})
+                residual_N=residual, colliders={name: force.tolist() for name, force in colliders.items()},
+                fixed_contact_friction_bound=bound)
 
 
 def main():

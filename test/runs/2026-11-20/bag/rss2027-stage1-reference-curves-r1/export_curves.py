@@ -45,6 +45,8 @@ CASES = (
      "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/paperboard/recording/trial"),
     ("kraft-top-0p5N", "kraft", "2026-11-20/bag/rss2027-stage1-whole-bag-pressure-pilots-r1/kraft/recording/trial"),
     ("pe-jaw-refined-189", "pe", "2026-11-20/bag/rss2027-stage1-pe-held-local-mesh-r1/full-action/recording/trial"),
+    ("pe-top-deeper-seat", "pe",
+     "2026-11-20/bag/rss2027-stage1-top-ridge-selection-r1/deeper-seat/recording/trial"),
 )
 COLUMNS = (
     "t_s", "phase", "downforce_N", "direct_finger_support_N", "actual_gap_m", "commanded_gap_m",
