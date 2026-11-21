@@ -8,3 +8,4 @@
 | unified-payload-proxy-r2 | 增加夹爪位置反馈。完整回合的有效吞吐通过。 | [P6 日志](bag/unified-payload-proxy-r2/p6.log) |
 | unified-payload-proxy-r3 | 最终模板接入回归。P1–P6、挂点虚功和既有 20 项整包测试通过。 | [CPU](bag/unified-payload-proxy-r3/cpu.log) · [GPU](bag/unified-payload-proxy-r3/cuda.log) · [整包](bag/unified-payload-proxy-r3/physical-parcel.log) · [验收](../../../docs/PAYLOAD_TEMPLATE_REPORT.md) |
 | unified-payload-proxy-r4 | 补充初始余料的填充率上限，P1–P6 与挂点虚功复测通过。 | [CPU](bag/unified-payload-proxy-r4/cpu.log) · [GPU](bag/unified-payload-proxy-r4/cuda.log) |
+| unified-payload-proxy-r5 | Stage 2.5 同袋分岔、侧壁推跑、预算接口与整批验收，`ubun`。 | [CPU](bag/unified-payload-proxy-r5/cpu.log) · [GPU](bag/unified-payload-proxy-r5/cuda.log) · [Stage 2](bag/unified-payload-proxy-r5/stage2-proxy.log) · [整包](bag/unified-payload-proxy-r5/physical-parcel.log) · [验收](../../../docs/PAYLOAD_TEMPLATE_REPORT.md#stage-25-同袋异物结果) |

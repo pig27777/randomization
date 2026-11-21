@@ -75,6 +75,7 @@ class ContactInputs(NamedTuple):
     inward_velocity: Tensor  # [B, 2], signed closing m/s
     feed_depth: Tensor  # [B, 2], m
     alignment_cos: Tensor  # [B, 2], projected pad and local fold normals
+    S_bag_eff: Tensor | None = None  # [B, 1], optional step-local film budget, m
 
 
 class ContactStep(NamedTuple):
@@ -103,15 +104,20 @@ class LumpedContactProxy:
     def validate_inputs(self, state: Tensor, inputs: ContactInputs) -> None:
         """Validate external data at ingestion, without synchronizing the step kernel."""
         batch = self.params.S_bag.shape[0]
-        shapes = ((batch, 2, 6), *((batch, 2, 3),) * 4, (batch, 3), *((batch, 2),) * 4)
+        shapes = ((batch, 2, 6), *((batch, 2, 3),) * 4, (batch, 3), *((batch, 2),) * 4, (batch, 1))
         for name, value, shape in zip(("state", *inputs._fields), (state, *inputs), shapes, strict=True):
+            if name == "S_bag_eff" and value is None:
+                continue
             if value.shape != shape or value.dtype != self.params.S_bag.dtype or value.device != self.params.S_bag.device:
                 raise ValueError(f"{name} must have shape {shape} and the device and dtype of S_bag")
             if not torch.isfinite(value).all():
                 raise ValueError(f"{name} contains non-finite values")
+        if inputs.S_bag_eff is not None and (inputs.S_bag_eff < 0.).any():
+            raise ValueError("S_bag_eff must be nonnegative")
 
     def step(self, state: Tensor, inputs: ContactInputs) -> ContactStep:
         p, dt = self.params, self.dt
+        budget = p.S_bag if inputs.S_bag_eff is None else inputs.S_bag_eff
         slack, captured, slip_cum, hold, _, peak = state.unbind(dim=-1)
         active = captured > .5
         normal = inputs.normal_force.clamp_min(0.)
@@ -129,14 +135,14 @@ class LumpedContactProxy:
         trial_tension = torch.where(active & (beyond_rest >= 0.),
                                     (p.k * strain + p.c_d * length_rate).clamp_min(0.), 0.)
 
-        free_fraction = (1. - slack.sum(dim=1, keepdim=True) / p.S_bag.clamp_min(EPS)).clamp_min(0.)
+        free_fraction = (1. - slack.sum(dim=1, keepdim=True) / budget.clamp_min(EPS)).clamp_min(0.)
         gather_speed = torch.minimum(inputs.inward_velocity.clamp_min(0.), p.v_gather_max)
         gathered = torch.where(pressed & (hold >= p.tau_gate), p.alpha * gather_speed * free_fraction * dt, 0.)
         available = torch.minimum(slack + gathered, p.s_max)
         # Withdrawal consumes physical reserve. Apply the global clamp before withdrawal so
         # simultaneous pad motion cannot withdraw more film than was ever available.
         total = available.sum(dim=1, keepdim=True)
-        available = available * (p.S_bag / total.clamp_min(EPS)).clamp(max=1.)
+        available = available * (budget / total.clamp_min(EPS)).clamp(max=1.)
         withdrawn = torch.minimum(available, dt * p.beta * (trial_tension - p.mu_eff * normal).clamp_min(0.))
         slack_next = available - withdrawn
         rate = withdrawn / dt

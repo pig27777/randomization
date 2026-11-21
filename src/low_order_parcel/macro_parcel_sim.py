@@ -1,7 +1,5 @@
 """Rigid or segmented parcel on a plane, loaded by two independent film ropes."""
 
-from copy import copy
-from dataclasses import replace
 import math
 from time import perf_counter
 from typing import NamedTuple
@@ -54,6 +52,8 @@ class PayloadParcelState(NamedTuple):
     angular_velocity: Tensor
     contacts: Tensor
     indentation_power: Tensor    # [B, 1], rope work rate on the prescribed indentation
+    side_axis: Tensor            # [B, 3], horizontal approach direction latched at first push
+    side_origin: Tensor          # [B, 3], parcel COM at first side contact
     payload: PayloadState
 
 
@@ -149,8 +149,9 @@ class MacroParcelSim:
         quat = torch.cat((torch.ones_like(zero[:, :1]), zero), dim=1)
         if self.payload is not None:
             state = self.payload.initial_state()
-            return PayloadParcelState(self.payload.com(state), quat, zero, zero, self.proxy.initial_state(),
-                                      torch.zeros_like(self.mass), state)
+            com = self.payload.com(state)
+            return PayloadParcelState(com, quat, zero, zero, self.proxy.initial_state(),
+                                      torch.zeros_like(self.mass), zero, com, state)
         com = self.up * self.half_extents[2] + self.offset
         return ParcelState(com, quat, zero, zero, self.proxy.initial_state())
 
@@ -221,6 +222,7 @@ class MacroParcelSim:
         midpoint = tip.mean(dim=1, keepdim=True)
         local_tip = torch.bmm(tip - current.pos.mean(dim=1, keepdim=True), frame)
         tip_weights = payload.weights_at(local_tip[:, :, :2])
+        side_axis, side_origin, side_load, side_at_pad = self._side_contact(state, action, frame, local_tip, tip_weights)
         normal = frame[:, :, 2]
         center = torch.bmm(tip_weights, current.pos)
         normal_gap = ((tip - center) * normal[:, None]).sum(dim=-1)
@@ -230,11 +232,13 @@ class MacroParcelSim:
         previous_indent = torch.bmm(tip_weights, current.d_surf.unsqueeze(-1)).squeeze(-1)
         top = ((previous_gap >= 0.) | (previous_indent > EPS) |
                (action.direct_press_N > 0.) | (tip[:, :, 2] <= 0.))
-        surface = payload.surface_contact(current, tip_depth, tip_weights, in_footprint & top)
+        surface = payload.surface_contact(current, tip_depth, tip_weights, in_footprint & top & ~side_at_pad)
         depth_rate = (surface.depth - current.d_surf) / self.dt
         current = current._replace(d_surf=surface.depth)
         anchor, anchor_vel = payload.anchors(current, weights, depth_rate)
-        feed, alignment, budget = payload.contact_geometry(current.d_surf, weights, action.feed_depth,
+        push_displacement = ((state.com - side_origin) * side_axis).sum(dim=1, keepdim=True)
+        net_feed = (action.feed_depth - push_displacement).clamp_min(0.)
+        feed, alignment, budget = payload.contact_geometry(current.d_surf, weights, net_feed,
                                                            action.alignment_cos, self.base_slack)
 
         jaw = tip[:, 1] - tip[:, 0]
@@ -248,19 +252,16 @@ class MacroParcelSim:
         crush = .5 * payload.params.lateral_crush_k * (width - span).clamp_min(0.) * bridge
         jaw_load = crush[:, :, None] * torch.stack((axis, -axis), dim=1)
 
-        # Supply a step-local budget through the existing parameter field.
-        proxy = copy(self.proxy)
-        proxy.params = replace(proxy.params, S_bag=budget)
-        contacts = proxy.step(state.contacts, ContactInputs(
+        contacts = self.proxy.step(state.contacts, ContactInputs(
             tip, anchor, action.pinch_velocity, anchor_vel, state.com,
-            action.normal_force + crush, action.inward_velocity, feed, alignment))
+            action.normal_force + crush, action.inward_velocity, feed, alignment, budget))
         force, depth_force = payload.distribute_anchor_forces(current, weights, contacts.force)
         indentation_power = (depth_force * depth_rate).sum(dim=1, keepdim=True)
         surface_vertical = (surface.pad_force_N * normal[:, 2:3]).clamp_min(0.)
         direct = (.5 * action.direct_press_N - surface_vertical).clamp_min(0.)
         extra_press = torch.bmm(tip_weights.transpose(1, 2), direct.unsqueeze(-1))
         force = (force + action.external_force[:, None] * payload.weights.unsqueeze(-1)
-                 + torch.bmm(tip_weights.transpose(1, 2), jaw_load)
+                 + torch.bmm(tip_weights.transpose(1, 2), jaw_load + side_load)
                  - surface.block_force_N.unsqueeze(-1) * normal[:, None] - extra_press * self.up[:, None])
         advanced = payload.step(state.payload, force, surface.depth)
 
@@ -271,8 +272,9 @@ class MacroParcelSim:
         delta_vector += torch.linalg.cross(old[:, 1:], orientation[:, 1:])
         omega = torch.where((old * orientation).sum(dim=1, keepdim=True) >= 0., delta_vector, -delta_vector)
         next_state = PayloadParcelState(payload.com(next_payload), orientation, payload.com_velocity(next_payload),
-                                        2. * omega / self.dt, contacts.state, indentation_power, next_payload)
-        pad_reaction = (-contacts.force - jaw_load + surface.pad_force_N.unsqueeze(-1) * normal[:, None]
+                                        2. * omega / self.dt, contacts.state, indentation_power,
+                                        side_axis, side_origin, next_payload)
+        pad_reaction = (-contacts.force - jaw_load - side_load + surface.pad_force_N.unsqueeze(-1) * normal[:, None]
                         + direct.unsqueeze(-1) * self.up[:, None])
         wrench = torch.cat((pad_reaction.sum(dim=1), torch.linalg.cross(tip - midpoint, pad_reaction).sum(dim=1)), dim=1)
         line = tip - anchor
@@ -281,6 +283,39 @@ class MacroParcelSim:
         return ParcelStep(next_state, wrench, advanced.support_N.sum(dim=1, keepdim=True),
                           advanced.clearance.amin(dim=1, keepdim=True), contacts.tension,
                           contacts.slip_rate, contacts.elastic_energy, elastic_pull)
+
+    def _side_contact(self, state, action, frame, local_tip, weights):
+        """Unilateral side-wall pressure and translation relative to the first entry."""
+        payload = self.payload
+        velocity = action.pinch_velocity.mean(dim=1)
+        horizontal = velocity - velocity[:, 2:3] * self.up
+        speed = horizontal.norm(dim=1, keepdim=True)
+        retreat = ((horizontal * state.side_axis).sum(dim=1, keepdim=True) < -1e-4)
+        retreat = retreat & (action.feed_depth <= 0.).all(dim=1, keepdim=True)
+        latched = (state.side_axis.abs().sum(dim=1, keepdim=True) > 0.) & ~retreat
+        candidate = horizontal / speed.clamp_min(EPS)
+        direction = torch.where(latched, state.side_axis, candidate)
+        transverse = torch.linalg.cross(self.up, direction)
+        axes = torch.bmm(torch.stack((direction, transverse), dim=1), frame)
+        extents = (axes[:, :, :2].abs() * self.half_extents[:, None, :2]).sum(dim=2)
+        longitudinal, lateral = torch.bmm(local_tip, axes.transpose(1, 2)).unbind(dim=2)
+        penetration = longitudinal + extents[:, :1]
+        thickness = payload.half_thickness(state.payload.d_surf)
+        pad_half = torch.bmm(weights, thickness.unsqueeze(-1)).squeeze(-1)
+        supported = (state.payload.pos[:, :, 2] <= thickness + EPS).any(dim=1, keepdim=True)
+        slab = (local_tip[:, :, 2].abs() < pad_half) & (lateral.abs() < extents[:, 1:])
+        near_side = supported & slab & (longitudinal < 0.) & (penetration >= 0.)
+        moving_in = (speed > velocity[:, 2:3].abs()) & (speed > 1e-4) & ~retreat
+        entering = moving_in & near_side.any(dim=1, keepdim=True)
+        active = latched | entering
+        side = near_side & active
+        axis = torch.where(active, direction, 0.)
+        origin = torch.where(latched, state.side_origin, state.com)
+        stiffness = .5 * payload.params.lateral_crush_k
+        # Implicit scalar compliance limits the kick when the effective mass is small.
+        gain = stiffness / (1. + 2. * self.dt**2 * stiffness / self.mass)
+        load = gain * penetration.clamp_min(0.) * side
+        return axis, origin, load[:, :, None] * axis[:, None], side
 
     def get_privileged_state(self, state: PayloadParcelState) -> Tensor:
         if self.payload is None:

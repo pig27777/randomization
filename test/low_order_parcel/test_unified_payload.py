@@ -12,7 +12,7 @@ from benchmark_stage2_cuda import build_sim, timed_episode
 from src.low_order_parcel.lumped_contact_proxy import ContactInputs, ContactState, LumpedContactProxy, ProxyParams
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction
 from src.low_order_parcel.unified_payload import DT, GRAVITY, PayloadParamsX, UnifiedPayloadTemplate
-from src.low_order_parcel.verify_stage2_alignment import verify
+from src.low_order_parcel.verify_stage2_alignment import airborne, both_captured, longest, verify
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "configs/payload_template_X.yaml").read_bytes())
@@ -34,6 +34,13 @@ def rigid_probe(nominal, dt, *, slack_m=None, com_offset=(0., 0., 0.)):
     payload = model("rigid_box", dtype=torch.float64, mass_weights=mass_weights,
                     total_mass=params.S_bag.new_tensor([[nominal["mass_kg"]]]))
     return MacroParcelSim(LumpedContactProxy(params, dt), payload=payload)
+
+
+def pe_proxy(batch):
+    nominal = STAGE2["materials"]["pe"]["nominal"]["proxy"]
+    base = ProxyParams.from_scalars(nominal, dtype=torch.float64)
+    return LumpedContactProxy(ProxyParams(**{f.name: getattr(base, f.name).expand(batch, -1)
+                                            for f in fields(base)}), DT)
 
 
 def heterogeneous_probe(config, worlds):
@@ -71,6 +78,56 @@ class UnifiedPayloadTest(unittest.TestCase):
         self.assertEqual(len(regimes["1_top_press"]["cases"]), 12)
         for material, result in regimes["3_side_hover"]["materials"].items():
             self.assertGreaterEqual(result["hover_s"], 3., material)
+
+    @torch.inference_mode()
+    def test_p2_same_pe_bag_top_grasp_bifurcation(self):
+        proxy = pe_proxy(3)
+        like = proxy.params.S_bag
+        payload = model("rigid_box", "folded_clothes", "fluffy_pillow", dtype=like.dtype,
+                        bag_half_extents=like.new_tensor([[.085, .105, .050]]).expand(3, -1),
+                        total_mass=like.new_full((3, 1), .24))
+        sim = MacroParcelSim(proxy, payload=payload)
+        state = sim.initial_state()
+        z = like.new_full((3, 1), .115)
+        feedback = torch.zeros_like(z)
+        side = z.new_tensor([[-1., 1.]])
+        zeros = z.new_zeros((3, 2))
+        old_position = None
+        values = []
+        for i in range(2300):
+            time = i * DT
+            if time < 1.:
+                # Same pressure servo for all three environments, sensing the actual wrist force.
+                z = z + DT * (.006 * (feedback - 20.)).clamp(-.13, .065)
+                press_z = z
+            else:
+                lift = min(1., (time - 1.) / 1.3)
+                z = press_z + .5 * (1. - math.cos(math.pi * lift)) * (.315 - press_z)
+            close = min(1., max(0., (time - .30) / .65))
+            x = (.056 - .043 * close) * side.expand_as(zeros)
+            pos = torch.stack((x, zeros, z.expand_as(x)), dim=-1)
+            vel = torch.zeros_like(pos) if old_position is None else (pos - old_position) / DT
+            old_position = pos
+            inward = (-vel[:, :, 0] * side).clamp_min(0.)
+            action = ParcelAction(pos, vel, torch.full_like(x, 6.), inward, zeros, zeros, pos[:, 0] * 0., z * 0.)
+            result = sim.step(state, action)
+            state = result.state
+            feedback = result.wrist_wrench[:, 2:3]
+            _, _, budget = payload.contact_geometry(state.payload.d_surf, sim.payload_mount_weights,
+                                                    zeros, zeros, sim.base_slack)
+            values.append((state.contacts[:, :, ContactState.CAPTURE], result.tension,
+                           state.payload.d_surf, budget - sim.base_slack, result.table_clearance))
+        capture, tension, indentation, slack_gain, clearance = (torch.stack(c) for c in zip(*values, strict=True))
+        self.assertFalse(capture[:, 0].any() or tension[:, 0].any() or indentation[:, 0].any() or slack_gain[:, 0].any())
+        self.assertTrue((indentation[:, 1:].amax(dim=(0, 2)) > .010).all())
+        self.assertTrue((slack_gain[:, 1:].amax(dim=(0, 2)) > .005).all())
+        self.assertTrue((capture[-100:, 1:] == 1.).all())
+        self.assertTrue((clearance[-100:, 1:] > .10).all())
+        side_trace = sim.run_side_grasp_and_hover().channels
+        self.assertGreaterEqual(longest(airborne(side_trace) & both_captured(side_trace), DT), 3.)
+        print("P2 same PE: max indentation (mm)", (1000. * indentation.amax(dim=(0, 2))).tolist(),
+              "max extra slack (mm)", (1000. * slack_gain.amax(dim=(0, 2))).tolist(),
+              "final clearance (mm)", (1000. * clearance[-1, :, 0]).tolist(), flush=True)
 
     @torch.inference_mode()
     def test_p2_progressive_lift_and_drape(self):
@@ -150,11 +207,21 @@ class UnifiedPayloadTest(unittest.TestCase):
         self.assertTrue((feed[0] < .020).all())
         nominal = STAGE2["materials"]["pe"]["nominal"]
         base = ProxyParams.from_scalars(nominal["proxy"])
-        params = ProxyParams(**{f.name: getattr(base, f.name).expand(2, -1) for f in fields(base)} | {"S_bag": budget})
+        params = ProxyParams(**{f.name: getattr(base, f.name).expand(2, -1) for f in fields(base)})
         proxy = LumpedContactProxy(params, DT)
         xyz = torch.zeros((2, 2, 3))
-        inputs = ContactInputs(xyz, xyz, xyz, xyz, xyz[:, 0], torch.ones_like(feed), torch.full_like(feed, .04), feed, cosine)
+        inputs = ContactInputs(xyz, xyz, xyz, xyz, xyz[:, 0], torch.ones_like(feed),
+                               torch.full_like(feed, .04), feed, cosine, budget)
         contacts = proxy.initial_state()
+        proxy.validate_inputs(contacts, inputs)
+        loaded_contact = contacts.clone()
+        loaded_contact[:, :, ContactState.SLACK] = .004
+        default = inputs._replace(S_bag_eff=None)
+        for a, b in zip(proxy.step(loaded_contact, default), proxy.step(loaded_contact, inputs._replace(S_bag_eff=params.S_bag)),
+                        strict=True):
+            torch.testing.assert_close(a, b, atol=0., rtol=0.)
+        starved = proxy.step(loaded_contact, inputs._replace(S_bag_eff=torch.zeros_like(budget)))
+        self.assertEqual(float(starved.state[:, :, ContactState.SLACK].max()), 0.)
         for _ in range(100):
             contacts = proxy.step(contacts, inputs).state
         self.assertTrue((contacts[0, :, ContactState.CAPTURE] == 1.).all())
@@ -174,8 +241,45 @@ class UnifiedPayloadTest(unittest.TestCase):
         pressed = parcel.step(initial, action)
         self.assertTrue((pressed.wrist_wrench[:, 2] > 0.).all())
         self.assertTrue((pressed.support_N[:, 0] > sim.params.total_mass[:, 0] * GRAVITY).all())
-        torch.testing.assert_close(proxy.params.S_bag, budget)
+        torch.testing.assert_close(proxy.params.S_bag, base.S_bag.expand_as(budget))
         print(f"P3: settled force {torch.stack(forces).tolist()} N, rebound ratio {float(loaded.d_surf[0, 0] / dmax[0, 0]):.3f}")
+
+    @torch.inference_mode()
+    def test_p3_head_on_side_approach_pushes_the_light_parcel(self):
+        proxy = pe_proxy(2)
+        like = proxy.params.S_bag
+        sim = MacroParcelSim(proxy, payload=model("rigid_box", "rigid_box", dtype=like.dtype,
+                             total_mass=like.new_full((2, 1), .065), table_friction=like.new_full((2, 1), .06)))
+        state = sim.initial_state()
+        side = like.new_tensor([[-1., 1.]])
+        heights = like.new_tensor([[.012], [.045]])
+        old_position = None
+        net_feed, push_force, capture = [], [], []
+        for i in range(245):
+            t = min(i * DT, .34)
+            x = (.030 - .025 * t / .34) * side.expand(2, -1)
+            y = torch.full_like(x, -.107 + .12 * t)
+            pos = torch.stack((x, y, heights.expand_as(y)), dim=-1)
+            vel = torch.zeros_like(pos) if old_position is None else (pos - old_position) / DT
+            old_position = pos
+            nominal_feed = (y + .10).clamp_min(0.)
+            action = ParcelAction(pos, vel, torch.full_like(x, 6.), (-vel[:, :, 0] * side).clamp_min(0.),
+                                  nominal_feed, torch.ones_like(x), state.com * 0., like * 0.)
+            result = sim.step(state, action)
+            state = result.state
+            net_feed.append(state.contacts[:, :, ContactState.FEED_DEPTH])
+            capture.append(state.contacts[:, :, ContactState.CAPTURE])
+            push_force.append(-result.wrist_wrench[:, 1])
+        observed_feed, capture, peak_force = (torch.stack(net_feed), torch.stack(capture),
+                                              torch.stack(push_force).amax(dim=0))
+        self.assertGreater(float(peak_force[0]), .06 * .065 * GRAVITY)
+        self.assertGreater(float(state.com[0, 1]), float(nominal_feed[0, 0]) - .005)
+        self.assertLess(float(observed_feed[:, 0].max()), float(proxy.params.h_min[0, 0]))
+        self.assertFalse(capture[:, 0].any())
+        self.assertTrue((capture[-1, 1] == 1.).all())
+        self.assertTrue((result.table_clearance[0] == 0.).all())
+        print(f"P3 side push: {float(state.com[0, 1]) * 1000.:.2f} mm parcel travel, "
+              f"{float(observed_feed[:, 0].max()) * 1000.:.3f} mm max net feed, {float(peak_force[0]):.3f} N peak reaction")
 
     @torch.inference_mode()
     def test_p4_slip_impulse_and_momentum(self):

@@ -57,3 +57,18 @@ git diff --check
 ```
 
 [最终 CPU 5 项 63.363 s](../test/runs/2026-11-21/bag/unified-payload-proxy-r4/cpu.log) · [最终 GPU 2 项 65.555 s](../test/runs/2026-11-21/bag/unified-payload-proxy-r4/cuda.log) · [整包 20 项 8.829 s](../test/runs/2026-11-21/bag/unified-payload-proxy-r3/physical-parcel.log) · [完整验收](../docs/PAYLOAD_TEMPLATE_REPORT.md)
+
+## Stage 2.5 · 同袋分岔与侧推回归
+
+最近验证为 2026-11-21 15:42（台北），机器 `ubun`。CPU 新增和原模板检查 7 项通过，用时 73.472 s。GPU 两项通过，用时 66.806 s。原 Stage 2 七项用时 228.137 s，原整包 20 项用时 8.737 s，均通过。旧刚体 CUDA Graph 回合 8,192 路全部达标，用时 1.087 s。
+
+同袋测试中，硬书顶抓零捕获且零张力，侧抓悬停超过 3 s。衣物与枕头顶抓双侧捕获，离台 133.4 和 133.6 mm。轻包正撞侧壁后平移 50.32 mm，最大净进给 0.389 mm，零捕获。2 ms 异质 8,192 路新版批次用时 3.637 s，采样显存 1,812 MiB，8,003 路满足原悬停要求。GPU 压测和旧刚体 GPU 校验均使用共享锁。
+
+沿用上节 CPU 与 GPU 命令及其环境。CPU 模板命令中的 `-k p2` 和 `-k p3` 同时包含了新增分岔和侧推检查。旧代理独立命令如下。
+
+```sh
+PYTHONPATH=/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages OMP_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_stage2_proxy.py -v
+flock /tmp/claude-gpu.lock env PYTHONPATH=/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages OMP_NUM_THREADS=1 .venv-physical-parcel/bin/python -B test/low_order_parcel/benchmark_stage2_cuda.py --worlds 8192 --output test/runs/2026-11-21/bag/unified-payload-proxy-r5/stage2-cuda.json
+```
+
+[Stage 2.5 验收](../docs/PAYLOAD_TEMPLATE_REPORT.md#stage-25-同袋异物结果) · [CPU](../test/runs/2026-11-21/bag/unified-payload-proxy-r5/cpu.log) · [GPU](../test/runs/2026-11-21/bag/unified-payload-proxy-r5/cuda.log) · [旧代理](../test/runs/2026-11-21/bag/unified-payload-proxy-r5/stage2-proxy.log) · [整包](../test/runs/2026-11-21/bag/unified-payload-proxy-r5/physical-parcel.log)
