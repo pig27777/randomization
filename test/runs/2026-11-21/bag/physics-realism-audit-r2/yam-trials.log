@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/audit_yam.py", line 267, in <module>
+    run_case(case, args.output / case)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/audit_yam.py", line 246, in run_case
+    result = protocol.run(sys.modules[__name__], cases()[name], output, on_sample=record)
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/protocol.py", line 280, in run
+    robot = backend.scene(cfg)
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/audit_yam.py", line 192, in scene
+    robot = protocol.attach_robot(cfg, built, AuditYamSim, center, size[2], size, cfg.mass, approach)
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/protocol.py", line 158, in attach_robot
+    robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/robot.py", line 103, in __init__
+    raise RuntimeError(f'YAM initial pose unreachable: {self.ik_errors[-1]}')
+RuntimeError: YAM initial pose unreachable: {'position_mm': 0.006118181533645803, 'rotation_deg': 23.672262516535383}

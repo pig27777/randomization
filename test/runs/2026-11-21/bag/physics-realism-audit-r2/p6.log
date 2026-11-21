@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/workspace/gzl/randomization/src/low_order_parcel/audit_physics_realism.py", line 157, in <module>
+    run(args.output,args.worlds)
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/lib/python3.14/site-packages/torch/utils/_contextlib.py", line 158, in inference_mode
+    return func(*args, **kwargs)
+  File "/home/ubuntu/workspace/gzl/randomization/src/low_order_parcel/audit_physics_realism.py", line 34, in run
+    sim, materials = heterogeneous_probe(STAGE2, worlds)
+                     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/test_unified_payload.py", line 47, in heterogeneous_probe
+    legacy, materials = build_sim(config, worlds)
+                        ~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/benchmark_stage2_cuda.py", line 35, in build_sim
+    arrays = {field.name: torch.as_tensor([row["proxy"][field.name] for row in nominal], dtype=torch.float32,
+                          ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                          device=device).reshape(worlds, -1) for field in fields(ProxyParams)}
+                                          ^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/lib/python3.14/site-packages/torch/cuda/__init__.py", line 609, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled
