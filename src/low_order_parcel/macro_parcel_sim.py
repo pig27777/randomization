@@ -11,6 +11,7 @@ from torch import Tensor
 from .lumped_contact_proxy import ContactInputs, EPS, LumpedContactProxy, ProxyParams
 
 GRAVITY = 9.81
+PROBE_ACTION_CHANGE_S = 2.65
 
 
 def rotate(q: Tensor, points: Tensor) -> Tensor:
@@ -89,13 +90,14 @@ class MacroParcelSim:
         self.mounts = like.new_tensor([(-.024, 0., hz), (.024, 0., hz)]) - com_offset[:, None, :]
 
     @classmethod
-    def from_nominal(cls, nominal, dt, *, slack_m=None, com_offset=(0., 0., 0.)):
+    def from_nominal(cls, nominal, dt, *, slack_m=None, com_offset=(0., 0., 0.),
+                     half_extents=(.075, .10, .016)):
         values = dict(nominal["proxy"])
         if slack_m is not None:
             values["S_bag"] = slack_m
         params = ProxyParams.from_scalars(values, dtype=torch.float64)
         return cls(LumpedContactProxy(params, dt), params.S_bag.new_tensor([[nominal["mass_kg"]]]),
-                   params.S_bag.new_tensor([com_offset]))
+                   params.S_bag.new_tensor([com_offset]), half_extents=half_extents)
 
     def initial_state(self) -> ParcelState:
         zero = torch.zeros_like(self.up)
@@ -187,16 +189,16 @@ class MacroParcelSim:
             raise ValueError("axis must be vertical or tangential")
         return self._run_probe("ramp", rate_N_s=rate_N_s, grip_N=grip_N, axis=axis)
 
-    def _run_probe(self, mode, *, feed_depth_m=.015531134179, grip_N=6., duration_s=4.77, pressure_N=.5,
-                   opening_span_m=.014, opening_speed_mps=.020, rate_N_s=5., axis="vertical"):
-        start = perf_counter()
-        state = self.initial_state()
+    def probe_actions(self, mode, *, feed_depth_m=.015531134179, grip_N=6., duration_s=4.77, pressure_N=.5,
+                      opening_span_m=.014, opening_speed_mps=.020, rate_N_s=5., axis="vertical"):
+        """Build the action trajectory used by both alignment and batched timing."""
         dt = self.dt
-        end_s = {"top": 1.5, "side": duration_s, "release": 2.65 + opening_span_m / opening_speed_mps + .5,
-                 "ramp": 2.65 + 15. / rate_N_s + .25}[mode]
+        change_at = PROBE_ACTION_CHANGE_S
+        end_s = {"top": 1.5, "side": duration_s, "release": change_at + opening_span_m / opening_speed_mps + .5,
+                 "ramp": change_at + 15. / rate_N_s + .25}[mode]
         times = torch.arange(math.ceil(end_s / dt), dtype=self.mass.dtype, device=self.mass.device)[:, None, None] * dt
         close_s = .36
-        lift_start, lift_end, change_at = .50, 1.80, 2.65
+        lift_start, lift_end = .50, 1.80
         depth = (feed_depth_m + self.mass.new_tensor([.00055, -.00055])).clamp_min(0.)
         p = self.proxy.params
         full_gather = (times / close_s).clamp(0., 1.)
@@ -235,13 +237,20 @@ class MacroParcelSim:
         pad_position = torch.stack((x, torch.zeros_like(z), z), dim=-1)
         pad_velocity = torch.cat(((pad_position[1:] - pad_position[:-1]) / dt, torch.zeros_like(pad_position[:1])))
         unit_load = self.mass.new_tensor((0., 0., -1.) if axis == "vertical" else (0., 1., 0.))
+        batches = self.mass.shape[0]
+        actions = ParcelAction(pad_position, pad_velocity, normal, inward.expand(-1, batches, 2),
+                               depth.expand(len(times), batches, 2), alignment_cos,
+                               (applied * unit_load).expand(-1, batches, -1), press.expand(-1, batches, -1))
+        return times, gap, applied, actions
 
+    def _run_probe(self, mode, **options):
+        start = perf_counter()
+        state = self.initial_state()
+        times, gap, applied, actions = self.probe_actions(mode, **options)
         clearance, support, com, speed, tilt, wrench, tension, contacts, rates, energy, elastic_pull = (
             [] for _ in range(11))
         for i in range(len(times)):
-            result = self.step(state, ParcelAction(pad_position[i], pad_velocity[i], normal[i], inward[i].expand_as(p.L0),
-                                                   depth.expand_as(p.L0), alignment_cos[i], applied[i] * unit_load,
-                                                   press[i]))
+            result = self.step(state, ParcelAction(*(channel[i] for channel in actions)))
             state = result.state
             clearance.append(result.table_clearance)
             support.append(result.support_N)
@@ -256,7 +265,7 @@ class MacroParcelSim:
             elastic_pull.append(result.elastic_pull)
 
         channels = dict(time_s=times[:, 0, 0], gap_m=gap[:, 0, 0], external_load_N=applied[:, 0, 0],
-                        normal_force_N=normal[:, 0], pad_position_m=pad_position[:, 0],
+                        normal_force_N=actions.normal_force[:, 0], pad_position_m=actions.pinch_position[:, 0],
                         table_clearance_m=torch.stack(clearance)[:, 0, 0], support_N=torch.stack(support)[:, 0, 0],
                         com_m=torch.stack(com)[:, 0], velocity_m_s=torch.stack(speed)[:, 0],
                         orientation=torch.stack(tilt)[:, 0], wrench=torch.stack(wrench)[:, 0],
@@ -264,5 +273,5 @@ class MacroParcelSim:
                         slip_rate_mps=torch.stack(rates)[:, 0], elastic_energy_J=torch.stack(energy)[:, 0],
                         elastic_pull_N=torch.stack(elastic_pull)[:, 0])
         traces = {key: value.detach().cpu().numpy() for key, value in channels.items()}
-        traces["action_change_s"] = change_at
+        traces["action_change_s"] = PROBE_ACTION_CHANGE_S
         return ProbeTrace(perf_counter() - start, traces)

@@ -141,7 +141,7 @@ class Stage2ProxyTest(unittest.TestCase):
         good_geometry = proxy.step(state, contact)
         self.assertTrue((good_geometry.state[:, :, C.CAPTURE] == 1.).all())
 
-    def test_100000_extreme_steps_at_both_step_sizes(self):
+    def test_million_extreme_steps_at_both_step_sizes(self):
         gen = torch.Generator().manual_seed(56484)
         size = 257, 16, 2
         normal = torch.rand(size, generator=gen)
@@ -164,10 +164,11 @@ class Stage2ProxyTest(unittest.TestCase):
                                                inward_velocity=inward[i], feed_depth=depth[i], alignment_cos=alignment[i]))
                 state = proxy.initial_state()
                 max_tension, detached, peak_slip = 0., 0, 0.
-                for first in range(0, 100_000, len(frame)):
+                steps = 1_000_000
+                for first in range(0, steps, len(frame)):
                     history = []
                     prior = state
-                    for action in frame[:min(len(frame), 100_000 - first)]:
+                    for action in frame[:min(len(frame), steps - first)]:
                         result = proxy.step(state, action)
                         state = result.state
                         history.append(result)
@@ -186,7 +187,7 @@ class Stage2ProxyTest(unittest.TestCase):
                 self.assertGreater(detached, 0)
                 self.assertGreater(peak_slip, 0.)
                 self.assertLessEqual(max_tension, 2000. * (3. - .10) + 10. * 80. + .01)
-                print(f"dt={dt * 1000:g} ms, B=16, steps=100000, releases={detached}, peak tension={max_tension:.3f} N",
+                print(f"dt={dt * 1000:g} ms, B=16, steps={steps}, releases={detached}, peak tension={max_tension:.3f} N",
                       flush=True)
 
     def test_rigid_snap_switch_keeps_the_tensor_interface(self):
