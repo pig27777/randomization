@@ -13,7 +13,7 @@ import torch
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from experience.yam_platform import protocol
-from src.low_order_parcel import yam_adapter
+from src.low_order_parcel import pad_torsion, yam_adapter
 from src.low_order_parcel.lumped_contact_proxy import ContactState
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction
 from src.low_order_parcel.unified_payload import UnifiedPayloadTemplate
@@ -22,6 +22,7 @@ from test_unified_payload import model, pe_proxy
 
 @dataclass
 class Config(yam_adapter.Config):
+    pad_radius_m: float = 0.
     preset: str = "rigid_box"
     fill: float = .75
     indent: float = 0.
@@ -169,12 +170,24 @@ class AuditYamSim(protocol.MuJoCoSim):
         action = ParcelAction(tip, tensor(velocity[None]), tensor(self.normal[None]), tensor(inward[None]),
                               tensor(feed[None]), tensor(alignment[None]), tensor(front.sum(axis=0)[None]),
                               torch.zeros_like(old.indentation_power))
-        result = self.parcel.step(old, action)
+        if self.parcel.torsion is None:
+            result = self.parcel.step(old, action)
+            reaction_torque = np.zeros(3)
+        else:
+            body = self.m.body("link_6").id
+            twist = np.zeros(6)
+            mujoco.mj_objectVelocity(self.m, self.d, mujoco.mjtObj.mjOBJ_BODY, body, twist, 0)
+            result = self.parcel.step(old, action, jaw_orientation=tensor(self.d.xquat[body][None]),
+                                      jaw_angular_velocity=tensor(twist[None, :3]))
+            reaction_torque = -result.state.torsion.torque[0, 0].numpy()
         reaction, _, _, _ = self.boundary.reaction(old, action, result)
         self.reactions = reaction[0].numpy() + self.normal[:, None] * outward - front
         self.d.qfrc_applied[:] = 0.
         for force, point, body in zip(self.reactions, pad, self.fingers, strict=True):
             mujoco.mj_applyFT(self.m, self.d, force, np.zeros(3), point, body, self.d.qfrc_applied)
+        if self.parcel.torsion is not None:
+            mujoco.mj_applyFT(self.m, self.d, np.zeros(3), reaction_torque, pad.mean(0),
+                              self.m.body("link_6").id, self.d.qfrc_applied)
         mujoco.mj_step(self.m, self.d)
         mujoco.mj_kinematics(self.m, self.d)
         self.last_step, self.state = result, result.state
@@ -192,7 +205,8 @@ def scene(cfg):
     params = replace(params, **{field: params.total_mass.new_tensor([[value]]) for field, value in
                                (("fill_ratio", cfg.fill), ("max_indent_ratio", cfg.indent),
                                 ("table_friction", cfg.friction), ("total_mass", cfg.mass))})
-    parcel = MacroParcelSim(pe_proxy(1), payload=UnifiedPayloadTemplate(params))
+    torsion = pad_torsion.PadTorsionParams(radius_m=cfg.pad_radius_m) if cfg.pad_radius_m else None
+    parcel = MacroParcelSim(pe_proxy(1), payload=UnifiedPayloadTemplate(params), torsion=torsion)
     center = np.array([-.25, .04])
     size = 2. * params.bag_half_extents[0].numpy()
     xml = """<mujoco model="YAM Stage 2.5 physical audit">
@@ -238,7 +252,7 @@ summarize = yam_adapter.summarize
 
 def source_files():
     from src.low_order_parcel import unified_payload
-    return {**yam_adapter.source_files(), "payload": Path(unified_payload.__file__)}
+    return {**yam_adapter.source_files(), "payload": Path(unified_payload.__file__), "pad_torsion": Path(pad_torsion.__file__)}
 
 
 def cases():

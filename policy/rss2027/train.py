@@ -16,7 +16,7 @@ from .grasp_env import SoftParcelGraspEnv, VARIANTS
 class Policy(nn.Module):
     def __init__(self):
         super().__init__()
-        self.encoder = nn.GRU(15,128,batch_first=True)
+        self.encoder = nn.GRU(18,128,batch_first=True)
         self.mode = nn.ModuleList([nn.Linear(128,2),nn.Linear(128,3)])
         self.mean = nn.ModuleList([nn.Linear(128,8),nn.Linear(128,2)])
         self.log_std = nn.ParameterList([nn.Parameter(torch.zeros(4)),nn.Parameter(torch.zeros(2))])
@@ -24,13 +24,23 @@ class Policy(nn.Module):
         with torch.no_grad():
             self.mode[1].bias.copy_(torch.tensor([.5,0.,-.6]))
 
+    def load_state_dict(self, state_dict, strict=True, assign=False):
+        # Previously saved actors had no Phase B current/vision channels.
+        key = "encoder.weight_ih_l0"
+        if key in state_dict and state_dict[key].shape[1] == 15:
+            state_dict = state_dict.copy()
+            state_dict[key] = nn.functional.pad(state_dict[key], (0, 3))
+        return super().load_state_dict(state_dict, strict=strict, assign=assign)
+
     def distributions(self, obs, stage):
-        """Float32 [B,T,15] normalized hardware history -> [B,128] latent and action heads."""
+        """Float32 [B,T,18] normalized hardware history -> [B,128] latent and action heads."""
+        if obs.shape[-1] == 15:
+            obs = nn.functional.pad(obs, (0, 3))
         h = self.encoder(obs)[1][0]
         return h,Categorical(logits=self.mode[stage](h)),self.mean[stage](h)
 
     def decide(self, obs, priv, stage, *, saved=None, forced=None, greedy=False):
-        """Normalized float32 history [B,T,15], privileged [B,70] -> hybrid choice/logp/value."""
+        """Normalized float32 history [B,T,18], privileged [B,70] -> hybrid choice/logp/value."""
         h, dist, means = self.distributions(obs,stage)
         mode = saved[0] if saved is not None else forced if forced is not None else (
             dist.probs.argmax(1) if greedy else dist.sample())
@@ -66,7 +76,7 @@ class Decision:
 
 
 def heuristic(obs,stage,previous):
-    """Dimensionless [B,T,15] hardware features -> int64 [B], float32 [B,4 or 2] controls."""
+    """Dimensionless [B,T,18] hardware features -> int64 [B], float32 [B,4 or 2] controls."""
     if stage==0:
         mode = ((obs[:,:,0].amax(1)<.85)&(obs[:,-1,10]>=.2)).long()
         if previous is not None:

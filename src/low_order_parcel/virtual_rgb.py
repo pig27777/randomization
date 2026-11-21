@@ -6,6 +6,7 @@ from typing import NamedTuple
 import torch
 from torch import Tensor
 
+from .lift_probe import monocular_lift_ratio
 from .unified_payload import PayloadState, UnifiedPayloadTemplate
 
 
@@ -39,12 +40,13 @@ class RGBParameters(NamedTuple):
 class RGBObservation(NamedTuple):
     top_box: Tensor          # [B,6], x, y, L, W, cos(yaw), sin(yaw); yaw modulo pi
     top_clearance: Tensor    # [B,4], -X,+X,-Y,+Y, in m
-    vis_lift_ratio: Tensor   # [B,1], synchronous image displacement during the 25 mm window
+    vis_lift_ratio: Tensor   # [B,1], synchronous image displacement during the active lift window
     top_valid: Tensor        # [B,1], a visible Top frame has arrived
     wrist_target_rel: Tensor  # [B,3], in the Wrist camera frame
     wrist_profile: Tensor     # [B,2], height and width in m at the FK depth
     wrist_sway_est: Tensor    # [B,2], apparent inter-frame displacement, camera right/down
     wrist_vis_valid: Tensor   # [B,1], latest delivered frame geometrically valid
+    vis_lift_valid: Tensor    # [B,1], same delivered Top frame has a usable lift ratio
 
 
 def _rotation_xyz(angles: Tensor) -> Tensor:
@@ -96,15 +98,16 @@ class VirtualRGBProjector:
         self.wrist_limit = (params.wrist_fov_rad / 2.).tan()
         self._rotation = _rotation_xyz(params.rotation_rad)
         self._signs = like.new_tensor([(x, y, z) for x in (-1., 1.) for y in (-1., 1.) for z in (-1., 1.)])
-        self._ring = like.new_zeros((61, batch, 2, 12))
+        self._ring = like.new_zeros((61, batch, 2, 13))
         self._exposed = torch.zeros((61, batch, 2), dtype=torch.bool, device=like.device)
-        self._last = like.new_zeros((batch, 2, 12))
+        self._last = like.new_zeros((batch, 2, 13))
         self._age = torch.zeros((batch, 1), dtype=torch.long, device=like.device)
         self._batch = torch.arange(batch, device=like.device)[:, None]
         self._camera = torch.arange(2, device=like.device)
         self._previous_wrist = like.new_zeros((batch, 3))
         self._wrist_seen = torch.zeros_like(self._age, dtype=torch.bool)
         self._lift_origin = like.new_zeros((batch, 3))  # Top mask y, FK image y, FK world z
+        self._reference_box = like.new_zeros((batch, 3))
         self._gamma = torch.zeros_like(like)
         self._lifting = torch.zeros_like(self._age, dtype=torch.bool)
         self._index = self._frame_clock = 0
@@ -163,7 +166,7 @@ class VirtualRGBProjector:
         return box, clearance, valid
 
     def step(self, state: PayloadState, wrist_camera: CameraPose, arm_A_fk: Tensor,
-             lift_active: Tensor) -> RGBObservation:
+             lift_active: Tensor, *, exterior_height: Tensor | None = None) -> RGBObservation:
         """Project one physics sample. FK is the known Arm A gripper center [B,3]."""
         p = self.params
         vertices = self.vertices(state)
@@ -199,6 +202,12 @@ class VirtualRGBProjector:
         delta_y, ee_y, lift_z = (working - self._lift_origin).split(1, dim=1)
         ratio = (delta_y * ee_y.sign() / ee_y.abs().clamp_min(1e-6)).clamp(0., 1.5)
         in_window = (lift_z >= 0.) & (lift_z <= .025 + 1e-6) & (ee_y.abs() > 1e-6)
+        if exterior_height is not None:
+            silhouette = torch.cat((.5*(lo[:,0] + hi[:,0]), hi[:,0,:1]-lo[:,0,:1]), dim=1)
+            self._reference_box = torch.where(start, silhouette, self._reference_box)
+            ratio, in_window = monocular_lift_ratio(
+                self._reference_box, silhouette, lift_z, exterior_height,
+                self.top_camera.position[:,2:3], self.top_camera.world_from_camera[:,2,:])
         update_ratio = self._lifting & in_window & top_exposed
         self._gamma = torch.where(start | ~lift_active, 0., torch.where(update_ratio, ratio, self._gamma))
 
@@ -216,8 +225,8 @@ class VirtualRGBProjector:
         self._wrist_seen = torch.where(fresh[:, 1:], wrist_valid, self._wrist_seen)
 
         top_frame = torch.cat((torch.where(top_valid, top_box, 0.), torch.where(top_valid, top_clearance, 0.),
-                               self._gamma, top_valid.to(lo.dtype)), dim=1)
-        wrist_frame_data = torch.cat((rel, profile, sway, torch.zeros_like(top_clearance), wrist_valid.to(lo.dtype)), dim=1)
+                               self._gamma, update_ratio.to(lo.dtype), top_valid.to(lo.dtype)), dim=1)
+        wrist_frame_data = torch.cat((rel, profile, sway, torch.zeros_like(top_clearance), torch.zeros_like(self._gamma), wrist_valid.to(lo.dtype)), dim=1)
         self._ring[self._index] = torch.stack((top_frame, wrist_frame_data), dim=1)
         self._exposed[self._index] = fresh
         index = (self._index - p.delay_steps.squeeze(-1)) % len(self._ring)
@@ -230,6 +239,6 @@ class VirtualRGBProjector:
         self._last = torch.where(arrived.unsqueeze(-1), delayed, self._last)
         self._index = (self._index + 1) % len(self._ring)
         self._age = (self._age + 1).clamp_max(len(self._ring))
-        box, clearance, gamma, top_valid = self._last[:, 0].split((6, 4, 1, 1), dim=1)
-        rel, profile, sway, _, wrist_valid = self._last[:, 1].split((3, 2, 2, 4, 1), dim=1)
-        return RGBObservation(box, clearance, gamma, top_valid.bool(), rel, profile, sway, wrist_valid.bool())
+        box, clearance, gamma, lift_valid, top_valid = self._last[:, 0].split((6, 4, 1, 1, 1), dim=1)
+        rel, profile, sway, _, wrist_valid = self._last[:, 1].split((3, 2, 2, 5, 1), dim=1)
+        return RGBObservation(box, clearance, gamma, top_valid.bool(), rel, profile, sway, wrist_valid.bool(), lift_valid.bool())

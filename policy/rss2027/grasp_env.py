@@ -4,6 +4,9 @@ import torch
 from torch.utils._pytree import tree_map
 
 from .domain import HardwareGapFilter
+from src.low_order_parcel.lift_probe import CAMERA_OFFSET, CAMERA_ROTATION, PROBE_RAMP_S, PROBE_SETTLE_S, probe_height
+from src.low_order_parcel.pad_torsion import PadTorsionParams
+from src.low_order_parcel.virtual_rgb import CameraPose, RGBParameters, VirtualRGBProjector
 from src.low_order_parcel.lumped_contact_proxy import LumpedContactProxy
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction
 from src.low_order_parcel.unified_payload import DT, UnifiedPayloadTemplate
@@ -20,7 +23,7 @@ class SoftParcelGraspEnv:
         self.e, self.variant, self.open_loop = episode, variant, open_loop
         self.sim = MacroParcelSim(LumpedContactProxy(episode.proxy, DT,
                                   ablation_rigid_snap=training and variant=="b1_rigid_snap"),
-                                  payload=UnifiedPayloadTemplate(episode.x))
+                                  payload=UnifiedPayloadTemplate(episode.x), torsion=PadTorsionParams())
         self.state = tree_map(torch.Tensor.clone, self.sim.initial_state())
         self.count = len(self.state.com)
         self.ext = episode.x.bag_half_extents
@@ -69,6 +72,21 @@ class SoftParcelGraspEnv:
         self.peak_press = self.zero.clone()
         self.valid_micro = self.zero.bool()
         self.samples = self.zero.new_zeros(32,self.count,8)
+        self.probe_height = probe_height(self.top)
+        self.probe_start_z = self.zero.clone()
+        self.probe_start_load = self.zero.clone()
+        # Capture physics at 2 ms. Expose/receive RGB outside the CUDA graph at 50 Hz.
+        self.rgb_history = self.zero.new_zeros(32, self.count, 2)
+        pose = CameraPose(self.top.new_tensor(CAMERA_OFFSET).expand(self.count,-1),
+                          self.top.new_tensor(CAMERA_ROTATION).expand(self.count,-1,-1))
+        camera = RGBParameters.sample(self.top)
+        camera = camera._replace(delay_steps=(camera.delay_steps + 5) // 10)
+        if not self.hw.enabled:
+            camera = camera._replace(translation_m=camera.translation_m*0, rotation_rad=camera.rotation_rad*0,
+                                     drop_probability=camera.drop_probability*0, mask_jitter=camera.mask_jitter*0,
+                                     delay_steps=camera.delay_steps*0)
+        self.rgb = VirtualRGBProjector(self.sim.payload, pose, camera, frame_period_steps=1,
+                                       table_bounds=self.top.new_tensor([-.5,.5,-.5,.5]).expand(self.count,-1))
         self.physics_steps = 0
         self.attempt = 0
         self.graph = None
@@ -127,13 +145,13 @@ class SoftParcelGraspEnv:
         scale = torch.where(self.route==1,.35+.5*self.b[:,1:2],1.)
         u = (t*scale/1.20).clamp(0.,1.)
         lift_z = sz + .265*(.5-.5*torch.cos(math.pi*u))
-        micro_z = sz + .025*(.5-.5*torch.cos(math.pi*(t/.4).clamp(max=1.)))
+        micro_z = sz + self.probe_height * (t / PROBE_RAMP_S).clamp(max=1.)
         # Carry the gathered side fold over the parcel before the main lift.
         centered = sy*(1-(.5-.5*torch.cos(math.pi*(t/.55).clamp(max=1.))))
         release = (ph==4)|(lift & retry)
         z = torch.where(micro,micro_z,torch.where(lift,lift_z,z))
         z = torch.where(release,torch.lerp(sz,self.top+.002,(t/.5).clamp(max=1.)),z)
-        y = torch.where(release,sy*(1-(t/.6).clamp(max=1.)),torch.where(micro,centered,torch.where(lift,sy,y)))
+        y = torch.where(release,sy*(1-(t/.6).clamp(max=1.)),torch.where(micro,sy,torch.where(lift,centered,y)))
         half = torch.where(release,torch.lerp(sh,self.width,(t/.25).clamp(max=1.)),torch.where(micro|lift,sh,half))
         boost = torch.where((self.route==1)&lift,2.+12.*self.b[:,:1],0.)
         grip = torch.where(release,0.,torch.where(micro|lift,sg+boost,grip))
@@ -194,24 +212,40 @@ class SoftParcelGraspEnv:
         self.tick.add_(1)
 
     def run(self, phase, steps):
-        """Advance a batch by integer ticks, return 50-Hz float32 [B,T,8] sensor history."""
+        """Advance a batch by integer ticks, return 50-Hz float32 [B,T,10] sensor history."""
         self.phase.fill_(phase)
         self.tick.zero_()
         self.start.copy_(self.request)
         if phase==0:
             self.probe_stop.zero_()
-        for _ in range(steps):
+        if phase == 2:
+            self.probe_start_z.copy_(self.real[:,1:2] + self.deflection[:,2:3])
+            self.probe_start_load.copy_(self.feedback)
+            self.rgb.reset(torch.ones(self.count, dtype=torch.bool, device=self.top.device))
+            self._probe_rgb()  # establish a pre-lift exposure if visible
+        for i in range(steps):
             if self.graph is None:
                 self._tick()
             else:
                 self.graph.replay()
+            if phase == 2 and (i + 1) % 10 == 0:
+                self.rgb_history[(i // 10) % 32].copy_(self._probe_rgb())
         self.physics_steps += self.count*steps
         n = min(steps//10,32)
         ids = torch.arange(steps//10-n,steps//10,device=self.top.device)%32
-        return self.samples.index_select(0,ids).transpose(0,1)
+        seq = self.samples.index_select(0,ids).transpose(0,1)
+        rgb = self.rgb_history.index_select(0,ids).transpose(0,1) if phase == 2 else seq.new_zeros(self.count,n,2)
+        return torch.cat((seq, rgb), dim=2)
+
+    def _probe_rgb(self):
+        fk = self._pad(self.real).mean(1) + self.deflection
+        wrist = CameraPose(fk + fk.new_tensor([0.,-.12,.12]), self.rgb.top_camera.world_from_camera)
+        obs = self.rgb.step(self.state.payload, wrist, fk, torch.ones_like(self.zero, dtype=torch.bool),
+                            exterior_height=self.top)
+        return torch.cat((obs.vis_lift_ratio, obs.vis_lift_valid.to(self.top.dtype)), dim=1)
 
     def touch(self):
-        """Return dimensionless [B,T,15] float32 tactile/geometry features."""
+        """Return dimensionless [B,T,18] float32 tactile/geometry features."""
         self.attempt += 1
         self.best.zero_()
         self.airborne.zero_()
@@ -228,10 +262,12 @@ class SoftParcelGraspEnv:
         """Int64 [B] top/side, float32 [B,4] controls in [0,1]; return micro history."""
         self.mode.copy_(mode[:,None])
         self.a.copy_(action)
-        self.run(1,600)
+        close = self.run(1,600)
         if self.variant=="ablation_no_microlift":
-            return self.features(self.samples[27:28].transpose(0,1),False)
-        return self.features(self.run(2,290),True)
+            return self.features(close[:,-1:],False)
+        # Hold long enough for the maximum 120 ms camera delay and a 300 ms decision window.
+        steps = 10 * math.ceil((PROBE_RAMP_S + PROBE_SETTLE_S) / (10*DT))
+        return self.features(self.run(2,steps),True)
 
     def finish(self, route, action):
         """Int64 [B] route and [B,2] float32 controls in [0,1]; return bool [B] success."""
@@ -250,23 +286,24 @@ class SoftParcelGraspEnv:
         self.real[:,0].zero_()
 
     def features(self, seq, micro):
-        """[B,T,8] float32 measured SI frames -> [B,T,15] dimensionless actor features."""
-        f,tau,z,h,p,room,hx,hy = seq.split(1,dim=2)
+        """[B,T,10] float32 measured frames -> [B,T,18] dimensionless actor features."""
+        f,tau,z,h,p,room,hx,hy,gamma,visible = seq.split(1,dim=2)
         gain_ref = torch.maximum(p,torch.ones_like(p)*2.)
         df = torch.diff(f,dim=1,prepend=f[:,:1])
-        dz = z-z[:,:1]
+        dz = z-(self.probe_start_z[:,None] if micro else z[:,:1])
         compress = ((-dz/.015)/((f-f[:,:1]).abs()/2.+.05)).clamp(-5,5)
         tension = (-f).clamp_min(0.)
         reference = tension[:,:min(seq.shape[1],20)].amax(dim=1,keepdim=True)
         keep = tension/(reference+.03*gain_ref)
+        current_delta = (self.probe_start_load[:,None] - f)/gain_ref if micro else torch.zeros_like(f)
         if self.variant=="ablation_no_history":
-            compress,df,keep,dz = (torch.zeros_like(f) for _ in range(4))
+            compress,df,keep,dz,current_delta,gamma = (torch.zeros_like(f) for _ in range(6))
         coarse_z = self.top[:,None].expand_as(f)/.16
         prior = (self.mode[:,None].expand_as(f) if self.attempt>1 else torch.full_like(f,-1.))
         feature = torch.cat((compress,df/(.02*gain_ref)*.1,keep,tension/gain_ref,
                            tau/(.03*gain_ref),h/hx.clamp_min(.01),
-                           torch.diff(h,dim=1,prepend=h[:,:1])/.002,dz/.025,
-                           hx/.19,hy/.15,room/.10,torch.full_like(f,float(micro)),coarse_z,prior,torch.full_like(f,self.attempt/3.)),2).clamp(-8,8)
+                           torch.diff(h,dim=1,prepend=h[:,:1])/.002,dz/(self.probe_height[:,None] if micro else .025),
+                           hx/.19,hy/.15,room/.10,torch.full_like(f,float(micro)),coarse_z,prior,torch.full_like(f,self.attempt/3.),current_delta,gamma,visible),2).clamp(-8,8)
         return feature[:,-1:] if self.variant=="ablation_no_history" else feature
 
     def privileged(self):

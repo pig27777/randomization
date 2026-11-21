@@ -9,7 +9,8 @@ class MicroLift:
     height = .025
     dwell = .30
 
-    def __init__(self, choose):
+    def __init__(self, choose, *, height=.025):
+        self.height = height
         self.choose = choose
         self.decision = None
         self.prefix = hashlib.sha256()
@@ -39,6 +40,7 @@ class MicroLift:
     def lift(self, elapsed, speed, now):
         """Return commanded upward travel and a one-shot request to reposition."""
         arrival = self.height / speed
+        self.lower_seconds = arrival
         if self.decision is None and elapsed >= arrival + self.dwell:
             lift_start = now - elapsed
             def window(phase, start, end):
@@ -61,9 +63,9 @@ class MicroLift:
 
     def retry_pose(self, elapsed, lift_site, closed_gap, open_gap, approach):
         """Lower, open, then shift the open hand smoothly to a nearby fold."""
-        lowering = min(elapsed / .625, 1.)
-        opening = np.clip((elapsed - .625) / .40, 0., 1.)
-        shift = np.clip((elapsed - 1.025) / .40, 0., 1.)
+        lowering = min(elapsed / self.lower_seconds, 1.)
+        opening = np.clip((elapsed - self.lower_seconds) / .40, 0., 1.)
+        shift = np.clip((elapsed - self.lower_seconds - .40) / .40, 0., 1.)
         offset = np.array([.008, 0., 0.]) + .006 * approach
         target = lift_site + [0., 0., self.height * (1. - lowering)] + shift * offset
-        return target, closed_gap + opening * (open_gap - closed_gap), elapsed >= 1.425
+        return target, closed_gap + opening * (open_gap - closed_gap), elapsed >= self.lower_seconds + .80
