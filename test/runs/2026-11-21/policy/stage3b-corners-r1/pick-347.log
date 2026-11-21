@@ -1,0 +1,36 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 48, in replay
+    tick()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 130, in tick
+    out = sim.step(state, DualArmAction(cmd, cmd, enabled, side_pair))
+  File "/home/ubuntu/workspace/gzl/randomization/src/low_order_parcel/dual_arm_parcel_sim.py", line 143, in step
+    local_tip = (tip - current.pos.mean(dim=1)[:, None, None]) @ frame[:, None]
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~
+RuntimeError: CUDA error: CUBLAS_STATUS_NOT_INITIALIZED when calling `cublasCreate(handle)`
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 220, in <module>
+    results = pick_search(suite, points, dr.tensor(picked, dtype=torch.long)) if picked else {}
+              ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/stage3-cu130/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 149, in pick_search
+    replay(tick, like, 5400)
+    ~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 47, in replay
+    with torch.cuda.graph(graph):
+         ~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/stage3-cu130/torch/cuda/graphs.py", line 265, in __exit__
+    self.cuda_graph.capture_end()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/stage3-cu130/torch/cuda/graphs.py", line 126, in capture_end
+    super().capture_end()
+    ~~~~~~~~~~~~~~~~~~~^^
+torch.AcceleratorError: CUDA error: operation failed due to a previous error during capture
+Search for `cudaErrorStreamCaptureInvalidated' in https://docs.nvidia.com/cuda/cuda-runtime-api/group__CUDART__TYPES.html for more information.
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.

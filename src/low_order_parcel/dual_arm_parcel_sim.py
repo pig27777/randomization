@@ -14,6 +14,7 @@ class DualArmAction(NamedTuple):
     arm_A: ParcelAction
     arm_B: ParcelAction
     enabled: Tensor  # [B,2] bool, one column per arm
+    side_feed: Tensor | None = None  # [B,2] bool, planned side feed can clear the wall
 
 
 class DualArmState(NamedTuple):
@@ -131,7 +132,7 @@ class DualArmParcelSim:
 
     def step(self, state: DualArmState, action: DualArmAction) -> DualArmStep:
         payload, current = self.payload, state.payload
-        arm_A, arm_B, enabled = action
+        arm_A, arm_B, enabled, side_feed = action
         enabled = enabled.unsqueeze(-1)
         tip, vel, normal, inward, feed, align, external, direct = (
             torch.stack(pair, dim=1) for pair in zip(arm_A, arm_B))
@@ -186,6 +187,8 @@ class DualArmParcelSim:
         press = (surface_vertical + extra_press).sum(dim=-1, keepdim=True)
         # The side wall/closing load provides compression when feeding horizontally.
         side = side_axis.abs().any(dim=-1, keepdim=True)
+        if side_feed is not None:
+            side = side | side_feed.unsqueeze(-1)
         normal = torch.where(pad_enabled, normal + crush, 0.)
         compression = torch.where(side, normal, press)
         excess = (compression - self.min_press).clamp_min(0.)

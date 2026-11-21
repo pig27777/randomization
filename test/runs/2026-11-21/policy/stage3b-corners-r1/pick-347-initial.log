@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 223, in <module>
+    release = measure_release() if 1 in args.corners else None
+              ~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/stage3-cu130/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/ubuntu/workspace/gzl/randomization/test/low_order_parcel/stage3_dual_arm_corners.py", line 203, in measure_release
+    return detachment_metrics(trace, DT, "external_load_N", [.55])
+  File "/home/ubuntu/workspace/gzl/randomization/src/low_order_parcel/verify_stage2_alignment.py", line 108, in detachment_metrics
+    slipping = trace["slip_rate_mps"].max(axis=1) > 1e-7
+               ~~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'slip_rate_mps'
