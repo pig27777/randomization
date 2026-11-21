@@ -137,7 +137,7 @@ def gather_slope(sim):
     return float(np.polyfit(distance, slack, 1)[0])
 
 
-def verify(config, dt):
+def verify(config, dt, *, sim_factory=MacroParcelSim.from_nominal):
     materials = config["materials"]
     archived = json.loads(CURVES.read_bytes())
     release_refs = {row["material"]: row["release"]["first_final_contact_loss_sample"]["actual_gap_m"]
@@ -147,7 +147,7 @@ def verify(config, dt):
     figures = {key: {} for key in ("top", "hover", "feed", "release", "load")}
     for material, entry in materials.items():
         nominal = entry["nominal"]
-        sim = MacroParcelSim.from_nominal(nominal, dt)
+        sim = sim_factory(nominal, dt)
         for pressure in (.3, .5, .8):
             trace = sim.run_top_press(pressure).channels
             top[f"{material}/{pressure:g} N"] = empty_result(trace)
@@ -177,9 +177,9 @@ def verify(config, dt):
 
     pe = materials["pe"]["nominal"]
     low_slack_m = config["geometry"]["opposing_axis_budget_by_group_m"]["0.90"][0]
-    starved = MacroParcelSim.from_nominal(pe, dt, slack_m=low_slack_m).run_side_grasp_and_hover(feed_depth_m=.035)
+    starved = sim_factory(pe, dt, slack_m=low_slack_m).run_side_grasp_and_hover(feed_depth_m=.035)
     low_slack = dict(slack_budget_m=low_slack_m, capture_threshold_m=pe["proxy"]["s_crit"], **empty_result(starved.channels))
-    sim = MacroParcelSim.from_nominal(pe, dt)
+    sim = sim_factory(pe, dt)
     feed = {}
     for depth in (.0015, .0075, .01125, .015531134179):
         label = f"{depth * 1000:.2f} mm"
@@ -193,7 +193,7 @@ def verify(config, dt):
     for row in feed.values():
         del row["pass_gate"]  # Zero-capture is only the expected outcome at the shallowest depth.
 
-    ecc = MacroParcelSim.from_nominal(pe, dt, com_offset=(.003, 0., 0.))
+    ecc = sim_factory(pe, dt, com_offset=(.003, 0., 0.))
     asymmetric = ecc.run_suspended_load_ramp(grip_N=pe["probe_grip_N"]).channels
     figures["asymmetric"] = asymmetric
     asym = asymmetric_metrics(asymmetric)

@@ -8,18 +8,70 @@ import unittest
 
 import torch
 
+from benchmark_stage2_cuda import build_sim, timed_episode
 from src.low_order_parcel.lumped_contact_proxy import ContactInputs, ContactState, LumpedContactProxy, ProxyParams
+from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction
 from src.low_order_parcel.unified_payload import DT, GRAVITY, PayloadParamsX, UnifiedPayloadTemplate
+from src.low_order_parcel.verify_stage2_alignment import verify
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG = json.loads((ROOT / "configs/payload_template_X.yaml").read_bytes())
+STAGE2 = json.loads((ROOT / "configs/proxy_material_envelopes.yaml").read_bytes())
 
 
 def model(*names, **overrides):
     return UnifiedPayloadTemplate(PayloadParamsX.from_presets(CONFIG, names, **overrides))
 
 
+def rigid_probe(nominal, dt, *, slack_m=None, com_offset=(0., 0., 0.)):
+    values = nominal["proxy"].copy()
+    if slack_m is not None:
+        values["S_bag"] = slack_m
+    params = ProxyParams.from_scalars(values, dtype=torch.float64)
+    hx = CONFIG["defaults"]["bag_half_extents"][0]
+    signs = params.S_bag.new_tensor([[-1., 1., -1., 1.]])
+    mass_weights = .25 + signs * (com_offset[0] / (2. * hx))
+    payload = model("rigid_box", dtype=torch.float64, mass_weights=mass_weights,
+                    total_mass=params.S_bag.new_tensor([[nominal["mass_kg"]]]))
+    return MacroParcelSim(LumpedContactProxy(params, dt), payload=payload)
+
+
+def heterogeneous_probe(config, worlds):
+    legacy, materials = build_sim(config, worlds)
+    gen = torch.Generator(device=legacy.mass.device).manual_seed(1726481)
+    params = PayloadParamsX.sample(CONFIG, worlds, device=legacy.mass.device, generator=gen)
+    return MacroParcelSim(legacy.proxy, payload=UnifiedPayloadTemplate(params)), materials
+
+
+def hover_grip(sim):
+    # Allocate enough per-pad friction for the sampled weight during the nominal lift.
+    return (2. * sim.mass * GRAVITY / sim.proxy.params.mu_eff.amin(dim=1, keepdim=True)).clamp_min(6.)
+
+
+def hover_steering(sim, state, action, offset):
+    relative = state.velocity - action.pinch_velocity.mean(dim=1)
+    # Common pad motion damps the pendulum and the vertical spring mode.
+    proxy = sim.proxy.params
+    segment = proxy.L0.mean(dim=1, keepdim=True) + .5 * sim.mass * GRAVITY / proxy.k
+    lateral_gain = 2. * torch.sqrt(segment / GRAVITY)
+    vertical_gain = torch.sqrt(2. * sim.mass / proxy.k)
+    lateral = .35 * state.com[:, :2] - lateral_gain * relative[:, :2]
+    target = torch.cat((lateral, -vertical_gain * relative[:, 2:3]), dim=1).clamp(-.10, .10)
+    return torch.lerp(offset, target, .18)
+
+
 class UnifiedPayloadTest(unittest.TestCase):
+    @torch.inference_mode()
+    def test_p1_rigid_template_passes_frozen_gate_a(self):
+        report, _ = verify(STAGE2, DT, sim_factory=rigid_probe)
+        regimes = report["regimes"]
+        print("P1:", {key: value["pass_gate"] for key, value in regimes.items()},
+              {key: value["hover_s"] for key, value in regimes["3_side_hover"]["materials"].items()}, flush=True)
+        self.assertTrue(report["gate_A_pass"], [key for key, value in regimes.items() if not value["pass_gate"]])
+        self.assertEqual(len(regimes["1_top_press"]["cases"]), 12)
+        for material, result in regimes["3_side_hover"]["materials"].items():
+            self.assertGreaterEqual(result["hover_s"], 3., material)
+
     @torch.inference_mode()
     def test_p2_progressive_lift_and_drape(self):
         sim = model("folded_clothes", "heavy_quilt")
@@ -87,10 +139,16 @@ class UnifiedPayloadTest(unittest.TestCase):
         self.assertTrue((cosine[0] > .65).all())
         self.assertTrue((budget - slack <= 2. * sim.depth_max).all())
         self.assertTrue((feed[1] == 0.).all() and (cosine[1] == 0.).all() and (budget[1] == slack[1]).all())
+        asymmetric_depth = overpress.depth.clone()
+        asymmetric_depth[:, 0] = 0.
+        _, _, asymmetric_budget = sim.contact_geometry(asymmetric_depth, weights, zeros, zeros, slack)
+        width = 2. * sim.params.bag_half_extents[:, :1]
+        perimeter_drop = width + dmax - torch.hypot(width, dmax)
+        self.assertTrue((asymmetric_budget - slack <= perimeter_drop + 1e-8).all())
         moderate = sim.surface_contact(state, torch.full((2, 2), .018), weights, engaged)
         feed, cosine, budget = sim.contact_geometry(moderate.depth, weights, zeros, zeros, slack)
         self.assertTrue((feed[0] < .020).all())
-        nominal = json.loads((ROOT / "configs/proxy_material_envelopes.yaml").read_bytes())["materials"]["pe"]["nominal"]
+        nominal = STAGE2["materials"]["pe"]["nominal"]
         base = ProxyParams.from_scalars(nominal["proxy"])
         params = ProxyParams(**{f.name: getattr(base, f.name).expand(2, -1) for f in fields(base)} | {"S_bag": budget})
         proxy = LumpedContactProxy(params, DT)
@@ -108,6 +166,15 @@ class UnifiedPayloadTest(unittest.TestCase):
             loaded = loaded._replace(d_surf=result.depth)
         torch.testing.assert_close(loaded.d_surf, overpress.depth * torch.exp(-.15 / sim.params.tau_rebound),
                                    rtol=1e-5, atol=1e-8)
+        parcel = MacroParcelSim(proxy, payload=sim)
+        initial = parcel.initial_state()
+        press = initial.payload.pos[:, :2].clone()
+        press[:, :, 2] = -.15
+        action = ParcelAction(press, torch.zeros_like(press), zeros, zeros, zeros, zeros, xyz[:, 0], slack * 0.)
+        pressed = parcel.step(initial, action)
+        self.assertTrue((pressed.wrist_wrench[:, 2] > 0.).all())
+        self.assertTrue((pressed.support_N[:, 0] > sim.params.total_mass[:, 0] * GRAVITY).all())
+        torch.testing.assert_close(proxy.params.S_bag, budget)
         print(f"P3: settled force {torch.stack(forces).tolist()} N, rebound ratio {float(loaded.d_surf[0, 0] / dmax[0, 0]):.3f}")
 
     @torch.inference_mode()
@@ -150,6 +217,46 @@ class UnifiedPayloadTest(unittest.TestCase):
         torch.testing.assert_close(weight.sum(dim=1)[:, 2], sim.params.total_mass[:, 0] * GRAVITY)
         self.assertEqual(float(suspended.support_N.sum()), 0.)
         print(f"P4: diagonal stop at {first_stop * DT:.3f} s, peak internal impulse {max(transfers):.6f} N s")
+
+        nominal = STAGE2["materials"]["pe"]["nominal"]["proxy"]
+        base = ProxyParams.from_scalars(nominal, dtype=torch.float64)
+        balanced_proxy = ProxyParams(**{f.name: getattr(base, f.name).expand(2, -1) for f in fields(base)})
+        payload = model("loose_shifting", "loose_shifting", dtype=torch.float64,
+                        slide_slack_max=base.S_bag.new_tensor([[.04], [0.]]))
+        parcel = MacroParcelSim(LumpedContactProxy(balanced_proxy, DT), payload=payload)
+        times, _, _, actions = parcel.probe_actions("side", grip_N=hover_grip(parcel))
+        state = parcel.initial_state()
+        correction = torch.zeros_like(state.com)
+        history, shifts, settled = [], [], []
+        for i in range(len(times)):
+            action = ParcelAction(*(c[i] for c in actions))
+            target = hover_steering(parcel, state, action, correction)[:1].expand_as(correction)
+            phase = min(1., max(0., (i * DT - .55) / .70))
+            tilt = .02 * (1. - math.cos(2. * math.pi * phase))
+            rate = .04 * math.pi / .70 * math.sin(2. * math.pi * phase)
+            side = state.com.new_tensor([[-1.], [1.]]) * parcel.up[:, None]
+            action = action._replace(pinch_position=action.pinch_position + target[:, None] + tilt * side,
+                                     pinch_velocity=action.pinch_velocity + ((target - correction) / DT)[:, None] + rate * side)
+            correction = target
+            out = parcel.step(state, action)
+            state = out.state
+            shifts.append((state.payload.pos[:, 3] - state.payload.pos[:, 0]).norm(dim=1) - payload.diagonal[:, 0])
+            history.append(out.wrist_wrench)
+            settled.append((out.support_N[0, 0] == 0.) & (out.table_clearance[0, 0] > .001))
+        wrench = torch.stack(history)
+        shift = torch.stack(shifts)
+        impact = torch.nonzero(shift[:, 0] >= .99 * payload.slide[0, 0])[0, 0].item()
+        self.assertGreater(impact * DT, .55)
+        self.assertLess(float(shift[:, 1].abs().max()), .002)
+        diff = wrench[275:1000, 0] - wrench[275:1000, 1]
+        self.assertGreater(float(diff[:, :3].norm(dim=1).max()), .1)
+        self.assertGreater(float(diff[:, 3:].norm(dim=1).max()), 1e-4)
+        self.assertTrue(torch.stack(settled)[-100:].all())
+        expected = -(parcel.mass[0, 0] * GRAVITY) * parcel.up[0]
+        hover_wrench = wrench[-100:, 0, :3]
+        torch.testing.assert_close(hover_wrench, expected.expand_as(hover_wrench), atol=1e-3, rtol=0.)
+        print(f"P4 coupled: delayed stop {impact * DT:.3f} s, "
+              f"hover force {float(-hover_wrench[:, 2].mean()):.6f} N, weight {float(-expected[2]):.6f} N")
 
     @unittest.skipUnless(torch.cuda.is_available(), "P5 requires CUDA")
     @torch.inference_mode()
@@ -228,6 +335,22 @@ class UnifiedPayloadTest(unittest.TestCase):
         torch.testing.assert_close(torch.linalg.cross(anchor - com, force).sum(dim=1),
                                    torch.linalg.cross(state.pos - com, block_force).sum(dim=1))
         self.assertEqual(sim.get_privileged_state(state).shape, (1, 54))
+        dense, loose = model("rigid_box", "rigid_box",
+                             fill_ratio=torch.tensor([[.95], [.30]])).params.fill_slack_capacity()
+        self.assertLess(float(dense), .034)
+        self.assertGreater(float(loose), .034)
+
+    @unittest.skipUnless(torch.cuda.is_available() and "5090" in torch.cuda.get_device_name(), "P6 requires an RTX 5090")
+    @torch.inference_mode()
+    def test_p6_rtx_5090_8192_heterogeneous_full_episodes(self):
+        result = timed_episode(STAGE2, 8192, {}, make_sim=heterogeneous_probe, grip_N=hover_grip, steer=hover_steering)
+        result["all_worlds_met_hold"] = result.pop("passed")
+        print(json.dumps(result, allow_nan=False), flush=True)
+        self.assertEqual(result["steps_per_world"], 2385)
+        self.assertEqual(result["nonfinite_worlds"], 0)
+        self.assertEqual(result["invalid_geometry_worlds"], 0)
+        self.assertLessEqual(result["wall_s"], 10. * 1.119)
+        self.assertGreaterEqual(result["verified_sim_seconds_per_wall_second"], 8192 * 4.77 / (10. * 1.119))
 
 
 def tensor_mean(value):

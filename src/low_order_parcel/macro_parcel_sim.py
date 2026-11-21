@@ -1,5 +1,7 @@
-"""Single rigid parcel on a plane, loaded by the two independent film ropes."""
+"""Rigid or segmented parcel on a plane, loaded by two independent film ropes."""
 
+from copy import copy
+from dataclasses import replace
 import math
 from time import perf_counter
 from typing import NamedTuple
@@ -9,8 +11,8 @@ import torch
 from torch import Tensor
 
 from .lumped_contact_proxy import ContactInputs, EPS, LumpedContactProxy, ProxyParams
+from .unified_payload import GRAVITY, PayloadState, UnifiedPayloadTemplate
 
-GRAVITY = 9.81
 PROBE_ACTION_CHANGE_S = 2.65
 
 
@@ -21,12 +23,38 @@ def rotate(q: Tensor, points: Tensor) -> Tensor:
     return points + q[..., :1] * cross + torch.linalg.cross(qv, cross)
 
 
+def _orientation(frame: Tensor) -> Tensor:
+    """Use the largest quaternion component as the pivot, including at 180 degrees."""
+    (xx, yx, zx), (xy, yy, zy), (xz, yz, zz) = (col.unbind(dim=1) for col in frame.unbind(dim=2))
+    squares = torch.stack((1. + xx + yy + zz, 1. + xx - yy - zz,
+                           1. - xx + yy - zz, 1. - xx - yy + zz), dim=1)
+    w, x, y, z = squares.unbind(dim=1)
+    wx, wy, wz = zy - yz, xz - zx, yx - xy
+    xy, xz, yz = xy + yx, xz + zx, yz + zy
+    candidates = torch.stack((torch.stack((w, wx, wy, wz), dim=1),
+                              torch.stack((wx, x, xy, xz), dim=1),
+                              torch.stack((wy, xy, y, yz), dim=1),
+                              torch.stack((wz, xz, yz, z), dim=1)), dim=1)
+    index = squares.argmax(dim=1).view(-1, 1, 1).expand(-1, 1, 4)
+    return torch.nn.functional.normalize(candidates.gather(1, index).squeeze(1), dim=1)
+
+
 class ParcelState(NamedTuple):
     com: Tensor
     orientation: Tensor
     velocity: Tensor
     angular_velocity: Tensor
     contacts: Tensor
+
+
+class PayloadParcelState(NamedTuple):
+    com: Tensor
+    orientation: Tensor
+    velocity: Tensor
+    angular_velocity: Tensor
+    contacts: Tensor
+    indentation_power: Tensor    # [B, 1], rope work rate on the prescribed indentation
+    payload: PayloadState
 
 
 class ParcelAction(NamedTuple):
@@ -41,7 +69,7 @@ class ParcelAction(NamedTuple):
 
 
 class ParcelStep(NamedTuple):
-    state: ParcelState
+    state: ParcelState | PayloadParcelState
     wrist_wrench: Tensor  # [B, 6], world frame, about pad midpoint
     support_N: Tensor  # [B, 1]
     table_clearance: Tensor  # [B, 1], minimum box-to-plane separation
@@ -57,26 +85,43 @@ class ProbeTrace(NamedTuple):
 
 
 class MacroParcelSim:
-    def __init__(self, proxy: LumpedContactProxy, mass_kg: Tensor, com_offset: Tensor, *,
-                 half_extents=(.075, .10, .016), table_friction: float = .40):
+    def __init__(self, proxy: LumpedContactProxy, mass_kg: Tensor | None = None,
+                 com_offset: Tensor | None = None, *, half_extents=(.075, .10, .016),
+                 table_friction: float = .40, payload: UnifiedPayloadTemplate | None = None):
         """Mass and COM offset are [B,1] kg and [B,3] m in the parcel frame."""
         like = proxy.params.S_bag
         batch = like.shape[0]
+        self.proxy = proxy
+        self.dt = proxy.dt
+        self.payload = payload
+        self.up = like.new_tensor((0., 0., 1.)).expand(batch, 3)
+        if payload is not None:
+            if mass_kg is not None or com_offset is not None:
+                raise ValueError("With a payload template, mass and COM come from PayloadParamsX")
+            self.mass = payload.params.total_mass
+            if (self.mass.shape != like.shape or self.mass.device != like.device or
+                    self.mass.dtype != like.dtype or payload.dt != self.dt):
+                raise ValueError("Payload and contact proxy must have the same batch, device, dtype and step")
+            self.half_extents = payload.params.bag_half_extents
+            # The calibrated mount coordinates are fixed material points on both sides.
+            xy = like.new_tensor([[-.024, 0.], [.024, 0.]]).expand(batch, -1, -1)
+            self.payload_mount_weights = payload.weights_at(xy)
+            self.base_slack = torch.minimum(like, payload.params.fill_slack_capacity())
+            return
+        if mass_kg is None or com_offset is None:
+            raise ValueError("Provide mass and COM offset for the rigid parcel")
         if mass_kg.shape != (batch, 1) or com_offset.shape != (batch, 3):
             raise ValueError("Expected mass [B,1] and COM offset [B,3]")
         if any(value.dtype != like.dtype or value.device != like.device for value in (mass_kg, com_offset)):
             raise ValueError("Mass and COM offset must match the contact parameter dtype and device")
         if (mass_kg <= 0).any() or not torch.isfinite(mass_kg).all() or not torch.isfinite(com_offset).all():
             raise ValueError("The parcel must have a finite positive mass and a finite COM offset")
-        self.proxy = proxy
-        self.dt = proxy.dt
         self.mass = mass_kg
         self.offset = com_offset
         self.half_extents = like.new_tensor(half_extents)
         if (self.half_extents <= 0).any() or (com_offset.abs() >= self.half_extents).any() or table_friction < 0.:
             raise ValueError("The parcel must enclose its COM and have nonnegative table friction")
         self.mu_table = table_friction
-        self.up = like.new_tensor((0., 0., 1.)).expand(batch, 3)
         hx, hy, hz = half_extents
         box_center_moi = like.new_tensor((hy**2 + hz**2, hx**2 + hz**2, hx**2 + hy**2)) / 3.
         # Apply the parallel axis theorem to approximate a mass distribution centred on the offset COM.
@@ -99,13 +144,19 @@ class MacroParcelSim:
         return cls(LumpedContactProxy(params, dt), params.S_bag.new_tensor([[nominal["mass_kg"]]]),
                    params.S_bag.new_tensor([com_offset]), half_extents=half_extents)
 
-    def initial_state(self) -> ParcelState:
+    def initial_state(self) -> ParcelState | PayloadParcelState:
         zero = torch.zeros_like(self.up)
-        com = self.up * self.half_extents[2] + self.offset
         quat = torch.cat((torch.ones_like(zero[:, :1]), zero), dim=1)
+        if self.payload is not None:
+            state = self.payload.initial_state()
+            return PayloadParcelState(self.payload.com(state), quat, zero, zero, self.proxy.initial_state(),
+                                      torch.zeros_like(self.mass), state)
+        com = self.up * self.half_extents[2] + self.offset
         return ParcelState(com, quat, zero, zero, self.proxy.initial_state())
 
-    def step(self, state: ParcelState, action: ParcelAction) -> ParcelStep:
+    def step(self, state: ParcelState | PayloadParcelState, action: ParcelAction) -> ParcelStep:
+        if self.payload is not None:
+            return self._step_payload(state, action)
         dt, q = self.dt, state.orientation
         mount_arm = rotate(q[:, None, :], self.mounts)
         attachment = state.com[:, None, :] + mount_arm
@@ -160,6 +211,81 @@ class MacroParcelSim:
         return ParcelStep(ParcelState(com, orientation, velocity, omega, contacts.state),
                           torch.cat((wrist_force, wrist_torque), dim=1), impulse_n / dt, clearance_next.clamp_min(0.),
                           contacts.tension, contacts.slip_rate, contacts.elastic_energy, elastic_pull)
+
+    def _step_payload(self, state: PayloadParcelState, action: ParcelAction) -> ParcelStep:
+        payload = self.payload
+        current = state.payload
+        weights = self.payload_mount_weights
+        frame = payload.frame(current)
+        tip = action.pinch_position
+        midpoint = tip.mean(dim=1, keepdim=True)
+        local_tip = torch.bmm(tip - current.pos.mean(dim=1, keepdim=True), frame)
+        tip_weights = payload.weights_at(local_tip[:, :, :2])
+        normal = frame[:, :, 2]
+        center = torch.bmm(tip_weights, current.pos)
+        normal_gap = ((tip - center) * normal[:, None]).sum(dim=-1)
+        tip_depth = payload.half_height - normal_gap
+        in_footprint = (local_tip[:, :, :2].abs() <= self.half_extents[:, None, :2]).all(dim=-1)
+        previous_gap = normal_gap - self.dt * (action.pinch_velocity * normal[:, None]).sum(dim=-1)
+        previous_indent = torch.bmm(tip_weights, current.d_surf.unsqueeze(-1)).squeeze(-1)
+        top = ((previous_gap >= 0.) | (previous_indent > EPS) |
+               (action.direct_press_N > 0.) | (tip[:, :, 2] <= 0.))
+        surface = payload.surface_contact(current, tip_depth, tip_weights, in_footprint & top)
+        depth_rate = (surface.depth - current.d_surf) / self.dt
+        current = current._replace(d_surf=surface.depth)
+        anchor, anchor_vel = payload.anchors(current, weights, depth_rate)
+        feed, alignment, budget = payload.contact_geometry(current.d_surf, weights, action.feed_depth,
+                                                           action.alignment_cos, self.base_slack)
+
+        jaw = tip[:, 1] - tip[:, 0]
+        span = jaw.norm(dim=1, keepdim=True)
+        axis = jaw / span.clamp_min(EPS)
+        local_axis = torch.bmm(axis.unsqueeze(1), frame).squeeze(1)
+        width = 2. * (local_axis[:, :2].abs() * self.half_extents[:, :2]).sum(dim=1, keepdim=True)
+        half = torch.bmm(tip_weights, payload.half_thickness(current.d_surf).unsqueeze(-1)).squeeze(-1)
+        z_in_slab = (local_tip[:, :, 2].abs() < half).all(dim=1, keepdim=True)
+        bridge = in_footprint.any(dim=1, keepdim=True) & z_in_slab & (span > EPS)
+        crush = .5 * payload.params.lateral_crush_k * (width - span).clamp_min(0.) * bridge
+        jaw_load = crush[:, :, None] * torch.stack((axis, -axis), dim=1)
+
+        # Supply a step-local budget through the existing parameter field.
+        proxy = copy(self.proxy)
+        proxy.params = replace(proxy.params, S_bag=budget)
+        contacts = proxy.step(state.contacts, ContactInputs(
+            tip, anchor, action.pinch_velocity, anchor_vel, state.com,
+            action.normal_force + crush, action.inward_velocity, feed, alignment))
+        force, depth_force = payload.distribute_anchor_forces(current, weights, contacts.force)
+        indentation_power = (depth_force * depth_rate).sum(dim=1, keepdim=True)
+        surface_vertical = (surface.pad_force_N * normal[:, 2:3]).clamp_min(0.)
+        direct = (.5 * action.direct_press_N - surface_vertical).clamp_min(0.)
+        extra_press = torch.bmm(tip_weights.transpose(1, 2), direct.unsqueeze(-1))
+        force = (force + action.external_force[:, None] * payload.weights.unsqueeze(-1)
+                 + torch.bmm(tip_weights.transpose(1, 2), jaw_load)
+                 - surface.block_force_N.unsqueeze(-1) * normal[:, None] - extra_press * self.up[:, None])
+        advanced = payload.step(state.payload, force, surface.depth)
+
+        next_payload = advanced.state
+        orientation = _orientation(payload.frame(next_payload))
+        old = state.orientation
+        delta_vector = old[:, :1] * orientation[:, 1:] - orientation[:, :1] * old[:, 1:]
+        delta_vector += torch.linalg.cross(old[:, 1:], orientation[:, 1:])
+        omega = torch.where((old * orientation).sum(dim=1, keepdim=True) >= 0., delta_vector, -delta_vector)
+        next_state = PayloadParcelState(payload.com(next_payload), orientation, payload.com_velocity(next_payload),
+                                        2. * omega / self.dt, contacts.state, indentation_power, next_payload)
+        pad_reaction = (-contacts.force - jaw_load + surface.pad_force_N.unsqueeze(-1) * normal[:, None]
+                        + direct.unsqueeze(-1) * self.up[:, None])
+        wrench = torch.cat((pad_reaction.sum(dim=1), torch.linalg.cross(tip - midpoint, pad_reaction).sum(dim=1)), dim=1)
+        line = tip - anchor
+        vertical = line[:, :, 2] / line.norm(dim=-1).clamp_min(EPS)
+        elastic_pull = (contacts.elastic_tension * vertical).sum(dim=1)
+        return ParcelStep(next_state, wrench, advanced.support_N.sum(dim=1, keepdim=True),
+                          advanced.clearance.amin(dim=1, keepdim=True), contacts.tension,
+                          contacts.slip_rate, contacts.elastic_energy, elastic_pull)
+
+    def get_privileged_state(self, state: PayloadParcelState) -> Tensor:
+        if self.payload is None:
+            raise ValueError("Privileged payload state requires the template")
+        return self.payload.get_privileged_state(state.payload)
 
     @staticmethod
     def _inertia_action(q, inertia, world):
@@ -225,7 +351,8 @@ class MacroParcelSim:
             applied = ((times - change_at).clamp_min(0.) * rate_N_s).clamp_max(15.)
 
         shoulder_sq = (.024 - gap0 / 2.) ** 2
-        start_z = 2. * self.half_extents[2] + (p.L0.square() - shoulder_sq).clamp_min(0.).sqrt()
+        hz = self.payload.half_height if self.payload is not None else self.half_extents[2]
+        start_z = 2. * hz + (p.L0.square() - shoulder_sq).clamp_min(0.).sqrt()
         lift_progress = ((times - lift_start) / (lift_end - lift_start)).clamp(0., 1.)
         lift = .5 * (1. - torch.cos(math.pi * lift_progress))
         # Reserve travel for the load-ramp probe so a swinging, one-sided parcel

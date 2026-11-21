@@ -13,11 +13,12 @@ import sys
 from time import perf_counter
 
 import torch
+from torch.utils._pytree import tree_map
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from src.low_order_parcel.lumped_contact_proxy import ContactState, LumpedContactProxy, ProxyParams  # noqa: E402
-from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction, ParcelState  # noqa: E402
+from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction
 
 CONFIG = ROOT / "configs/proxy_material_envelopes.yaml"
 ARCHIVE = ROOT / "test/runs/2026-11-20/bag"
@@ -38,6 +39,10 @@ def build_sim(config, worlds, device="cuda"):
     return MacroParcelSim(proxy, mass, torch.zeros((worlds, 3), device=device)), materials
 
 
+def state_tensors(state):
+    return (*state[:-1], *state.payload) if hasattr(state, "payload") else tuple(state)
+
+
 def process_memory_mib():
     result = subprocess.check_output(["nvidia-smi", "--query-compute-apps=pid,used_gpu_memory",
                                       "--format=csv,noheader,nounits"], text=True)
@@ -46,35 +51,51 @@ def process_memory_mib():
 
 
 @torch.no_grad()
-def timed_episode(config, worlds, baselines):
+def timed_episode(config, worlds, baselines, *, make_sim=build_sim, grip_N=6., steer=None):
     initial_start = perf_counter()
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
-    sim, labels = build_sim(config, worlds)
-    times, _, _, actions = sim.probe_actions("side", duration_s=DURATION)
+    sim, labels = make_sim(config, worlds)
+    if callable(grip_N):
+        grip_N = grip_N(sim)
+    times, _, _, actions = sim.probe_actions("side", duration_s=DURATION, grip_N=grip_N)
     steps = len(times)
-    state = ParcelState(*(value.clone() for value in sim.initial_state()))
+    state = tree_map(torch.Tensor.clone, sim.initial_state())
+    buffers = state_tensors(state)
     cursor = torch.zeros(1, device="cuda", dtype=torch.long)
     finite = torch.ones(worlds, device="cuda", dtype=torch.bool)
     stable = torch.zeros(worlds, device="cuda", dtype=torch.int32)
     peak_tension = sim.mass.new_zeros(worlds)
+    admissible = torch.ones(worlds, device="cuda", dtype=torch.bool)
+    offset = torch.zeros_like(state.com)
 
     def reset():
-        for current, initial in zip(state, sim.initial_state(), strict=True):
+        for current, initial in zip(buffers, state_tensors(sim.initial_state()), strict=True):
             current.copy_(initial)
         cursor.zero_()
         finite.fill_(True)
         stable.zero_()
         peak_tension.zero_()
+        admissible.fill_(True)
+        offset.zero_()
 
     def advance():
         action = ParcelAction(*(torch.index_select(channel, 0, cursor).squeeze(0) for channel in actions))
+        if steer is not None:
+            correction = steer(sim, state, action, offset)
+            action = action._replace(pinch_position=action.pinch_position + correction[:, None],
+                                     pinch_velocity=action.pinch_velocity + ((correction - offset) / DT)[:, None])
+            offset.copy_(correction)
         result = sim.step(state, action)
-        for current, update in zip(state, result.state, strict=True):
+        for current, update in zip(buffers, state_tensors(result.state), strict=True):
             current.copy_(update)
             finite.logical_and_(torch.isfinite(update.flatten(1)).all(dim=1))
         for channel in result[1:]:
             finite.logical_and_(torch.isfinite(channel.reshape(worlds, -1)).all(dim=1))
+        if sim.payload is not None:
+            depth = state.payload.d_surf
+            admissible.logical_and_(((0. <= depth) & (depth <= sim.payload.depth_max)).all(dim=1)
+                                    & (result.table_clearance[:, 0] >= 0.))
         both = (state.contacts[:, :, ContactState.CAPTURE] > .5).all(dim=1)
         airborne = (result.table_clearance[:, 0] > .001) & (result.support_N[:, 0] == 0.)
         quiet = torch.linalg.vector_norm(state.velocity, dim=1) < .020
@@ -109,15 +130,18 @@ def timed_episode(config, worlds, baselines):
     if cursor.item() != steps:
         raise RuntimeError("The graph did not advance exactly one step per replay")
     hold_required = math.ceil(.20 / DT)
-    valid = finite & (stable >= hold_required)
+    valid = finite & admissible & (stable >= hold_required)
     counts = {label: int(valid[i::len(labels)].sum().item()) for i, label in enumerate(labels)}
     completed = sum(counts.values())
     rate = worlds * steps / wall
     return dict(worlds=worlds, steps_per_world=steps, simulated_s_per_world=steps * DT, wall_s=wall,
                 device_timed_s=begin.elapsed_time(end) / 1000, setup_s=setup_s, capture_s=capture_s,
                 env_steps_per_s=rate, sim_seconds_per_wall_second=rate * DT,
+                verified_sim_seconds_per_wall_second=completed * steps * DT / wall,
                 verified_pickups=completed, verified_by_material=counts, pickups_per_hour=3600. * completed / wall,
                 min_final_continuous_hold_s=float(stable.min().item()) * DT,
+                final_bilateral_capture_worlds=int((state.contacts[:, :, ContactState.CAPTURE] > .5).all(dim=1).sum().item()),
+                invalid_geometry_worlds=worlds - int(admissible.sum().item()),
                 nonfinite_worlds=worlds - int(finite.sum().item()), peak_tension_N=float(peak_tension.max().item()),
                 sampled_process_gpu_memory_mib=process_memory_mib(),
                 peak_torch_reserved_mib=torch.cuda.max_memory_reserved() / 2**20,

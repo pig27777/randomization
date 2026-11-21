@@ -40,7 +40,7 @@
   "fill_coupling": {
     "slide_slack_max": "0.35 * (1 - fill_ratio ** (1/3)) * min(L, W)",
     "randomized_slack": "uniform fraction of slide_slack_max",
-    "initial_bag_slack": "use calibrated Stage 1 budget for the selected geometry and fill"
+    "initial_bag_slack": "min(calibrated_S_bag, 2 * (L + H0) * (fill_ratio ** (-1/3) - 1))"
   },
   "presets": {
     "rigid_box": {},

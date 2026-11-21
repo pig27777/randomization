@@ -41,6 +41,12 @@ class PayloadParamsX:
     def cavity_slack(half_extents, fill_ratio):
         return .70 * (1. - fill_ratio.pow(1. / 3.)) * half_extents[:, :2].amin(dim=1, keepdim=True)
 
+    def fill_slack_capacity(self):
+        """Available perimeter for an envelope scaled isotropically by fill."""
+        fraction = self.fill_ratio.pow(1. / 3.)
+        section_perimeter = 4. * (self.bag_half_extents[:, :1] + self.bag_half_extents[:, 2:3])
+        return section_perimeter * (1. - fraction) / fraction.clamp_min(EPS)
+
     @classmethod
     def sample(cls, config, batch, *, device=None, generator=None):
         values = {}
@@ -64,6 +70,10 @@ class PayloadParamsX:
 
     def validate(self):
         like = self.total_mass
+        if like.ndim != 2 or not len(like) or like.dtype not in (torch.float32, torch.float64):
+            raise ValueError("Use a nonempty float32 or float64 batch with total_mass [B,1]")
+        if like.is_cuda and like.dtype != torch.float32:
+            raise ValueError("CUDA payload batches use float32")
         for field in fields(self):
             value = getattr(self, field.name)
             width = {"bag_half_extents": 3, "mass_weights": 4}.get(field.name, 1)
@@ -71,8 +81,6 @@ class PayloadParamsX:
                 raise ValueError(f"{field.name} must have shape [B,{width}] and match total_mass")
             if not (torch.isfinite(value) & (value >= 0.)).all():
                 raise ValueError(f"{field.name} must be finite and nonnegative")
-        if not len(like) or like.dtype not in (torch.float32, torch.float64):
-            raise ValueError("Use a nonempty float32 or float64 batch")
         if not ((like > 0.).all() and (self.bag_half_extents > 0.).all() and (self.tau_rebound > 0.).all()):
             raise ValueError("Mass, dimensions, and rebound time must be positive")
         if not ((self.mass_weights >= .05).all() and
@@ -119,6 +127,7 @@ class UnifiedPayloadTemplate:
         self.rest = params.total_mass.new_tensor([[-.5, -.5, 0.], [.5, -.5, 0.], [-.5, .5, 0.], [.5, .5, 0.]])
         self.rest = self.rest * params.bag_half_extents[:, None]
         self.up = self.rest.new_tensor([0., 0., 1.])
+        self.right = self.rest.new_tensor([1., 0., 0.])
         self.bend_sign = self.rest.new_tensor([.5, -.5, -.5, .5])
         self.bend_delta = self.inv_mass * self.bend_sign
         self.bend_inverse_mass = self.inv_mass.sum(dim=1, keepdim=True) * .25
@@ -234,7 +243,7 @@ class UnifiedPayloadTemplate:
         normal, a, b, _ = self._normal(state.pos)
         x = a - b
         x = torch.where(x.norm(dim=-1, keepdim=True) > EPS,
-                        torch.nn.functional.normalize(x, dim=-1, eps=EPS), self.up.new_tensor([1., 0., 0.]))
+                        torch.nn.functional.normalize(x, dim=-1, eps=EPS), self.right)
         return torch.stack((x, torch.linalg.cross(normal, x), normal), dim=-1)
 
     def weights_at(self, xy):
@@ -256,7 +265,8 @@ class UnifiedPayloadTemplate:
                               p.c_comp * ((depth - state.d_surf) / self.dt).clamp_min(0.))
         # The core begins where the compressed top reaches its minimum height above the bottom.
         core = (demand - self.depth_max).clamp_min(0.) * 10000.
-        share = raw / raw.sum(dim=1, keepdim=True).clamp_min(EPS)
+        loaded = (raw >= depth.unsqueeze(1)) * raw
+        share = loaded / loaded.sum(dim=1, keepdim=True).clamp_min(EPS)
         return SurfaceStep(depth, torch.bmm(share, (compress + core).unsqueeze(-1)).squeeze(-1),
                            compress + core, torch.bmm(share, core.unsqueeze(-1)).squeeze(-1))
 

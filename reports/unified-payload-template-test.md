@@ -41,3 +41,19 @@
 PYTHONPATH=/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages OMP_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_unified_payload.py -v -k p2 -k p3 -k p4 -k test_top
 flock /tmp/claude-gpu.lock env PYTHONPATH=/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages OMP_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_unified_payload.py -v -k p5
 ```
+
+## Step 3 · 接入与最终回归
+
+最近验证为 2026-11-21 15:32（台北），机器 `ubun`。项目解释器从已有环境加载 PyTorch 2.11.0+cu130，未升级共享环境。模板的 P1–P6 与挂点虚功检查均通过，整包原有 20 项通过。冻结代理文件与 `8184257e` 的 Git 差异为空。
+
+首次 P1 的局部高度计算误触发气泡膜加载的触底反力。改用随板面旋转的法向后，六类门禁全通过。开环 P6 只得到 78 路达标悬停，改用受限的夹爪位置反馈后达到 8,003/8,192 路。原悬停判据一直保留。最终总吞吐 11,618、有效吞吐 11,350 仿真秒/墙钟秒，3.363 s 墙钟，采样显存 1,810 MiB，PyTorch 预留峰值 1,968 MiB。仍有 189 路悬停未达标。
+
+```sh
+PYTHONPATH=/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages OMP_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_unified_payload.py -v -k p1 -k p2 -k p3 -k p4 -k test_top
+flock /tmp/claude-gpu.lock env PYTHONPATH=/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages OMP_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_unified_payload.py -v -k p5 -k p6
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv-physical-parcel/bin/python -B -m unittest discover -s test/bag_model -p test_physical_parcel.py -v
+git diff --exit-code 8184257e -- src/low_order_parcel/lumped_contact_proxy.py
+git diff --check
+```
+
+[最终 CPU 5 项 63.363 s](../test/runs/2026-11-21/bag/unified-payload-proxy-r4/cpu.log) · [最终 GPU 2 项 65.555 s](../test/runs/2026-11-21/bag/unified-payload-proxy-r4/cuda.log) · [整包 20 项 8.829 s](../test/runs/2026-11-21/bag/unified-payload-proxy-r3/physical-parcel.log) · [完整验收](../docs/PAYLOAD_TEMPLATE_REPORT.md)
