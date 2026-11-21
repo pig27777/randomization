@@ -122,7 +122,7 @@ class ParcelEnv:
                        self.zeros(2).bool(), self.zeros(2, 3),
                        self.vector([90., 90., 650.]).expand_as(center))
 
-    def _tick(self, requested, active, *, lift=False):
+    def _tick(self, requested, active, *, lift=False, exterior_height=None):
         previous = self.command
         cmd = tree_map(lambda new, old: select(active, new, old), requested, previous)
         # Passive wrist load and deflection are part of the mechanical actuator.
@@ -157,7 +157,7 @@ class ParcelEnv:
         wrist = CameraPose(actual[:, 1] + self.vector([0., .015, .015]),
                            self.wrist_frame.expand(self.batch, -1, -1))
         self.rgb = self.rgb_sensor.step(self.state.payload, wrist, actual[:, 0],
-                                        active & lift)
+                                        active & lift, exterior_height=exterior_height)
         self.torn |= active & self.state.torn_flag.flatten(1).any(dim=1)
 
     def _pad_positions(self, center, half_span, quaternion):

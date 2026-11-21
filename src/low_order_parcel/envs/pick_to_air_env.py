@@ -3,6 +3,7 @@
 import torch
 
 from ._parcel_env import ParcelEnv, columns, has_grasp, phase_encoding, scaled, select, smooth
+from ..lift_probe import PROBE_RAMP_S, PROBE_SETTLE_S, probe_height
 from ..lumped_contact_proxy import ContactState
 from ..rl.asymmetric_ppo import PICK_DECISIONS
 from ..unified_payload import DT
@@ -48,14 +49,20 @@ class PickToAirEnv(ParcelEnv):
         z = force[:, 2] * sign
         reference = self.load_reference.abs().clamp_min(.25)
         error = self.sensed.position_error[:, 0]
+        load_feature = z.abs() / target.clamp_min(.25)
+        gamma = self.rgb.vis_lift_ratio
+        if phase == 1:
+            # Positive for extra downward wrist load relative to the closed grasp.
+            load_feature = (self.load_reference - force[:, 2]) / target.clamp_min(.25)
+            gamma = torch.where(self.rgb.vis_lift_valid, gamma, -1.)
         features = columns(phase_encoding(torch.full_like(self.phase, phase), 3),
                            (z / reference).clamp(-.5, 2.),
                            ((z - self.force_previous) / reference).clamp(-2., 2.),
                            (force[:, :2].norm(dim=1) / z.abs().clamp_min(.25)).clamp(0., 3.),
                            error[:, 2], error[:, :2].norm(dim=1),
-                           (z.abs() / target.clamp_min(.25)).clamp(0., 3.),
+                           load_feature.clamp(-3., 3.),
                            self.sensed.opening[:, 0], self.sensed.gripper_current[:, 0],
-                           self.rgb.vis_lift_ratio)
+                           gamma)
         self._record(features, mask)
         self.force_previous = select(mask, z, self.force_previous)
 
@@ -186,10 +193,11 @@ class PickToAirEnv(ParcelEnv):
         self.force_previous = select(active, self.load_reference.abs(), self.force_previous)
         slip_start = self.state.contacts_A[..., ContactState.SLIP_CUM]
         origin = self.command
-        for i in range(275):
+        stroke = probe_height(self.height)
+        for i in range(round((PROBE_RAMP_S + PROBE_SETTLE_S) / DT)):
             center = origin.center.clone()
-            center[:, 0, 2] += .025 * smooth(self.vector(i * DT / .40))
-            self._tick(origin._replace(center=center), active, lift=True)
+            center[:, 0, 2] += stroke * min(i * DT / PROBE_RAMP_S, 1.)
+            self._tick(origin._replace(center=center), active, lift=True, exterior_height=self.height[:, None])
             if i % 10 == 0:
                 self._sequence(1, active & self.sensed.valid[:, 0, 0], self.grasp_force)
         slip = (self.state.contacts_A[..., ContactState.SLIP_CUM] - slip_start).amax(dim=1) > .002
