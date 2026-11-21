@@ -116,6 +116,13 @@ class LumpedContactProxy:
             raise ValueError("S_bag_eff must be nonnegative")
 
     def step(self, state: Tensor, inputs: ContactInputs) -> ContactStep:
+        """Compatibility entry for callers whose established ropes use nominal L0."""
+        result, _ = self.step_with_reference(state, inputs, self.params.L0)
+        return result
+
+    def step_with_reference(self, state: Tensor, inputs: ContactInputs, reference: Tensor,
+                            inverse_mass: Tensor | None = None) -> tuple[ContactStep, Tensor]:
+        """Advance a contact and its independent [B,2] unstretched length."""
         p, dt = self.params, self.dt
         budget = p.S_bag if inputs.S_bag_eff is None else inputs.S_bag_eff
         slack, captured, slip_cum, hold, _, peak = state.unbind(dim=-1)
@@ -130,10 +137,11 @@ class LumpedContactProxy:
         distance = torch.linalg.vector_norm(separation, dim=-1)
         direction = separation / distance.clamp_min(EPS).unsqueeze(-1)
         length_rate = ((inputs.pinch_velocity - inputs.attachment_velocity) * direction).sum(dim=-1)
-        beyond_rest = distance - p.L0 - slip_cum
+        damping = p.c_d if inverse_mass is None else p.c_d / (1. + dt * p.c_d * inverse_mass)
+        beyond_rest = (distance - slip_cum) - reference
         strain = beyond_rest.clamp_min(0.)
         trial_tension = torch.where(active & (beyond_rest >= 0.),
-                                    (p.k * strain + p.c_d * length_rate).clamp_min(0.), 0.)
+                                    (p.k * strain + damping * length_rate).clamp_min(0.), 0.)
 
         free_fraction = (1. - slack.sum(dim=1, keepdim=True) / budget.clamp_min(EPS)).clamp_min(0.)
         gather_speed = torch.minimum(inputs.inward_velocity.clamp_min(0.), p.v_gather_max)
@@ -159,14 +167,18 @@ class LumpedContactProxy:
             slip_next = slip_cum
             rate = torch.zeros_like(rate)
 
-        remaining = distance - p.L0 - slip_next
+        # No spring displacement or dashpot impulse predates the new attachment.
+        new_reference = torch.where(active, reference, torch.maximum(p.L0, distance - slip_next))
+        new_reference = torch.where(captured_next, new_reference, p.L0)
+        transmitting = active & captured_next
+        remaining = (distance - slip_next) - new_reference
         extension = remaining.clamp_min(0.)
-        tension = torch.where(captured_next & (remaining >= 0.),
-                              (self.stiffness * extension + p.c_d * (length_rate - rate)).clamp_min(0.), 0.)
+        tension = torch.where(transmitting & (remaining >= 0.),
+                              (self.stiffness * extension + damping * (length_rate - rate)).clamp_min(0.), 0.)
         force = tension.unsqueeze(-1) * direction
         torque = torch.linalg.cross(inputs.bag_attachment - inputs.bag_com.unsqueeze(1), force)
         new_peak = torch.where(captured_next, torch.maximum(torch.where(active, peak, 0.), tension), 0.)
         new_state = torch.stack((slack_next, captured_next.to(state.dtype), slip_next, hold, depth, new_peak), dim=-1)
-        energy = torch.where(captured_next, .5 * self.stiffness * extension.square(), 0.)
-        elastic_tension = torch.where(captured_next, self.stiffness * extension, 0.)
-        return ContactStep(new_state, force, torque, tension, rate, energy, elastic_tension)
+        energy = torch.where(transmitting, .5 * self.stiffness * extension.square(), 0.)
+        elastic_tension = torch.where(transmitting, self.stiffness * extension, 0.)
+        return ContactStep(new_state, force, torque, tension, rate, energy, elastic_tension), new_reference

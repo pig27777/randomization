@@ -99,9 +99,12 @@ class DualArmTests(unittest.TestCase):
         pos = anchor + tensor([0., 0., .070])
         normal = tensor([[.25, .25], [6., 6.]])
         cmd = action(pos, normal=normal, inward=.05, feed=.01)
-        frozen = sim.proxy_A.step(prior, ContactInputs(
+        separation = torch.cat((pos - anchor, torch.zeros_like(anchor)), dim=1)
+        mobility = sim.payload.anchor_inverse_mass(current, sim.mount_weights, separation)[:, :2]
+        frozen, _ = sim.proxy_A.step_with_reference(prior, ContactInputs(
             pos, anchor, cmd.pinch_velocity, anchor_vel, sim.payload.com(current), normal,
-            cmd.inward_velocity, cmd.feed_depth, cmd.alignment_cos, sim.base_slack))
+            cmd.inward_velocity, cmd.feed_depth, cmd.alignment_cos, sim.base_slack),
+            state.contact_reference[:, 0], mobility)
         result = sim.step(state, pair(cmd))
         torch.testing.assert_close(result.state.contacts_A, frozen.state, atol=0., rtol=0.)
         torch.testing.assert_close(result.tension[:, 0], frozen.tension, atol=0., rtol=0.)
@@ -121,24 +124,24 @@ class DualArmTests(unittest.TestCase):
         old_position = None
         press_samples = []
         max_indentation = torch.zeros_like(z)
-        for step in range(1450):
+        for step in range(1625):
             t = step * DT
-            if t < 1.45:
-                z = z + DT * (.05 * (filtered_force - pressure)).clamp(-.06, .06)
+            if t < 1.80:
+                z = z + DT * (.08 * (filtered_force - pressure)).clamp(-.06, .06)
                 press_z = z
             else:
-                phase = min(1., (t - 1.45) / 1.05)
+                phase = min(1., (t - 1.80) / 1.05)
                 z = press_z + .5 * (1. - math.cos(math.pi * phase)) * .135
-            close = min(1., max(0., (t - 1.15) / .22))
+            close = min(1., max(0., (t - 1.27) / .40))
             x = ((.027 - .008 * close) * signs).expand(2, -1)
             pos = torch.stack((x, torch.zeros_like(x), z.expand_as(x)), dim=-1)
             vel = torch.zeros_like(pos) if old_position is None else (pos - old_position) / DT
             old_position = pos
-            cmd = action(pos, velocity=vel, inward=.008 / .22 if 1.15 < t < 1.37 else 0., feed=.004)
+            cmd = action(pos, velocity=vel, inward=.008 / .40 if 1.27 < t < 1.67 else 0., feed=.004)
             result = sim.step(state, pair(cmd))
             state = result.state
             filtered_force = torch.lerp(filtered_force, result.press_N[:, :1], .06)
-            if 1.15 < t < 1.37:
+            if 1.27 < t < 1.67:
                 press_samples.append(result.press_N[:, :1])
                 max_indentation = torch.maximum(max_indentation, state.payload.d_surf.amax(dim=1, keepdim=True))
         measured_press = torch.stack(press_samples).mean(dim=0)

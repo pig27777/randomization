@@ -29,21 +29,21 @@ def json_file(path, value):
 
 
 @torch.inference_mode()
-def run(output, worlds):
+def run(output, worlds, compare_frozen=False):
     output.mkdir(parents=True, exist_ok=False)
     sim, materials = heterogeneous_probe(STAGE2, worlds)
     # Keep references to the very inputs used by this instance; all reads occur
     # before the next graph replay. The old capture state is updated in-place
     # by the benchmark, so preserve a copy at the call boundary.
-    original_step = sim.proxy.step
-    def record_contact(state, inputs):
+    original_step = sim.proxy.step_with_reference
+    def record_contact(state, inputs, reference, inverse_mass=None):
         nonlocal contact, boundary, was_captured
         was_captured = state[:, :, 1].clone()
         boundary = inputs
-        contact = original_step(state, inputs)
-        return contact
+        contact, next_reference = original_step(state, inputs, reference, inverse_mass)
+        return contact, next_reference
 
-    sim.proxy.step = record_contact
+    sim.proxy.step_with_reference = record_contact
     contact = boundary = was_captured = None
     tape = None
     names = []
@@ -79,9 +79,11 @@ def run(output, worlds):
     ranks = np.argsort(-peak, kind="stable")
     failed = np.flatnonzero(~passed)
     selected = np.union1d(ranks[:20], failed)
+    if worlds > 6383:
+        selected = np.union1d(selected, [6383])
     wave = tape.index_select(1, torch.as_tensor(selected, device=tape.device)).cpu().numpy()
     assert int(passed.sum()) == stats["verified_pickups"] and float(peak.max()) == stats["peak_tension_N"]
-    if worlds == 8192:
+    if worlds == 8192 and compare_frozen:
         assert stats["verified_by_material"] == {"pe":2037,"kraft":2021,"bubble":2038,"paperboard":1907}
         assert stats["final_bilateral_capture_worlds"] == 8162 and abs(float(peak.max()) - 343.974884) < .01
     assert stats["nonfinite_worlds"] == stats["invalid_geometry_worlds"] == 0
@@ -123,7 +125,7 @@ def run(output, worlds):
                 assert reason
             losses[f"end_pad_{finger}"] = reason
             losses[f"last_drop_s_{finger}"] = float(drops[-1] * DT) if len(drops) else None
-        damp = proxy["c_d"][0] * (value("axial_mps") - value("slip_mps"))
+        damp = value("T_N") - value("elastic_N")
         samples.append(dict(world_id=world, material=materials[world % len(materials)], rank=rank[world],
             pass_hold=int(passed[world]), peak_N=value("T_N"), time_s=t*DT, pad=pad,
             elastic_N=value("elastic_N"), damping_N=damp, normal_N=value("normal_N"),
@@ -143,6 +145,7 @@ def run(output, worlds):
     csv_rows(output / "peak_windows.csv", events)
     json_file(output / "parameters.json", params)
     stats.update(n_over_50=int((peak>50).sum()), n_failed_over_50=int(((peak>50)&~passed).sum()),
+                 max_effective_normal_N=float(tape[:, :, col("normal_N_0"):col("normal_N_1")+1].amax().item()),
                  n_selected=len(selected), seed=1726481, dt=DT, device=torch.cuda.get_device_name(),
                  torch=str(torch.__version__))
     json_file(output / "p6.json",stats)
@@ -153,5 +156,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output",type=Path)
     parser.add_argument("--worlds",type=int,default=8192)
+    parser.add_argument("--compare-frozen", action="store_true", help="assert the archival baseline values")
     args = parser.parse_args()
-    run(args.output,args.worlds)
+    run(args.output, args.worlds, args.compare_frozen)

@@ -43,19 +43,21 @@ class StepForces:
 
     def __init__(self, sim):
         self.sim = sim
-        self.proxy_step = sim.proxy.step
+        self.proxy_step = sim.proxy.step_with_reference
         self.surface_step = sim.payload.surface_contact
         self.side_step = sim._side_contact
+        self.jaw_step = sim._jaw_contact
         self.payload_step = sim.payload.step
-        sim.proxy.step = self.contact_step
+        sim.proxy.step_with_reference = self.contact_step
         sim.payload.surface_contact = self.surface_contact
         sim._side_contact = self.side_contact
+        sim._jaw_contact = self.jaw_contact
         sim.payload.step = self.advance
 
-    def contact_step(self, state, inputs):
+    def contact_step(self, state, inputs, reference, inverse_mass=None):
         self.inputs = inputs
-        self.contact = self.proxy_step(state, inputs)
-        return self.contact
+        self.contact, next_reference = self.proxy_step(state, inputs, reference, inverse_mass)
+        return self.contact, next_reference
 
     def surface_contact(self, *args):
         self.surface = self.surface_step(*args)
@@ -65,6 +67,10 @@ class StepForces:
         result = self.side_step(*args)
         self.side = result[2]
         return result
+
+    def jaw_contact(self, *args):
+        self.jaw = self.jaw_step(*args)
+        return self.jaw
 
     def advance(self, state, force, depth):
         self.block_force = force
@@ -78,10 +84,7 @@ class StepForces:
         normal = payload.frame(old.payload)[:, :, 2]
         direct = (.5 * action.direct_press_N -
                   (self.surface.pad_force_N * normal[:, 2:3]).clamp_min(0.)).clamp_min(0.)
-        jaw = tip[:, 1] - tip[:, 0]
-        axis = jaw / jaw.norm(dim=1, keepdim=True).clamp_min(1e-8)
-        crush = self.inputs.normal_force - action.normal_force
-        jaw_force = crush[:, :, None] * torch.stack((axis, -axis), dim=1)
+        jaw_force = self.jaw
         top_force = self.surface.pad_force_N.unsqueeze(-1) * normal[:, None] + direct.unsqueeze(-1) * self.sim.up[:, None]
         reaction = -self.contact.force - jaw_force - self.side + top_force
         arm = tip - tip.mean(dim=1, keepdim=True)

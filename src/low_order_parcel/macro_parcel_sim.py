@@ -43,6 +43,7 @@ class ParcelState(NamedTuple):
     velocity: Tensor
     angular_velocity: Tensor
     contacts: Tensor
+    contact_reference: Tensor | None = None
 
 
 class PayloadParcelState(NamedTuple):
@@ -55,6 +56,7 @@ class PayloadParcelState(NamedTuple):
     side_axis: Tensor            # [B, 3], horizontal approach direction latched at first push
     side_origin: Tensor          # [B, 3], parcel COM at first side contact
     payload: PayloadState
+    contact_reference: Tensor | None = None
 
 
 class ParcelAction(NamedTuple):
@@ -151,9 +153,9 @@ class MacroParcelSim:
             state = self.payload.initial_state()
             com = self.payload.com(state)
             return PayloadParcelState(com, quat, zero, zero, self.proxy.initial_state(),
-                                      torch.zeros_like(self.mass), zero, com, state)
+                                      torch.zeros_like(self.mass), zero, com, state, self.proxy.params.L0.clone())
         com = self.up * self.half_extents[2] + self.offset
-        return ParcelState(com, quat, zero, zero, self.proxy.initial_state())
+        return ParcelState(com, quat, zero, zero, self.proxy.initial_state(), self.proxy.params.L0.clone())
 
     def step(self, state: ParcelState | PayloadParcelState, action: ParcelAction) -> ParcelStep:
         if self.payload is not None:
@@ -162,10 +164,18 @@ class MacroParcelSim:
         mount_arm = rotate(q[:, None, :], self.mounts)
         attachment = state.com[:, None, :] + mount_arm
         attachment_velocity = state.velocity[:, None, :] + torch.linalg.cross(state.angular_velocity[:, None, :], mount_arm)
-        contacts = self.proxy.step(state.contacts, ContactInputs(
+        reference = self.proxy.params.L0 if state.contact_reference is None else state.contact_reference
+        separation = action.pinch_position - attachment
+        direction = torch.nn.functional.normalize(separation, dim=-1, eps=EPS)
+        lever = torch.linalg.cross(mount_arm, direction)
+        inverse_q = torch.cat((q[:, :1], -q[:, 1:]), dim=1)
+        local_lever = rotate(inverse_q[:, None], lever)
+        mobility = ((direction @ direction.transpose(1, 2)) / self.mass[:, :, None]
+                    + (local_lever @ self.inv_inertia) @ local_lever.transpose(1, 2))
+        contacts, reference = self.proxy.step_with_reference(state.contacts, ContactInputs(
             action.pinch_position, attachment, action.pinch_velocity,
             attachment_velocity, state.com, action.normal_force, action.inward_velocity,
-            action.feed_depth, action.alignment_cos))
+            action.feed_depth, action.alignment_cos), reference, mobility.abs().sum(dim=-1))
 
         force = contacts.force.sum(dim=1) + action.external_force - action.direct_press_N * self.up
         angular_momentum = self._inertia_action(q, self.inertia, state.angular_velocity)
@@ -173,15 +183,7 @@ class MacroParcelSim:
         velocity = state.velocity + dt * (force / self.mass - GRAVITY * self.up)
         omega = state.angular_velocity + dt * self._inertia_action(q, self.inv_inertia, torque)
 
-        points = rotate(q[:, None, :], self.points)
-        height = points[:, :, 2] + state.com[:, 2:3]
-        clearance = height.amin(dim=1, keepdim=True)
-        on_edge = height <= clearance + 1e-7
-        arm = (points * on_edge.unsqueeze(-1)).sum(dim=1) / on_edge.sum(dim=1, keepdim=True)
-        normal_eff = self._effective_inverse_mass(q, arm, self.up)
-        point_velocity = velocity + torch.linalg.cross(omega, arm)
-        impulse_n = (-clearance / dt - point_velocity[:, 2:3]).clamp_min(0.) / normal_eff
-        dv, dw = self._impulse(q, arm, impulse_n * self.up)
+        impulse_n, arm, dv, dw = self._swept_floor(state, velocity, omega)
         velocity, omega = velocity + dv, omega + dw
 
         point_velocity = velocity + torch.linalg.cross(omega, arm)
@@ -193,9 +195,11 @@ class MacroParcelSim:
         dv, dw = self._impulse(q, arm, -impulse_t * direction)
         velocity, omega = velocity + dv, omega + dw
 
-        qv = q[:, 1:]
-        q_dot = torch.cat((-(omega * qv).sum(dim=1, keepdim=True), q[:, :1] * omega + torch.linalg.cross(omega, qv)), dim=1)
-        orientation = torch.nn.functional.normalize(q + .5 * dt * q_dot, dim=1)
+        # Friction also rotates the body. Recheck the end-pose normal constraint.
+        correction, _, dv, dw = self._swept_floor(state, velocity, omega)
+        impulse_n = impulse_n + correction
+        velocity, omega = velocity + dv, omega + dw
+        orientation = self._advance_orientation(q, omega)
         com = state.com + velocity * dt
         bottom = rotate(orientation[:, None, :], self.points)[:, :, 2].amin(dim=1, keepdim=True)
         clearance_next = com[:, 2:3] + bottom
@@ -206,12 +210,29 @@ class MacroParcelSim:
         pad_arm = action.pinch_position - action.pinch_position.mean(dim=1, keepdim=True)
         wrist_force = -contacts.force.sum(dim=1) + action.direct_press_N * self.up
         wrist_torque = torch.linalg.cross(pad_arm, -contacts.force).sum(dim=1)
-        separation = action.pinch_position - attachment
         cos_vertical = separation[:, :, 2] / torch.linalg.vector_norm(separation, dim=-1).clamp_min(EPS)
         elastic_pull = (contacts.elastic_tension * cos_vertical).sum(dim=1)
-        return ParcelStep(ParcelState(com, orientation, velocity, omega, contacts.state),
+        return ParcelStep(ParcelState(com, orientation, velocity, omega, contacts.state, reference),
                           torch.cat((wrist_force, wrist_torque), dim=1), impulse_n / dt, clearance_next.clamp_min(0.),
                           contacts.tension, contacts.slip_rate, contacts.elastic_energy, elastic_pull)
+
+    def _advance_orientation(self, q, omega):
+        qv = q[:, 1:]
+        q_dot = torch.cat((-(omega * qv).sum(dim=1, keepdim=True),
+                           q[:, :1] * omega + torch.linalg.cross(omega, qv)), dim=1)
+        return torch.nn.functional.normalize(q + .5 * self.dt * q_dot, dim=1)
+
+    def _swept_floor(self, state, velocity, omega):
+        end_orientation = self._advance_orientation(state.orientation, omega)
+        points = rotate(end_orientation[:, None], self.points)
+        floor = points[:, :, 2].amin(dim=1, keepdim=True)
+        contact = points[:, :, 2] <= floor + 1e-7
+        arm = (points * contact.unsqueeze(-1)).sum(dim=1) / contact.sum(dim=1, keepdim=True)
+        gap = state.com[:, 2:3] + self.dt * velocity[:, 2:3] + floor
+        normal_eff = self._effective_inverse_mass(state.orientation, arm, self.up)
+        impulse = (-gap / self.dt).clamp_min(0.) / normal_eff
+        dv, dw = self._impulse(state.orientation, arm, impulse * self.up)
+        return impulse, arm, dv, dw
 
     def _step_payload(self, state: PayloadParcelState, action: ParcelAction) -> ParcelStep:
         payload = self.payload
@@ -222,7 +243,8 @@ class MacroParcelSim:
         midpoint = tip.mean(dim=1, keepdim=True)
         local_tip = torch.bmm(tip - current.pos.mean(dim=1, keepdim=True), frame)
         tip_weights = payload.weights_at(local_tip[:, :, :2])
-        side_axis, side_origin, side_load, side_at_pad = self._side_contact(state, action, frame, local_tip, tip_weights)
+        side_axis, side_origin, side_load, side_at_pad, inward_margin = self._side_contact(
+            state, action, frame, local_tip, tip_weights)
         normal = frame[:, :, 2]
         center = torch.bmm(tip_weights, current.pos)
         normal_gap = ((tip - center) * normal[:, None]).sum(dim=-1)
@@ -232,29 +254,25 @@ class MacroParcelSim:
         previous_indent = torch.bmm(tip_weights, current.d_surf.unsqueeze(-1)).squeeze(-1)
         top = ((previous_gap >= 0.) | (previous_indent > EPS) |
                (action.direct_press_N > 0.) | (tip[:, :, 2] <= 0.))
-        surface = payload.surface_contact(current, tip_depth, tip_weights, in_footprint & top & ~side_at_pad)
+        engaged = in_footprint & top & ~side_at_pad
+        demand = payload.predict_surface_demand(current, tip + self.dt * action.pinch_velocity, engaged)
+        surface = payload.surface_contact(current, tip_depth, tip_weights, engaged, demand)
         depth_rate = (surface.depth - current.d_surf) / self.dt
         current = current._replace(d_surf=surface.depth)
         anchor, anchor_vel = payload.anchors(current, weights, depth_rate)
         push_displacement = ((state.com - side_origin) * side_axis).sum(dim=1, keepdim=True)
         net_feed = (action.feed_depth - push_displacement).clamp_min(0.)
+        # Nominal feed can already be positive where the actual wall begins.
+        net_feed = torch.minimum(net_feed, inward_margin)
         feed, alignment, budget = payload.contact_geometry(current.d_surf, weights, net_feed,
                                                            action.alignment_cos, self.base_slack)
 
-        jaw = tip[:, 1] - tip[:, 0]
-        span = jaw.norm(dim=1, keepdim=True)
-        axis = jaw / span.clamp_min(EPS)
-        local_axis = torch.bmm(axis.unsqueeze(1), frame).squeeze(1)
-        width = 2. * (local_axis[:, :2].abs() * self.half_extents[:, :2]).sum(dim=1, keepdim=True)
-        half = torch.bmm(tip_weights, payload.half_thickness(current.d_surf).unsqueeze(-1)).squeeze(-1)
-        z_in_slab = (local_tip[:, :, 2].abs() < half).all(dim=1, keepdim=True)
-        bridge = in_footprint.any(dim=1, keepdim=True) & z_in_slab & (span > EPS)
-        crush = .5 * payload.params.lateral_crush_k * (width - span).clamp_min(0.) * bridge
-        jaw_load = crush[:, :, None] * torch.stack((axis, -axis), dim=1)
-
-        contacts = self.proxy.step(state.contacts, ContactInputs(
+        jaw_load = self._jaw_contact(current, action, frame, local_tip, tip_weights, side_at_pad)
+        reference = self.proxy.params.L0 if state.contact_reference is None else state.contact_reference
+        inverse_mass = payload.anchor_inverse_mass(current, weights, tip - anchor)
+        contacts, reference = self.proxy.step_with_reference(state.contacts, ContactInputs(
             tip, anchor, action.pinch_velocity, anchor_vel, state.com,
-            action.normal_force + crush, action.inward_velocity, feed, alignment, budget))
+            action.normal_force, action.inward_velocity, feed, alignment, budget), reference, inverse_mass)
         force, depth_force = payload.distribute_anchor_forces(current, weights, contacts.force)
         indentation_power = (depth_force * depth_rate).sum(dim=1, keepdim=True)
         surface_vertical = (surface.pad_force_N * normal[:, 2:3]).clamp_min(0.)
@@ -273,7 +291,7 @@ class MacroParcelSim:
         omega = torch.where((old * orientation).sum(dim=1, keepdim=True) >= 0., delta_vector, -delta_vector)
         next_state = PayloadParcelState(payload.com(next_payload), orientation, payload.com_velocity(next_payload),
                                         2. * omega / self.dt, contacts.state, indentation_power,
-                                        side_axis, side_origin, next_payload)
+                                        side_axis, side_origin, next_payload, reference)
         pad_reaction = (-contacts.force - jaw_load - side_load + surface.pad_force_N.unsqueeze(-1) * normal[:, None]
                         + direct.unsqueeze(-1) * self.up[:, None])
         wrench = torch.cat((pad_reaction.sum(dim=1), torch.linalg.cross(tip - midpoint, pad_reaction).sum(dim=1)), dim=1)
@@ -303,19 +321,37 @@ class MacroParcelSim:
         thickness = payload.half_thickness(state.payload.d_surf)
         pad_half = torch.bmm(weights, thickness.unsqueeze(-1)).squeeze(-1)
         supported = (state.payload.pos[:, :, 2] <= thickness + EPS).any(dim=1, keepdim=True)
-        slab = (local_tip[:, :, 2].abs() < pad_half) & (lateral.abs() < extents[:, 1:])
-        near_side = supported & slab & (longitudinal < 0.) & (penetration >= 0.)
+        clip = torch.minimum(pad_half - local_tip[:, :, 2].abs(), extents[:, 1:] - lateral.abs())
+        margin = torch.minimum(torch.minimum(clip, -longitudinal), penetration)
+        near_side = supported & (margin >= -1e-6)
         moving_in = (speed > velocity[:, 2:3].abs()) & (speed > 1e-4) & ~retreat
         entering = moving_in & near_side.any(dim=1, keepdim=True)
         active = latched | entering
         side = near_side & active
         axis = torch.where(active, direction, 0.)
         origin = torch.where(latched, state.side_origin, state.com)
-        stiffness = .5 * payload.params.lateral_crush_k
-        # Implicit scalar compliance limits the kick when the effective mass is small.
-        gain = stiffness / (1. + 2. * self.dt**2 * stiffness / self.mass)
-        load = gain * penetration.clamp_min(0.) * side
-        return axis, origin, load[:, :, None] * axis[:, None], side
+        load = payload.pad_stop(state.payload, weights, axis[:, None], action.pinch_velocity,
+                                torch.where(side, margin, 0.))
+        low_approach = supported & moving_in & (clip > 0.) & (longitudinal < 0.)
+        depth = torch.where(active | low_approach, penetration.clamp_min(0.), torch.inf)
+        return axis, origin, load[:, :, None] * axis[:, None], side, depth
+
+    def _jaw_contact(self, state, action, frame, local_tip, weights, side):
+        separation = action.pinch_position[:, 1] - action.pinch_position[:, 0]
+        span = separation.norm(dim=1, keepdim=True)
+        axis = separation / span.clamp_min(EPS)
+        width = 2. * ((axis[:, None] @ frame)[:, 0, :2].abs() * self.half_extents[:, :2]).sum(1, keepdim=True)
+        half = (weights @ self.payload.half_thickness(state.d_surf).unsqueeze(-1)).squeeze(-1)
+        slab = (half - local_tip[..., 2].abs()).amin(dim=1, keepdim=True)
+        footprint = (self.half_extents[:, None, :2] - local_tip[..., :2].abs()).amin(-1).amax(1, keepdim=True)
+        gap = torch.minimum(width - span, torch.minimum(slab, footprint))
+        margin = torch.where(~side.any(dim=1, keepdim=True) & (span > EPS), gap, 0.)
+        directions = torch.stack((axis, -axis), dim=1)
+        load = self.payload.pad_stop(state, weights, directions, action.pinch_velocity, margin)
+        # The same actuator load already enters the film friction law.
+        available = action.normal_force.clamp_min(0.)
+        load = available * torch.tanh(load / available.clamp_min(EPS))
+        return load.unsqueeze(-1) * directions
 
     def get_privileged_state(self, state: PayloadParcelState) -> Tensor:
         if self.payload is None:

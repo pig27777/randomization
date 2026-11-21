@@ -92,6 +92,17 @@ class ObservePayload(StepForces):
         jaw_work = float((jaw * inc).sum())
         top_work = float(-(top * inc).sum())
         end_store = self.storage(step.payload)
+        frame = p.frame(step.payload)
+        local = (end_tip - step.payload.pos.mean(dim=1, keepdim=True)) @ frame
+        weights = p.weights_at(local[..., :2])
+        gap = ((end_tip - weights @ step.payload.pos) * frame[:, None, :, 2]).sum(dim=-1)
+        footprint = (local[..., :2].abs() <= p.params.bag_half_extents[:, None, :2]).all(dim=-1)
+        indentation = (weights @ step.payload.d_surf.unsqueeze(-1)).squeeze(-1)
+        upper = ((gap >= 0.) | (indentation > 1e-8) |
+                 (action.direct_press_N > 0.) | (end_tip[..., 2] <= 0.))
+        side_end = self.side_step(step, action._replace(pinch_position=end_tip), frame, local, weights)[3]
+        engaged = footprint & upper & ~side_end
+        end_store["core_J"] = float(p.surface_core_energy(p.half_height - gap, weights, engaged).sum())
         anchors, _ = p.anchors(step.payload, self.sim.payload_mount_weights, torch.zeros_like(step.payload.d_surf))
         end_store["tether_J"] = tether_storage(self.sim, step, end_tip, anchors)
         xy = self.velocity_after_damping[:, :, :2]
@@ -114,7 +125,8 @@ class ObservePayload(StepForces):
 def tether_storage(sim, state, pads, anchors):
     separation = (pads - anchors).norm(dim=-1)
     active = state.contacts[:, :, ContactState.CAPTURE] > .5
-    extension = (separation - sim.proxy.params.L0 - state.contacts[:, :, ContactState.SLIP_CUM]).clamp_min(0.)
+    reference = sim.proxy.params.L0 if state.contact_reference is None else state.contact_reference
+    extension = ((separation - state.contacts[:, :, ContactState.SLIP_CUM]) - reference).clamp_min(0.)
     return float((.5 * sim.proxy.stiffness * extension.square() * active).sum())
 
 
@@ -149,7 +161,7 @@ def complete_row(sim, old, result, before, after, left, right, external, top, si
         if (change > 1e-8).any():
             events.append("compression")
     work = left + right + external + top + side + jaw
-    delta = sum(after[key] - before[key] for key in after)
+    delta = sum(after[key] - before.get(key, 0.) for key in after)
     slip = float((result.tension * result.slip_rate).sum() * DT)
     known = xpbd_damp + friction + floor_kinetic + indent_loss + slip + tendon_damp
     return dict(work_J=work, delta_storage_J=delta, net_dissipation_J=work - delta,
@@ -174,21 +186,22 @@ def rigid_kinetic(sim, orientation, velocity, angular_rate):
 
 def run_rigid(mode):
     sim = MacroParcelSim.from_nominal(STAGE2["materials"]["pe"]["nominal"], DT)
-    observed, impulse = sim.proxy.step, sim._impulse
+    observed, impulse = sim.proxy.step_with_reference, sim._impulse
     impulses = []
     contact = boundary = None
 
-    def capture(state, inputs):
+    def capture(state, inputs, reference, inverse_mass=None):
         nonlocal contact, boundary
-        contact, boundary = observed(state, inputs), inputs
-        return contact
+        contact, next_reference = observed(state, inputs, reference, inverse_mass)
+        boundary = inputs
+        return contact, next_reference
 
     def record_impulse(*args):
         result = impulse(*args)
         impulses.append(result)
         return result
 
-    sim.proxy.step, sim._impulse = capture, record_impulse
+    sim.proxy.step_with_reference, sim._impulse = capture, record_impulse
     _, _, _, actions = sim.probe_actions(mode, axis="tangential" if mode == "ramp" else "vertical")
     state = sim.initial_state()
     row = rigid_storage(sim, state) | {"tether_J": 0.}
@@ -205,16 +218,19 @@ def run_rigid(mode):
         end["tether_J"] = tether_storage(sim, state, action.pinch_position + inc, attachment)
         ext = float(((action.external_force - action.direct_press_N * sim.up) * (state.com - old.com)).sum())
         left, right = (contact.force * inc).sum(dim=2)[0].tolist()
-        (ndv, ndw), (fdv, fdw) = impulses
-        pre_friction = rigid_kinetic(sim, old.orientation, state.velocity-fdv, state.angular_velocity-fdw)
-        pre_floor = rigid_kinetic(sim, old.orientation, state.velocity-fdv-ndv, state.angular_velocity-fdw-ndw)
-        post_friction = rigid_kinetic(sim, old.orientation, state.velocity, state.angular_velocity)
+        (ndv, ndw), (fdv, fdw), (cdv, cdw) = impulses
+        post_friction = rigid_kinetic(sim, old.orientation, state.velocity-cdv, state.angular_velocity-cdw)
+        pre_friction = rigid_kinetic(sim, old.orientation, state.velocity-cdv-fdv, state.angular_velocity-cdw-fdw)
+        pre_floor = rigid_kinetic(sim, old.orientation, state.velocity-cdv-fdv-ndv,
+                                  state.angular_velocity-cdw-fdw-ndw)
+        post_correction = rigid_kinetic(sim, old.orientation, state.velocity, state.angular_velocity)
+        normal_loss = pre_floor-pre_friction + post_friction-post_correction
         rows.append(dict(time_s=(i + 1) * DT, evaluated_tether_J=float(out.elastic_energy.sum()),
                          max_elastic_tension_N=float(contact.elastic_tension.max()),
                          max_effective_normal_N=float(boundary.normal_force.max()),
                          max_anchor_speed_mps=float(boundary.attachment_velocity.norm(dim=2).max()),
                          **complete_row(sim, old, out, row, end, left, right, ext, 0., 0., 0., 0.,
-                                        0., pre_friction-post_friction, pre_floor-pre_friction, 0.,
+                                        0., pre_friction-post_friction, normal_loss, 0.,
                                         tether_damping(contact, boundary, out), False, False)))
         row = end
     return rows
@@ -258,8 +274,9 @@ def run_payload(name, yam=None):
         # Scene construction puts an observer on the parcel for immediate
         # robot-side reactions. Restore its wrapped methods before replay.
         tap = robot.sim.boundary
-        sim.proxy.step, sim.payload.surface_contact = tap.proxy_step, tap.surface_step
+        sim.proxy.step_with_reference, sim.payload.surface_contact = tap.proxy_step, tap.surface_step
         sim._side_contact, sim.payload.step = tap.side_step, tap.payload_step
+        sim._jaw_contact = tap.jaw_step
         with np.load(yam) as data:
             end_reference = data["clearance_m"]
             explicit = ParcelAction(*(torch.as_tensor(data[f"action_{f}"])[:, None] for f in ParcelAction._fields))
@@ -276,9 +293,11 @@ def run_payload(name, yam=None):
             a = ParcelAction(*(value[i] for value in explicit))
             if name in ("loose-stop", "bend-limit"):
                 t = min(1., max(0., (i * DT - .55) / .70))
+                next_t = min(1., max(0., ((i + 1) * DT - .55) / .70))
                 amplitude = .02 if name == "loose-stop" else .06
                 offset = amplitude * (1. - math.cos(2. * math.pi * t))
-                tilt_v = 2. * amplitude * math.pi / .70 * math.sin(2. * math.pi * t)
+                next_offset = amplitude * (1. - math.cos(2. * math.pi * next_t))
+                tilt_v = (next_offset - offset) / DT
                 side = sim.up[:, None] * sim.up.new_tensor([[[-1.], [1.]]])
                 a = a._replace(pinch_position=a.pinch_position + offset * side,
                                pinch_velocity=a.pinch_velocity + tilt_v * side)
@@ -286,15 +305,22 @@ def run_payload(name, yam=None):
             a = side_action(i, .024 + torch.zeros_like(z), previous)
         else:
             a, z, press_z = top_action(i, sim.mass, z, press_z, feedback, previous)
+        commanded_tip = a.pinch_position
+        if explicit is None and previous is not None:
+            # The feedback probe constructs the next command from the previous
+            # one. Integrate along that actual segment, not its extrapolation.
+            a = a._replace(pinch_position=previous)
         out = sim.step(state, a)
-        if yam is None:
+        if explicit is None:
+            end_tip = commanded_tip
+        elif yam is None:
             end_tip = a.pinch_position + DT * a.pinch_velocity
         else:
             end_tip = explicit.pinch_position[min(i + 1, n - 1)]
             np.testing.assert_allclose(out.table_clearance.numpy().reshape(-1), end_reference[i], atol=1e-10)
         storage, row = ledger.ledger(state, a, out, end_tip, storage)
         rows.append(dict(time_s=(i + 1) * DT, **row))
-        state, previous, feedback = out.state, a.pinch_position, out.wrist_wrench[:, 2:3]
+        state, previous, feedback = out.state, commanded_tip, out.wrist_wrench[:, 2:3]
     return rows
 
 

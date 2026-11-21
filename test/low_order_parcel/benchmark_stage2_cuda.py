@@ -13,7 +13,7 @@ import sys
 from time import perf_counter
 
 import torch
-from torch.utils._pytree import tree_map
+from torch.utils._pytree import tree_leaves, tree_map
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -40,7 +40,7 @@ def build_sim(config, worlds, device="cuda"):
 
 
 def state_tensors(state):
-    return (*state[:-1], *state.payload) if hasattr(state, "payload") else tuple(state)
+    return tree_leaves(state)
 
 
 def process_memory_mib():

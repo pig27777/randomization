@@ -49,3 +49,7 @@ flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/low_order_pa
 - 首轮轻重压台架受瞬时压力波动影响，改用低通下压伺服并在聚拢窗取均值。拉拔台架首轮指垫穿入厚度包络，修正为初始预载的包裹轮廓外拉拔。腕相机首轮夹具的光轴写错，按右、下、前列向量修正，复测通过。
 - 空中侧推初次在 CPU 与 CUDA 分别测到 3.011 N 和 29.778 N。侧壁命中与横向夹压同时施力，导致刚体包裹形变对数值误差敏感。双臂封装将入射侧壁接触与横向夹压互斥后，两端均为 3.011 N 峰值、22.512 mm 位移、净进给零。新增横向形变上限检查通过。[修复前逐步记录](../test/runs/2026-11-21/policy/stage3a-dual-arm-r1/air-side-diagnostic.log)
 - Step 1 台架从已抓持状态验证 65 g 拉拔。相机标定误差与估力为仿真注入。完整交接、真机迁移与双臂吞吐需要后续阶段的独立验证。
+
+## 无源物理修复后复跑
+
+2026-11-21 19:56（北京时间），`ubun`。CPU 与 RTX 5090 均 11/11 通过。轻重压台架保持原目标与容差，CUDA 实测 0.280／2.883 N，重压双指捕获并离台 21.540 mm。65 g CUDA 拉拔双臂真实峰值均为 5.126 N，双侧退化读数同时超过 3.5 N 达 76 ms。逐指撕裂与余料共有量检查通过。双臂侧推改用无反弹接触，CUDA 测得 0.817 N 峰值、10.383 mm 位移，名义 11.700 mm 对应末帧净进给 1.617 mm。[CPU 日志](../test/runs/2026-11-21/bag/parcel-passivity-fix-r1/gate6-cpu.log) · [CUDA 日志](../test/runs/2026-11-21/bag/parcel-passivity-fix-r1/gate6-cuda.log) · [六组门禁与命令](physics-realism-audit-test.md#修复后全量复验)

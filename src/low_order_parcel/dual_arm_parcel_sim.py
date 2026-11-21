@@ -24,6 +24,7 @@ class DualArmState(NamedTuple):
     torn_flag: Tensor  # [B,arm,finger] bool, latched until reset
     side_axis: Tensor  # [B,arm,3]
     side_origin: Tensor  # [B,arm,3]
+    contact_reference: Tensor | None = None  # [B,arm,finger]
 
 
 class DualArmStep(NamedTuple):
@@ -66,6 +67,7 @@ class DualArmParcelSim:
             raise ValueError("mount_xy must be finite [B,arm,finger,xy] in payload material coordinates")
         self.mount_weights = payload.weights_at(mount_xy.flatten(1, 2))
         self.min_press = torch.stack((proxy_A.params.F_min, proxy_B.params.F_min), dim=1)
+        self.nominal_reference = torch.stack((proxy_A.params.L0, proxy_B.params.L0), dim=1)
 
     def _batch_parameter(self, value, name, low, high):
         value = torch.as_tensor(value, dtype=self.mass.dtype, device=self.mass.device)
@@ -84,7 +86,7 @@ class DualArmParcelSim:
         origin = self.payload.com(payload)[:, None].expand(-1, 2, -1)
         return DualArmState(payload, self.proxy_A.initial_state(), self.proxy_B.initial_state(),
                             self.mass.new_zeros((len(self.mass), 2, 2), dtype=torch.bool),
-                            torch.zeros_like(origin), origin)
+                            torch.zeros_like(origin), origin, self.nominal_reference.clone())
 
     def reset(self, state: DualArmState, reset_mask: Tensor, *, resample_tear: bool = True) -> DualArmState:
         """Reset selected environments at an episode boundary. Pass False for fixed corners."""
@@ -96,15 +98,18 @@ class DualArmParcelSim:
 
         if resample_tear:
             self.T_tear = select(self.sample_tear(), self.T_tear)
+        reference = self.nominal_reference if state.contact_reference is None else state.contact_reference
         return DualArmState(PayloadState(*(select(n, o) for n, o in zip(fresh.payload, state.payload))),
-                            *(select(n, o) for n, o in zip(fresh[1:], state[1:])))
+                            *(select(n, o) for n, o in zip(fresh[1:-1], state[1:-1])),
+                            select(fresh.contact_reference, reference))
 
     def get_privileged_state(self, state: DualArmState) -> Tensor:
         return self.payload.get_privileged_state(state.payload)
 
-    def _side_contact(self, state, center, local_tip, frame, tip_weights, velocity, feed, enabled):
+    def _side_contact(self, state, center, local_tip, frame, tip_weights, pad_velocity, feed, enabled):
         """Use unilateral side pressure both on the table and in the air."""
         payload = self.payload
+        velocity = pad_velocity.mean(dim=2)
         horizontal = velocity[..., :2]
         speed = horizontal.norm(dim=-1, keepdim=True)
         retreat = ((horizontal * state.side_axis[..., :2]).sum(dim=-1, keepdim=True) < -1e-4)
@@ -118,17 +123,20 @@ class DualArmParcelSim:
         longitudinal, lateral = (local_tip @ axes.transpose(-1, -2)).unbind(dim=-1)
         penetration = longitudinal + extents[..., :1]
         half = (tip_weights @ payload.half_thickness(state.payload.d_surf)[:, None, :, None]).squeeze(-1)
-        slab = (local_tip[..., 2].abs() < half) & (lateral.abs() < extents[..., 1:])
-        near_side = slab & (longitudinal < 0.) & (penetration >= 0.)
+        clip = torch.minimum(half - local_tip[..., 2].abs(), extents[..., 1:] - lateral.abs())
+        margin = torch.minimum(torch.minimum(clip, -longitudinal), penetration)
+        near_side = margin >= -1e-6
         moving_in = (speed > velocity[..., 2:].abs()) & (speed > 1e-4) & ~retreat
         active = (latched | (moving_in & near_side.any(dim=-1, keepdim=True))) & enabled
         side = near_side & active
         axis = torch.where(active, direction, 0.)
         origin = torch.where(latched & enabled, state.side_origin, center[:, None])
-        stiffness = .5 * payload.params.lateral_crush_k
-        gain = stiffness / (1. + 2. * self.dt**2 * stiffness / self.mass)
-        load = gain[:, None] * penetration.clamp_min(0.) * side
-        return axis, origin, load.unsqueeze(-1) * direction[:, :, None], side
+        pad_axis = axis[:, :, None].expand_as(pad_velocity)
+        load = payload.pad_stop(state.payload, tip_weights.flatten(1, 2), pad_axis.flatten(1, 2),
+                                pad_velocity.flatten(1, 2), torch.where(side, margin, 0.).flatten(1))
+        low_approach = enabled & moving_in & (clip > 0.) & (longitudinal < 0.)
+        depth = torch.where(active | low_approach, penetration.clamp_min(0.), torch.inf)
+        return axis, origin, load.unflatten(1, (2, 2)).unsqueeze(-1) * pad_axis, side, depth
 
     def step(self, state: DualArmState, action: DualArmAction) -> DualArmStep:
         payload, current = self.payload, state.payload
@@ -142,8 +150,8 @@ class DualArmParcelSim:
         center = payload.com(current)
         local_tip = (tip - current.pos.mean(dim=1)[:, None, None]) @ frame[:, None]
         tip_weights = payload.weights_at(local_tip.flatten(1, 2)[..., :2]).unflatten(1, (2, 2))
-        side_axis, side_origin, side_load, side_pad = self._side_contact(
-            state, center, local_tip, frame, tip_weights, vel.mean(dim=2), feed, enabled)
+        side_axis, side_origin, side_load, side_pad, inward_margin = self._side_contact(
+            state, center, local_tip, frame, tip_weights, vel, feed, enabled)
         up = frame[:, :, 2]
         pad_center = tip_weights @ current.pos[:, None]
         normal_gap = ((tip - pad_center) * up[:, None, None]).sum(dim=-1)
@@ -153,14 +161,15 @@ class DualArmParcelSim:
         previous_indent = (tip_weights @ current.d_surf[:, None, :, None]).squeeze(-1)
         top = ((previous_gap >= 0.) | (previous_indent > EPS) | (direct > 0.) | (tip[..., 2] <= 0.))
         engaged = in_footprint & top & ~side_pad & enabled
+        demand = payload.predict_surface_demand(current, (tip + self.dt * vel).flatten(1, 2), engaged.flatten(1))
         surface = payload.surface_contact(current, tip_depth.flatten(1), tip_weights.flatten(1, 2),
-                                          engaged.flatten(1))
+                                          engaged.flatten(1), demand)
         depth_rate = (surface.depth - current.d_surf) / self.dt
         compressed = current._replace(d_surf=surface.depth)
         anchors, anchor_vel = payload.anchors(compressed, self.mount_weights, depth_rate)
         anchors, anchor_vel = (item.unflatten(1, (2, 2)) for item in (anchors, anchor_vel))
         displacement = ((center[:, None] - side_origin) * side_axis).sum(dim=-1, keepdim=True)
-        net_feed = (feed - displacement).clamp_min(0.)
+        net_feed = torch.minimum((feed - displacement).clamp_min(0.), inward_margin)
         feed_A, align_A, budget_A = payload.contact_geometry(
             surface.depth, self.mount_weights[:, :2], net_feed[:, 0], align[:, 0], self.base_slack)
         feed_B, align_B, budget_B = payload.contact_geometry(
@@ -177,10 +186,17 @@ class DualArmParcelSim:
         half = (tip_weights @ payload.half_thickness(surface.depth)[:, None, :, None]).squeeze(-1)
         # Pads on the entry wall are still outside the parcel. Applying a transverse
         # crush to that same contact would drive the blocks apart across the jaw.
-        bridge = (in_footprint.any(dim=-1, keepdim=True) & ~side_pad.any(dim=-1, keepdim=True) &
-                  (local_tip[..., 2].abs() < half).all(dim=-1, keepdim=True) & (span > EPS) & enabled)
-        crush = .5 * payload.params.lateral_crush_k[:, None] * (width - span).clamp_min(0.) * bridge
-        jaw_load = crush.unsqueeze(-1) * torch.stack((axis, -axis), dim=2)
+        footprint = (payload.params.bag_half_extents[:, None, None, :2] -
+                     local_tip[..., :2].abs()).amin(-1).amax(-1, keepdim=True)
+        slab = (half - local_tip[..., 2].abs()).amin(-1, keepdim=True)
+        gap = torch.minimum(width - span, torch.minimum(slab, footprint))
+        jaw_margin = torch.where(~side_pad.any(dim=-1, keepdim=True) & (span > EPS) & enabled, gap, 0.)
+        jaw_axis = torch.stack((axis, -axis), dim=2)
+        load = payload.pad_stop(compressed, tip_weights.flatten(1, 2), jaw_axis.flatten(1, 2),
+                                vel.flatten(1, 2), jaw_margin.expand_as(normal).flatten(1)).unflatten(1, (2, 2))
+        available_force = normal.clamp_min(0.)
+        load = available_force * torch.tanh(load / available_force.clamp_min(EPS))
+        jaw_load = load.unsqueeze(-1) * jaw_axis
         surface_pad = surface.pad_force_N.unflatten(1, (2, 2))
         surface_vertical = (surface_pad * up[:, None, 2:3]).clamp_min(0.)
         extra_press = (.5 * direct - surface_vertical).clamp_min(0.)
@@ -189,7 +205,7 @@ class DualArmParcelSim:
         side = side_axis.abs().any(dim=-1, keepdim=True)
         if side_feed is not None:
             side = side | side_feed.unsqueeze(-1)
-        normal = torch.where(pad_enabled, normal + crush, 0.)
+        normal = torch.where(pad_enabled, normal, 0.)
         compression = torch.where(side, normal, press)
         excess = (compression - self.min_press).clamp_min(0.)
         half_force = self.F_half[:, None]
@@ -205,8 +221,11 @@ class DualArmParcelSim:
                                  normal[:, 0], effective_inward[:, 0], feed_A, align_A, available[:, :1])
         inputs_B = ContactInputs(tip[:, 1], anchors[:, 1], vel[:, 1], anchor_vel[:, 1], center,
                                  normal[:, 1], effective_inward[:, 1], feed_B, align_B, available[:, 1:])
-        result_A = self.proxy_A.step(prior[:, 0], inputs_A)
-        result_B = self.proxy_B.step(prior[:, 1], inputs_B)
+        reference = self.nominal_reference if state.contact_reference is None else state.contact_reference
+        separation = torch.where(pad_enabled.unsqueeze(-1), tip - anchors, 0.).flatten(1, 2)
+        inverse_mass = payload.anchor_inverse_mass(compressed, self.mount_weights, separation).unflatten(1, (2, 2))
+        result_A, _ = self.proxy_A.step_with_reference(prior[:, 0], inputs_A, reference[:, 0], inverse_mass[:, 0])
+        result_B, _ = self.proxy_B.step_with_reference(prior[:, 1], inputs_B, reference[:, 1], inverse_mass[:, 1])
         claim_A = (result_A.state[..., ContactState.SLACK] + self.dt * result_A.slip_rate).sum(dim=1)
         claim_B = (result_B.state[..., ContactState.SLACK] + self.dt * result_B.slip_rate).sum(dim=1)
         claims = torch.stack((claim_A, claim_B), dim=1)
@@ -220,8 +239,10 @@ class DualArmParcelSim:
         reserved = retained + growth * (free / growth.sum(dim=1, keepdim=True).clamp_min(EPS)).clamp_max(1.)
         capped = torch.where(claims.sum(dim=1, keepdim=True) > budget,
                              torch.minimum(available, reserved), available)
-        result_A = self.proxy_A.step(prior[:, 0], inputs_A._replace(S_bag_eff=capped[:, :1]))
-        result_B = self.proxy_B.step(prior[:, 1], inputs_B._replace(S_bag_eff=capped[:, 1:]))
+        result_A, reference_A = self.proxy_A.step_with_reference(
+            prior[:, 0], inputs_A._replace(S_bag_eff=capped[:, :1]), reference[:, 0], inverse_mass[:, 0])
+        result_B, reference_B = self.proxy_B.step_with_reference(
+            prior[:, 1], inputs_B._replace(S_bag_eff=capped[:, 1:]), reference[:, 1], inverse_mass[:, 1])
         tension = torch.stack((result_A.tension, result_B.tension), dim=1)
         torn = state.torn_flag | (tension > self.T_tear[:, None])
         live = pad_enabled & ~torn
@@ -230,7 +251,7 @@ class DualArmParcelSim:
         tension = torch.where(live, tension, 0.)
         rope_force = torch.stack((result_A.force, result_B.force), dim=1)
         rope_force = torch.where(live.unsqueeze(-1), rope_force, 0.)
-        rope_load = self.mount_weights.transpose(1, 2).bmm(rope_force.flatten(1, 2))
+        rope_load, _ = payload.distribute_anchor_forces(compressed, self.mount_weights, rope_force.flatten(1, 2))
         up = up[:, None]
         contact_load = jaw_load + side_load - extra_press.unsqueeze(-1) * payload.up
         block_load = tip_weights.flatten(1, 2).transpose(1, 2).bmm(contact_load.flatten(1, 2))
@@ -242,8 +263,9 @@ class DualArmParcelSim:
         reaction = (-rope_force - contact_load + surface_pad.unsqueeze(-1) * up[:, None])
         torque = torch.linalg.cross(tip - tip.mean(dim=2, keepdim=True), reaction).sum(dim=2)
         wrench = torch.cat((reaction.sum(dim=2), torque), dim=-1)
+        reference_next = torch.where(live, torch.stack((reference_A, reference_B), dim=1), self.nominal_reference)
         next_state = DualArmState(advanced.state, next_contacts[:, 0], next_contacts[:, 1], torn,
-                                  side_axis, side_origin)
+                                  side_axis, side_origin, reference_next)
         return DualArmStep(next_state, wrench, tension, advanced.support_N.sum(dim=1, keepdim=True),
                            advanced.clearance.amin(dim=1, keepdim=True), budget, available, net_feed,
                            press.squeeze(-1))

@@ -9,6 +9,7 @@ from torch import Tensor
 DT = .002
 GRAVITY = 9.81
 EPS = 1e-8
+CORE_STIFFNESS = 10000.
 
 
 @dataclass(frozen=True)
@@ -252,23 +253,59 @@ class UnifiedPayloadTemplate:
         u, v = .5 * (u + 1.), .5 * (v + 1.)
         return torch.stack(((1. - u) * (1. - v), u * (1. - v), (1. - u) * v, u * v), dim=-1)
 
-    def surface_contact(self, state, tip_depth, weights, engaged):
-        """Update under top pads. tip_depth is uncompressed-surface approach [B,pads], in meters."""
-        raw = tip_depth.clamp_min(0.).unsqueeze(-1) * weights * engaged.unsqueeze(-1)
-        demand = raw.amax(dim=1)
+    @staticmethod
+    def _surface_demand(tip_depth, weights, engaged):
+        valid = engaged.unsqueeze(-1) & (weights > 0.)
+        raw = torch.where(valid, tip_depth.unsqueeze(-1) * weights, -torch.inf)
+        demand = torch.where(valid.any(dim=1), raw.amax(dim=1), 0.)
+        return raw, demand
+
+    def surface_contact(self, state, tip_depth, weights, engaged, end_demand=None):
+        """Update under top pads using an optional predicted end-step block demand."""
+        raw, demand = self._surface_demand(tip_depth, weights, engaged)
+        if end_demand is None:
+            end_demand = demand
         free = state.d_surf * self.rebound
-        depth = torch.maximum(free, torch.minimum(demand, self.depth_max))
-        ratio = depth / self.depth_max.clamp_min(EPS)
+        depth = torch.maximum(free, torch.minimum(end_demand, self.depth_max))
         p = self.params
-        loading = (demand >= free) & (demand > 0.)
-        compress = loading * (p.k_soft * depth * (1. + p.hardening_gamma * ratio.square()) +
-                              p.c_comp * ((depth - state.d_surf) / self.dt).clamp_min(0.))
+        loading = (end_demand >= free) & (end_demand > 0.)
+        old = state.d_surf
+        # Secant of the compression potential between the two indentation states.
+        ratio = (depth.square() + old.square()) / self.depth_max.clamp_min(EPS).square()
+        elastic = p.k_soft * .5 * (depth + old) * (1. + .5 * p.hardening_gamma * ratio)
+        # Unloading viscosity matches the free rebound at zero pad reaction.
+        rebound_factor = (1. - (old - depth).clamp_min(0.) / (old - free).clamp_min(EPS)).clamp_min(0.)
+        compress = loading * (elastic * rebound_factor + p.c_comp * ((depth - old) / self.dt).clamp_min(0.))
         # The core begins where the compressed top reaches its minimum height above the bottom.
-        core = (demand - self.depth_max).clamp_min(0.) * 10000.
-        loaded = (raw >= depth.unsqueeze(1)) * raw
-        share = loaded / loaded.sum(dim=1, keepdim=True).clamp_min(EPS)
-        return SurfaceStep(depth, torch.bmm(share, (compress + core).unsqueeze(-1)).squeeze(-1),
-                           compress + core, torch.bmm(share, core.unsqueeze(-1)).squeeze(-1))
+        start_core = (demand - self.depth_max).clamp_min(0.)
+        end_core = (end_demand - self.depth_max).clamp_min(0.)
+        core = .5 * CORE_STIFFNESS * (start_core + end_core)
+        sweep = (end_demand - demand).abs()
+        core_secant = .5 * CORE_STIFFNESS * (end_core.square() - start_core.square()).abs()
+        core = torch.where(sweep > EPS, core_secant / sweep.clamp_min(EPS), core)
+        owners = ((raw == demand.unsqueeze(1)) & engaged.unsqueeze(-1)).to(raw.dtype)
+        share = owners / owners.sum(dim=1, keepdim=True).clamp_min(1.)
+        # Pull the block strain force back through its weighted pad displacement.
+        pad_gradient = share * weights
+        pad_force = (pad_gradient @ (compress + core).unsqueeze(-1)).squeeze(-1)
+        block_force = (weights.transpose(1, 2) @ pad_force.unsqueeze(-1)).squeeze(-1)
+        return SurfaceStep(depth, pad_force, block_force, (pad_gradient @ core.unsqueeze(-1)).squeeze(-1))
+
+    def predict_surface_demand(self, state, pads_end, active):
+        """Extrapolate the moving contact geometry without entering the floor."""
+        pos = state.pos + self.dt * state.vel
+        z = torch.maximum(pos[..., 2], self.half_thickness(state.d_surf))
+        predicted = state._replace(pos=torch.cat((pos[..., :2], z.unsqueeze(-1)), dim=-1))
+        frame = self.frame(predicted)
+        local = (pads_end - predicted.pos.mean(dim=1, keepdim=True)) @ frame
+        weights = self.weights_at(local[..., :2])
+        separation = ((pads_end - weights @ predicted.pos) * frame[:, None, :, 2]).sum(dim=-1)
+        return self._surface_demand(self.half_height - separation, weights, active)[1]
+
+    def surface_core_energy(self, tip_depth, weights, engaged):
+        """Recoverable energy of the unilateral core penalty at a boundary pose."""
+        _, demand = self._surface_demand(tip_depth, weights, engaged)
+        return .5 * CORE_STIFFNESS * (demand - self.depth_max).clamp_min(0.).square()
 
     def contact_geometry(self, depth, weights, feed, cosine, slack, *, pad_height=.020, pad_radius=.005):
         indentation = torch.bmm(weights, depth.unsqueeze(-1)).squeeze(-1)
@@ -292,6 +329,30 @@ class UnifiedPayloadTemplate:
         height_rate = -.5 * torch.bmm(weights, depth_rate.unsqueeze(-1))
         return (torch.bmm(weights, state.pos) + height * normal[:, None],
                 torch.bmm(weights, state.vel) + height * normal_rate[:, None] + height_rate * normal[:, None])
+
+    def anchor_inverse_mass(self, state, weights, separation):
+        """Absolute row sums of the axial mobility for all ropes on this payload."""
+        direction = torch.nn.functional.normalize(separation, dim=-1, eps=EPS)
+        normal, a, b, length = self._normal(state.pos)
+        h = weights @ self.half_thickness(state.d_surf).unsqueeze(-1)
+        projected = direction - (direction * normal[:, None]).sum(dim=-1, keepdim=True) * normal[:, None]
+        adjoint = torch.where(length[:, None] > EPS, h * projected / length[:, None].clamp_min(EPS), 0.)
+        ga = torch.linalg.cross(b[:, None].expand_as(adjoint), adjoint)
+        gb = torch.linalg.cross(adjoint, a[:, None].expand_as(adjoint))
+        jacobian = weights.unsqueeze(-1) * direction.unsqueeze(-2) + torch.stack((-ga, -gb, gb, ga), dim=-2)
+        mobility = (jacobian * self.inv_mass[:, None, :, None]).flatten(2) @ jacobian.flatten(2).transpose(1, 2)
+        return mobility.abs().sum(dim=-1)
+
+    def pad_stop(self, state, weights, axis, pad_velocity, margin):
+        """A compliant zero-restitution stop with no stored penetration spring."""
+        gap = (margin / .0005).clamp(0., 1.)
+        engage = gap.square() * (3. - 2. * gap)
+        speed = ((pad_velocity - weights @ state.vel) * axis).sum(dim=-1).clamp_min(0.)
+        # The row bound includes other pads pushing on the same blocks.
+        row = (weights @ (weights.sum(dim=1) * self.inv_mass).unsqueeze(-1)).squeeze(-1)
+        critical = 2. * torch.sqrt(.5 * self.params.lateral_crush_k / row.clamp_min(EPS))
+        damping = critical * engage
+        return damping * speed / (1. + self.dt * damping * row)
 
     def distribute_anchor_forces(self, state, weights, force):
         normal, a, b, length = self._normal(state.pos)
