@@ -239,7 +239,7 @@ def measure_contacts(robot, target_geoms=(), target_flexes=(), monitor_support=F
 
 
 
-def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
+def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None, micro_lift=None):
     if not np.isfinite(cfg.lift_height) or cfg.lift_height <= 0:
         raise ValueError("lift_height must be finite and positive")
     if not np.isfinite(cfg.lift_speed_m_s) or cfg.lift_speed_m_s <= 0:
@@ -313,6 +313,9 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
     approach_origin = tips(robot).mean(0) if close_advance is not None else None
     lift_retract = getattr(robot, "lift_retract_m", 0.)
     lift_length = cfg.lift_height + lift_retract * (1. + approach[2]) if lift_retract else cfg.lift_height
+    retried = False
+    if micro_lift is not None and (approach is None or lift_retract or not cfg.pickup_only or cfg.lift_height <= micro_lift.height):
+        raise ValueError("micro-lift requires a side pickup with a longer vertical lift")
     press = None
     if cfg.press_target_N is not None:
         if approach is not None:
@@ -354,6 +357,8 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
             outcome,reason="over_squeeze","v2.2 category grip threshold"
         if (press is not None or close_advance is not None) and feedback["penetration_mm"] > 1.:
             outcome,reason="sim_fail","film contact penetration exceeds 1 mm"
+        if micro_lift is not None:
+            micro_lift.observe(robot, phase, target, gap)
         if phase=="settle":
             if elapsed>=.3:
                 baseline_com=sim.com().copy()
@@ -396,6 +401,9 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                 next_phase="close" if arrived or (contacted and down>=20) else None
             if press is None and elapsed>8:
                 outcome,reason="grasp_fail","no surface contact/approach timeout"
+        elif phase == "regrasp":
+            target, gap, ready = micro_lift.retry_pose(elapsed, lift_site, retry_gap, cfg.grasp_opening_m, approach)
+            next_phase = "close" if ready else None
         elif phase in ("close","lift","lift_hold","carry","carry_hold"):
             gap_rate = np.clip((filtered.mean()-10)*cfg.closing_gain_m_per_N_s,-.05,.015)
             if press is not None and phase == "close":
@@ -417,11 +425,22 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                     lift_site=target.copy(); lift_object=sim.com().copy()
             elif phase=="lift":
                 travel = cfg.lift_speed_m_s * elapsed
+                retry_now = False
+                if micro_lift is not None and not retried:
+                    travel, retry_now = micro_lift.lift(elapsed, cfg.lift_speed_m_s, float(d.time))
                 if lift_retract:
                     target = lift_site + retracted_lift_displacement(approach, lift_retract, cfg.lift_height, travel)
                 else:
                     target=lift_site+np.array([0.,0.,min(cfg.lift_height,travel)])
-                next_phase="lift_hold" if elapsed>=lift_length/cfg.lift_speed_m_s else None
+                complete = elapsed >= lift_length / cfg.lift_speed_m_s if micro_lift is None else travel >= lift_length
+                next_phase="lift_hold" if complete else None
+                if retry_now:
+                    next_phase = "regrasp"
+                    retried = True
+                    retry_gap = gap
+                    stable = gap_hold = loss = 0.
+                    pinch.release("regrasp")
+                    spring.release()
             elif phase=="lift_hold":
                 pickup_end = "open" if release_ramp else "done"
                 next_phase=(pickup_end if cfg.pickup_only else "carry") if elapsed>=cfg.lift_hold_seconds else None
@@ -565,6 +584,9 @@ def run(backend, cfg, output, *, on_sample=None, on_penetration_peak=None):
                 pinch_frame="articulated palm; reactions load arm",robot=robot.diagnostics(),
                 dimensions=backend.dimensions(sim),
                 warnings={mujoco.mjtWarning(i).name:int(w.number) for i,w in enumerate(d.warning) if w.number})
+    if micro_lift is not None:
+        result["micro_lift"] = dict(decision=micro_lift.decision, prefix_sha256=micro_lift.prefix.hexdigest(),
+                                    observations=micro_lift.samples)
     if press is not None:
         result["normal_press"] = dict(
             target_N=press.target_N, band_N=[.8 * press.target_N, 1.2 * press.target_N],
