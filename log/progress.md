@@ -1174,3 +1174,9 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 - P6 重现 343.97 N、189/8,192 路未稳态。三张 CUDA 相图通过，整包原回归 20/20。
 - 静止指垫捕获产生 6.826 mJ 未支付柔索储能，YAM 重包复验同类事件约 9.569 mJ。训练判定 NO-GO，实物包络待核对。
 - [主报告](../docs/PHYSICS_REALISM_AUDIT_REPORT.md) · [检查报告](../reports/physics-realism-audit-test.md)。
+
+### 2026-11-21 Stage 3A 双臂 Step 1
+
+- 同袋衣物 0.291 N 轻压零捕获，2.897 N 重压双指捕获、离台 37.279 mm。343.97 N 撕裂试算张力当步归零。
+- RTX 5090 上 65 g 拉拔的退化估力双侧同时高于 3.5 N 达 76 ms。侧壁与横向夹压互斥后，CPU/CUDA 的侧推反力均为 3.011 N。
+- 新增测试 CPU/CUDA 各 11 项通过，冻结代理、对齐工况、P1–P6、8,192 路原代理 CUDA 验收和整包回归通过。[测试报告](../reports/stage3a-dual-arm-test.md)
