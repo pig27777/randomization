@@ -9,6 +9,9 @@ import sys
 import numpy as np
 import torch
 
+from .macro_parcel_sim import MacroParcelSim
+from .pad_torsion import PadTorsionParams
+
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "test/low_order_parcel"))
 from test_unified_payload import STAGE2, DT, heterogeneous_probe, hover_grip, hover_steering
@@ -29,9 +32,11 @@ def json_file(path, value):
 
 
 @torch.inference_mode()
-def run(output, worlds, compare_frozen=False):
+def run(output, worlds, compare_frozen=False, open_loop=False, pad_radius=0.):
     output.mkdir(parents=True, exist_ok=False)
     sim, materials = heterogeneous_probe(STAGE2, worlds)
+    if pad_radius > 0.:
+        sim = MacroParcelSim(sim.proxy, payload=sim.payload, torsion=PadTorsionParams(radius_m=pad_radius))
     # Keep references to the very inputs used by this instance; all reads occur
     # before the next graph replay. The old capture state is updated in-place
     # by the benchmark, so preserve a copy at the call boundary.
@@ -71,13 +76,16 @@ def run(output, worlds, compare_frozen=False):
         tape.index_copy_(0, cursor, frame.unsqueeze(0))
 
     stats = timed_episode(STAGE2, worlds, {}, make_sim=lambda *_: (sim, materials),
-                          grip_N=hover_grip, steer=hover_steering, observe=observe)
+                          grip_N=hover_grip, steer=None if open_loop else hover_steering,
+                          observe=observe, uniform_lift=open_loop)
     peak = tape[:, :, :2].amax(dim=(0, 2)).cpu().numpy()
     tail = tape[-1].cpu().numpy()
     col = names.index
     passed = (tail[:, col("final_run_steps_0")] >= 100) & tail[:, -2:].all(axis=1)
     ranks = np.argsort(-peak, kind="stable")
     failed = np.flatnonzero(~passed)
+    if open_loop and len(failed) > 64:
+        failed = failed[np.linspace(0, len(failed) - 1, 64, dtype=int)]
     selected = np.union1d(ranks[:20], failed)
     if worlds > 6383:
         selected = np.union1d(selected, [6383])
@@ -86,7 +94,6 @@ def run(output, worlds, compare_frozen=False):
     if worlds == 8192 and compare_frozen:
         assert stats["verified_by_material"] == {"pe":2037,"kraft":2021,"bubble":2038,"paperboard":1907}
         assert stats["final_bilateral_capture_worlds"] == 8162 and abs(float(peak.max()) - 343.974884) < .01
-    assert stats["nonfinite_worlds"] == stats["invalid_geometry_worlds"] == 0
     np.savez_compressed(output / "waveforms.npz", world_id=selected, columns=np.array(names),
                         time_s=np.arange(len(wave)) * DT, frames=wave)
     rank = np.argsort(ranks) + 1
@@ -105,7 +112,9 @@ def run(output, worlds, compare_frozen=False):
         gate = {"capture":dtail[:, col("cap_0"):col("cap_1")+1].min(axis=1) < .5,
                 "clearance":dtail[:, col("clearance_m_0")] <= .001,
                 "support":dtail[:, col("support_N_0")] != 0,
-                "speed":dtail[:, col("speed_mps_0")] >= .020}
+                "speed":dtail[:, col("speed_mps_0")] >= .020,
+                "nonfinite":dtail[:, col("finite_0")] != 1.,
+                "geometry":dtail[:, col("geometry_ok_0")] != 1.}
         bad = [key for key, mask in gate.items() if mask.any()]
         assert bool(bad) != bool(passed[world])
         losses = {}
@@ -147,9 +156,11 @@ def run(output, worlds, compare_frozen=False):
     stats.update(n_over_50=int((peak>50).sum()), n_failed_over_50=int(((peak>50)&~passed).sum()),
                  max_effective_normal_N=float(tape[:, :, col("normal_N_0"):col("normal_N_1")+1].amax().item()),
                  n_selected=len(selected), seed=1726481, dt=DT, device=torch.cuda.get_device_name(),
+                 open_loop=open_loop, pad_radius_m=pad_radius,
                  torch=str(torch.__version__))
     json_file(output / "p6.json",stats)
     print(json.dumps(stats))
+    assert stats["nonfinite_worlds"] == stats["invalid_geometry_worlds"] == 0
 
 
 if __name__ == "__main__":
@@ -157,5 +168,9 @@ if __name__ == "__main__":
     parser.add_argument("output",type=Path)
     parser.add_argument("--worlds",type=int,default=8192)
     parser.add_argument("--compare-frozen", action="store_true", help="assert the archival baseline values")
+    parser.add_argument("--open-loop", action="store_true", help="fixed vertical trajectory at uniform lift speed")
+    parser.add_argument("--pad-radius", type=float, default=0.)
     args = parser.parse_args()
-    run(args.output, args.worlds, args.compare_frozen)
+    if not 0. <= args.pad_radius <= .020 or (args.compare_frozen and (args.open_loop or args.pad_radius)):
+        parser.error("invalid pad radius or settings for archival comparison")
+    run(args.output, args.worlds, args.compare_frozen, args.open_loop, args.pad_radius)

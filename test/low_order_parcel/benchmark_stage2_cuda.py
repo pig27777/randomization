@@ -51,14 +51,15 @@ def process_memory_mib():
 
 
 @torch.no_grad()
-def timed_episode(config, worlds, baselines, *, make_sim=build_sim, grip_N=6., steer=None, observe=None):
+def timed_episode(config, worlds, baselines, *, make_sim=build_sim, grip_N=6., steer=None, observe=None,
+                  uniform_lift=False):
     initial_start = perf_counter()
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
     sim, labels = make_sim(config, worlds)
     if callable(grip_N):
         grip_N = grip_N(sim)
-    times, _, _, actions = sim.probe_actions("side", duration_s=DURATION, grip_N=grip_N)
+    times, _, _, actions = sim.probe_actions("side", duration_s=DURATION, grip_N=grip_N, uniform_lift=uniform_lift)
     steps = len(times)
     state = tree_map(torch.Tensor.clone, sim.initial_state())
     buffers = state_tensors(state)

@@ -11,6 +11,7 @@ from torch import Tensor
 from .dual_arm_parcel_sim import DualArmParcelSim
 from .hardware_filters import YAMParameters
 from .lumped_contact_proxy import LumpedContactProxy, ProxyParams
+from .pad_torsion import PadTorsionParams
 from .unified_payload import DT, PayloadParamsX, UnifiedPayloadTemplate
 from .virtual_rgb import RGBParameters
 
@@ -36,11 +37,12 @@ class Stage3Episode:
     fold_rad: Tensor
     yam: YAMParameters
     rgb: RGBParameters
+    torsion: PadTorsionParams = PadTorsionParams()
 
     def make_sim(self, *, mount_xy=None):
         return DualArmParcelSim(LumpedContactProxy(self.proxy, DT), LumpedContactProxy(self.proxy, DT),
                                 UnifiedPayloadTemplate(self.payload), F_half=self.F_half, T_tear=self.T_tear,
-                                mount_xy=mount_xy)
+                                mount_xy=mount_xy, torsion=self.torsion)
 
     def table_state(self, sim):
         state = sim.initial_state()
@@ -157,8 +159,15 @@ class DomainRandomizer:
                             _interval(cfg["press_half_N"], self._uniform((count, 1))), mix)
         tear = torch.lerp(torch.full_like(yaw, 40.), _interval(cfg["tear_N"], self._uniform((count, 1))), mix)
         yam, rgb = self._hardware(payload.total_mass, a)
+        draw = self._uniform((count, 3)).split(1, dim=1)
+        nominal = PadTorsionParams()
+        torsion = PadTorsionParams(*(torch.lerp(torch.full_like(rank, center),
+                                               _interval(cfg.get(key, (center, center)), rank), mix)
+                                    for key, rank, center in zip(
+                                        ("pad_radius_m", "neck_damping_ratio", "neck_length_m"), draw, nominal[:3],
+                                        strict=True)))
         return Stage3Episode(ProxyParams(**p), payload, F_half, tear, material, content, yaw, clearance,
-                             torch.zeros_like(yaw), torch.zeros_like(yaw), yam, rgb)
+                             torch.zeros_like(yaw), torch.zeros_like(yaw), yam, rgb, torsion)
 
     def _hardware(self, like, alpha):
         yam = YAMParameters.sample(like, generator=self.rng)
@@ -198,6 +207,9 @@ class DomainRandomizer:
                        payload=replace_fields(episode.payload, fresh.payload),
                        yam=YAMParameters(*(select(x, y) for x, y in zip(episode.yam, fresh.yam, strict=True))),
                        rgb=RGBParameters(*(select(x, y) for x, y in zip(episode.rgb, fresh.rgb, strict=True))),
+                       torsion=PadTorsionParams(*(select(torch.as_tensor(x, device=self.device).expand_as(y), y)
+                                                 for x, y in zip(episode.torsion[:3], fresh.torsion[:3], strict=True)),
+                                                episode.torsion.stiffness_Nm_rad),
                        **{f.name: select(getattr(episode, f.name), getattr(fresh, f.name)) for f in fields(episode)
                           if isinstance(getattr(episode, f.name), Tensor)})
 
@@ -249,6 +261,6 @@ class CornerSuite:
         e = self.episodes
         return Stage3Episode(ProxyParams(*(getattr(e.proxy, f.name)[indices] for f in fields(e.proxy))),
                              PayloadParamsX(*(getattr(e.payload, f.name)[indices] for f in fields(e.payload))),
-                             *(getattr(e, f.name)[indices] for f in fields(e)[2:-2]),
+                             *(getattr(e, f.name)[indices] for f in fields(e)[2:-3]),
                              YAMParameters(*(value[indices] for value in e.yam)),
-                             RGBParameters(*(value[indices] for value in e.rgb)))
+                             RGBParameters(*(value[indices] for value in e.rgb)), e.torsion)

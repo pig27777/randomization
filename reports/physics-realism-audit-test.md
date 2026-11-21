@@ -52,3 +52,39 @@ flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/low_order_pa
 flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_unified_payload.py -v -k p5 -k p6
 flock /tmp/claude-gpu.lock env STAGE3_TEST_DEVICE=cuda .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_stage3_dual_arm.py -v
 ```
+
+## Fix 4 有限指垫抗转计划
+
+本轮使用已经通过 Fix 1–3 的 `d6e519bc` 物理底座，历史 Stage 3B 对照为 `09a0901e`。正式运行在 `ubun` 的 RTX 5090 上持锁，步长 2 ms。各配置正式运行一遍，同一种子固定对比。
+
+- Gate 1 保留 17 组能量回归，新增悬空抗转、轻夹打滑及零合力检查。所有逐步净耗散至少 −0.1 mJ，捕获转动储能 0 J。
+- Gate 2 关闭 P6 平移反馈，同种子 1726481 分别用零半径和有限半径运行 8,192 路 × 2,385 步。报告可稳悬数量、峰值张力、墙钟和显存。1.5 kg 偏心硬书分别验证低夹打滑和高夹稳持。
+- Gate 3 用种子 347、每组 1,024 个动作复跑 C1–C10 和 C7 21.6 s，沿用原 3 s 稳持及交接判据。Gate 4 复跑三张 32×32 相图。Gate 5 执行 Stage 2、2.5、3 系列、随机化与整包回归。
+- 门禁全部通过才冻结物理底座。若失效，保留原验收阈值，记录失败范围与证据。
+
+## Fix 4 复验与冻结
+
+2026-11-21，ubun，RTX 5090，2 ms。五组规定门禁通过。Stage 4 仿真训练使用本轮冻结的低阶物理。保留前轮 YAM 软料顶压、重包离台和 UMI 实物包络限制。
+
+| 门禁 | 结果 |
+| --- | --- |
+| 1 · 逐步能量 | 有限指垫 **19/19**，最小净耗散 −0.050156 mJ，低于 −0.1 mJ 的步数为 0。首次捕获抗转储能 0 J。四子块力偶合力最大分量 **0.030 µN**，力矩残差最大分量 3.73 nN·m。[总表](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/gate1-finite-pad/energy-summary.json) · [力偶核对](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/couple-balance.log) |
+| 2 · 开环与打滑 | 同种子同匀速竖提，关闭 P6 平移反馈。零半径到 12 mm，稳悬 **84 → 5,481 / 8,192**，峰值张力 **20.702 → 22.019 N**，墙钟 **4.114 → 5.213 s**，进程显存 **4,738 → 4,740 MiB**。两组均零非有限、零几何越界、零超过 50 N。1.5 kg 偏心硬书 18 N/指时参考滑移 0.943 rad，末角 55.41°。90 N/指时零滑移，末角 9.73°，末 0.2 s 最大角速度 0.01453 rad/s。[零半径 P6](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/p6-open-zero/p6.json) · [12 mm P6](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/p6-open-pad-final/p6.json) · [专项 3/3](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/pad-torsion-final.log) |
+| 3 · 角点 | C1–C10 每组 1,024 个动作均有通过。C3 462 个，C7 511 个，C9 1,024 个，C10 89 个。C7 21.6 s 压力跑 512 个通过，零撕裂，最长稳持 16.182 s。[角点与历史对照](stage3b-corners-test.md#fix-4-有限指垫复跑) |
+| 4 · 相图 | 有限指垫下三张 32×32 GPU 相图均通过。A 硬书边界零误捕获、零离台。B 零逆序。C 低区 84 格零捕获，高区 54 格全双指捕获。[相图与判定](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/phases-finite-pad/) |
+| 5 · 回归 | Stage 2 七项通过，1 ms／2 ms 各 6/6，刚体 CUDA 8,192/8,192，1.393 s。P1–P6 与挂点虚功通过，Stage 3 CPU 与 CUDA 各 14/14，随机化 2/2，原整包 20/20。零半径专项与原封装逐元素一致。[运行日志](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/) |
+
+初版分开预测扭转冲量和原有载荷，高夹仍有缓慢倾斜。最终先由原有载荷预测自由角速度，再解惯量耦合的隐式力矩。参考姿态更新包含摩擦截断后的滑移，膜颈变短时的已有储能受上一时刻结余约束。YAM 能量沿用历史 2 ms 指垫边界，腕部旋转由存档关节轨迹插值得到。
+
+    export OMP_NUM_THREADS=1
+    run=/tmp/parcel-pad-torsion-check
+    mkdir -p "$run"
+    yam=test/runs/2026-11-21/bag/parcel-passivity-fix-r1/final-yam
+    .venv-physical-parcel/bin/python -B test/low_order_parcel/audit_energy_passivity.py "$run/energy" --finite-pad --yam-root "$yam"
+    .venv-physical-parcel/bin/python -B -m unittest discover -s test/low_order_parcel -p test_pad_torsion.py -v
+    export PYTHONPATH="$PWD/.venv-physical-parcel/stage3-cu130:$PWD"
+    flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B -m src.low_order_parcel.audit_physics_realism "$run/p6-zero" --open-loop
+    flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B -m src.low_order_parcel.audit_physics_realism "$run/p6-pad" --open-loop --pad-radius .012
+    flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/low_order_parcel/audit_phase_diagrams.py "$run/phases" --finite-pad
+
+Stage 2、P1–P6 和整包沿用本报告上一节命令。Stage 3 CPU 和 CUDA 用 test_stage3*.py，另运行 test_domain.py。角点命令见[角点报告](stage3b-corners-test.md#fix-4-有限指垫复跑)。

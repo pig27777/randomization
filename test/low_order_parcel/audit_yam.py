@@ -88,7 +88,10 @@ class StepForces:
         top_force = self.surface.pad_force_N.unsqueeze(-1) * normal[:, None] + direct.unsqueeze(-1) * self.sim.up[:, None]
         reaction = -self.contact.force - jaw_force - self.side + top_force
         arm = tip - tip.mean(dim=1, keepdim=True)
-        wrench = torch.cat((reaction.sum(dim=1), torch.linalg.cross(arm, reaction).sum(dim=1)), dim=1)
+        torque = torch.linalg.cross(arm, reaction).sum(dim=1)
+        if result.state.torsion:
+            torque = torque - result.state.torsion.torque[:, 0]
+        wrench = torch.cat((reaction.sum(dim=1), torque), dim=1)
         torch.testing.assert_close(wrench, result.wrist_wrench, atol=1e-9, rtol=1e-9)
         return reaction, jaw_force, top_force, weights
 

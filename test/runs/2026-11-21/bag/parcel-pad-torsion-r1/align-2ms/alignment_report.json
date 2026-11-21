@@ -1,0 +1,471 @@
+{
+  "machine": "ubun",
+  "torch_version": "2.15.0+cpu",
+  "device": "cpu",
+  "batch": 1,
+  "dt_s": 0.002,
+  "config_sha256": "1c194cfa7d2b269453629621c37359e8c53c9c384532e9075c1b029410bf73a2",
+  "side_episode_s": 4.77,
+  "reference_warp_wall_s": [
+    539.12,
+    579.86,
+    4263.54
+  ],
+  "cpu_side_episode_timings": {
+    "pe": {
+      "wall_s": 0.9597978080273606,
+      "multiplier": [
+        561.7016370437799,
+        604.1480769702594,
+        4442.123085030489
+      ]
+    },
+    "kraft": {
+      "wall_s": 0.9765683499863371,
+      "multiplier": [
+        552.0555729740194,
+        593.7730830700306,
+        4365.838806940293
+      ]
+    },
+    "bubble": {
+      "wall_s": 0.9705751959700137,
+      "multiplier": [
+        555.4644320589626,
+        597.4395414262317,
+        4392.797196655048
+      ]
+    },
+    "paperboard": {
+      "wall_s": 1.147087791992817,
+      "multiplier": [
+        469.9901818878183,
+        505.5062080232051,
+        3716.838440580926
+      ]
+    }
+  },
+  "regimes": {
+    "1_top_press": {
+      "cases": {
+        "pe/0.3 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "pe/0.5 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "pe/0.8 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "kraft/0.3 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "kraft/0.5 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "kraft/0.8 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "bubble/0.3 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "bubble/0.5 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "bubble/0.8 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "paperboard/0.3 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "paperboard/0.5 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        },
+        "paperboard/0.8 N": {
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0,
+          "pass_gate": true
+        }
+      },
+      "stage1_bilateral_positive_pull": false,
+      "pass_gate": true
+    },
+    "2_low_slack": {
+      "slack_budget_m": 0.00025565905134485034,
+      "capture_threshold_m": 0.0015,
+      "peak_tension_N": 0.0,
+      "peak_capture": 0.0,
+      "pass_gate": true
+    },
+    "3_side_hover": {
+      "materials": {
+        "pe": {
+          "hover_s": 3.0100000000000002,
+          "final_clearance_m": 0.1485386386162295,
+          "stiffness_N_per_m": 123.29926021912111,
+          "stiffness_samples": 55,
+          "stage1_stiffness_N_per_m": [
+            136.51865191061387,
+            136.51865191061387
+          ],
+          "pass_gate": true,
+          "wall_s": 0.9597978080273606
+        },
+        "kraft": {
+          "hover_s": 3.0140000000000002,
+          "final_clearance_m": 0.14906994342604768,
+          "stiffness_N_per_m": 219.86714725210604,
+          "stiffness_samples": 42,
+          "stage1_stiffness_N_per_m": [
+            246.48586931425106,
+            1090.8935593658005
+          ],
+          "pass_gate": true,
+          "wall_s": 0.9765683499863371
+        },
+        "bubble": {
+          "hover_s": 3.0020000000000002,
+          "final_clearance_m": 0.147329257172093,
+          "stiffness_N_per_m": 9.047886021189429,
+          "stiffness_samples": 83,
+          "stage1_stiffness_N_per_m": [
+            9.689079941109787,
+            11.685243316045556
+          ],
+          "pass_gate": true,
+          "wall_s": 0.9705751959700137
+        },
+        "paperboard": {
+          "hover_s": 3.0140000000000002,
+          "final_clearance_m": 0.14959188277161112,
+          "stiffness_N_per_m": 558.1060184778158,
+          "stiffness_samples": 27,
+          "stage1_stiffness_N_per_m": [
+            632.721400462751,
+            632.721400462751
+          ],
+          "pass_gate": true,
+          "wall_s": 1.147087791992817
+        }
+      },
+      "pass_gate": true
+    },
+    "4_feed_depth": {
+      "cases": {
+        "1.50 mm": {
+          "bilateral_unsupported_s": 0.0,
+          "slipped_m": [
+            0.0,
+            0.0
+          ],
+          "first_release_fingers": [],
+          "peak_tension_N": 0.0,
+          "peak_capture": 0.0
+        },
+        "7.50 mm": {
+          "bilateral_unsupported_s": 0.038,
+          "slipped_m": [
+            0.0024509758796998704,
+            0.0017506970569284768
+          ],
+          "first_release_fingers": [
+            1
+          ],
+          "peak_tension_N": 1.4883620030399953,
+          "peak_capture": 1.0
+        },
+        "11.25 mm": {
+          "bilateral_unsupported_s": 0.372,
+          "slipped_m": [
+            0.00450220050115779,
+            0.0038505662180954732
+          ],
+          "first_release_fingers": [
+            1
+          ],
+          "peak_tension_N": 2.936943320079363,
+          "peak_capture": 1.0
+        },
+        "15.53 mm": {
+          "bilateral_unsupported_s": 4.0120000000000005,
+          "slipped_m": [
+            0.0,
+            0.0
+          ],
+          "first_release_fingers": [],
+          "peak_tension_N": 1.187062204782933,
+          "peak_capture": 1.0
+        }
+      },
+      "stage1_feed_diagnostics": [
+        {
+          "case": "original-advance",
+          "samples": 239,
+          "outcome": "pickup_ok",
+          "peak_penetration_mm": 0.6013963833212861,
+          "accepted": true,
+          "actual_initial_close_advance_m": 0.015531134179020013,
+          "sustained_positive_unsupported_bilateral_s": 0.7780000000016241,
+          "hold_observation": {
+            "samples": 100,
+            "unsupported_samples": 100,
+            "positive_pull_samples": 100,
+            "bilateral_standard_samples": 100,
+            "standard_contact_missing_each": [
+              0,
+              0
+            ],
+            "mean_right_auxiliary_pull_without_right_inner_N": null,
+            "actual_gap_range_m": [
+              0.001994675750755116,
+              0.002007969203392206
+            ],
+            "reference_membrane_range_m": [
+              0.07981957921890395,
+              0.07990147692019797
+            ]
+          },
+          "intact": true,
+          "first_lift_gap_m": 0.00201338974610906,
+          "first_lift_tension_N": 0.6451481362819846,
+          "first_lift_reference_length_m": 0.08012211246086726,
+          "first_lift_reference_excess_m": 0.07988881486666835
+        },
+        {
+          "case": "advance-7p5mm",
+          "samples": 227,
+          "outcome": "pickup_ok",
+          "peak_penetration_mm": 0.393089985985054,
+          "accepted": false,
+          "actual_initial_close_advance_m": 0.007734597104812775,
+          "sustained_positive_unsupported_bilateral_s": 0.0680000000001435,
+          "hold_observation": {
+            "samples": 100,
+            "unsupported_samples": 100,
+            "positive_pull_samples": 100,
+            "bilateral_standard_samples": 45,
+            "standard_contact_missing_each": [
+              1,
+              54
+            ],
+            "mean_right_auxiliary_pull_without_right_inner_N": 7.327022776898235,
+            "actual_gap_range_m": [
+              0.0047476453972165765,
+              0.006334001145872781
+            ],
+            "reference_membrane_range_m": [
+              0.08072541115501189,
+              0.0813501892022135
+            ]
+          },
+          "intact": true,
+          "first_lift_gap_m": 0.002006205384661808,
+          "first_lift_tension_N": 0.7226499387855565,
+          "first_lift_reference_length_m": 0.08015303835179662,
+          "first_lift_reference_excess_m": 0.0796444581538548,
+          "identical_approach_samples": 32
+        },
+        {
+          "case": "advance-11p25mm",
+          "samples": 233,
+          "outcome": "pickup_ok",
+          "peak_penetration_mm": 0.42713244970394554,
+          "accepted": false,
+          "actual_initial_close_advance_m": 0.01144821493131856,
+          "sustained_positive_unsupported_bilateral_s": 0.09800000000020681,
+          "hold_observation": {
+            "samples": 100,
+            "unsupported_samples": 100,
+            "positive_pull_samples": 100,
+            "bilateral_standard_samples": 57,
+            "standard_contact_missing_each": [
+              0,
+              43
+            ],
+            "mean_right_auxiliary_pull_without_right_inner_N": 7.348411608041706,
+            "actual_gap_range_m": [
+              0.002062967972185328,
+              0.0038886733447181694
+            ],
+            "reference_membrane_range_m": [
+              0.07986838666137819,
+              0.07999459219442655
+            ]
+          },
+          "intact": true,
+          "first_lift_gap_m": 0.0020084487456025137,
+          "first_lift_tension_N": 0.6736854257015308,
+          "first_lift_reference_length_m": 0.08018250592446771,
+          "first_lift_reference_excess_m": 0.07982761497356718,
+          "identical_approach_samples": 38
+        }
+      ],
+      "pass_gate": true
+    },
+    "5_unilateral_release": {
+      "first_slip_s": [
+        3.81,
+        3.458
+      ],
+      "first_release_s": [
+        4.11,
+        4.016
+      ],
+      "initiating_finger": 1,
+      "torque_precursor_Nm": 0.00023105133157200186,
+      "pull_slope_pre_slip_N_per_s": 5.01104493808304,
+      "pull_slope_at_first_release_N_per_s": -85.03606669094816,
+      "stage1_markers": "A sustained unilateral path or the first finger losing load precedes full detachment",
+      "pass_gate": true
+    },
+    "6_gather_and_detachment": {
+      "pe_slope_m_per_m": 0.6880008294899574,
+      "pe_reference_interval": [
+        0.6,
+        0.75
+      ],
+      "controlled_opening": {
+        "pe": {
+          "detached": true,
+          "end_s": 3.078,
+          "value": 0.010559999999999998,
+          "stage1_reference": [
+            0.010594664566385753
+          ],
+          "absolute_difference_to_nearest_reference": 3.466456638575449e-05,
+          "slip_s": 0.126,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.0009828849369679649,
+          "pass_gate": true
+        },
+        "kraft": {
+          "detached": true,
+          "end_s": 3.496,
+          "value": 0.01892,
+          "stage1_reference": [
+            0.018993316662366852
+          ],
+          "absolute_difference_to_nearest_reference": 7.331666236685269e-05,
+          "slip_s": 0.52,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.0016524570400127114,
+          "pass_gate": true
+        },
+        "bubble": {
+          "detached": true,
+          "end_s": 2.7760000000000002,
+          "value": 0.004520000000000007,
+          "stage1_reference": [
+            0.001720830053708738
+          ],
+          "absolute_difference_to_nearest_reference": 0.0027991699462912687,
+          "slip_s": 0.1,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 6.94106499046776e-05,
+          "pass_gate": true
+        },
+        "paperboard": {
+          "detached": true,
+          "end_s": 3.658,
+          "value": 0.02216,
+          "stage1_reference": [
+            0.02205837068337895
+          ],
+          "absolute_difference_to_nearest_reference": 0.00010162931662104774,
+          "slip_s": 0.272,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.003580000024508756,
+          "pass_gate": true
+        }
+      },
+      "load_ramp": {
+        "pe": {
+          "detached": true,
+          "end_s": 4.172,
+          "value": 7.609999999999999,
+          "stage1_reference": [
+            7.889875000261917
+          ],
+          "absolute_difference_to_nearest_reference": 0.27987500026191725,
+          "slip_s": 0.634,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.22414321747340438,
+          "pass_gate": true,
+          "direction": "vertical",
+          "rate_N_per_s": 5.0
+        },
+        "kraft": {
+          "detached": true,
+          "end_s": 3.798,
+          "value": 5.74,
+          "stage1_reference": [
+            5.169499999987952,
+            5.797999999986487
+          ],
+          "absolute_difference_to_nearest_reference": 0.05799999998648708,
+          "slip_s": 0.922,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.11488513348340135,
+          "pass_gate": true,
+          "direction": "vertical",
+          "rate_N_per_s": 5.0
+        },
+        "bubble": {
+          "detached": true,
+          "end_s": 3.0180000000000002,
+          "value": 1.8400000000000016,
+          "stage1_reference": [
+            0.6739999999984292
+          ],
+          "absolute_difference_to_nearest_reference": 1.1660000000015724,
+          "slip_s": 0.268,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.020494599342360975,
+          "pass_gate": true,
+          "direction": "tangential",
+          "rate_N_per_s": 5.0,
+          "stage1_20_N_per_s_reference": 2.1880000000046174
+        },
+        "paperboard": {
+          "detached": true,
+          "end_s": 4.152,
+          "value": 7.510000000000002,
+          "stage1_reference": [
+            7.709499999982032
+          ],
+          "absolute_difference_to_nearest_reference": 0.19949999998203083,
+          "slip_s": 0.534,
+          "max_support_before_release_N": 0.0,
+          "largest_positive_step_N": 0.17695883052778338,
+          "pass_gate": true,
+          "direction": "vertical",
+          "rate_N_per_s": 5.0
+        }
+      },
+      "pass_gate": true
+    }
+  },
+  "gate_A_pass": true
+}

@@ -7,6 +7,7 @@ from torch import Tensor
 
 from .lumped_contact_proxy import ContactInputs, ContactState, EPS, LumpedContactProxy
 from .macro_parcel_sim import ParcelAction
+from .pad_torsion import PadTorsion, PadTorsionParams, TorsionState
 from .unified_payload import DT, PayloadState, UnifiedPayloadTemplate
 
 
@@ -25,6 +26,7 @@ class DualArmState(NamedTuple):
     side_axis: Tensor  # [B,arm,3]
     side_origin: Tensor  # [B,arm,3]
     contact_reference: Tensor | None = None  # [B,arm,finger]
+    torsion: TorsionState | tuple[()] = ()
 
 
 class DualArmStep(NamedTuple):
@@ -43,7 +45,7 @@ class DualArmParcelSim:
     def __init__(self, proxy_A: LumpedContactProxy, proxy_B: LumpedContactProxy,
                  payload: UnifiedPayloadTemplate, *, F_half: Tensor | float = 0.,
                  T_tear: Tensor | float | None = None, mount_xy: Tensor | None = None,
-                 generator: torch.Generator | None = None):
+                 generator: torch.Generator | None = None, torsion: PadTorsionParams | None = None):
         like = payload.params.total_mass
         if like.dtype != torch.float32 or any(
                 proxy.dt != DT or proxy.params.S_bag.shape != like.shape
@@ -68,6 +70,8 @@ class DualArmParcelSim:
         self.mount_weights = payload.weights_at(mount_xy.flatten(1, 2))
         self.min_press = torch.stack((proxy_A.params.F_min, proxy_B.params.F_min), dim=1)
         self.nominal_reference = torch.stack((proxy_A.params.L0, proxy_B.params.L0), dim=1)
+        mu = torch.stack((proxy_A.params.mu_eff, proxy_B.params.mu_eff), dim=1)
+        self.torsion = None if torsion is None else PadTorsion(like, mu, self.dt, torsion)
 
     def _batch_parameter(self, value, name, low, high):
         value = torch.as_tensor(value, dtype=self.mass.dtype, device=self.mass.device)
@@ -84,9 +88,10 @@ class DualArmParcelSim:
     def initial_state(self) -> DualArmState:
         payload = self.payload.initial_state()
         origin = self.payload.com(payload)[:, None].expand(-1, 2, -1)
+        torsion = () if self.torsion is None else self.torsion.initial_state()
         return DualArmState(payload, self.proxy_A.initial_state(), self.proxy_B.initial_state(),
                             self.mass.new_zeros((len(self.mass), 2, 2), dtype=torch.bool),
-                            torch.zeros_like(origin), origin, self.nominal_reference.clone())
+                            torch.zeros_like(origin), origin, self.nominal_reference.clone(), torsion)
 
     def reset(self, state: DualArmState, reset_mask: Tensor, *, resample_tear: bool = True) -> DualArmState:
         """Reset selected environments at an episode boundary. Pass False for fixed corners."""
@@ -99,9 +104,12 @@ class DualArmParcelSim:
         if resample_tear:
             self.T_tear = select(self.sample_tear(), self.T_tear)
         reference = self.nominal_reference if state.contact_reference is None else state.contact_reference
+        torsion = fresh.torsion
+        if torsion and state.torsion:
+            torsion = TorsionState(*(select(n, o) for n, o in zip(torsion, state.torsion, strict=True)))
         return DualArmState(PayloadState(*(select(n, o) for n, o in zip(fresh.payload, state.payload))),
-                            *(select(n, o) for n, o in zip(fresh[1:-1], state[1:-1])),
-                            select(fresh.contact_reference, reference))
+                            *(select(n, o) for n, o in zip(fresh[1:6], state[1:6], strict=True)),
+                            select(fresh.contact_reference, reference), torsion)
 
     def get_privileged_state(self, state: DualArmState) -> Tensor:
         return self.payload.get_privileged_state(state.payload)
@@ -138,7 +146,9 @@ class DualArmParcelSim:
         depth = torch.where(active | low_approach, penetration.clamp_min(0.), torch.inf)
         return axis, origin, load.unflatten(1, (2, 2)).unsqueeze(-1) * pad_axis, side, depth
 
-    def step(self, state: DualArmState, action: DualArmAction) -> DualArmStep:
+    def step(self, state: DualArmState, action: DualArmAction, *,
+             jaw_orientation: Tensor | None = None, jaw_angular_velocity: Tensor | None = None) -> DualArmStep:
+        """Jaw orientation (wxyz) and angular velocity are world-frame, [B,2,4] and [B,2,3]."""
         payload, current = self.payload, state.payload
         arm_A, arm_B, enabled, side_feed = action
         enabled = enabled.unsqueeze(-1)
@@ -258,14 +268,22 @@ class DualArmParcelSim:
         external = torch.where(enabled, external, 0.).sum(dim=1)
         force = (rope_load + block_load + external[:, None] * payload.weights.unsqueeze(-1)
                  - surface.block_force_N.unsqueeze(-1) * up)
+        torsion = ()
+        if self.torsion is not None:
+            pad_torque, couple, torsion = self.torsion.couples(
+                payload, current, frame, state.torsion, prior, next_contacts, normal, tip - anchors, force,
+                jaw_orientation, jaw_angular_velocity)
+            force = force + couple
         advanced = payload.step(current, force, surface.depth)
 
         reaction = (-rope_force - contact_load + surface_pad.unsqueeze(-1) * up[:, None])
         torque = torch.linalg.cross(tip - tip.mean(dim=2, keepdim=True), reaction).sum(dim=2)
+        if self.torsion is not None:
+            torque = torque - pad_torque
         wrench = torch.cat((reaction.sum(dim=2), torque), dim=-1)
         reference_next = torch.where(live, torch.stack((reference_A, reference_B), dim=1), self.nominal_reference)
         next_state = DualArmState(advanced.state, next_contacts[:, 0], next_contacts[:, 1], torn,
-                                  side_axis, side_origin, reference_next)
+                                  side_axis, side_origin, reference_next, torsion)
         return DualArmStep(next_state, wrench, tension, advanced.support_N.sum(dim=1, keepdim=True),
                            advanced.clearance.amin(dim=1, keepdim=True), budget, available, net_feed,
                            press.squeeze(-1))

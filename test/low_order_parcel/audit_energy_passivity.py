@@ -1,6 +1,7 @@
 """Record 2 ms storage, boundary work, and measured losses for the frozen parcel."""
 import argparse
 import csv
+from dataclasses import replace
 import json
 import math
 from pathlib import Path
@@ -9,6 +10,7 @@ import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import mujoco
 import numpy as np
 import torch
 
@@ -17,8 +19,9 @@ from audit_yam import StepForces, cases as yam_cases, scene as yam_scene
 from test_unified_payload import STAGE2, model, pe_proxy
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from src.low_order_parcel.lumped_contact_proxy import ContactState
+from src.low_order_parcel.lumped_contact_proxy import ContactState, LumpedContactProxy
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction, rotate
+from src.low_order_parcel.pad_torsion import PadTorsion, PadTorsionParams, conjugate, quaternion_product, rotation_vector
 from src.low_order_parcel.unified_payload import DT, GRAVITY
 
 LIMIT_J = -1e-4
@@ -160,17 +163,32 @@ def complete_row(sim, old, result, before, after, left, right, external, top, si
             events.append("rebound")
         if (change > 1e-8).any():
             events.append("compression")
-    work = left + right + external + top + side + jaw
+    torsion = state.torsion
+    twist = {}
+    angular_work = angular_loss = 0.
+    if torsion:
+        angular_work = float(torsion.jaw_work.sum())
+        body_work = float(torsion.body_work.sum())
+        rotational_damping = float(torsion.damping.sum())
+        rotational_slip = float(torsion.slip_loss.sum())
+        rotational_integration = float(torsion.integration_loss.sum())
+        angular_loss = rotational_damping + rotational_slip + rotational_integration
+        after["torsion_J"] = float(torsion.energy.sum())
+        twist = dict(torsion_jaw_work_J=angular_work, torsion_body_work_J=body_work,
+                     torsion_damping_J=rotational_damping, torsion_slip_loss_J=rotational_slip,
+                     torsion_integration_loss_J=rotational_integration, torsion_slip_rad=float(torsion.slip_angle.sum()),
+                     torsion_net_dissipation_J=angular_work - body_work - after["torsion_J"] + before.get("torsion_J", 0.))
+    work = left + right + external + top + side + jaw + angular_work
     delta = sum(after[key] - before.get(key, 0.) for key in after)
     slip = float((result.tension * result.slip_rate).sum() * DT)
-    known = xpbd_damp + friction + floor_kinetic + indent_loss + slip + tendon_damp
+    known = xpbd_damp + friction + floor_kinetic + indent_loss + slip + tendon_damp + angular_loss
     return dict(work_J=work, delta_storage_J=delta, net_dissipation_J=work - delta,
                 accounted_loss_J=known, closure_residual_J=work - delta - known,
                 tether_left_work_J=left, tether_right_work_J=right, body_external_work_J=external,
                 top_work_J=top, side_work_J=side, jaw_work_J=jaw, indent_transfer_J=indent_work,
                 xpbd_damping_J=xpbd_damp, table_friction_J=friction, floor_velocity_loss_J=floor_kinetic,
                 compression_damping_J=indent_loss, tether_damping_J=tendon_damp, slip_work_J=slip, events="+".join(events),
-                tension_N=float(result.tension.max()), **after)
+                tension_N=float(result.tension.max()), **twist, **after)
 
 
 def rigid_storage(sim, state):
@@ -184,8 +202,10 @@ def rigid_kinetic(sim, orientation, velocity, angular_rate):
     return float(.5 * ((sim.mass * velocity.square()).sum() + (angular_rate * momentum).sum()))
 
 
-def run_rigid(mode):
+def run_rigid(mode, finite_pad=False):
     sim = MacroParcelSim.from_nominal(STAGE2["materials"]["pe"]["nominal"], DT)
+    if finite_pad:
+        sim.torsion = PadTorsion(sim.mass, sim.proxy.params.mu_eff[:, None], DT, PadTorsionParams())
     observed, impulse = sim.proxy.step_with_reference, sim._impulse
     impulses = []
     contact = boundary = None
@@ -265,7 +285,8 @@ def bench(name):
 
 
 @torch.inference_mode()
-def run_payload(name, yam=None):
+def run_payload(name, yam=None, finite_pad=False):
+    jaw = jaw_rate = None
     if yam is None:
         sim, state, n, explicit = bench(name)
     else:
@@ -279,8 +300,13 @@ def run_payload(name, yam=None):
         sim._jaw_contact = tap.jaw_step
         with np.load(yam) as data:
             end_reference = data["clearance_m"]
+            time = data["time_s"]
             explicit = ParcelAction(*(torch.as_tensor(data[f"action_{f}"])[:, None] for f in ParcelAction._fields))
+        if finite_pad:
+            jaw, jaw_rate = replay_wrist(robot.sim, yam.with_name("trajectory.npz"), time, sim.mass)
         n = len(explicit.pinch_position)
+    if finite_pad:
+        sim.torsion = PadTorsion(sim.mass, sim.proxy.params.mu_eff[:, None], DT, PadTorsionParams())
     ledger = ObservePayload(sim)
     storage = ledger.storage(state.payload) | {"tether_J": 0.}
     previous = None
@@ -310,23 +336,44 @@ def run_payload(name, yam=None):
             # The feedback probe constructs the next command from the previous
             # one. Integrate along that actual segment, not its extrapolation.
             a = a._replace(pinch_position=previous)
-        out = sim.step(state, a)
+        out = sim.step(state, a, jaw_orientation=None if jaw is None else jaw[i],
+                       jaw_angular_velocity=None if jaw_rate is None else jaw_rate[i])
         if explicit is None:
             end_tip = commanded_tip
         elif yam is None:
             end_tip = a.pinch_position + DT * a.pinch_velocity
         else:
             end_tip = explicit.pinch_position[min(i + 1, n - 1)]
-            np.testing.assert_allclose(out.table_clearance.numpy().reshape(-1), end_reference[i], atol=1e-10)
+            if not finite_pad:
+                np.testing.assert_allclose(out.table_clearance.numpy().reshape(-1), end_reference[i], atol=1e-10)
         storage, row = ledger.ledger(state, a, out, end_tip, storage)
         rows.append(dict(time_s=(i + 1) * DT, **row))
         state, previous, feedback = out.state, commanded_tip, out.wrist_wrench[:, 2:3]
     return rows
 
 
+def replay_wrist(robot, path, time, like):
+    """Reconstruct the archived wrist frame; use both endpoint poses for angular work."""
+    with np.load(path) as saved:
+        sample_time = saved["time"]
+        positions = saved["qpos"]
+    endpoints = np.append(time, time[-1] + DT)
+    qpos = np.stack([np.interp(endpoints, sample_time, q) for q in positions.T], axis=1)
+    wrist = robot.m.body("link_6").id
+    data = mujoco.MjData(robot.m)
+    quats = np.empty((len(qpos), 4))
+    for i, q in enumerate(qpos):
+        data.qpos[:] = q
+        mujoco.mj_kinematics(robot.m, data)
+        quats[i] = data.xquat[wrist]
+    oriented = like.new_tensor(quats)[:, None]
+    rate = rotation_vector(quaternion_product(oriented[1:], conjugate(oriented[:-1]))) / DT
+    return oriented[:-1], rate
+
+
 def static_capture():
     sim = MacroParcelSim(pe_proxy(1), payload=model("rigid_box", dtype=torch.float64,
-                          total_mass=torch.tensor([[1.5]], dtype=torch.float64)))
+                          total_mass=torch.tensor([[1.5]], dtype=torch.float64)), torsion=PadTorsionParams())
     old = sim.initial_state()
     old.contacts[:, :, ContactState.SLACK] = .003
     tap = ObservePayload(sim)
@@ -340,8 +387,57 @@ def static_capture():
     for name, inputs in (("static-no-capture", action._replace(normal_force=zeros)), ("static-capture", action)):
         step = sim.step(old, inputs)
         _, row = tap.ledger(old, inputs, step, tip, before)
+        assert row["torsion_J"] == 0.
         verdicts[name] = [dict(time_s=DT, **row)]
     return verdicts
+
+
+def torsion_fixture(grip, radius=.012):
+    """Hold a preloaded 1.5 kg book with centered mounts and an eccentric payload."""
+    mass = torch.tensor([[1.5]])
+    base = pe_proxy(1).params
+    params = replace(type(base)(**{k: v.float() for k, v in vars(base).items()}),
+                     k=mass.new_full((1, 1), 1800.), c_d=mass.new_full((1, 1), 10.),
+                     L0=mass.new_full((1, 2), .004))
+    sim = MacroParcelSim(LumpedContactProxy(params, DT), payload=model(
+        "rigid_box", dtype=mass.dtype, total_mass=mass, mass_weights=mass.new_tensor([[.4, .4, .1, .1]])),
+        torsion=PadTorsionParams(radius_m=radius))
+    state = sim.initial_state()
+    p = sim.payload
+    positions = state.payload.pos + .30 * p.up
+    payload_state = state.payload._replace(pos=positions)
+    state = state._replace(payload=payload_state, com=p.com(payload_state))
+    state.contacts[..., ContactState.CAPTURE] = 1.
+    state.contacts[..., ContactState.SLACK] = .003
+    tip, _ = p.anchors(state.payload, sim.payload_mount_weights, torch.zeros_like(state.payload.d_surf))
+    tip = tip + (params.L0 + .5 * mass * GRAVITY / params.k).unsqueeze(-1) * sim.up[:, None]
+    zero = torch.zeros_like(params.L0)
+    inputs = ParcelAction(tip, torch.zeros_like(tip), zero + grip, zero, zero, zero + 1.,
+                          torch.zeros_like(state.com), torch.zeros_like(mass))
+    return sim, state, inputs
+
+
+@torch.inference_mode()
+def torsion_episode(grip, steps=1000):
+    sim, state, inputs = torsion_fixture(grip)
+    observe = ObservePayload(sim)
+    storage = observe.storage(state.payload)
+    anchors, _ = sim.payload.anchors(state.payload, sim.payload_mount_weights, state.payload.d_surf)
+    storage["tether_J"] = tether_storage(sim, state, inputs.pinch_position, anchors)
+    rows = []
+    for i in range(steps):
+        result = sim.step(state, inputs)
+        storage, row = observe.ledger(state, inputs, result, inputs.pinch_position, storage)
+        state = result.state
+        frame = sim.payload.frame(state.payload)
+        roll = torch.atan2(frame[:, 2, 1], frame[:, 2, 2])
+        rows.append(dict(time_s=(i + 1) * DT, **row, roll_rad=float(roll),
+                         roll_speed_rad_s=float(state.angular_velocity[:, 0]),
+                         com_speed_mps=float(state.velocity.norm()),
+                         clearance_m=float(result.table_clearance.min()),
+                         captured=int(state.contacts[..., ContactState.CAPTURE].sum()),
+                         torque_limit_Nm=float(state.torsion.capacity.sum())))
+    return rows
 
 
 def write_case(output, name, rows):
@@ -367,20 +463,22 @@ def write_case(output, name, rows):
 
 
 @torch.inference_mode()
-def main(output, yam_roots, focus):
+def main(output, yam_roots, focus, finite_pad=False):
     output.mkdir(parents=True, exist_ok=False)
     cases = static_capture()
+    cases["torsion-hold"] = torsion_episode(90.)
+    cases["torsion-slip"] = torsion_episode(18.)
     if not focus:
         for name in ("book-top", "clothes-rebound", "pillow-rebound", "side-push", "loose-stop", "bend-limit",
                      "overload", "release"):
-            cases[name] = run_payload(name)
+            cases[name] = run_payload(name, finite_pad=finite_pad)
         for mode in ("ramp", "release"):
-            cases[f"stage2-{mode}"] = run_rigid(mode)
+            cases[f"stage2-{mode}"] = run_rigid(mode, finite_pad)
     for yam_root in yam_roots:
         for name in yam_cases():
             path = yam_root / name / "boundary.npz"
             if path.is_file():
-                cases[f"yam-{name}"] = run_payload(name, path)
+                cases[f"yam-{name}"] = run_payload(name, path, finite_pad)
     summary = {}
     fig, axes = plt.subplots(2, 1, figsize=(12, 9), layout="constrained")
     for name, rows in cases.items():
@@ -394,7 +492,9 @@ def main(output, yam_roots, focus):
         if ax.lines:
             ax.legend(fontsize=8, ncols=3)
     fig.savefig(output / "cumulative-dissipation.png", dpi=170)
-    (output / "energy-summary.json").write_text(json.dumps(dict(threshold_J=LIMIT_J, cases=summary), indent=2) + "\n")
+    (output / "energy-summary.json").write_text(json.dumps(
+        dict(threshold_J=LIMIT_J, finite_pad=finite_pad, cases=summary), indent=2) + "\n")
+    return all(case["passed"] for case in summary.values())
 
 
 if __name__ == "__main__":
@@ -402,6 +502,7 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--yam-root", type=Path, action="append", default=[])
     parser.add_argument("--capture-focus", action="store_true", help="keep the zero-motion capture and YAM replays")
+    parser.add_argument("--finite-pad", action="store_true", help="enable torsion in historical scenarios as well")
     args = parser.parse_args()
     torch.set_num_threads(1)
-    main(args.output, args.yam_root, args.capture_focus)
+    raise SystemExit(0 if main(args.output, args.yam_root, args.capture_focus, args.finite_pad) else 1)

@@ -38,6 +38,10 @@ class Stage3DomainTest(unittest.TestCase):
         self.assertLess(e.proxy.mu_eff[:, 0].min().item(), .021)
         self.assertTrue(((e.F_half >= .05) & (e.F_half <= 2.5)).all())
         self.assertTrue(((e.T_tear >= 20.) & (e.T_tear <= 60.)).all())
+        radius, damping, neck, _ = e.torsion
+        self.assertTrue(((radius >= .008) & (radius <= .020)).all())
+        self.assertTrue(((damping >= .45) & (damping <= 1.15)).all())
+        self.assertTrue(((neck >= .022) & (neck <= .055)).all())
         print(f"Wide DR: whole-bag k={k.min().item():.3f}–{k.max().item():.3f} N/m, "
               f"rigid={(e.content == 0).float().mean().item():.3f}, "
               f"occluded={(e.clearance_m < .02).any(dim=1).float().mean().item():.3f}", flush=True)
@@ -60,6 +64,9 @@ class Stage3DomainTest(unittest.TestCase):
                     torch.testing.assert_close(old[~mask], new_value[~mask], atol=0, rtol=0)
         for old, new_value in zip((*e.yam, *e.rgb), (*new.yam, *new.rgb), strict=True):
             torch.testing.assert_close(old[~mask], new_value[~mask], atol=0, rtol=0)
+        for old, new_value in zip(e.torsion[:3], new.torsion[:3], strict=True):
+            torch.testing.assert_close(old[~mask], new_value[~mask], atol=0, rtol=0)
+            self.assertFalse(torch.equal(old[mask], new_value[mask]))
         self.assertTrue((new.yam.delay_steps[mask] >= 5).all())
         self.assertTrue((new.rgb.delay_steps[mask] >= 30).all())
         self.assertFalse(torch.equal(new.yam.sensor_gain[mask, 0], new.yam.sensor_gain[mask, 1]))

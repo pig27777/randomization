@@ -15,6 +15,7 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.low_order_parcel.lumped_contact_proxy import ContactState, LumpedContactProxy, ProxyParams
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction
+from src.low_order_parcel.pad_torsion import PadTorsionParams
 from src.low_order_parcel.unified_payload import DT, PayloadParamsX, UnifiedPayloadTemplate
 from test_unified_payload import CONFIG, STAGE2
 
@@ -24,13 +25,13 @@ def wide_grid(a, b, device):
     return [torch.as_tensor(v.ravel()[:, None], dtype=torch.float32, device=device) for v in (x, y)]
 
 
-def build(preset, x, **changes):
+def build(preset, x, *, torsion=None, **changes):
     nominal = STAGE2["materials"]["pe"]["nominal"]["proxy"]
     params = ProxyParams.from_scalars(nominal, dtype=x.dtype, device=x.device)
     proxy = LumpedContactProxy(ProxyParams(**{k: v.expand(len(x), -1) for k, v in vars(params).items()}), DT)
     changes.setdefault("bag_half_extents", x.new_tensor([[.085, .105, .050]]).expand(len(x), -1))
     payload = PayloadParamsX.from_presets(CONFIG, [preset] * len(x), dtype=x.dtype, device=x.device, **changes)
-    return MacroParcelSim(proxy, payload=UnifiedPayloadTemplate(payload))
+    return MacroParcelSim(proxy, payload=UnifiedPayloadTemplate(payload), torsion=torsion)
 
 
 def top_action(i, like, z, press_z, feedback, previous):
@@ -81,17 +82,18 @@ def longest_updates(state, result, current, best):
 
 
 @torch.inference_mode()
-def scan(phase, a, b, device):
+def scan(phase, a, b, device, torsion=None):
     x, y = wide_grid(a, b, device)
     if phase == "A":
-        sim = build("fluffy_pillow", x, fill_ratio=x, max_indent_ratio=y, total_mass=torch.full_like(x, .24))
+        sim = build("fluffy_pillow", x, torsion=torsion, fill_ratio=x, max_indent_ratio=y,
+                    total_mass=torch.full_like(x, .24))
         steps = 2300
     elif phase == "B":
-        sim = build("rigid_box", x, total_mass=y)
+        sim = build("rigid_box", x, torsion=torsion, total_mass=y)
         actions = phase_b_actions(a, y[::len(a)])
         steps = len(actions.pinch_position)
     else:
-        sim = build("rigid_box", x, table_friction=x, total_mass=torch.full_like(x, .065))
+        sim = build("rigid_box", x, torsion=torsion, table_friction=x, total_mass=torch.full_like(x, .065))
         steps = 245
     state = sim.initial_state()
     z = torch.full_like(x, .115)
@@ -188,14 +190,14 @@ def output_phase(output, phase, a, b, grids, names):
     plt.close(fig)
 
 
-def main(output, n, device):
+def main(output, n, device, torsion=None):
     output.mkdir(parents=True, exist_ok=False)
     axes = dict(A=(np.linspace(.25, .95, n), np.linspace(0., .78, n), ("fill_ratio", "indent_ratio")),
                 B=(np.linspace(.001, .025, n), np.geomspace(.03, 2., n), ("feed_m", "mass_kg")),
                 C=(np.linspace(.04, .95, n), np.linspace(-.020, .015, n), ("table_mu", "entry_height_m")))
     report = {}
     for phase, (a, b, names) in axes.items():
-        grids = scan(phase, a, b, device)
+        grids = scan(phase, a, b, device, torsion)
         report[phase] = check(phase, a, b, grids)
         output_phase(output, phase, a, b, grids, names)
         print(phase, json.dumps(report[phase]), flush=True)
@@ -207,8 +209,9 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path)
     parser.add_argument("--grid", type=int, default=32)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
+    parser.add_argument("--finite-pad", action="store_true")
     args = parser.parse_args()
     if args.grid < 2:
         parser.error("--grid must be at least 2")
     torch.set_num_threads(1)
-    main(args.output, args.grid, args.device)
+    main(args.output, args.grid, args.device, PadTorsionParams() if args.finite_pad else None)

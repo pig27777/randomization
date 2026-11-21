@@ -20,6 +20,7 @@ from src.low_order_parcel.dual_arm_parcel_sim import DualArmAction
 from src.low_order_parcel.hardware_filters import YAMCurrentEstimatorFilter
 from src.low_order_parcel.lumped_contact_proxy import ContactState
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction, PROBE_ACTION_CHANGE_S
+from src.low_order_parcel.pad_torsion import conjugate, quaternion_product, rotate, rotation_quaternion, rotation_vector
 from src.low_order_parcel.unified_payload import DT, GRAVITY, PayloadState
 from src.low_order_parcel.verify_stage2_alignment import detachment_metrics
 from src.low_order_parcel.virtual_rgb import CameraPose, VirtualRGBProjector
@@ -132,6 +133,7 @@ def pick_search(suite, points, corner_ids=None, *, trace=None, seconds=21.6):
     wrist_torque = torch.zeros_like(offset)
     angle = torch.zeros_like(offset)
     angular_velocity = torch.zeros_like(offset)
+    nominal_jaw = rotation_quaternion(p.yaw_rad * sim.payload.up)
     kxy = 18. + 170. * approach
     dxy = 4. + 30. * close_stroke
     wrist_k = torch.where(loose, torch.cat((kxy, kxy, 200. + 600. * grip), dim=1),
@@ -176,11 +178,16 @@ def pick_search(suite, points, corner_ids=None, *, trace=None, seconds=21.6):
         lift_compliance = heavy_or_loose * smooth((time - 1.66) / .65)
         deflect(offset, offset_velocity, wrist_load * lift_compliance, wrist_k, wrist_d)
         # The passive wrist can also turn under differential pad loads.
+        old_rotation = rotation_quaternion(angle)
         deflect(angle, angular_velocity, wrist_torque * lift_compliance * loose,
                 angular_k, angular_d, mass=.006, speed=1.5, travel=.24)
+        rotation = rotation_quaternion(angle)
+        jaw_orientation = quaternion_product(rotation, nominal_jaw)
+        jaw_rate = rotation_vector(quaternion_product(rotation, conjugate(old_rotation))) / DT
         arm = pos - pos.mean(dim=1, keepdim=True)
-        arm_rotation = torch.linalg.cross(angle[:, None].expand_as(arm), arm)
-        arm_velocity = torch.linalg.cross(angular_velocity[:, None].expand_as(arm), arm)
+        rotated_arm = rotate(rotation[:, None], arm)
+        arm_rotation = rotated_arm - arm
+        arm_velocity = torch.linalg.cross(jaw_rate[:, None], rotated_arm)
         normal = (target_grip * smooth((time - .68) / .25) * p.yam.gripper_gain[:, 0]
                   - p.yam.gripper_deadzone_N[:, 0]).clamp_min(0.)
         inward = (old_gap - gap) / DT
@@ -190,7 +197,9 @@ def pick_search(suite, points, corner_ids=None, *, trace=None, seconds=21.6):
                      (pos - before) / DT + offset_velocity[:, None] + arm_velocity,
                      normal, inward, feed, align)
         was_captured = state.contacts_A[..., ContactState.CAPTURE] > .5
-        out = sim.step(state, DualArmAction(cmd, cmd, enabled, side_pair))
+        out = sim.step(state, DualArmAction(cmd, cmd, enabled, side_pair),
+                       jaw_orientation=jaw_orientation[:, None].expand(-1, 2, -1),
+                       jaw_angular_velocity=jaw_rate[:, None].expand(-1, 2, -1))
         wrist_load.copy_(out.wrist_wrench[:, 0, :3])
         wrist_torque.copy_(out.wrist_wrench[:, 0, 3:])
         newly = ~was_captured & (out.state.contacts_A[..., ContactState.CAPTURE] > .5)

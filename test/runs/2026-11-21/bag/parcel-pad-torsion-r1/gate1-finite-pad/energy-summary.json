@@ -1,0 +1,766 @@
+{
+  "threshold_J": -0.0001,
+  "finite_pad": true,
+  "cases": {
+    "static-no-capture": {
+      "minimum_step_J": 0.0,
+      "time_s": 0.002,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.0,
+      "events_below_threshold": {},
+      "event_worst_step": {},
+      "passed": true
+    },
+    "static-capture": {
+      "minimum_step_J": 0.0,
+      "time_s": 0.002,
+      "events": "capture",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 1,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.0,
+      "events_below_threshold": {
+        "capture": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.002,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.0,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.0
+        }
+      },
+      "passed": true
+    },
+    "torsion-hold": {
+      "minimum_step_J": -1.6057747416198254e-06,
+      "time_s": 0.304,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 8.914590835571289,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 434,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.03810518648447214,
+      "events_below_threshold": {
+        "hard_bend": 0
+      },
+      "event_worst_step": {
+        "hard_bend": {
+          "time_s": 0.644,
+          "events": "hard_bend",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.028919048607349396,
+          "net_dissipation_J": -1.0970834409818053e-06,
+          "kinetic_J": 0.00017833961464930326,
+          "tether_J": 0.028869271278381348,
+          "tension_N": 7.196021556854248,
+          "max_elastic_tension_N": 7.214970588684082,
+          "max_effective_normal_N": 90.0,
+          "max_anchor_speed_mps": 0.016627628356218338
+        }
+      },
+      "passed": true
+    },
+    "torsion-slip": {
+      "minimum_step_J": -1.2112258218621719e-06,
+      "time_s": 0.8180000000000001,
+      "events": "hard_bend",
+      "negative_steps": 0,
+      "peak_tension_N": 8.44802474975586,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 253,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.26095351411687595,
+      "events_below_threshold": {
+        "hard_bend": 0
+      },
+      "event_worst_step": {
+        "hard_bend": {
+          "time_s": 0.8180000000000001,
+          "events": "hard_bend",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.030031254515051842,
+          "net_dissipation_J": -1.2112258218621719e-06,
+          "kinetic_J": 9.155867246590788e-07,
+          "tether_J": 0.030020497739315033,
+          "tension_N": 7.34852933883667,
+          "max_elastic_tension_N": 7.3525390625,
+          "max_effective_normal_N": 18.0,
+          "max_anchor_speed_mps": 0.0004442280041985214
+        }
+      },
+      "passed": true
+    },
+    "book-top": {
+      "minimum_step_J": -6.23702989030324e-08,
+      "time_s": 1.124,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.17337340855480043,
+      "events_below_threshold": {},
+      "event_worst_step": {},
+      "passed": true
+    },
+    "clothes-rebound": {
+      "minimum_step_J": -5.015585251790452e-05,
+      "time_s": 1.004,
+      "events": "compression",
+      "negative_steps": 0,
+      "peak_tension_N": 1.6520857362526482,
+      "event_frames": {
+        "capture": 1,
+        "release": 0,
+        "rebound": 1799,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.4553160335840646,
+      "events_below_threshold": {
+        "capture": 0,
+        "rebound": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.336,
+          "events": "capture+compression",
+          "work_J": 0.0007021508582063397,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.000378530910306328,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.02058739860378873
+        },
+        "rebound": {
+          "time_s": 1.008,
+          "events": "rebound",
+          "work_J": -6.581225837419242e-05,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": -2.4181532988549398e-05,
+          "kinetic_J": 2.4141357271334083e-08,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.0011986606090145374
+        }
+      },
+      "passed": true
+    },
+    "pillow-rebound": {
+      "minimum_step_J": -1.4332465149512973e-05,
+      "time_s": 1.004,
+      "events": "compression",
+      "negative_steps": 0,
+      "peak_tension_N": 1.6898758502444915,
+      "event_frames": {
+        "capture": 1,
+        "release": 0,
+        "rebound": 1799,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.2471628795569663,
+      "events_below_threshold": {
+        "capture": 0,
+        "rebound": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.336,
+          "events": "capture+compression",
+          "work_J": 0.000323190647209959,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.0002932703567603009,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.022675520304176258
+        },
+        "rebound": {
+          "time_s": 1.02,
+          "events": "rebound",
+          "work_J": -7.494238817190757e-05,
+          "evaluated_tether_J": 0.001593665155966558,
+          "net_dissipation_J": -1.4247639053024109e-05,
+          "kinetic_J": 5.572703628428593e-07,
+          "tether_J": 0.0015764763172854508,
+          "tension_N": 0.2859736265333386,
+          "max_elastic_tension_N": 0.32982193581497327,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.004083881972465758
+        }
+      },
+      "passed": true
+    },
+    "side-push": {
+      "minimum_step_J": 0.0,
+      "time_s": 0.002,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 119,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.001973807173368808,
+      "events_below_threshold": {
+        "side_contact": 0
+      },
+      "event_worst_step": {
+        "side_contact": {
+          "time_s": 0.272,
+          "events": "side_contact",
+          "work_J": 9.18215999998381e-06,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 9.182159999970691e-06,
+          "kinetic_J": 0.0004417381291837428,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.11658448625963255
+        }
+      },
+      "passed": true
+    },
+    "loose-stop": {
+      "minimum_step_J": 0.0,
+      "time_s": 0.002,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 3.8044766883658863,
+      "event_frames": {
+        "capture": 2,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 1788,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 41
+      },
+      "cumulative_dissipation_J": 0.2263205409074383,
+      "events_below_threshold": {
+        "capture": 0,
+        "edge_stop": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.078,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.0,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.0
+        },
+        "edge_stop": {
+          "time_s": 4.714,
+          "events": "edge_stop",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.11915805968891222,
+          "net_dissipation_J": 1.3529416616583e-07,
+          "kinetic_J": 2.925085345063464e-05,
+          "tether_J": 0.11914955787709185,
+          "tension_N": 3.561495051471541,
+          "max_elastic_tension_N": 3.5663863670413294,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.009421139234566125
+        }
+      },
+      "passed": true
+    },
+    "bend-limit": {
+      "minimum_step_J": -2.574326470822192e-06,
+      "time_s": 1.048,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 11.091653550118295,
+      "event_frames": {
+        "capture": 2,
+        "release": 2,
+        "rebound": 0,
+        "edge_stop": 77,
+        "hard_bend": 337,
+        "side_contact": 0,
+        "slip": 277
+      },
+      "cumulative_dissipation_J": 1.5783275725980301,
+      "events_below_threshold": {
+        "capture": 0,
+        "release": 0,
+        "edge_stop": 0,
+        "hard_bend": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.078,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.0,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.0
+        },
+        "release": {
+          "time_s": 1.498,
+          "events": "release+slip+edge_stop",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.19835497561282003,
+          "kinetic_J": 0.022006713323605678,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.22652144965224577
+        },
+        "edge_stop": {
+          "time_s": 1.5,
+          "events": "edge_stop",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.00011384319453247954,
+          "kinetic_J": 0.02182091762258012,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.22031801681907873
+        },
+        "hard_bend": {
+          "time_s": 1.6440000000000001,
+          "events": "hard_bend",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.00013298410280676551,
+          "kinetic_J": 0.10765241177562364,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.9113948796034896
+        }
+      },
+      "passed": true
+    },
+    "overload": {
+      "minimum_step_J": -1.8556030744804246e-16,
+      "time_s": 2.61,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 9.653504914759,
+      "event_frames": {
+        "capture": 2,
+        "release": 2,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 318
+      },
+      "cumulative_dissipation_J": 45.59124608684846,
+      "events_below_threshold": {
+        "capture": 0,
+        "release": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.078,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.0,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.0
+        },
+        "release": {
+          "time_s": 4.442,
+          "events": "release+slip",
+          "work_J": 0.0023817304387494546,
+          "evaluated_tether_J": 0.15403477868287474,
+          "net_dissipation_J": 0.1516389568277631,
+          "kinetic_J": 0.0037610845456028555,
+          "tether_J": 0.1547112181657933,
+          "tension_N": 4.714925545693757,
+          "max_elastic_tension_N": 4.5856973660650375,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.17227611671959564
+        }
+      },
+      "passed": true
+    },
+    "release": {
+      "minimum_step_J": -5.486578086169938e-09,
+      "time_s": 2.758,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 1.1873153470154327,
+      "event_frames": {
+        "capture": 2,
+        "release": 1,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 103
+      },
+      "cumulative_dissipation_J": 0.3113533545045392,
+      "events_below_threshold": {
+        "capture": 0,
+        "release": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.078,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.0,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.0
+        },
+        "release": {
+          "time_s": 3.342,
+          "events": "release+slip",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.014588632617460543,
+          "kinetic_J": 0.00013171498429313485,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 0.08571428571428608,
+          "max_anchor_speed_mps": 0.016724404092806205
+        }
+      },
+      "passed": true
+    },
+    "stage2-ramp": {
+      "minimum_step_J": -1.120160821062687e-16,
+      "time_s": 2.552,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 9.394054063640287,
+      "event_frames": {
+        "capture": 2,
+        "release": 2,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 318
+      },
+      "cumulative_dissipation_J": 28.27985229439705,
+      "events_below_threshold": {
+        "capture": 0,
+        "release": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.08600000000000001,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": -2.3020881366503679e-32,
+          "kinetic_J": 2.891904182118959e-32,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 2.42861286636753e-16
+        },
+        "release": {
+          "time_s": 4.442,
+          "events": "release+slip",
+          "work_J": 0.002513605986020056,
+          "evaluated_tether_J": 0.15415308960335863,
+          "net_dissipation_J": 0.15290434250259505,
+          "kinetic_J": 0.00453151173392998,
+          "tether_J": 0.15489216113348717,
+          "tension_N": 4.724270238408392,
+          "max_elastic_tension_N": 4.587458117575199,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 0.19366433624359985
+        }
+      },
+      "passed": true
+    },
+    "stage2-release": {
+      "minimum_step_J": -2.9762869046938955e-05,
+      "time_s": 3.5340000000000003,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 1.187062204782933,
+      "event_frames": {
+        "capture": 2,
+        "release": 1,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 103
+      },
+      "cumulative_dissipation_J": 0.311296227021756,
+      "events_below_threshold": {
+        "capture": 0,
+        "release": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 0.08600000000000001,
+          "events": "capture",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": -2.3020881366503679e-32,
+          "kinetic_J": 2.891904182118959e-32,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.0,
+          "max_anchor_speed_mps": 2.42861286636753e-16
+        },
+        "release": {
+          "time_s": 3.342,
+          "events": "release+slip",
+          "work_J": 0.0,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 0.014588754617627249,
+          "kinetic_J": 0.00013171621402070744,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 0.08571428571428608,
+          "max_anchor_speed_mps": 0.01672125706077248
+        }
+      },
+      "passed": true
+    },
+    "yam-book-top": {
+      "minimum_step_J": -4.794724434566934e-10,
+      "time_s": 2.674,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 2983,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.0003516060951492043,
+      "events_below_threshold": {
+        "side_contact": 0
+      },
+      "event_worst_step": {
+        "side_contact": {
+          "time_s": 2.702,
+          "events": "side_contact",
+          "work_J": 1.763506215532384e-07,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 1.6607699220058053e-09,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 0.0,
+          "max_anchor_speed_mps": 0.0
+        }
+      },
+      "passed": true
+    },
+    "yam-clothes-top": {
+      "minimum_step_J": -1.425528627585475e-06,
+      "time_s": 12.304,
+      "events": "compression",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.007699634998360596,
+      "events_below_threshold": {},
+      "event_worst_step": {},
+      "passed": true
+    },
+    "yam-pillow-top": {
+      "minimum_step_J": 0.0,
+      "time_s": 0.002,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.007545411618152758,
+      "events_below_threshold": {},
+      "event_worst_step": {},
+      "passed": true
+    },
+    "yam-low-side-push": {
+      "minimum_step_J": -9.277875378430465e-11,
+      "time_s": 8.802,
+      "events": "side_contact",
+      "negative_steps": 0,
+      "peak_tension_N": 0.0,
+      "event_frames": {
+        "capture": 0,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 3163,
+        "slip": 0
+      },
+      "cumulative_dissipation_J": 0.0012202770548039416,
+      "events_below_threshold": {
+        "side_contact": 0
+      },
+      "event_worst_step": {
+        "side_contact": {
+          "time_s": 8.802,
+          "events": "side_contact",
+          "work_J": -9.277875378430465e-11,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": -9.277875378430465e-11,
+          "kinetic_J": 0.0,
+          "tether_J": 0.0,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 6.876824281086505,
+          "max_anchor_speed_mps": 0.0
+        }
+      },
+      "passed": true
+    },
+    "yam-heavy-raised-fold": {
+      "minimum_step_J": 0.0,
+      "time_s": 0.002,
+      "events": "",
+      "negative_steps": 0,
+      "peak_tension_N": 3.811082755543551,
+      "event_frames": {
+        "capture": 1,
+        "release": 0,
+        "rebound": 0,
+        "edge_stop": 0,
+        "hard_bend": 0,
+        "side_contact": 0,
+        "slip": 319
+      },
+      "cumulative_dissipation_J": 0.10718685917585839,
+      "events_below_threshold": {
+        "capture": 0
+      },
+      "event_worst_step": {
+        "capture": {
+          "time_s": 7.362,
+          "events": "capture",
+          "work_J": 7.096842473842252e-08,
+          "evaluated_tether_J": 0.0,
+          "net_dissipation_J": 7.086770975831162e-08,
+          "kinetic_J": 0.0,
+          "tether_J": 1.0071498011090829e-10,
+          "tension_N": 0.0,
+          "max_elastic_tension_N": 0.0,
+          "max_effective_normal_N": 3.9232185163240727,
+          "max_anchor_speed_mps": 0.0
+        }
+      },
+      "passed": true
+    }
+  }
+}

@@ -49,3 +49,28 @@ git diff --check
 ```
 
 [全部候选与证据行](../test/runs/2026-11-21/policy/stage3b-corners-r1/c1-c10-347.json) · [角点日志](../test/runs/2026-11-21/policy/stage3b-corners-r1/c1-c10-347.log) · [CPU 单测](../test/runs/2026-11-21/policy/stage3b-corners-r1/stage3-cpu-verified.log) · [CUDA 单测](../test/runs/2026-11-21/policy/stage3b-corners-r1/stage3-gpu-final.log) · [旧版回归](../test/runs/2026-11-21/policy/stage3b-corners-r1/legacy-domain.log)
+
+## Fix 4 有限指垫复跑
+
+2026-11-21，ubun，RTX 5090。采用 d6e519bc 上的 Fix 4，沿用种子 347、每组 1,024 个 Sobol 动作和原判据。C1–C10 全部有解。
+
+| 角点 | 历史通过数 | 本轮通过数 | 本轮最长稳持 s |
+| --- | ---: | ---: | ---: |
+| C1 | 512 | 512 | 18.108 |
+| C2 | 496 | 500 | 18.206 |
+| C3 | 3 | 462 | 16.152 |
+| C4 | 456 | 456 | 18.292 |
+| C5 | 737 | 747 | 18.692 |
+| C6 | 510 | 510 | 18.248 |
+| C7 | 1 | 511 | 11.082 |
+| C8 | 579 | 586 | 18.718 |
+| C9 | 124 | 1,024 | 6.592 |
+| C10 | 87 | 89 | 3.390 |
+
+- C7 21.6 s 延长跑从 0/1,024 增至 512/1,024，无撕裂，最长稳持 16.182 s。旧证据行 631 从稳持 9.636 s 后撕裂，变为稳持 15.132 s、未撕裂、末态离台 192.738 mm。[同种子延长跑](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/corner-c7-21s.json) · [旧证据行回放](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/corner-c7-row631.trace.json)
+- C1 切向增载脱手值 0.570 N，沿用 0.45–0.65 N 门禁。C9 通过数增加，证据行稳持时间从 6.848 s 到 6.592 s。C10 从 3.394 s 到 3.390 s。[十角点候选与证据行](../test/runs/2026-11-21/bag/parcel-pad-torsion-r1/corners-347.json)
+
+    export OMP_NUM_THREADS=1
+    export PYTHONPATH="$PWD/.venv-physical-parcel/stage3-cu130:$PWD"
+    flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/low_order_parcel/stage3_dual_arm_corners.py --seed 347 --candidates 1024 --output /tmp/fix4-corners.json
+    flock /tmp/claude-gpu.lock .venv-physical-parcel/bin/python -B test/low_order_parcel/stage3_dual_arm_corners.py --seed 347 --candidates 1024 --corners 7 --loose-seconds 21.6 --trace-row 631 --output /tmp/fix4-c7-21s.json
