@@ -1,0 +1,41 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/test/low_order_parcel/manual_yam.py", line 207, in <module>
+    manual(ManualScene(args.payload),args.payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/test/low_order_parcel/manual_yam.py", line 42, in __init__
+    self.robot = attach_robot(self.cfg,built,MuJoCoSim,CENTER,self.size[2],self.size,float(x.total_mass[0,0]))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/experience/yam_platform/protocol.py", line 158, in attach_robot
+    robot = Yam(fixture=dict(built=built, target=target, rotation=rotation, sim_factory=sim_factory))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/experience/yam_platform/robot.py", line 103, in __init__
+    raise RuntimeError(f'YAM initial pose unreachable: {self.ik_errors[-1]}')
+RuntimeError: YAM initial pose unreachable: {'position_mm': 0.0061181815336514, 'rotation_deg': 23.672262516535383}
+/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/glfw/__init__.py:917: GLFWError: (65548) b'Wayland: The platform does not provide the window position'
+  warnings.warn(message, GLFWError)
+WARNING: OpenGL error 0x502 in or before mjr_makeContext
+
+Manual YAM ready: fluffy_pillow. Click viewer; G lower, C close, L lift, O open. R reset.
+key D  target=[-0.24  -0.052  0.197] gap=0.095
+key D  target=[-0.23  -0.052  0.197] gap=0.095
+key W  target=[-0.23  -0.042  0.197] gap=0.095
+key W  target=[-0.23  -0.032  0.197] gap=0.095
+key W  target=[-0.23  -0.022  0.197] gap=0.095
+key D  target=[-0.22  -0.022  0.197] gap=0.095
+key A  target=[-0.23  -0.022  0.197] gap=0.095
+key S  target=[-0.23  -0.032  0.197] gap=0.095
+key S  target=[-0.23  -0.042  0.197] gap=0.095
+key W  target=[-0.23  -0.032  0.197] gap=0.095
+key D  target=[-0.22  -0.032  0.197] gap=0.095
+key A  target=[-0.23  -0.032  0.197] gap=0.095
+key A  target=[-0.24  -0.032  0.197] gap=0.095
+key A  target=[-0.25  -0.032  0.197] gap=0.095
+key G  target=[-0.25   0.033  0.086] gap=0.095
+key G  target=[-0.25   0.033  0.086] gap=0.095
+key G  target=[-0.25   0.033  0.086] gap=0.095
+key C  target=[-0.25   0.033  0.086] gap=0.001
+key C  target=[-0.25   0.033  0.086] gap=0.001
+key C  target=[-0.25   0.033  0.086] gap=0.001
+key O  target=[-0.25   0.033  0.086] gap=0.095
+key R  target=[-0.25  -0.052  0.197] gap=0.095
+key L  target=[-0.25   0.033  0.321] gap=0.095

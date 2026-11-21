@@ -51,7 +51,7 @@ def process_memory_mib():
 
 
 @torch.no_grad()
-def timed_episode(config, worlds, baselines, *, make_sim=build_sim, grip_N=6., steer=None):
+def timed_episode(config, worlds, baselines, *, make_sim=build_sim, grip_N=6., steer=None, observe=None):
     initial_start = perf_counter()
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
@@ -101,6 +101,8 @@ def timed_episode(config, worlds, baselines, *, make_sim=build_sim, grip_N=6., s
         quiet = torch.linalg.vector_norm(state.velocity, dim=1) < .020
         stable.copy_(torch.where(both & airborne & quiet, stable + 1, 0))
         peak_tension.copy_(torch.maximum(peak_tension, result.tension.max(dim=1).values))
+        if observe is not None:
+            observe(cursor, action, result, finite, admissible, stable)
         cursor.add_(1)
 
     warm = torch.cuda.Stream()
