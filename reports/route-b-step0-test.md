@@ -1,6 +1,6 @@
 # 路线 B Step 0 盘点与互操作检查
 
-最近检查 2026-11-22 21:16（北京时间）。**环境、设备张量互操作与 ABC 仿真工位资产门禁通过。**
+最近检查 2026-11-22 22:32（北京时间）。**环境、设备张量互操作与 ABC 仿真工位资产门禁通过。**
 
 ## 原生 Isaac 环境
 
@@ -48,6 +48,12 @@ URDF 统一填 1 的驱动字段与现有仿真配置有差异。项目的 `yam_
 [双臂配置](/home/ubuntu/workspace/xzy/manimux/manimux/configs/embodiment/robot/yam_dual.yaml) · [双臂关节预置](/home/ubuntu/workspace/xzy/manimux/manimux/configs/embodiment/initial_poses/yam.yaml) · [单臂工作台布局](../experience/yam_platform/robot.py#L47) · [270° 试验](../docs/PHYSICS_REALISM_AUDIT_REPORT.md#L28)
 
 初查时缺少 URDF 碰撞体、指垫和工位外参。按用户指定的 ABC 工位补齐后，在冻结提交 `2ef4a394` 持锁复验通过。桌面上表面为 `z=0`，双臂中心距 620 mm，20 个 2 ms 子步后四个指垫内表面离台 104.86–106.52 mm。零拷贝复验读写地址均一致，独立探针速度增量 +8.379996 mm/s，解析值 +8.380000 mm/s。真机部署所需工位实测外参与限位单独确认。[ABC 场景与装配检查](route-b-abc-scene-test.md) · [冻结版复验日志](../test/runs/2026-11-22/isaaclab/route-b-fix41-step0-r1/)
+
+### 并行 YAM URDF 试验
+
+核对工作树 `stage4/fix4-training@e103f1e9` 的 `experience/yam_platform/urdf.py`、`YamPickToAirEnv` 和 `--yam-urdf` 入口。复用 I2RT 关节命名、两轨同号目标以及参考执行器范围。ABC 使用验收后的 USD、CAD 指垫内表面和双臂 270° 起始位姿。并行试验采用 MuJoCo-Warp 和不同桌面布置。其力回写分别有腕部合力／合力矩和双指相向夹持负载两个通道，供 Step 1 对照。[并行提交](https://github.com/pig27777/randomization/commit/e103f1e9) · [ABC 入口](../src/isaac_yam_parcel/yam_scene.py)
+
+并行试验种子 17 的 `training/config.json` 指向同一 I2RT URDF，源文件 SHA-256 与上表相同。在已合入 Fix 4.1 的 `main@ed5fe78c`，两向缓冲区地址对照、已知载荷回写和最终 ABC USD 均重新通过。两臂 270° 初态通过，20 个 2 ms 子步后四个指垫离台 104.887–106.478 mm。[最终资产复验日志](../test/runs/2026-11-22/isaaclab/route-b-step1-r1/)
 
 ## 复现
 
