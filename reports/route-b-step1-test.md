@@ -54,3 +54,54 @@ flock /tmp/claude-gpu.lock "$native/python.sh" -B test/isaaclab/check_route_b_wr
 C6 在进入抓取区时偏离名义高入口，低位推动包裹。现有数据无法测出已捕获状态的悬空摆动。Step 2 示范与 BC 未启动。[中心轨迹](../test/runs/2026-11-22/isaaclab/route-b-step1-dual-port-r1/acquisition-trace.json) · [近区轨迹](../test/runs/2026-11-22/isaaclab/route-b-step1-dual-port-r1/acquisition-near-trace.json) · [近区结果](../test/runs/2026-11-22/isaaclab/route-b-step1-dual-port-r1/acquisition-near.log)
 
 当前版本的功率和电流试验沿用上文命令，成功时退出码为 0。近区回放同一原生环境执行 `flock /tmp/claude-gpu.lock "$native/python.sh" -B test/isaaclab/check_route_b_closed_loop.py --headless --near-workcell --seconds 12`，C6 门禁失败返回 1。首轮静态隔离单帧检查受约 13 µm 的滑轨微振影响，终态按 100 个物理子步核对平均保持力，同时记录峰峰位移和瞬时速度。限幅专项首次由摩擦上限先截断，将专项输入的法向力提高后复核组合惯量分支，常规功率反例的 6 N 法向力保持原值。
+
+## C6 入口跟踪只读诊断（2026-11-22 23:09，北京时间）
+
+从归档近区轨迹读取 3.20 s 末帧。同一 `736db9b2` 源码和固定行在 PhysX 重放至 3.24 s，另采驱动力、关节位置、限位和指尖接触。用 I2RT 原 URDF 和 ABC 指垫 CAD 独立计算 FK，三行实测和独立 FK 的 Z 差绝对值均小于 0.001 mm。
+
+| C6 名义 Z，mm | FK(q_des)，mm | 实测 Z，mm | 关节 2 重力补偿／实测电机，N·m | 关节 3 重力补偿／实测电机，N·m | 指尖竖直净接触力最大值，N |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 35 | 26.660 | 15.258 | −7.896 / −3.021 | 4.719 / 1.262 | 0.000 |
+| 38 | 26.868 | 15.445 | −7.889 / −3.031 | 4.714 / 1.291 | 0.000 |
+| 41 | 26.870 | 15.603 | −7.924 / −3.016 | 4.711 / 1.263 | 0.703 |
+
+三路臂关节距最近位置限位 0.531–0.533 rad。原演示把重力力矩换算为位置偏置，再与 IK 合并交给 0.04 rad 步幅截断。六轴中有五轴的归一化动作绝对值大于 1，关节 6 速度贴近 1 rad/s 仿真限位。命令侧 FK 已丢失高度跨度，驱动力不足又造成约 11.3–11.4 mm 的跟踪误差。指垫坐标系没有可解释该落差的常量 Z 偏置。GPU 后端对静态桌面筛选报不支持，表中接触为指尖净值，不能给 41 mm 样本的 0.703 N 逐碰撞体归因。其余两路在该帧无竖直指尖接触反力。[完整 q_des、q_act、力矩、FK 和限位](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/read-only-urdf-fk.log) · [PhysX 净接触](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/read-only-physx.log) · [ABC 视口](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/abc-ui.png)
+
+## 重力前馈、指垫 IK 与 Step 1 余项
+
+六臂关节在每个 2 ms 子步读取 PhysX 重力补偿力矩并写入电机前馈。滑轨不加前馈，逐关节退化滤波仍读取电机的实际 `applied_effort`。验收脚本在指垫内表面中点解 IK，用对应的平动雅可比并保持目标腕部方向。双通道外载实现与 `736db9b2` 一致。
+
+| 检查 | 结果 |
+| --- | --- |
+| 空载 | 前 0.32 s 8 路悬停，Z 最大绝对误差低于 0.001 mm，顶压 0 N。4,096 路双臂显式 PD 的独立空载基准 Z 最坏误差 1.930 mm。 |
+| C6 高入口 | 在 3.20 s 时，35／38／41 mm 分别实测 **34.965／37.951／40.954 mm**，最大绝对误差 **0.049 mm**。 |
+| C4 硬书 | 顶压峰值 **8.676 N**，双指捕获 0，净空 0。 |
+| C5 衣物 | 顶压峰值由 **40.218 N** 降至 **0.596 N**，双指捕获 0。 |
+| C6 低入口 | 平移 **64.496 mm**，双指捕获 0。 |
+| C6 高入口闭环 | 三路净进给峰值 **97.839–98.039 mm**，滑轨绝对峰值 **0.344–0.361 N**，低于 C6 锁定阈值 **0.48 N**。双指捕获和离台均为 0。 |
+| C6 高入口后下探闭合 | 备选轨迹在高入口达标后才下探。顶压达到 **1.305–2.811 N**，滑轨峰值 **0.373–0.375 N**，三路仍无聚拢和捕获。 |
+| C3 偏心 | 两路均无双指捕获，无法比较扭转打滑与稳持。 |
+
+入口跟踪门禁通过。完整 12 s 近区回放和下探对照均未建立 C6 抓取。高入口的膜料进给已有读数，但夹爪未建立足够的法向负载，现有记录无法检验悬空质心速度。C10 真实拉拔、检出帧数及依次轻放尚未执行。Step 2 未启动。[入口轨迹](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/tracking-probe-trace.json) · [完整回放](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/acquisition-corrected.log) · [下探对照](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/acquisition-seat.log)
+
+### RTX 5090 双臂吞吐
+
+在 `ubun` 持 GPU 锁，每次热身 3 个策略步，计时 12 个策略步（240 个 2 ms 物理子步）。场景包含两台 YAM、包裹耦合和观测更新。显存增量按进程启动后、场景构建前的设备可用量为基线。
+
+| 执行器 | 并发 | 物理 env-steps/s | 增量显存，MiB | 峰值 PyTorch，MiB | 空载最大 Z 漂移，mm |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 显式 PD + 重力前馈 | 1,024 | 43,107 | 2,574 | 32.8 | 0.058 |
+| 显式 PD + 重力前馈 | 2,048 | 87,658 | 2,996 | 57.5 | 1.944 |
+| 显式 PD + 重力前馈 | 4,096 | **173,244** | 3,762 | 107.2 | 1.930 |
+| PhysX 隐式臂驱动，显式轨道 | 1,024 | 45,323 | 2,574 | 32.8 | 0.00014 |
+| PhysX 隐式臂驱动，显式轨道 | 4,096 | 176,332 | 3,748 | 107.4 | **144.610** |
+| 原生 Newton 执行器回退 eager | 1,024 | 42,376 | 2,576 | 32.4 | 0.058 |
+| 原生 Newton 执行器回退 eager | 4,096 | 173,737 | 3,764 | 105.7 | 1.930 |
+
+原生 Newton 路径两档都发生 CUDA Graph 捕获失败。回退后，相对现行显式 PD，1,024 路慢 1.7%，4,096 路快 0.3%，单次样本无法把差异单独归因到 CUDA Graph。隐式臂驱动在 4,096 路出现明显空载偏移，保留为对照。按现有精度与吞吐，候选并发为 **4,096 路显式 PD**。[基准输出](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/benchmark-summary.log)
+
+沿用上文原生环境，入口检查运行 `test/isaaclab/check_route_b_closed_loop.py --headless --near-workcell --tracking-probe --seconds 3.24`。完整回放使用 `--headless --near-workcell --seconds 12`，追加 `--seat-fold` 复现下探对照。吞吐使用 `--headless --dual-arm --num-envs N --benchmark 12`，对照分别追加 `--implicit-arm` 和 `--native-actuators`。所有命令使用 `flock /tmp/claude-gpu.lock`。
+
+### 界面和抓取过程
+
+Kit 图形视口缺少本地扩展且远程索引不可用。使用 Isaac Lab 的 Newton OpenGL 查看器，物理后端仍为 PhysX。预览资产副本将重复的固定基座定义合并为一次，正式 ABC USD 保持原样。双臂预览只展示布局。C6 录像用同一 IK 脚本记录一条 38 mm 高入口的单臂回放。视口退出后录像保留前 170 帧，已用 FFprobe 核对为 6.8 s、25 fps、1280 × 720。可看到闭爪后夹爪抬起，包裹留在桌面。[双臂 UI](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/abc-ui.png) · [C6 回放](../test/runs/2026-11-22/isaaclab/route-b-step1-tracking-r1/c6-grasp-ui.mp4)

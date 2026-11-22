@@ -14,3 +14,4 @@
 | route-b-main-merge-r1 | ubun RTX 5090。Fix 4.1 与 ABC 场景并入 main，CPU/CUDA 回归和双臂场景加载通过。 | [合并检查](../../../reports/route-b-main-merge-test.md) · [日志](isaaclab/route-b-main-merge-r1/) |
 | route-b-step1-r1 | ubun RTX 5090。Step 0 复验通过。真实滑轨运动下仅腕部回写导致子步端口功越限，Step 1 暂停。 | [门禁报告](../../../reports/route-b-step1-test.md) · [日志](isaaclab/route-b-step1-r1/) |
 | route-b-step1-dual-port-r1 | ubun RTX 5090。双通道端口功和静态电流隔离通过，C6 真实关节入口轨迹跟踪未达标，暂停 Step 1。 | [门禁报告](../../../reports/route-b-step1-test.md#双通道续测2026-11-22-2255北京时间) · [轨迹和日志](isaaclab/route-b-step1-dual-port-r1/) |
+| route-b-step1-tracking-r1 | ubun RTX 5090。重力前馈和指垫 IK 通过 35／38／41 mm 跟踪，C6 捕获仍未达标，完成三档吞吐与对照。 | [跟踪与吞吐报告](../../../reports/route-b-step1-test.md#重力前馈指垫-ik-与-step-1-余项) · [日志和视频](isaaclab/route-b-step1-tracking-r1/) |

@@ -62,6 +62,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.parcel_sim = self.episode.make_sim()
         self.parcel_state = self.episode.table_state(self.parcel_sim)
         self.q_des = [robot.data.default_joint_pos.torch.clone() for robot in self.robots]
+        self.gravity_feedforward = [torch.zeros_like(target) for target in self.q_des]
         self.step_limit = origin.new_tensor([.04] * 6 + [.008])
         self.joint_limits = [robot.data.soft_joint_pos_limits.torch for robot in self.robots]
         self.enabled = torch.arange(2, device=self.device).expand(self.num_envs, -1) < self.arm_count
@@ -188,6 +189,11 @@ class YAMParcelBaseEnv(DirectRLEnv):
         cmds, quats, rates = [], [], []
         for i, (robot, sample) in enumerate(zip(self.robots, kinematics, strict=True)):
             robot.actuators.target_command.set_position_index(value=self.q_des[i], full_data=True)
+            # MIT-style joint feedforward supplies the URDF arm's own weight.
+            # The two rails retain their independent position/effort channels.
+            gravity = self.gravity_feedforward[i]
+            gravity[:, :6].copy_(robot.data.gravity_compensation_forces.torch[:, :6])
+            robot.actuators.target_command.set_effort_index(value=gravity, full_data=True)
             cmds.append(self._parcel_action(i, robot, sample, dq[i], motor[i]))
             quat = sample.wrist_quat_xyzw
             quats.append(torch.cat((quat[:, 3:], quat[:, :3]), dim=-1))

@@ -1,0 +1,61 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1795360731.090593 2946374 descriptor_database.cc:633] File already exists in database: grpc/health/v1/health.proto
+W0000 00:00:1795360731.090625 2946374 message.cc:301] Protobuf GeneratedMessageFactory: File is already registered: grpc/health/v1/health.proto
+Warning: Possible version incompatibility. Attempting to load carb::ujitso::IFactory with version v0.3 against v0.2.
+[ISAACLAB] KitLauncher initialization complete
+/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:165: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 17
+	Physics step-size     : 0.002
+	Rendering step-size   : 0.04
+	Environment step-size : 0.04
+[INFO]: Physics scene prim path: /physicsScene
+[INFO]: Time taken for scene creation Last: 0.271631 s, Mean: 0.271631 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 2.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Simulation parameters for joints in /World/envs/env_[^/]+/Yam_A:
++-------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                                            Simulation Joint Information (Prim path: /World/envs/env_[^/]+/Yam_A)                                            |
++-------+--------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+| Index | Name   | Stiffness | Damping | Armature | Static Friction | Dynamic Friction | Viscous Friction | Position Limits | Velocity Limits | Effort Limits |
++-------+--------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+|   0   | joint1 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-2.618, 3.142] |      1.000      |     28.000    |
+|   1   | joint2 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-0.000, 3.665] |      1.000      |     28.000    |
+|   2   | joint3 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       |  [0.000, 3.142] |      1.000      |     28.000    |
+|   3   | joint4 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-1.693, 1.571] |      1.000      |     10.000    |
+|   4   | joint5 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-1.571, 1.571] |      1.000      |     10.000    |
+|   5   | joint6 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-2.094, 2.094] |      1.000      |     10.000    |
+|   6   | joint7 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-0.047, 0.000] |      1.000      |     50.000    |
+|   7   | joint8 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-0.047, 0.000] |      1.000      |     50.000    |
++-------+--------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+[INFO]: [NewtonVisualizer] Object dragging is disabled because the active physics solver does not support rigid-body force input.
+[INFO]: Time taken for simulation start Last: 1.035363 s, Mean: 1.035363 s, Std: 0.000000 s, N: 1
+[INFO]: Completed setting up the environment...
+[INFO]: Visualizer not running: NewtonGLVisualizer
+[INFO]: Removed visualizer: NewtonGLVisualizer
+[INFO]: SimulationContext cleared
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab/isaaclab/app/sim_launcher.py", line 677, in launch_simulation
+    yield physics_cfg
+  File "/tmp/route-b-abc-ui.2aaqMr/record_grasp.py", line 71, in <module>
+    scores, trace = acquisition(env, [row], 12., near_workcell=True, seat_fold=args.seat_fold)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/envs/isaacsim/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "test/isaaclab/check_route_b_closed_loop.py", line 98, in acquisition
+    env.step(action)
+  File "/tmp/route-b-abc-ui.2aaqMr/record_grasp.py", line 27, in step
+    frame = self.sim._visualizers[0].render_rgb_array()
+            ~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+Loading user config located at: '/home/ubuntu/workspace/czx/system0/sim/envs/isaacsim/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+2026-11-22T15:18:51Z [0ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-11-22T15:18:54Z [3,499ms] [Warning] [usdrt.population.plugin] Last global time was not created. Did you call setEnableUsdNoticeHandling?
