@@ -21,6 +21,7 @@ from test_unified_payload import STAGE2, model, pe_proxy
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from src.low_order_parcel.lumped_contact_proxy import ContactState, LumpedContactProxy
 from src.low_order_parcel.macro_parcel_sim import MacroParcelSim, ParcelAction, rotate
+from src.low_order_parcel.neck_damping import NeckDamping, NeckDampingParams
 from src.low_order_parcel.pad_torsion import PadTorsion, PadTorsionParams, conjugate, quaternion_product, rotation_vector
 from src.low_order_parcel.unified_payload import DT, GRAVITY
 
@@ -33,6 +34,14 @@ class ObservePayload(StepForces):
         p = sim.payload
         self.damp_step, self.edges_step, self.bend_step = p._damp, p._edges, p._bend
         p._damp, p._edges, p._bend = self.damp, self.edges, self.bend
+        self.neck_result = None
+        if sim.neck is not None and sim.neck.enabled:
+            self.neck_step = sim.neck.payload
+            sim.neck.payload = self.observe_neck
+
+    def observe_neck(self, *args):
+        self.neck_result = self.neck_step(*args)
+        return self.neck_result
 
     def kinetic(self, v):
         return .5 * (self.sim.payload.mass.unsqueeze(-1) * v.square()).sum()
@@ -85,7 +94,7 @@ class ObservePayload(StepForces):
 
     def ledger(self, old, action, result, end_tip, old_store):
         p = self.sim.payload
-        _, jaw, top, _ = self.reaction(old, action, result)
+        _, jaw, top, _ = self.reaction(old, action, result, self.neck_result)
         step = result.state
         inc = end_tip - action.pinch_position
         left, right = (self.contact.force * inc).sum(dim=2)[0].tolist()
@@ -122,7 +131,8 @@ class ObservePayload(StepForces):
         return end_store, details | complete_row(self.sim, old, result, old_store, end_store, left, right,
                                         external, top_work, side, jaw_work, indent_work, self.damping,
                                         table, floor_kinetic, indent_loss, tether_damping(self.contact, self.inputs, result),
-                                        self.edge_stop, self.hard_bend)
+                                        self.edge_stop, self.hard_bend,
+                                        neck_terms(self.neck_result, inc))
 
 
 def tether_storage(sim, state, pads, anchors):
@@ -141,8 +151,20 @@ def tether_damping(contact, inputs, result):
     return float((damping_force * (speed - result.slip_rate)).sum() * DT)
 
 
+def neck_terms(step, pad_displacement):
+    values = (0., 0., 0., 0., 0.) if step is None else (
+        float((step.force * pad_displacement).sum()),
+        float(step.pad_couple_power.sum() * DT),
+        float(step.anchor_power.sum() * DT),
+        float(step.dissipation_J.sum()),
+        float((step.pad_force_power + step.pad_couple_power - step.anchor_power).sum() * DT),
+    )
+    return dict(zip(("neck_pad_force_work_J", "neck_pad_couple_work_J", "neck_anchor_work_J",
+                     "neck_discrete_dissipation_J", "neck_contact_dissipation_J"), values, strict=True))
+
+
 def complete_row(sim, old, result, before, after, left, right, external, top, side, jaw, indent_work, xpbd_damp,
-                 friction, floor_kinetic, indent_loss, tendon_damp, edge_stop, hard_bend):
+                 friction, floor_kinetic, indent_loss, tendon_damp, edge_stop, hard_bend, neck=None):
     start = old.contacts[:, :, ContactState.CAPTURE] > .5
     state = result.state
     end = state.contacts[:, :, ContactState.CAPTURE] > .5
@@ -178,17 +200,20 @@ def complete_row(sim, old, result, before, after, left, right, external, top, si
                      torsion_damping_J=rotational_damping, torsion_slip_loss_J=rotational_slip,
                      torsion_integration_loss_J=rotational_integration, torsion_slip_rad=float(torsion.slip_angle.sum()),
                      torsion_net_dissipation_J=angular_work - body_work - after["torsion_J"] + before.get("torsion_J", 0.))
-    work = left + right + external + top + side + jaw + angular_work
+    neck = neck if neck is not None else neck_terms(None, None)
+    work = (left + right + external + top + side + jaw + angular_work
+            + neck["neck_pad_force_work_J"] + neck["neck_pad_couple_work_J"])
     delta = sum(after[key] - before.get(key, 0.) for key in after)
     slip = float((result.tension * result.slip_rate).sum() * DT)
-    known = xpbd_damp + friction + floor_kinetic + indent_loss + slip + tendon_damp + angular_loss
+    known = (xpbd_damp + friction + floor_kinetic + indent_loss + slip + tendon_damp + angular_loss
+             + neck["neck_discrete_dissipation_J"])
     return dict(work_J=work, delta_storage_J=delta, net_dissipation_J=work - delta,
                 accounted_loss_J=known, closure_residual_J=work - delta - known,
                 tether_left_work_J=left, tether_right_work_J=right, body_external_work_J=external,
                 top_work_J=top, side_work_J=side, jaw_work_J=jaw, indent_transfer_J=indent_work,
                 xpbd_damping_J=xpbd_damp, table_friction_J=friction, floor_velocity_loss_J=floor_kinetic,
                 compression_damping_J=indent_loss, tether_damping_J=tendon_damp, slip_work_J=slip, events="+".join(events),
-                tension_N=float(result.tension.max()), **twist, **after)
+                tension_N=float(result.tension.max()), **neck, **twist, **after)
 
 
 def rigid_storage(sim, state):
@@ -202,10 +227,26 @@ def rigid_kinetic(sim, orientation, velocity, angular_rate):
     return float(.5 * ((sim.mass * velocity.square()).sum() + (angular_rate * momentum).sum()))
 
 
-def run_rigid(mode, finite_pad=False):
+def enable_neck(sim, coefficient):
+    if coefficient:
+        sim.neck = NeckDamping(sim.mass, sim.proxy.params.mu_eff[:, None], DT, NeckDampingParams(coefficient))
+
+
+def run_rigid(mode, finite_pad=False, neck_coefficient=0.):
     sim = MacroParcelSim.from_nominal(STAGE2["materials"]["pe"]["nominal"], DT)
     if finite_pad:
         sim.torsion = PadTorsion(sim.mass, sim.proxy.params.mu_eff[:, None], DT, PadTorsionParams())
+    enable_neck(sim, neck_coefficient)
+    neck = None
+    if sim.neck is not None:
+        calculate = sim.neck.rigid
+
+        def observe_neck(*args):
+            nonlocal neck
+            neck = calculate(*args)
+            return neck
+
+        sim.neck.rigid = observe_neck
     observed, impulse = sim.proxy.step_with_reference, sim._impulse
     impulses = []
     contact = boundary = None
@@ -251,7 +292,7 @@ def run_rigid(mode, finite_pad=False):
                          max_anchor_speed_mps=float(boundary.attachment_velocity.norm(dim=2).max()),
                          **complete_row(sim, old, out, row, end, left, right, ext, 0., 0., 0., 0.,
                                         0., pre_friction-post_friction, normal_loss, 0.,
-                                        tether_damping(contact, boundary, out), False, False)))
+                                        tether_damping(contact, boundary, out), False, False, neck_terms(neck, inc))))
         row = end
     return rows
 
@@ -285,7 +326,7 @@ def bench(name):
 
 
 @torch.inference_mode()
-def run_payload(name, yam=None, finite_pad=False):
+def run_payload(name, yam=None, finite_pad=False, neck_coefficient=0.):
     jaw = jaw_rate = None
     if yam is None:
         sim, state, n, explicit = bench(name)
@@ -307,6 +348,7 @@ def run_payload(name, yam=None, finite_pad=False):
         n = len(explicit.pinch_position)
     if finite_pad:
         sim.torsion = PadTorsion(sim.mass, sim.proxy.params.mu_eff[:, None], DT, PadTorsionParams())
+    enable_neck(sim, neck_coefficient)
     ledger = ObservePayload(sim)
     storage = ledger.storage(state.payload) | {"tether_J": 0.}
     previous = None
@@ -344,7 +386,7 @@ def run_payload(name, yam=None, finite_pad=False):
             end_tip = a.pinch_position + DT * a.pinch_velocity
         else:
             end_tip = explicit.pinch_position[min(i + 1, n - 1)]
-            if not finite_pad:
+            if not finite_pad and not neck_coefficient:
                 np.testing.assert_allclose(out.table_clearance.numpy().reshape(-1), end_reference[i], atol=1e-10)
         storage, row = ledger.ledger(state, a, out, end_tip, storage)
         rows.append(dict(time_s=(i + 1) * DT, **row))
@@ -371,11 +413,12 @@ def replay_wrist(robot, path, time, like):
     return oriented[:-1], rate
 
 
-def static_capture():
+def static_capture(neck_coefficient=0.):
     sim = MacroParcelSim(pe_proxy(1), payload=model("rigid_box", dtype=torch.float64,
                           total_mass=torch.tensor([[1.5]], dtype=torch.float64)), torsion=PadTorsionParams())
     old = sim.initial_state()
     old.contacts[:, :, ContactState.SLACK] = .003
+    enable_neck(sim, neck_coefficient)
     tap = ObservePayload(sim)
     anchors, _ = sim.payload.anchors(old.payload, sim.payload_mount_weights, torch.zeros_like(old.payload.d_surf))
     tip = anchors + (sim.proxy.params.L0 + .010).unsqueeze(-1) * sim.up[:, None]
@@ -387,7 +430,7 @@ def static_capture():
     for name, inputs in (("static-no-capture", action._replace(normal_force=zeros)), ("static-capture", action)):
         step = sim.step(old, inputs)
         _, row = tap.ledger(old, inputs, step, tip, before)
-        assert row["torsion_J"] == 0.
+        assert row["torsion_J"] == row["evaluated_tether_J"] == row["neck_discrete_dissipation_J"] == 0.
         verdicts[name] = [dict(time_s=DT, **row)]
     return verdicts
 
@@ -418,8 +461,9 @@ def torsion_fixture(grip, radius=.012):
 
 
 @torch.inference_mode()
-def torsion_episode(grip, steps=1000):
+def torsion_episode(grip, steps=1000, neck_coefficient=0.):
     sim, state, inputs = torsion_fixture(grip)
+    enable_neck(sim, neck_coefficient)
     observe = ObservePayload(sim)
     storage = observe.storage(state.payload)
     anchors, _ = sim.payload.anchors(state.payload, sim.payload_mount_weights, state.payload.d_surf)
@@ -437,6 +481,38 @@ def torsion_episode(grip, steps=1000):
                          clearance_m=float(result.table_clearance.min()),
                          captured=int(state.contacts[..., ContactState.CAPTURE].sum()),
                          torque_limit_Nm=float(state.torsion.capacity.sum())))
+    return rows
+
+
+def c6_neck_episode(coefficient):
+    from src.low_order_parcel.domain_randomizer import CornerSuite, DomainRandomizer
+    episode = CornerSuite(DomainRandomizer()).select(torch.tensor([5]))
+    sim = MacroParcelSim(LumpedContactProxy(episode.proxy, DT), payload=model(
+        "rigid_box", dtype=torch.float32, total_mass=episode.payload.total_mass, table_friction=episode.payload.table_friction),
+        torsion=episode.torsion, neck_damping=NeckDampingParams(coefficient))
+    old = sim.initial_state()
+    payload = old.payload._replace(pos=old.payload.pos + .20 * sim.payload.up,
+                                   vel=old.payload.vel + old.com.new_tensor([.12, 0., 0.]))
+    old = old._replace(payload=payload, com=sim.payload.com(payload))
+    old.contacts[..., ContactState.CAPTURE] = 1.
+    old.contacts[..., ContactState.SLACK] = .005
+    anchors, _ = sim.payload.anchors(payload, sim.payload_mount_weights, torch.zeros_like(payload.d_surf))
+    length = episode.proxy.L0 + .5 * (episode.payload.total_mass * GRAVITY / episode.proxy.k)
+    tip = anchors + length.unsqueeze(-1) * sim.up[:, None]
+    zero = torch.zeros_like(length)
+    cmd = ParcelAction(tip, torch.zeros_like(tip), zero + 12., zero, zero, zero + 1.,
+                       torch.zeros_like(old.com), torch.zeros_like(sim.mass))
+    observer = ObservePayload(sim)
+    store = (observer.storage(payload) |
+             {"tether_J": tether_storage(sim, old, tip, anchors), "torsion_J": 0.})
+    rows = []
+    for i in range(2250):
+        out = sim.step(old, cmd)
+        store, row = observer.ledger(old, cmd, out, tip, store)
+        old = out.state
+        rows.append(dict(time_s=(i + 1) * DT, **row,
+                         com_speed_mps=float(old.velocity.norm()), clearance_m=float(out.table_clearance.min()),
+                         captured=int(old.contacts[..., ContactState.CAPTURE].sum())))
     return rows
 
 
@@ -463,22 +539,24 @@ def write_case(output, name, rows):
 
 
 @torch.inference_mode()
-def main(output, yam_roots, focus, finite_pad=False):
+def main(output, yam_roots, focus, finite_pad=False, neck_coefficient=0.):
     output.mkdir(parents=True, exist_ok=False)
-    cases = static_capture()
-    cases["torsion-hold"] = torsion_episode(90.)
-    cases["torsion-slip"] = torsion_episode(18.)
+    cases = static_capture(neck_coefficient)
+    cases["torsion-hold"] = torsion_episode(90., neck_coefficient=neck_coefficient)
+    cases["torsion-slip"] = torsion_episode(18., neck_coefficient=neck_coefficient)
+    if neck_coefficient:
+        cases["c6-neck"] = c6_neck_episode(neck_coefficient)
     if not focus:
         for name in ("book-top", "clothes-rebound", "pillow-rebound", "side-push", "loose-stop", "bend-limit",
                      "overload", "release"):
-            cases[name] = run_payload(name, finite_pad=finite_pad)
+            cases[name] = run_payload(name, finite_pad=finite_pad, neck_coefficient=neck_coefficient)
         for mode in ("ramp", "release"):
-            cases[f"stage2-{mode}"] = run_rigid(mode, finite_pad)
+            cases[f"stage2-{mode}"] = run_rigid(mode, finite_pad, neck_coefficient)
     for yam_root in yam_roots:
         for name in yam_cases():
             path = yam_root / name / "boundary.npz"
             if path.is_file():
-                cases[f"yam-{name}"] = run_payload(name, path, finite_pad)
+                cases[f"yam-{name}"] = run_payload(name, path, finite_pad, neck_coefficient)
     summary = {}
     fig, axes = plt.subplots(2, 1, figsize=(12, 9), layout="constrained")
     for name, rows in cases.items():
@@ -493,7 +571,7 @@ def main(output, yam_roots, focus, finite_pad=False):
             ax.legend(fontsize=8, ncols=3)
     fig.savefig(output / "cumulative-dissipation.png", dpi=170)
     (output / "energy-summary.json").write_text(json.dumps(
-        dict(threshold_J=LIMIT_J, finite_pad=finite_pad, cases=summary), indent=2) + "\n")
+        dict(threshold_J=LIMIT_J, finite_pad=finite_pad, neck_coefficient_Ns_m=neck_coefficient, cases=summary), indent=2) + "\n")
     return all(case["passed"] for case in summary.values())
 
 
@@ -503,6 +581,7 @@ if __name__ == "__main__":
     parser.add_argument("--yam-root", type=Path, action="append", default=[])
     parser.add_argument("--capture-focus", action="store_true", help="keep the zero-motion capture and YAM replays")
     parser.add_argument("--finite-pad", action="store_true", help="enable torsion in historical scenarios as well")
+    parser.add_argument("--neck-coefficient", type=float, default=0.)
     args = parser.parse_args()
     torch.set_num_threads(1)
-    raise SystemExit(0 if main(args.output, args.yam_root, args.capture_focus, args.finite_pad) else 1)
+    raise SystemExit(0 if main(args.output, args.yam_root, args.capture_focus, args.finite_pad, args.neck_coefficient) else 1)

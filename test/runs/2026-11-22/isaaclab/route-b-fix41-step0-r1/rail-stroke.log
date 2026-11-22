@@ -1,0 +1,51 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1795353814.177742 2645064 descriptor_database.cc:633] File already exists in database: grpc/health/v1/health.proto
+W0000 00:00:1795353814.177773 2645064 message.cc:301] Protobuf GeneratedMessageFactory: File is already registered: grpc/health/v1/health.proto
+Warning: Possible version incompatibility. Attempting to load carb::ujitso::IFactory with version v0.3 against v0.2.
+[ISAACLAB] KitLauncher initialization complete
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 17
+	Physics step-size     : 0.002
+	Rendering step-size   : 0.04
+	Environment step-size : 0.04
+[INFO]: Registered backend 'physx' for factory Articulation.
+[INFO]: Physics scene prim path: /physicsScene
+[INFO]: Time taken for scene creation Last: 0.930331 s, Mean: 0.930331 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4
+	Environment spacing   : 2.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Simulation parameters for joints in /World/envs/env_[^/]+/Yam_A:
++-------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                                            Simulation Joint Information (Prim path: /World/envs/env_[^/]+/Yam_A)                                            |
++-------+--------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+| Index | Name   | Stiffness | Damping | Armature | Static Friction | Dynamic Friction | Viscous Friction | Position Limits | Velocity Limits | Effort Limits |
++-------+--------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+|   0   | joint1 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-2.618, 3.142] |      1.000      |     28.000    |
+|   1   | joint2 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-0.000, 3.665] |      1.000      |     28.000    |
+|   2   | joint3 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       |  [0.000, 3.142] |      1.000      |     28.000    |
+|   3   | joint4 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-1.693, 1.571] |      1.000      |     10.000    |
+|   4   | joint5 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-1.571, 1.571] |      1.000      |     10.000    |
+|   5   | joint6 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-2.094, 2.094] |      1.000      |     10.000    |
+|   6   | joint7 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-0.047, 0.000] |      1.000      |     50.000    |
+|   7   | joint8 |   0.000   |  0.000  |  0.000   |      0.000      |      0.000       |      0.000       | [-0.047, 0.000] |      1.000      |     50.000    |
++-------+--------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+Loading user config located at: '/home/ubuntu/workspace/czx/system0/sim/envs/isaacsim/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+2026-11-22T13:23:34Z [0ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-11-22T13:23:37Z [2,629ms] [Warning] [omni.physx.plugin] Cloning joints /World/envs/env_1/Yam_A/Geometry/base/FixedJoint without a body rel may cause issues, since the localPose wont be updated.
+2026-11-22T13:23:37Z [2,629ms] [Warning] [omni.physx.plugin] Cloning joints /World/envs/env_2/Yam_A/Geometry/base/FixedJoint without a body rel may cause issues, since the localPose wont be updated.
+2026-11-22T13:23:37Z [2,630ms] [Warning] [omni.physx.plugin] Cloning joints /World/envs/env_3/Yam_A/Geometry/base/FixedJoint without a body rel may cause issues, since the localPose wont be updated.
+2026-11-22T13:23:37Z [2,630ms] [Warning] [usdrt.population.plugin] Last global time was not created. Did you call setEnableUsdNoticeHandling?
+2026-11-22T13:23:37Z [3,007ms] [Error] [omni.physx.tensors.plugin] CUDA driver shim call failed at /builds/omniverse/physics/omni/ovruntime/source/omni.physx.tensors/plugins/gpu/GpuArticulationView.cpp:623
+2026-11-22T13:23:37Z [3,007ms] [Error] [omni.physx.tensors.plugin] CUDA error: operation would make the legacy stream depend on a capturing blocking stream: /builds/omniverse/physics/omni/ovruntime/source/omni.physx.tensors/plugins/gpu/CudaKernels.cu: 534
+2026-11-22T13:23:37Z [3,007ms] [Error] [omni.physx.tensors.plugin] Failed to fetch DOF position attribute
+[INFO]: Time taken for simulation start Last: 0.365253 s, Mean: 0.365253 s, Std: 0.000000 s, N: 1
+[INFO]: Completed setting up the environment...
+ABC_DIRECT_SCENE_PASS {"envs": 4, "arms": 1, "table_top_m": 0.0, "physics_dt_s": 0.002, "policy_dt_s": 0.04, "substeps": 20, "sensors": 0, "minimum_pad_height_m": [0.10504863411188126]}
+ABC_RAIL_STROKE [{"target_mm": -46.949999999999996, "aperture_mm": 94.9002355337143, "positions_mm": [-46.84874725341797, -46.950199127197266], "applied_effort_N": [-0.30130764842033386, -0.13570009171962738]}, {"target_mm": -40.0, "aperture_mm": 81.11895620822906, "positions_mm": [-39.901763916015625, -40.115840911865234], "applied_effort_N": [-0.29371121525764465, -0.09793063253164291]}, {"target_mm": -25.0, "aperture_mm": 75.16566663980484, "positions_mm": [-36.925357818603516, -37.139034271240234], "applied_effort_N": [11.934093475341797, 12.165831565856934]}, {"target_mm": -15.0, "aperture_mm": 75.16555488109589, "positions_mm": [-36.92528533935547, -37.13900375366211], "applied_effort_N": [21.93666648864746, 22.168413162231445]}, {"target_mm": -5.0, "aperture_mm": 75.16559958457947, "positions_mm": [-36.92527770996094, -37.13899230957031], "applied_effort_N": [31.938772201538086, 32.170536041259766]}, {"target_mm": 0.0, "aperture_mm": 75.1655325293541, "positions_mm": [-36.92527389526367, -37.139007568359375], "applied_effort_N": [36.93999481201172, 37.1717414855957]}]
+[INFO]: SimulationContext cleared
+2026-11-22T13:23:37Z [3,007ms] [Warning] [isaaclab_physx.assets.articulation.actuator_control] Host Newton-actuator CUDA graph capture failed; using eager execution: Failed to get DOF positions from backend

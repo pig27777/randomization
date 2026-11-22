@@ -9,6 +9,7 @@ import torch
 from torch import Tensor
 
 from .lumped_contact_proxy import ContactInputs, EPS, LumpedContactProxy, ProxyParams
+from .neck_damping import NeckDamping, NeckDampingParams
 from .pad_torsion import PadTorsion, PadTorsionParams, TorsionState, _orientation, rotate
 from .unified_payload import GRAVITY, PayloadState, UnifiedPayloadTemplate
 
@@ -70,7 +71,8 @@ class MacroParcelSim:
     def __init__(self, proxy: LumpedContactProxy, mass_kg: Tensor | None = None,
                  com_offset: Tensor | None = None, *, half_extents=(.075, .10, .016),
                  table_friction: float = .40, payload: UnifiedPayloadTemplate | None = None,
-                 torsion: PadTorsionParams | None = None):
+                 torsion: PadTorsionParams | None = None,
+                 neck_damping: NeckDampingParams | None = None):
         """Mass and COM offset are [B,1] kg and [B,3] m in the parcel frame."""
         like = proxy.params.S_bag
         batch = like.shape[0]
@@ -79,6 +81,7 @@ class MacroParcelSim:
         self.payload = payload
         self.up = like.new_tensor((0., 0., 1.)).expand(batch, 3)
         self.torsion = None if torsion is None else PadTorsion(like, proxy.params.mu_eff[:, None], self.dt, torsion)
+        self.neck = None if neck_damping is None else NeckDamping(like, proxy.params.mu_eff[:, None], self.dt, neck_damping)
         if payload is not None:
             if mass_kg is not None or com_offset is not None:
                 raise ValueError("With a payload template, mass and COM come from PayloadParamsX")
@@ -164,9 +167,19 @@ class MacroParcelSim:
             attachment_velocity, state.com, action.normal_force, action.inward_velocity,
             action.feed_depth, action.alignment_cos), reference, mobility.abs().sum(dim=-1))
 
-        force = contacts.force.sum(dim=1) + action.external_force - action.direct_press_N * self.up
+        rope_force = contacts.force
+        neck_torque = None
+        if self.neck is not None and self.neck.enabled:
+            neck = self.neck.rigid(action.pinch_position, attachment, action.pinch_velocity, attachment_velocity,
+                                   state.contacts, contacts.state, action.normal_force, self.mass, mount_arm,
+                                   inverse_q, self.inv_inertia, jaw_rate)
+            rope_force = rope_force + neck.force
+            neck_torque = neck.pad_couple.sum(dim=1)
+        force = rope_force.sum(dim=1) + action.external_force - action.direct_press_N * self.up
         angular_momentum = self._inertia_action(q, self.inertia, state.angular_velocity)
         torque = contacts.torque.sum(dim=1) - torch.linalg.cross(state.angular_velocity, angular_momentum)
+        if neck_torque is not None:
+            torque = torque + torch.linalg.cross(mount_arm, neck.force).sum(dim=1)
         torsion = ()
         if self.torsion is not None:
             axes = rotate(q[:, None], self.torsion.eye.expand(len(q), -1, -1))
@@ -204,8 +217,10 @@ class MacroParcelSim:
         # The sensed loads are opposite to the forces transmitted to the parcel.
         # Direct symmetric top-press forces have no moment about the pad midpoint.
         pad_arm = action.pinch_position - action.pinch_position.mean(dim=1, keepdim=True)
-        wrist_force = -contacts.force.sum(dim=1) + action.direct_press_N * self.up
-        wrist_torque = torch.linalg.cross(pad_arm, -contacts.force).sum(dim=1)
+        wrist_force = -rope_force.sum(dim=1) + action.direct_press_N * self.up
+        wrist_torque = torch.linalg.cross(pad_arm, -rope_force).sum(dim=1)
+        if neck_torque is not None:
+            wrist_torque = wrist_torque + neck_torque
         if self.torsion is not None:
             wrist_torque = wrist_torque - pad_torque[:, 0]
         cos_vertical = separation[:, :, 2] / torch.linalg.vector_norm(separation, dim=-1).clamp_min(EPS)
@@ -271,7 +286,14 @@ class MacroParcelSim:
         contacts, reference = self.proxy.step_with_reference(state.contacts, ContactInputs(
             tip, anchor, action.pinch_velocity, anchor_vel, state.com,
             action.normal_force, action.inward_velocity, feed, alignment, budget), reference, inverse_mass)
-        force, depth_force = payload.distribute_anchor_forces(current, weights, contacts.force)
+        rope_force = contacts.force
+        neck_torque = None
+        if self.neck is not None and self.neck.enabled:
+            neck = self.neck.payload(payload, current, weights, tip, anchor, action.pinch_velocity, anchor_vel,
+                                     state.contacts, contacts.state, action.normal_force, jaw_rate)
+            rope_force = rope_force + neck.force
+            neck_torque = neck.pad_couple.sum(dim=1)
+        force, depth_force = payload.distribute_anchor_forces(current, weights, rope_force)
         indentation_power = (depth_force * depth_rate).sum(dim=1, keepdim=True)
         surface_vertical = (surface.pad_force_N * normal[:, 2:3]).clamp_min(0.)
         direct = (.5 * action.direct_press_N - surface_vertical).clamp_min(0.)
@@ -296,9 +318,11 @@ class MacroParcelSim:
         next_state = PayloadParcelState(payload.com(next_payload), orientation, payload.com_velocity(next_payload),
                                         2. * omega / self.dt, contacts.state, indentation_power,
                                         side_axis, side_origin, next_payload, reference, torsion)
-        pad_reaction = (-contacts.force - jaw_load - side_load + surface.pad_force_N.unsqueeze(-1) * normal[:, None]
+        pad_reaction = (-rope_force - jaw_load - side_load + surface.pad_force_N.unsqueeze(-1) * normal[:, None]
                         + direct.unsqueeze(-1) * self.up[:, None])
         wrist_torque = torch.linalg.cross(tip - midpoint, pad_reaction).sum(dim=1)
+        if neck_torque is not None:
+            wrist_torque = wrist_torque + neck_torque
         if self.torsion is not None:
             wrist_torque = wrist_torque - pad_torque[:, 0]
         wrench = torch.cat((pad_reaction.sum(dim=1), wrist_torque), dim=1)

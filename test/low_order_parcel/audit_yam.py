@@ -77,7 +77,7 @@ class StepForces:
         self.block_force = force
         return self.payload_step(state, force, depth)
 
-    def reaction(self, old, action, result):
+    def reaction(self, old, action, result, neck=None):
         payload = self.sim.payload
         tip = action.pinch_position
         local = torch.bmm(tip - old.payload.pos.mean(dim=1, keepdim=True), payload.frame(old.payload))
@@ -87,9 +87,12 @@ class StepForces:
                   (self.surface.pad_force_N * normal[:, 2:3]).clamp_min(0.)).clamp_min(0.)
         jaw_force = self.jaw
         top_force = self.surface.pad_force_N.unsqueeze(-1) * normal[:, None] + direct.unsqueeze(-1) * self.sim.up[:, None]
-        reaction = -self.contact.force - jaw_force - self.side + top_force
+        rope_force = self.contact.force if neck is None else self.contact.force + neck.force
+        reaction = -rope_force - jaw_force - self.side + top_force
         arm = tip - tip.mean(dim=1, keepdim=True)
         torque = torch.linalg.cross(arm, reaction).sum(dim=1)
+        if neck is not None:
+            torque = torque + neck.pad_couple.sum(dim=1)
         if result.state.torsion:
             torque = torque - result.state.torsion.torque[:, 0]
         wrench = torch.cat((reaction.sum(dim=1), torque), dim=1)

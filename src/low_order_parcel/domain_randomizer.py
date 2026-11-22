@@ -11,6 +11,7 @@ from torch import Tensor
 from .dual_arm_parcel_sim import DualArmParcelSim
 from .hardware_filters import YAMParameters
 from .lumped_contact_proxy import LumpedContactProxy, ProxyParams
+from .neck_damping import NeckDampingParams
 from .pad_torsion import PadTorsionParams
 from .unified_payload import DT, PayloadParamsX, UnifiedPayloadTemplate
 from .virtual_rgb import RGBParameters
@@ -38,11 +39,12 @@ class Stage3Episode:
     yam: YAMParameters
     rgb: RGBParameters
     torsion: PadTorsionParams = PadTorsionParams()
+    neck_damping: NeckDampingParams = NeckDampingParams()
 
     def make_sim(self, *, mount_xy=None):
         return DualArmParcelSim(LumpedContactProxy(self.proxy, DT), LumpedContactProxy(self.proxy, DT),
                                 UnifiedPayloadTemplate(self.payload), F_half=self.F_half, T_tear=self.T_tear,
-                                mount_xy=mount_xy, torsion=self.torsion)
+                                mount_xy=mount_xy, torsion=self.torsion, neck_damping=self.neck_damping)
 
     def table_state(self, sim):
         state = sim.initial_state()
@@ -59,6 +61,7 @@ class DomainRandomizer:
         self.config = json.loads(Path(config_path).read_text())
         cfg = self.config
         self.rng = torch.Generator(device=self.device).manual_seed(cfg["seed"] if seed is None else seed)
+        self.neck_rng = torch.Generator(device=self.device).manual_seed(self.rng.initial_seed() ^ 0x4E45434B)
         self.materials, self.contents = tuple(cfg["material_order"]), tuple(cfg["content_order"])
         materials = json.loads((CONFIG_DIR / "proxy_material_envelopes.yaml").read_text())["materials"]
         rows = [materials[name] for name in self.materials]
@@ -166,8 +169,12 @@ class DomainRandomizer:
                                     for key, rank, center in zip(
                                         ("pad_radius_m", "neck_damping_ratio", "neck_length_m"), draw, nominal[:3],
                                         strict=True)))
+        neck_bounds = cfg.get("neck_transverse_Ns_m", (0., 0.))
+        neck_rank = torch.rand((count, 1), device=self.device, generator=self.neck_rng)
+        neck = NeckDampingParams(_interval(neck_bounds, .5 + mix * (neck_rank - .5)),
+                                 cfg.get("neck_transverse_characteristic_m", .05))
         return Stage3Episode(ProxyParams(**p), payload, F_half, tear, material, content, yaw, clearance,
-                             torch.zeros_like(yaw), torch.zeros_like(yaw), yam, rgb, torsion)
+                             torch.zeros_like(yaw), torch.zeros_like(yaw), yam, rgb, torsion, neck)
 
     def _hardware(self, like, alpha):
         yam = YAMParameters.sample(like, generator=self.rng)
@@ -254,13 +261,15 @@ class CornerSuite:
         self.episodes = Stage3Episode(p, x, scalar("F_half", .30), scalar("T_tear", 40.),
                                       dr.tensor(material, dtype=torch.long), dr.tensor(content, dtype=torch.long),
                                       scalar("yaw_rad", 0.), dr.tensor([c.get("clearance_m", [.26, .26]) for c in corners]),
-                                      scalar("swing_rad", 0.), scalar("fold_rad", 0.), yam, rgb)
+                                      scalar("swing_rad", 0.), scalar("fold_rad", 0.), yam, rgb,
+                                      neck_damping=NeckDampingParams(cfg.get("neck_transverse_nominal_Ns_m", 0.),
+                                                                      cfg.get("neck_transverse_characteristic_m", .05)))
 
     def select(self, indices):
         """Return rows for zero-based int64 [B] corner indices, preserving their order."""
         e = self.episodes
         return Stage3Episode(ProxyParams(*(getattr(e.proxy, f.name)[indices] for f in fields(e.proxy))),
                              PayloadParamsX(*(getattr(e.payload, f.name)[indices] for f in fields(e.payload))),
-                             *(getattr(e, f.name)[indices] for f in fields(e)[2:-3]),
+                             *(getattr(e, f.name)[indices] for f in fields(e)[2:-4]),
                              YAMParameters(*(value[indices] for value in e.yam)),
-                             RGBParameters(*(value[indices] for value in e.rgb)), e.torsion)
+                             RGBParameters(*(value[indices] for value in e.rgb)), e.torsion, e.neck_damping)

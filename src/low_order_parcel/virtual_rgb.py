@@ -166,8 +166,9 @@ class VirtualRGBProjector:
         return box, clearance, valid
 
     def step(self, state: PayloadState, wrist_camera: CameraPose, arm_A_fk: Tensor,
-             lift_active: Tensor, *, exterior_height: Tensor | None = None) -> RGBObservation:
-        """Project one physics sample. FK is the known Arm A gripper center [B,3]."""
+             lift_active: Tensor, *, exterior_height: Tensor | None = None,
+             lift_travel_m: float | Tensor | None = None) -> RGBObservation:
+        """Project one sample. Without height calibration, the default lift window is 25 mm."""
         p = self.params
         vertices = self.vertices(state)
         positions = torch.stack((self.top_camera.position, wrist_camera.position), dim=1)
@@ -201,13 +202,19 @@ class VirtualRGBProjector:
         self._lifting = lift_active & (self._lifting | start)
         delta_y, ee_y, lift_z = (working - self._lift_origin).split(1, dim=1)
         ratio = (delta_y * ee_y.sign() / ee_y.abs().clamp_min(1e-6)).clamp(0., 1.5)
-        in_window = (lift_z >= 0.) & (lift_z <= .025 + 1e-6) & (ee_y.abs() > 1e-6)
+        in_window = (lift_z >= 0.) & (ee_y.abs() > 1e-6)
         if exterior_height is not None:
             silhouette = torch.cat((.5*(lo[:,0] + hi[:,0]), hi[:,0,:1]-lo[:,0,:1]), dim=1)
             self._reference_box = torch.where(start, silhouette, self._reference_box)
             ratio, in_window = monocular_lift_ratio(
                 self._reference_box, silhouette, lift_z, exterior_height,
                 self.top_camera.position[:,2:3], self.top_camera.world_from_camera[:,2,:])
+        elif lift_travel_m is None:
+            lift_travel_m = .025
+        if isinstance(lift_travel_m, Tensor):
+            lift_travel_m = lift_travel_m.reshape(-1, 1)
+        if lift_travel_m is not None:
+            in_window = in_window & (lift_z <= lift_travel_m + 1e-6)
         update_ratio = self._lifting & in_window & top_exposed
         self._gamma = torch.where(start | ~lift_active, 0., torch.where(update_ratio, ratio, self._gamma))
 

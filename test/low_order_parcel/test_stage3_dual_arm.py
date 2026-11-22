@@ -403,6 +403,27 @@ class HardwareTests(unittest.TestCase):
               f"wrist depths {after.wrist_target_rel[:, 2].tolist()} m", flush=True)
 
     @torch.inference_mode()
+    def test_rgb_lift_window_is_configurable_per_environment(self):
+        sim = fixture("rigid_box", "rigid_box")
+        default, explicit, adaptive = (rgb_projector(sim.payload) for _ in range(3))
+        state = sim.initial_state().payload
+        wrist = camera((0., -.30, .045), WRIST, 2)
+        fk = tensor([0., -.010, .034]).expand(2, -1)
+        lift = torch.ones(2, dtype=torch.bool, device=DEVICE)
+        for sensor in (default, explicit, adaptive):
+            sensor.step(state, wrist, fk, lift)
+        rise = tensor([[0., 0., .045], [0., 0., 0.]])
+        moved = state._replace(pos=state.pos + rise[:, None])
+        fk = fk + tensor([0., 0., .050])
+        old = default.step(moved, wrist, fk, lift)
+        fixed = explicit.step(moved, wrist, fk, lift, lift_travel_m=.025)
+        new = adaptive.step(moved, wrist, fk, lift, lift_travel_m=tensor([.060, .080]))
+        self.assertTrue(all(torch.equal(a, b) for a, b in zip(old, fixed, strict=True)))
+        self.assertTrue((old.vis_lift_ratio == 0.).all())
+        self.assertGreater(new.vis_lift_ratio[0].item(), .60)
+        self.assertEqual(new.vis_lift_ratio[1].item(), 0.)
+
+    @torch.inference_mode()
     def test_rgb_delay_dropout_near_field_fov_and_partial_reset(self):
         sim = fixture("rigid_box", "rigid_box")
         delays = torch.tensor([[[30], [60]], [[0], [0]]], device=DEVICE)
