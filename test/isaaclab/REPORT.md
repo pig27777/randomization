@@ -287,3 +287,5 @@ VBD没有MuJoCo式的粒子`connect`等式，本线将布料三角片上的重�
 本轮结果。ABC 620 mm 双臂场景、静态桌面、I2RT 关节与 CAD 光学和指垫帧均读回通过。两臂 270° 初始姿态验证通过，20 个子步后四个指垫仍离台 104.86–106.52 mm。台面精确为 0。CPU/GPU 帧换算一致。[任务检查](../../reports/route-b-abc-scene-test.md)
 
 Fix 4.1 冻结后的 Step 0 复验通过，两向 CUDA 均地址一致。单臂 4 路、双臂 4 路和双臂 1,024 路复用 `abc_scene_cfg` 通过 DirectRLEnv 场景检查，台面与环境原点对齐，25 Hz 步进无渲染。[复验范围](../../reports/route-b-abc-scene-test.md)
+
+两臂滑轨扫程发现显式阻尼过大与配合件凸包碰撞。以滑轨质量计算阻尼，并按 linear 4310 配合关系过滤碰撞后，双臂全开约 94.9 mm、闭合 1.21–1.24 mm，稳态空载驱动力峰值 0.319 N。最终资产通过 4 路双臂扫程和 1,024 路无渲染启动。[验证命令及结果](../../reports/route-b-abc-scene-test.md)

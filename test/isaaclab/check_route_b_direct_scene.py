@@ -9,18 +9,24 @@ from isaaclab.app import add_launcher_args, launch_simulation
 from isaaclab.envs import DirectRLEnv, DirectRLEnvCfg
 from isaaclab_physx.physics import PhysxCfg
 
-from src.isaac_yam_parcel.yam_scene import YamSceneFrames, abc_scene_cfg, load_scene
+from src.isaac_yam_parcel.yam_scene import RAIL_JOINTS, YamSceneFrames, abc_scene_cfg, load_scene
 
 
 class SceneCheckEnv(DirectRLEnv):
+    rail_target = None
+
     def _pre_physics_step(self, actions):
         self.substeps = 0
 
     def _apply_action(self):
         self.substeps += 1
         for robot in self.scene.articulations.values():
-            robot.actuators.target_command.set_position_index(
-                value=robot.data.default_joint_pos.torch, full_data=True)
+            target = robot.data.default_joint_pos.torch
+            if self.rail_target is not None:
+                target = target.clone()
+                rails = [robot.joint_names.index(name) for name in RAIL_JOINTS]
+                target[:, rails] = self.rail_target
+            robot.actuators.target_command.set_position_index(value=target, full_data=True)
 
     def _reset_idx(self, env_ids):
         super()._reset_idx(env_ids)
@@ -88,11 +94,42 @@ def check(env, dual_arm):
                 sensors=len(env.scene.sensors), minimum_pad_height_m=minimum_height)
 
 
+def read_rail_stroke(env):
+    from isaaclab.utils.math import quat_apply_inverse
+
+    scene = load_scene()
+    arms = []
+    for name, robot in env.scene.articulations.items():
+        rails = [robot.joint_names.index(joint) for joint in RAIL_JOINTS]
+        frames = YamSceneFrames(scene, robot.body_names, robot.data.body_link_pose_w.torch)
+        wrist = robot.body_names.index(scene["wrist_camera"]["parent"])
+        arms.append((name, robot, rails, frames, wrist))
+    zero = torch.zeros((env.num_envs, env.cfg.action_space), device=env.device)
+    readings = []
+    for target in [-.04695, -.040, -.025, -.015, -.005, 0., -.04695]:
+        env.rail_target = target
+        for _ in range(35):
+            env.step(zero)
+        for name, robot, rails, frames, wrist in arms:
+            poses = robot.data.body_link_pose_w.torch
+            _, pads = frames.wrist_camera_and_pads(poses, env.scene.env_origins)
+            aperture = quat_apply_inverse(poses[:, wrist, 3:], pads[:, 1] - pads[:, 0])[:, 1]
+            effort = robot.actuators.applied_effort.torch[:, rails]
+            error = (robot.data.joint_pos.torch[:, rails] - target).abs()
+            row = dict(arm=name, target_mm=1000 * target, aperture_mm=1000 * aperture[0].item(),
+                       maximum_rail_error_mm=1000 * error.max().item(), maximum_effort_N=effort.abs().max().item())
+            assert (aperture - (.001101 - 2. * target)).abs().max() < .0008, row
+            assert row["maximum_rail_error_mm"] < .5 and row["maximum_effort_N"] < .6, row
+            readings.append(row)
+    return readings
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--headless", action="store_true")
     parser.add_argument("--dual-arm", action="store_true")
     parser.add_argument("--num-envs", type=int, default=4)
+    parser.add_argument("--rail-stroke", action="store_true")
     add_launcher_args(parser)
     parser.set_defaults(visualizer=[], livestream=0)
     args = parser.parse_args()
@@ -101,13 +138,15 @@ def main():
     cfg = DirectRLEnvCfg(
         sim=sim_utils.SimulationCfg(device="cuda:0", dt=.002, render_interval=20, physics=PhysxCfg()),
         scene=abc_scene_cfg(args.num_envs, dual_arm=args.dual_arm),
-        seed=17, decimation=20, episode_length_s=1., action_space=14 if args.dual_arm else 7,
+        seed=17, decimation=20, episode_length_s=10., action_space=14 if args.dual_arm else 7,
         observation_space=8,
     )
     with launch_simulation(cfg.sim, args):
         env = SceneCheckEnv(cfg)
         try:
             print("ABC_DIRECT_SCENE_PASS " + json.dumps(check(env, args.dual_arm)), flush=True)
+            if args.rail_stroke:
+                print("ABC_RAIL_STROKE " + json.dumps(read_rail_stroke(env)), flush=True)
         finally:
             env.close()
 

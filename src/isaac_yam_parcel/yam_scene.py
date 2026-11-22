@@ -45,6 +45,22 @@ def prepare_urdf(source: Path, destination: Path, scene):
     ET.ElementTree(root).write(destination, encoding="utf-8", xml_declaration=True)
 
 
+def filter_gripper_collisions(usd):
+    """Exclude the mating rail housings as in linear 4310, keeping pad-to-pad contact."""
+    from pxr import Usd, UsdPhysics
+
+    stage = Usd.Stage.Open(str(usd))
+    shapes = {prim.GetName(): prim for prim in stage.Traverse() if prim.HasAPI(UsdPhysics.CollisionAPI)}
+    for parent, mates in (
+        ("gripper_1", ("tip_left_1", "tip_right_1", "tip_left_pad", "tip_right_pad")),
+        ("tip_left_1", ("tip_right_1", "tip_right_pad")),
+        ("tip_right_1", ("tip_left_pad",)),
+    ):
+        exclude = UsdPhysics.FilteredPairsAPI.Apply(shapes[parent]).CreateFilteredPairsRel()
+        exclude.SetTargets([shapes[mate].GetPath() for mate in mates])
+    stage.GetRootLayer().Save()
+
+
 def _xyz(values):
     return " ".join(map(str, values))
 
@@ -76,7 +92,8 @@ def arm_cfg(index, scene, usd, prim_path):
         actuators={
             "proximal": drive(ARM_JOINTS[:3], 80., 5., 28.),
             "distal": drive(ARM_JOINTS[3:], 10., 1.5, 10.),
-            "rails": drive(RAIL_JOINTS, 1000., 75., 50.),
+            # Near critical for the 69.657 g URDF sliders at 2 ms with explicit PD.
+            "rails": drive(RAIL_JOINTS, 1000., 16.7, 50.),
         },
     )
 
@@ -170,4 +187,5 @@ if __name__ == "__main__":
         urdf = Path(scratch) / "yam.urdf"
         prepare_urdf(args.urdf, urdf, load_scene())
         asset = Converter(layer_structure=False, scene=False).convert(urdf, args.output_dir)
+        filter_gripper_collisions(asset.path)
         print(asset.path, flush=True)

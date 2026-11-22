@@ -9,3 +9,4 @@
 | route-b-step0-r1 | ubun RTX 5090。Isaac Lab 原生 PhysX 与冻结包裹双向 CUDA 缓冲区检查通过。YAM 指垫几何与双臂、腕相机标定待补齐。 | [计划](../../isaaclab/REPORT.md#路线-b-step-02026-11-22ubun) · [检查](../../../reports/route-b-step0-test.md) · [日志](isaaclab/route-b-step0-r1/) |
 | route-b-abc-scene-r1 | ubun RTX 5090。ABC 静态桌面与两台 I2RT YAM 的 2 ms 装配入口通过。 | [计划](../../isaaclab/REPORT.md#路线-b--abc-场景外参2026-11-22ubun) · [验收](../../../reports/route-b-abc-scene-test.md) · [日志](isaaclab/route-b-abc-scene-r1/) |
 | route-b-fix41-r1 | ubun RTX 5090。Fix 4.1 功率共轭膜颈阻尼与默认 25 mm 视觉兼容。能量、固定轨迹、相图和回归全部通过。 | [计划](../../low_order_parcel/STAGE34_REPORT.md) · [冻结检查](../../../reports/route-b-fix41-test.md) · [日志](bag/route-b-fix41-r1/) |
+| route-b-fix41-step0-r1 | ubun RTX 5090。冻结版 CUDA 复验、ABC 单臂 / 双臂场景复制与双臂空载滑轨扫程通过，最终场景已复验 1,024 路。 | [检查](../../../reports/route-b-abc-scene-test.md) · [日志](isaaclab/route-b-fix41-step0-r1/) |
