@@ -163,7 +163,7 @@ class VirtualRGBProjector:
         return box, clearance, valid
 
     def step(self, state: PayloadState, wrist_camera: CameraPose, arm_A_fk: Tensor,
-             lift_active: Tensor) -> RGBObservation:
+             lift_active: Tensor, *, lift_travel_m: float | Tensor = .025) -> RGBObservation:
         """Project one physics sample. FK is the known Arm A gripper center [B,3]."""
         p = self.params
         vertices = self.vertices(state)
@@ -198,7 +198,9 @@ class VirtualRGBProjector:
         self._lifting = lift_active & (self._lifting | start)
         delta_y, ee_y, lift_z = (working - self._lift_origin).split(1, dim=1)
         ratio = (delta_y * ee_y.sign() / ee_y.abs().clamp_min(1e-6)).clamp(0., 1.5)
-        in_window = (lift_z >= 0.) & (lift_z <= .025 + 1e-6) & (ee_y.abs() > 1e-6)
+        if isinstance(lift_travel_m, Tensor):
+            lift_travel_m = lift_travel_m.reshape(-1, 1)
+        in_window = (lift_z >= 0.) & (lift_z <= lift_travel_m + 1e-6) & (ee_y.abs() > 1e-6)
         update_ratio = self._lifting & in_window & top_exposed
         self._gamma = torch.where(start | ~lift_active, 0., torch.where(update_ratio, ratio, self._gamma))
 

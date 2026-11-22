@@ -7,6 +7,7 @@ from torch import Tensor
 
 from .lumped_contact_proxy import ContactInputs, ContactState, EPS, LumpedContactProxy
 from .macro_parcel_sim import ParcelAction
+from .neck_damping import NeckDamping, NeckDampingParams
 from .pad_torsion import PadTorsion, PadTorsionParams, TorsionState
 from .unified_payload import DT, PayloadState, UnifiedPayloadTemplate
 
@@ -45,7 +46,8 @@ class DualArmParcelSim:
     def __init__(self, proxy_A: LumpedContactProxy, proxy_B: LumpedContactProxy,
                  payload: UnifiedPayloadTemplate, *, F_half: Tensor | float = 0.,
                  T_tear: Tensor | float | None = None, mount_xy: Tensor | None = None,
-                 generator: torch.Generator | None = None, torsion: PadTorsionParams | None = None):
+                 generator: torch.Generator | None = None, torsion: PadTorsionParams | None = None,
+                 neck_damping: NeckDampingParams | None = None):
         like = payload.params.total_mass
         if like.dtype != torch.float32 or any(
                 proxy.dt != DT or proxy.params.S_bag.shape != like.shape
@@ -72,6 +74,7 @@ class DualArmParcelSim:
         self.nominal_reference = torch.stack((proxy_A.params.L0, proxy_B.params.L0), dim=1)
         mu = torch.stack((proxy_A.params.mu_eff, proxy_B.params.mu_eff), dim=1)
         self.torsion = None if torsion is None else PadTorsion(like, mu, self.dt, torsion)
+        self.neck = None if neck_damping is None else NeckDamping(like, mu, self.dt, neck_damping)
 
     def _batch_parameter(self, value, name, low, high):
         value = torch.as_tensor(value, dtype=self.mass.dtype, device=self.mass.device)
@@ -261,6 +264,14 @@ class DualArmParcelSim:
         tension = torch.where(live, tension, 0.)
         rope_force = torch.stack((result_A.force, result_B.force), dim=1)
         rope_force = torch.where(live.unsqueeze(-1), rope_force, 0.)
+        neck_torque = None
+        if self.neck is not None and self.neck.enabled:
+            pad_rate = None if jaw_angular_velocity is None else jaw_angular_velocity.repeat_interleave(2, dim=1)
+            neck = self.neck.payload(payload, compressed, self.mount_weights, tip.flatten(1, 2),
+                                     anchors.flatten(1, 2), vel.flatten(1, 2), anchor_vel.flatten(1, 2),
+                                     prior.flatten(1, 2), next_contacts.flatten(1, 2), normal.flatten(1), pad_rate)
+            rope_force = rope_force + neck.force.unflatten(1, (2, 2))
+            neck_torque = neck.pad_couple.unflatten(1, (2, 2)).sum(dim=2)
         rope_load, _ = payload.distribute_anchor_forces(compressed, self.mount_weights, rope_force.flatten(1, 2))
         up = up[:, None]
         contact_load = jaw_load + side_load - extra_press.unsqueeze(-1) * payload.up
@@ -278,6 +289,8 @@ class DualArmParcelSim:
 
         reaction = (-rope_force - contact_load + surface_pad.unsqueeze(-1) * up[:, None])
         torque = torch.linalg.cross(tip - tip.mean(dim=2, keepdim=True), reaction).sum(dim=2)
+        if neck_torque is not None:
+            torque = torque + neck_torque
         if self.torsion is not None:
             torque = torque - pad_torque
         wrench = torch.cat((reaction.sum(dim=2), torque), dim=-1)
