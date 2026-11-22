@@ -1224,3 +1224,9 @@ C6 仅 12/512，Step 3 熔断。 [测试报告](../reports/stage4-policy1-traini
 RTX 5090 上原生 Isaac Lab PhysX 与冻结包裹核完成 2 ms 设备张量互操作，双向共享 CUDA 地址。
 原始 YAM URDF 缺碰撞体与腕相机帧，双臂工位外参待补齐。
 Step 1 暂停在资产门禁。[盘点与复现](../reports/route-b-step0-test.md)
+
+### 2026-11-22 · 路线 B ABC 场景
+
+双臂基座中心距 620 mm，台面精确归零，URDF 转换和线性夹爪光学／指垫帧通过 GPU 装配检查。
+两臂 270° 初态读回通过，20 子步后四指垫高度为 104.86–106.52 mm。
+后续 Isaac 环境共用场景配置、装配与帧换算入口。[测试报告](../reports/route-b-abc-scene-test.md)

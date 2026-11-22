@@ -7,3 +7,4 @@
 | stage4-policy1-replay-r2 | ubun RTX 5090。原 4,096 路角点成功数完全复现，C3／C6 对照录像已播放。 | [检查](../../../reports/stage4-policy1-replay-test.md) · [视频与轨迹](policy/stage4-policy1-replay-r2/) |
 | stage4-c6-sway-audit-r1 | ubun。复算同一 C3/C6 录像，C6 末段持续捕获且包裹与夹爪存在横向相对摆动。 | [报告](../../../reports/stage4-c6-sway-test.md) · [图与数据](policy/stage4-c6-sway-audit-r1/) |
 | route-b-step0-r1 | ubun RTX 5090。Isaac Lab 原生 PhysX 与冻结包裹双向 CUDA 缓冲区检查通过。YAM 指垫几何与双臂、腕相机标定待补齐。 | [计划](../../isaaclab/REPORT.md#路线-b-step-02026-11-22ubun) · [检查](../../../reports/route-b-step0-test.md) · [日志](isaaclab/route-b-step0-r1/) |
+| route-b-abc-scene-r1 | ubun RTX 5090。ABC 静态桌面与两台 I2RT YAM 的 2 ms 装配入口通过。 | [计划](../../isaaclab/REPORT.md#路线-b--abc-场景外参2026-11-22ubun) · [验收](../../../reports/route-b-abc-scene-test.md) · [日志](isaaclab/route-b-abc-scene-r1/) |
