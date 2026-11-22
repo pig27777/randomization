@@ -1208,3 +1208,8 @@ SNH通过mjSpec编译并保存完整MJB；网格/本构属于新B，不沿用旧
 Fix 4 干净分支完成 4,096 路、30 轮 Policy 1 训练，RTX 5090 用时 26.37 分钟。
 全宽成功 367/4,096，固定 25 mm 末帧净空全部为 0，补救 0/1,838。
 C6 仅 12/512，Step 3 熔断。 [测试报告](../reports/stage4-policy1-training-test.md)
+
+### 2026-11-22 · Policy 1 轨迹回放
+
+原 4,096 路角点结果完全复现。C3 稳悬与 C6 离台后稳悬失败的对照视频已播放。
+两条轨迹的微提拉净空均为 0 mm。[录像检查](../reports/stage4-policy1-replay-test.md)
