@@ -1213,3 +1213,8 @@ C6 仅 12/512，Step 3 熔断。 [测试报告](../reports/stage4-policy1-traini
 
 原 4,096 路角点结果完全复现。C3 稳悬与 C6 离台后稳悬失败的对照视频已播放。
 两条轨迹的微提拉净空均为 0 mm。[录像检查](../reports/stage4-policy1-replay-test.md)
+
+### 2026-11-22 · C6 录像归因
+
+末段双指保持捕获，C6 包裹横向摆幅峰峰值 29.45 mm，夹爪仅 1.53 mm。66/75 个速度区间达到或超过 20 mm/s。
+[摆动报告与复算](../reports/stage4-c6-sway-test.md)
