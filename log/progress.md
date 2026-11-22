@@ -1218,3 +1218,9 @@ C6 仅 12/512，Step 3 熔断。 [测试报告](../reports/stage4-policy1-traini
 
 末段双指保持捕获，C6 包裹横向摆幅峰峰值 29.45 mm，夹爪仅 1.53 mm。66/75 个速度区间达到或超过 20 mm/s。
 [摆动报告与复算](../reports/stage4-c6-sway-test.md)
+
+### 2026-11-22 · 路线 B Step 0
+
+RTX 5090 上原生 Isaac Lab PhysX 与冻结包裹核完成 2 ms 设备张量互操作，双向共享 CUDA 地址。
+原始 YAM URDF 缺碰撞体与腕相机帧，双臂工位外参待补齐。
+Step 1 暂停在资产门禁。[盘点与复现](../reports/route-b-step0-test.md)
