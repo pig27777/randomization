@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/scripts/train_stage4_ppo.py", line 325, in <module>
+    train(args)
+    ~~~~~^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/scripts/train_stage4_ppo.py", line 228, in train
+    opt = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/optim/adam.py", line 102, in __init__
+    super().__init__(params, defaults)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/optim/optimizer.py", line 408, in __init__
+    self.add_param_group(cast(dict, param_group))
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_compile.py", line 47, in inner
+    import torch._dynamo
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_dynamo/__init__.py", line 13, in <module>
+    from . import (
+    ...<6 lines>...
+    )
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_dynamo/aot_compile.py", line 15, in <module>
+    from torch._dynamo.convert_frame import GraphRuntimeEnv
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_dynamo/convert_frame.py", line 62, in <module>
+    from torch._dynamo.symbolic_convert import TensorifyState
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_dynamo/symbolic_convert.py", line 54, in <module>
+    from torch._dynamo.exc import ObservedException, TensorifyScalarRestartAnalysis
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_dynamo/exc.py", line 44, in <module>
+    from .utils import counters
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/_dynamo/utils.py", line 70, in <module>
+    import torch.fx.experimental.symbolic_shapes
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/fx/experimental/symbolic_shapes.py", line 3, in <module>
+    import sympy
+ModuleNotFoundError: No module named 'sympy'
