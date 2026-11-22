@@ -37,4 +37,12 @@ flock /tmp/claude-gpu.lock env PYTHONPATH="$route_path" \
   "$native/python.sh" -B test/isaaclab/check_route_b_yam_scene.py --headless --usd "$out/asset/yam.usdc"
 ```
 
-后续环境使用 `table_cfg`、`arm_cfg` 与 `YamSceneFrames` 加载同一场景参数。验证用的 [URDF 转换产物](../test/runs/2026-11-22/isaaclab/route-b-abc-scene-r1/asset/yam.usdc) 已在本机生成。
+后续环境使用 `table_cfg`、`arm_cfg` 与 `YamSceneFrames` 加载同一场景参数。验证用的 [URDF 转换产物](../src/isaac_yam_parcel/assets/yam.usdc) 已在本机生成。
+
+## 冻结版与 DirectRLEnv 场景入口复验
+
+本轮计划。基于 Fix 4.1 标签 `fix4.1-route-b-base` 持锁复验一次原位 CUDA 读写和一次 ABC 双臂 20×2 ms 自由空间检查，再以 `abc_scene_cfg` 分别启动一次 4 路单臂和 4 路双臂的无渲染 DirectRLEnv。检查每路桌面上表面、双臂基座与环境原点、腕光学帧、指垫内表面和 25 Hz 步进。通过后将该配置作为路线 B 单臂和双臂的场景入口。
+
+最近验证 2026-11-22 21:21（北京时间）。单臂和双臂各 4 路全部通过，另做一次 1,024 路双臂场景启动检查。每个环境的桌面为静态碰撞体，上表面为环境系 `z=0`。扣除克隆环境原点后，基座和腕光学帧符合 ABC／CAD 定义，指垫坐标跨行误差小于 10 µm。每个策略步均执行 20 个 2 ms PhysX 子步，无相机传感器、无 GUI、无离屏渲染。1,024 路的最小指垫离台高度分别为 105.068 和 105.012 mm。[持锁复验日志](../test/runs/2026-11-22/isaaclab/route-b-fix41-step0-r1/)
+
+按上段复现的原生环境再加 `$lab/isaaclab_contrib` 到 `route_path`，运行 `test/isaaclab/check_route_b_direct_scene.py --headless`，可加 `--dual-arm --num-envs 1024`。首次启动发现搬迁后需补上 `isaaclab_contrib`，并改用 v3 的 `cfg.action_space`。PhysX 记录了固定基座关节复制告警，所有基座平移已逐路核对。该版本记录了驱动 CUDA Graph 捕获失败并回退 eager。本轮的结果覆盖场景加载与自由空间，Step 1 的包裹闭环与吞吐另行验收。

@@ -1,6 +1,6 @@
 # 路线 B Step 0 盘点与互操作检查
 
-最近检查 2026-11-22 20:43（北京时间）。**环境和设备张量互操作通过，YAM 资产门禁未通过。**
+最近检查 2026-11-22 21:16（北京时间）。**环境、设备张量互操作与 ABC 仿真工位资产门禁通过。**
 
 ## 原生 Isaac 环境
 
@@ -47,7 +47,7 @@ URDF 统一填 1 的驱动字段与现有仿真配置有差异。项目的 `yam_
 
 [双臂配置](/home/ubuntu/workspace/xzy/manimux/manimux/configs/embodiment/robot/yam_dual.yaml) · [双臂关节预置](/home/ubuntu/workspace/xzy/manimux/manimux/configs/embodiment/initial_poses/yam.yaml) · [单臂工作台布局](../experience/yam_platform/robot.py#L47) · [270° 试验](../docs/PHYSICS_REALISM_AUDIT_REPORT.md#L28)
 
-Step 1 按资产门禁暂停。需要能绑定到 URDF 坐标系的指垫接触帧和碰撞几何，以及腕相机和左右底座相对桌面的 6D 外参。实机纯关节策略须使用经确认的执行限位。CAD/MJCF 可用于准备这些定义，当前工位标定仍空缺。
+初查时缺少 URDF 碰撞体、指垫和工位外参。按用户指定的 ABC 工位补齐后，在冻结提交 `2ef4a394` 持锁复验通过。桌面上表面为 `z=0`，双臂中心距 620 mm，20 个 2 ms 子步后四个指垫内表面离台 104.86–106.52 mm。零拷贝复验读写地址均一致，独立探针速度增量 +8.379996 mm/s，解析值 +8.380000 mm/s。真机部署所需工位实测外参与限位单独确认。[ABC 场景与装配检查](route-b-abc-scene-test.md) · [冻结版复验日志](../test/runs/2026-11-22/isaaclab/route-b-fix41-step0-r1/)
 
 ## 复现
 

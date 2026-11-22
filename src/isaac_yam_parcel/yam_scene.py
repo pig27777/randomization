@@ -8,6 +8,7 @@ from xml.etree import ElementTree as ET
 
 
 SCENE_FILE = Path(__file__).resolve().parents[2] / "configs" / "route_b_yam_scene.json"
+YAM_USD = Path(__file__).with_name("assets") / "yam.usdc"
 ARM_JOINTS = tuple(f"joint{i}" for i in range(1, 7))
 RAIL_JOINTS = ("joint7", "joint8")
 
@@ -93,6 +94,19 @@ def table_cfg(scene, prim_path):
         init_state=AssetBaseCfg.InitialStateCfg(pos=tuple(table["center_m"])),
     )
 
+
+def abc_scene_cfg(num_envs, *, dual_arm, usd=YAM_USD, env_spacing=2.0):
+    """Use the same ABC workcell in single- and dual-arm DirectRLEnv batches."""
+    from isaaclab.scene import InteractiveSceneCfg
+
+    usd = Path(usd).resolve(strict=True)
+    scene = load_scene()
+    cfg = InteractiveSceneCfg(num_envs=num_envs, env_spacing=env_spacing)
+    cfg.table = table_cfg(scene, "{ENV_REGEX_NS}/Table")
+    cfg.arm_a = arm_cfg(0, scene, usd, "{ENV_REGEX_NS}/Yam_A")
+    if dual_arm:
+        cfg.arm_b = arm_cfg(1, scene, usd, "{ENV_REGEX_NS}/Yam_B")
+    return cfg
 
 
 class YamSceneFrames:
