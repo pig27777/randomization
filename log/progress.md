@@ -1218,3 +1218,9 @@ C6 仅 12/512，Step 3 熔断。 [测试报告](../reports/stage4-policy1-traini
 
 末段双指保持捕获，C6 包裹横向摆幅峰峰值 29.45 mm，夹爪仅 1.53 mm。66/75 个速度区间达到或超过 20 mm/s。
 [摆动报告与复算](../reports/stage4-c6-sway-test.md)
+
+### 2026-11-22 · Fix 4.1 Phase 0
+
+C6 腕部横向阻尼比 1.302，末段腕部与包裹同为约 1.645 Hz。
+CPU 核对 C1、C7 连续稳悬 0.144 s、1.854 s，C8 实际侧抓。
+横向力配对并按原速度另加平衡力矩可注入 0.105 mJ，Phase 1 暂停确认功率定义。[定量诊断](../reports/stage4-fix41-phase0-test.md)

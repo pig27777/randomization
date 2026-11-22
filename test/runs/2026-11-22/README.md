@@ -6,3 +6,4 @@
 | stage4-policy1-ours-s17 | ubun RTX 5090。Step 2 30 轮完成，留出成功 367/4,096，Step 3 熔断。 | [计划](../../low_order_parcel/STAGE34_REPORT.md#stage-4-step-22026-11-22ubun) · [检查](../../../reports/stage4-policy1-training-test.md) · [数据](policy/stage4-policy1-ours-s17/) |
 | stage4-policy1-replay-r2 | ubun RTX 5090。原 4,096 路角点成功数完全复现，C3／C6 对照录像已播放。 | [检查](../../../reports/stage4-policy1-replay-test.md) · [视频与轨迹](policy/stage4-policy1-replay-r2/) |
 | stage4-c6-sway-audit-r1 | ubun。复算同一 C3/C6 录像，C6 末段持续捕获且包裹与夹爪存在横向相对摆动。 | [报告](../../../reports/stage4-c6-sway-test.md) · [图与数据](policy/stage4-c6-sway-audit-r1/) |
+| stage4-fix41-phase0-r1 | ubun。复算冻结录像、训练汇总、腕部和回报，CPU 各回放 C1/C7/C8 一路。GPU 未获得锁。膜颈横向力矩的离散反例已复算，暂停进入 Phase 1。 | [计划](../../low_order_parcel/STAGE34_REPORT.md#fix-41-phase-02026-11-22ubun) · [检查](../../../reports/stage4-fix41-phase0-test.md) · [CPU 输出](policy/stage4-fix41-phase0-r1/cpu.log) |
