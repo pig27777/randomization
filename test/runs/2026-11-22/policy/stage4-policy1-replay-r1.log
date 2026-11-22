@@ -1,0 +1,23 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/test/low_order_parcel/replay_stage4_policy1.py", line 167, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/test/low_order_parcel/replay_stage4_policy1.py", line 162, in main
+    trace, stages, half = record(args.checkpoint_directory, args.output)
+                          ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/test/low_order_parcel/replay_stage4_policy1.py", line 62, in record
+    obs = env.reset()
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/.venv-physical-parcel/stage3-cu130/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/src/low_order_parcel/envs/pick_to_air_env.py", line 17, in reset
+    self._setup()
+    ~~~~~~~~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/src/low_order_parcel/envs/_parcel_env.py", line 119, in _setup
+    self.history = self.zeros(self.frames, self.seq_size)
+                   ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-stage4-fix4/src/low_order_parcel/envs/_parcel_env.py", line 85, in zeros
+    return self.mass.new_zeros((self.batch, *shape))
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+TypeError: new_zeros(): argument 'size' failed to unpack the object at pos 2 with error "type must be tuple of ints,but got list"

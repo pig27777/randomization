@@ -3,7 +3,6 @@
 import torch
 
 from ._parcel_env import ParcelEnv, columns, has_grasp, phase_encoding, scaled, select, smooth
-from ..lift_probe import PROBE_RAMP_S, PROBE_SETTLE_S, probe_height
 from ..lumped_contact_proxy import ContactState
 from ..rl.asymmetric_ppo import PICK_DECISIONS
 from ..unified_payload import DT
@@ -24,6 +23,8 @@ class PickToAirEnv(ParcelEnv):
         self.load_reference = self.zeros()
         self.force_previous = self.zeros()
         self.slipped = self.flags()
+        self.phase_b_clearance_m = self.zeros()
+        self.phase_b_false_grasp = self.flags()
         self.rescue_pending = self.flags()
         self.rescued = self.flags()
         self.grasp_force = self.zeros()
@@ -49,20 +50,14 @@ class PickToAirEnv(ParcelEnv):
         z = force[:, 2] * sign
         reference = self.load_reference.abs().clamp_min(.25)
         error = self.sensed.position_error[:, 0]
-        load_feature = z.abs() / target.clamp_min(.25)
-        gamma = self.rgb.vis_lift_ratio
-        if phase == 1:
-            # Positive for extra downward wrist load relative to the closed grasp.
-            load_feature = (self.load_reference - force[:, 2]) / target.clamp_min(.25)
-            gamma = torch.where(self.rgb.vis_lift_valid, gamma, -1.)
         features = columns(phase_encoding(torch.full_like(self.phase, phase), 3),
                            (z / reference).clamp(-.5, 2.),
                            ((z - self.force_previous) / reference).clamp(-2., 2.),
                            (force[:, :2].norm(dim=1) / z.abs().clamp_min(.25)).clamp(0., 3.),
                            error[:, 2], error[:, :2].norm(dim=1),
-                           load_feature.clamp(-3., 3.),
+                           (z.abs() / target.clamp_min(.25)).clamp(0., 3.),
                            self.sensed.opening[:, 0], self.sensed.gripper_current[:, 0],
-                           gamma)
+                           self.rgb.vis_lift_ratio)
         self._record(features, mask)
         self.force_previous = select(mask, z, self.force_previous)
 
@@ -70,14 +65,14 @@ class PickToAirEnv(ParcelEnv):
         self._clear_history(active)
         safe = self.command.center.clone()
         safe[:, 0, 2] = .25
-        start = self.command
+        start = self._command_snapshot()
         for i in range(130):
             center = torch.lerp(start.center, safe, smooth(self.vector(i / 129.)))
             self._tick(start._replace(center=center, grip=self.zeros(2), half_span=self.zeros(2) + .04,
                                       feed=self.zeros(2), side=self.zeros(2).bool()), active)
         self.tare = select(active, self.sensed.force, self.tare)
         safe[:, 0, :2] = self.rgb.top_box[:, :2]
-        start = self.command
+        start = self._command_snapshot()
         for i in range(113):
             self._tick(start._replace(center=torch.lerp(start.center, safe, smooth(self.vector(i / 112.)))),
                        active)
@@ -151,7 +146,7 @@ class PickToAirEnv(ParcelEnv):
         gather = torch.where(side, scaled(b, .012, .045), scaled(b, .012, .050))
         press = scaled(a, .30, 6.)
         entry_z = torch.where(side, self.height + scaled(a, -.010, .018), self.height - .004).clamp_min(.004)
-        origin = self.command
+        origin = self._command_snapshot()
         start_half = origin.half_span[:, 0]
         open_half = torch.where(side, .045, .048)
         close_half = (open_half - gather).clamp_min(.005)
@@ -191,17 +186,20 @@ class PickToAirEnv(ParcelEnv):
         self.load_reference = select(active, self.sensed.force[:, 0, 2] - self.tare[:, 0, 2],
                                      self.load_reference)
         self.force_previous = select(active, self.load_reference.abs(), self.force_previous)
-        slip_start = self.state.contacts_A[..., ContactState.SLIP_CUM]
-        origin = self.command
-        stroke = probe_height(self.height)
-        for i in range(round((PROBE_RAMP_S + PROBE_SETTLE_S) / DT)):
+        slip_start = self.state.contacts_A[..., ContactState.SLIP_CUM].clone()
+        origin = self._command_snapshot()
+        for i in range(275):
             center = origin.center.clone()
-            center[:, 0, 2] += stroke * min(i * DT / PROBE_RAMP_S, 1.)
-            self._tick(origin._replace(center=center), active, lift=True, exterior_height=self.height[:, None])
+            center[:, 0, 2] += .025 * smooth(self.vector(i * DT / .40))
+            self._tick(origin._replace(center=center), active, lift=True)
             if i % 10 == 0:
                 self._sequence(1, active & self.sensed.valid[:, 0, 0], self.grasp_force)
-        slip = (self.state.contacts_A[..., ContactState.SLIP_CUM] - slip_start).amax(dim=1) > .002
-        self.slipped = select(active, slip | ~has_grasp(self.state.contacts_A), self.slipped)
+        per_pad_slip = self.state.contacts_A[..., ContactState.SLIP_CUM] - slip_start > .002
+        virtual_grasp = ~has_grasp(self.state.contacts_A)
+        self.phase_b_clearance_m = select(active, self.result.table_clearance[:, 0], self.phase_b_clearance_m)
+        self.phase_b_false_grasp = select(active, virtual_grasp | (per_pad_slip.sum(dim=1) == 1),
+                                          self.phase_b_false_grasp)
+        self.slipped = select(active, per_pad_slip.any(dim=1) | virtual_grasp, self.slipped)
         progress_reward = peak_progress - self.best_progress
         self.best_progress = peak_progress
         self.phase = torch.where(active, 1, self.phase)
@@ -215,7 +213,7 @@ class PickToAirEnv(ParcelEnv):
         boost = decision == 1
         self.rescue_pending |= active & self.slipped & (boost | retry)
         self._clear_history(active)
-        origin = self.command
+        origin = self._command_snapshot()
         streak = torch.zeros_like(self.attempts)
         was_airborne = self.flags()
         if lift.any():

@@ -15,6 +15,7 @@ from ..pad_torsion import rotation_quaternion
 from ..rl.asymmetric_ppo import Observation
 from ..unified_payload import DT
 from ..virtual_rgb import CameraPose, VirtualRGBProjector
+from ._tick_graph import TickGraph
 
 
 class Command(NamedTuple):
@@ -61,12 +62,16 @@ def phase_encoding(phase, count):
 class ParcelEnv:
     frames = 28
 
-    def __init__(self, episode, *, seed=347):
+    def __init__(self, episode, *, seed=347, cuda_graph=False):
         self.episode = episode
         self.mass = episode.payload.total_mass
         self.batch = len(self.mass)
         self.device = self.mass.device
         self.seed = seed
+        self.cuda_graph = cuda_graph and self.device.type == "cuda"
+        self._wrist_mount = self.vector([0., .015, .015])
+        self._damping = self.vector([12., 12., 28.])
+        self._pad_sign = self.vector([-1., 1.])[None, None, :, None]
         self.up = self.vector([0., 0., 1.])
         self.along = self.vector([0., 1., 0.])
         self.eye_x = self.vector([1., 0., 0.])
@@ -115,6 +120,9 @@ class ParcelEnv:
         self.valid = torch.zeros_like(self.history[..., 0], dtype=torch.bool)
         self.cursor = torch.zeros_like(self.phase)
         self.enabled = self.arm_mask
+        self.physics_ticks = torch.zeros_like(self.attempts)
+        self._graph = None
+        self._warm_tick = False
 
     def _idle(self, center, *, grip=None, half_span=None):
         return Command(center, self.zeros(2) + .04 if half_span is None else half_span,
@@ -122,15 +130,28 @@ class ParcelEnv:
                        self.zeros(2).bool(), self.zeros(2, 3),
                        self.vector([90., 90., 650.]).expand_as(center))
 
-    def _tick(self, requested, active, *, lift=False, exterior_height=None):
+    def _tick(self, requested, active, *, lift=False):
+        if not self.cuda_graph or not self._warm_tick:
+            self._tick_eager(requested, active, lift)
+            self._warm_tick = True
+            return
+        lift_mask = active if lift else self._no_lift
+        if self._graph is None:
+            self._graph = TickGraph(self, requested, active, lift_mask)
+        self._graph.step(requested, active, lift_mask)
+
+    def _command_snapshot(self):
+        return tree_map(torch.Tensor.clone, self.command) if self.cuda_graph else self.command
+
+    def _tick_eager(self, requested, active, lift):
+        self.physics_ticks.add_(active)
         previous = self.command
         cmd = tree_map(lambda new, old: select(active, new, old), requested, previous)
         # Passive wrist load and deflection are part of the mechanical actuator.
         # Software primitives only read the resulting encoder and delayed sensors.
         k = cmd.stiffness
-        damping = self.vector([12., 12., 28.])
         speed = (.25 * self.offset_velocity + DT * (self.load - k * self.offset)) / (
-            .25 + DT * damping + DT**2 * k)
+            .25 + DT * self._damping + DT**2 * k)
         offset = (self.offset + DT * speed.clamp(-.24, .24)).clamp(-.055, .055)
         delta = (offset - self.offset) / DT
         self.offset = select(active, offset, self.offset)
@@ -154,10 +175,10 @@ class ParcelEnv:
         self.command, self.actual, self.result = cmd, actual, out
         self.sensed = self.yam.step(self.load, velocity, -self.up.expand_as(velocity),
                                     cmd.grip[..., None], 2. * cmd.half_span[..., None], actual, cmd.center)
-        wrist = CameraPose(actual[:, 1] + self.vector([0., .015, .015]),
+        wrist = CameraPose(actual[:, 1] + self._wrist_mount,
                            self.wrist_frame.expand(self.batch, -1, -1))
         self.rgb = self.rgb_sensor.step(self.state.payload, wrist, actual[:, 0],
-                                        active & lift, exterior_height=exterior_height)
+                                        active & lift)
         self.torn |= active & self.state.torn_flag.flatten(1).any(dim=1)
 
     def _pad_positions(self, center, half_span, quaternion):
@@ -165,10 +186,11 @@ class ParcelEnv:
         w, x, y, z = quaternion.unbind(dim=-1)
         axis = torch.stack((1. - 2. * (y*y + z*z), 2. * (x*y + w*z), 2. * (x*z - w*y)), dim=-1)
         half = half_span[..., None] * axis
-        return center[:, :, None] + self.vector([-1., 1.])[None, None, :, None] * half[:, :, None]
+        return center[:, :, None] + self._pad_sign * half[:, :, None]
 
     def _start_command(self, command):
         self.command = command
+        self._no_lift = self.flags()
         self.actual = command.center + self.offset
         self.zero_xyz = self.zeros(3)
         self.zero_column = self.zeros(1)
