@@ -150,8 +150,9 @@ class DualArmParcelSim:
         return axis, origin, load.unflatten(1, (2, 2)).unsqueeze(-1) * pad_axis, side, depth
 
     def step(self, state: DualArmState, action: DualArmAction, *,
-             jaw_orientation: Tensor | None = None, jaw_angular_velocity: Tensor | None = None) -> DualArmStep:
-        """Jaw orientation (wxyz) and angular velocity are world-frame, [B,2,4] and [B,2,3]."""
+             jaw_orientation: Tensor | None = None, jaw_angular_velocity: Tensor | None = None,
+             pad_reaction_out: Tensor | None = None, neck_port_mobility=None) -> DualArmStep:
+        """World jaw pose/rate, with optional [B,arm,pad,xyz] articulation reaction buffer."""
         payload, current = self.payload, state.payload
         arm_A, arm_B, enabled, side_feed = action
         enabled = enabled.unsqueeze(-1)
@@ -269,7 +270,8 @@ class DualArmParcelSim:
             pad_rate = None if jaw_angular_velocity is None else jaw_angular_velocity.repeat_interleave(2, dim=1)
             neck = self.neck.payload(payload, compressed, self.mount_weights, tip.flatten(1, 2),
                                      anchors.flatten(1, 2), vel.flatten(1, 2), anchor_vel.flatten(1, 2),
-                                     prior.flatten(1, 2), next_contacts.flatten(1, 2), normal.flatten(1), pad_rate)
+                                     prior.flatten(1, 2), next_contacts.flatten(1, 2), normal.flatten(1), pad_rate,
+                                     neck_port_mobility)
             rope_force = rope_force + neck.force.unflatten(1, (2, 2))
             neck_torque = neck.pad_couple.unflatten(1, (2, 2)).sum(dim=2)
         rope_load, _ = payload.distribute_anchor_forces(compressed, self.mount_weights, rope_force.flatten(1, 2))
@@ -288,6 +290,8 @@ class DualArmParcelSim:
         advanced = payload.step(current, force, surface.depth)
 
         reaction = (-rope_force - contact_load + surface_pad.unsqueeze(-1) * up[:, None])
+        if pad_reaction_out is not None:
+            pad_reaction_out.copy_(reaction)
         torque = torch.linalg.cross(tip - tip.mean(dim=2, keepdim=True), reaction).sum(dim=2)
         if neck_torque is not None:
             torque = torque + neck_torque

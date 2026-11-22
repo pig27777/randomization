@@ -50,7 +50,8 @@ class NeckDamping:
         speed = transverse.norm(dim=-1, keepdim=True)
         return r, length.squeeze(-1), transverse / speed.clamp_min(EPS), speed.squeeze(-1)
 
-    def resolve(self, relative, prev, current, normal, motion, pad_velocity, anchor_velocity, jaw_rate):
+    def resolve(self, relative, prev, current, normal, motion, pad_velocity, anchor_velocity, jaw_rate,
+                articulated_mobility=None):
         r, length, direction, speed = relative
         span = (length - current[..., ContactState.SLACK] - current[..., ContactState.SLIP_CUM]).clamp_min(0.)
         coefficient = self.c / (1. + (span / self.length).square())
@@ -58,7 +59,9 @@ class NeckDamping:
                   & (length > EPS) & (speed > EPS))
         radius = self.mu.flatten(1) * normal.clamp_min(0.)
         magnitude = torch.where(active, torch.minimum(coefficient * speed, radius), 0.)
-        motion = motion + (direction @ direction.transpose(1, 2)) * self.wrist_mobility
+        if articulated_mobility is None:
+            articulated_mobility = (direction @ direction.transpose(1, 2)) * self.wrist_mobility
+        motion = motion + articulated_mobility
         projected_delta = self.dt * (motion @ magnitude.unsqueeze(-1)).squeeze(-1)
         # One common factor prevents concurrent pads from pushing through a slower pad's zero crossing.
         scale = torch.where(active & (projected_delta > speed),
@@ -73,7 +76,7 @@ class NeckDamping:
                                loss)
 
     def payload(self, model, state, weights, tip, anchor, pad_velocity, anchor_velocity,
-                prev, current, normal, jaw_rate=None):
+                prev, current, normal, jaw_rate=None, port_mobility=None):
         if jaw_rate is None:
             jaw_rate = torch.zeros_like(tip)
         relative = self.relative(tip, anchor, pad_velocity, anchor_velocity, jaw_rate)
@@ -87,10 +90,12 @@ class NeckDamping:
         gb = torch.linalg.cross(adjoint, a[:, None])
         jacobian = weights.unsqueeze(-1) * direction.unsqueeze(-2) + torch.stack((-ga, -gb, gb, ga), dim=-2)
         mobility = (jacobian * model.inv_mass[:, None, :, None]).flatten(2) @ jacobian.flatten(2).transpose(1, 2)
-        return self.resolve(relative, prev, current, normal, mobility, pad_velocity, anchor_velocity, jaw_rate)
+        articulated = None if port_mobility is None else port_mobility(relative[0], direction)
+        return self.resolve(relative, prev, current, normal, mobility, pad_velocity, anchor_velocity, jaw_rate,
+                            articulated)
 
     def rigid(self, tip, anchor, pad_velocity, anchor_velocity, prev, current, normal,
-              mass, mounts, inverse_q, inverse_inertia, jaw_rate=None):
+              mass, mounts, inverse_q, inverse_inertia, jaw_rate=None, port_mobility=None):
         if jaw_rate is None:
             jaw_rate = torch.zeros_like(tip)
         relative = self.relative(tip, anchor, pad_velocity, anchor_velocity, jaw_rate)
@@ -98,4 +103,6 @@ class NeckDamping:
         lever = rotate(inverse_q[:, None], torch.linalg.cross(mounts, direction))
         mobility = ((direction @ direction.transpose(1, 2)) / mass[:, :, None]
                     + (lever @ inverse_inertia) @ lever.transpose(1, 2))
-        return self.resolve(relative, prev, current, normal, mobility, pad_velocity, anchor_velocity, jaw_rate)
+        articulated = None if port_mobility is None else port_mobility(relative[0], direction)
+        return self.resolve(relative, prev, current, normal, mobility, pad_velocity, anchor_velocity, jaw_rate,
+                            articulated)
