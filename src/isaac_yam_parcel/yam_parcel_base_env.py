@@ -16,25 +16,26 @@ from src.low_order_parcel.unified_payload import DT
 from src.low_order_parcel.virtual_rgb import VirtualRGBProjector
 
 from .joint_current_filter import JointCurrentEstimatorFilter, JointCurrentParams
-from .yam_scene import abc_scene_cfg, load_scene
+from .yam_scene import abc_scene_cfg, load_scene, load_workcell
 
 
 JOINT_CHANNELS = 7
 OBS_PER_ARM = 57
+PLACE_OBS = 4
 
 
 def yam_parcel_cfg(num_envs, *, dual_arm=False, seed=17, use_newton_actuators=False):
-    scene = abc_scene_cfg(num_envs, dual_arm=dual_arm)
+    # The left arm remains physically in the same workcell during Policy 1.
+    scene = abc_scene_cfg(num_envs, dual_arm=True)
     scene.arm_a.class_type = "src.isaac_yam_parcel.yam_load_port:RailLoadedYam"
-    if dual_arm:
-        scene.arm_b.class_type = scene.arm_a.class_type
+    scene.arm_b.class_type = scene.arm_a.class_type
     arms = 2 if dual_arm else 1
+    obs = arms * OBS_PER_ARM + (PLACE_OBS if dual_arm else 0)
     return DirectRLEnvCfg(
         sim=sim_utils.SimulationCfg(device="cuda:0", dt=DT, render_interval=20, physics=PhysxCfg(),
                                     use_newton_actuators=use_newton_actuators),
         scene=scene, decimation=20, seed=seed, episode_length_s=18.,
-        action_space=arms * JOINT_CHANNELS, observation_space=arms * OBS_PER_ARM,
-        state_space=arms * OBS_PER_ARM + 54 + 24,
+        action_space=arms * JOINT_CHANNELS, observation_space=obs, state_space=obs + 54 + 24,
     )
 
 
@@ -51,7 +52,9 @@ class YAMParcelBaseEnv(DirectRLEnv):
             raise ValueError("The co-simulation must be called on each 2 ms substep.")
         self.render_enabled = self.sim.has_gui
         self.scene_definition = scene = load_scene()
-        self.robots = tuple(self.scene.articulations.values())
+        self.workcell = load_workcell()
+        self.scene_robots = (self.scene["arm_a"], self.scene["arm_b"])
+        self.robots = self.scene_robots[:self.arm_count]
         origin = self.scene.env_origins
         self.ports = tuple(YamLoadPort(robot, scene, origin) for robot in self.robots)
         self.randomizer = DomainRandomizer(self.device, cfg.seed)
@@ -60,8 +63,18 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.episode = episode if self.fixed_episode else self.randomizer.sample(
             self.num_envs, curriculum_alpha=curriculum_alpha)
         self.parcel_sim = self.episode.make_sim()
-        self.parcel_state = self.episode.table_state(self.parcel_sim)
-        self.q_des = [robot.data.default_joint_pos.torch.clone() for robot in self.robots]
+        pick = self.workcell["right_pick"]
+        self.pick_center = origin.new_tensor(pick["center_m"])
+        self.pick_half = origin.new_tensor(pick["sampling_half_xy_m"])
+        place = self.workcell["left_place"]
+        self.place_center = origin.new_tensor(place["center_m"][:2])
+        self.place_half = origin.new_tensor(place["half_xy_m"])
+        handover = self.workcell["center_handover"]
+        self.handover_center = origin.new_tensor(handover["center_m"])
+        self.handover_half = origin.new_tensor(handover["half_extents_m"])
+        self.parcel_state = self._parcel_table_state()
+        self.q_des = [robot.data.default_joint_pos.torch.clone() for robot in self.scene_robots]
+        self.drive_target = [target.clone() for target in self.q_des]
         self.gravity_feedforward = [torch.zeros_like(target) for target in self.q_des]
         self.step_limit = origin.new_tensor([.04] * 6 + [.008])
         self.joint_limits = [robot.data.soft_joint_pos_limits.torch for robot in self.robots]
@@ -79,6 +92,18 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.longest_hold = torch.zeros_like(self.hold)
         self.ever_captured = torch.zeros_like(self.hold, dtype=torch.bool)
         self.ever_airborne = torch.zeros_like(self.ever_captured)
+        self.handover_seen = torch.zeros_like(self.ever_captured)
+        self.left_carrying = torch.zeros_like(self.ever_captured)
+        self.placed_supported = torch.zeros_like(self.ever_captured)
+        self.place_streak = torch.zeros_like(self.hold)
+        self.preload_N = origin.new_zeros((self.num_envs, self.arm_count, 1))
+        self.rail_close = float(self.workcell["gripper"]["close_calibration_m"])
+        # Align the simulation's closing stop to the CAD zero-gap position.
+        # This one-time property write keeps the real source USD and 2 ms loop untouched.
+        for robot in self.scene_robots:
+            rails = robot.data.joint_pos_limits.torch.index_select(1, robot.rail_indices)
+            rails[..., 1] = self.rail_close
+            robot.write_joint_position_limit_to_sim_index(limits=rails, joint_ids=robot.rail_indices)
         self.current_filter = JointCurrentEstimatorFilter(self._current_params(), generator=self.randomizer.rng)
         self.sensed = origin.new_zeros((self.num_envs, self.arm_count, 15))
         self.visual = origin.new_zeros((self.num_envs, self.arm_count, 21))
@@ -97,13 +122,22 @@ class YAMParcelBaseEnv(DirectRLEnv):
         like = self.scene.env_origins.new_empty((self.num_envs, self.arm_count, JOINT_CHANNELS))
         return JointCurrentParams.sample(like, generator=self.randomizer.rng)
 
+    def _parcel_table_state(self):
+        state = self.episode.table_state(self.parcel_sim)
+        shift = self.pick_center.expand(self.num_envs, -1).clone()
+        if not self.fixed_episode:
+            rank = torch.rand((self.num_envs, 2), device=self.device, generator=self.randomizer.rng)
+            shift[:, :2] += (2. * rank - 1.) * self.pick_half
+        return state._replace(payload=state.payload._replace(pos=state.payload.pos + shift[:, None]),
+                              side_origin=state.side_origin + shift[:, None])
+
     def _reset_idx(self, env_ids):
         super()._reset_idx(env_ids)
         mask = torch.zeros_like(self.ever_captured)
         mask[env_ids] = True
-        for i, robot in enumerate(self.robots):
+        for i, robot in enumerate(self.scene_robots):
             q = robot.data.default_joint_pos.torch[env_ids].clone()
-            if not self.fixed_episode:
+            if not self.fixed_episode and i < self.arm_count:
                 q[:, :6] += .01 * torch.rand(q[:, :6].shape, device=self.device, generator=self.randomizer.rng) - .005
             self.q_des[i][env_ids] = q
             robot.rail_load[env_ids] = 0.
@@ -112,7 +146,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
         if not self.fixed_episode:
             self.episode = self.randomizer.resample(self.episode, mask, curriculum_alpha=self.curriculum_alpha)
             self.parcel_sim = self.episode.make_sim()
-        fresh = self.episode.table_state(self.parcel_sim)
+        fresh = self._parcel_table_state()
 
         def reset_tensor(new, old):
             return torch.where(mask.reshape(-1, *([1] * (old.ndim - 1))), new, old)
@@ -123,6 +157,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
             projector.reset(mask, params=self.episode.rgb)
         self.current_filter.reset(mask, self._current_params())
         for buffer in (self.hold, self.longest_hold, self.ever_captured, self.ever_airborne,
+                       self.handover_seen, self.left_carrying, self.placed_supported, self.place_streak, self.preload_N,
                        self.side, self.feed_axis, self.side_feed, self.have_history, self.sensed, self.visual):
             buffer[env_ids] = 0
         self.height[env_ids] = .045
@@ -135,13 +170,19 @@ class YAMParcelBaseEnv(DirectRLEnv):
 
     def _pre_physics_step(self, actions):
         self.actions.copy_(actions.clamp(-1., 1.))
-        for i, (robot, target, limits) in enumerate(zip(self.robots, self.q_des, self.joint_limits, strict=True)):
+        for i, (robot, limits) in enumerate(zip(self.robots, self.joint_limits, strict=True)):
+            target = self.q_des[i]
             q = self.motor_channels(robot.data.joint_pos.torch, robot)
             command = q + self.actions[:, i * JOINT_CHANNELS:(i + 1) * JOINT_CHANNELS] * self.step_limit
             target[:, :6] = command[:, :6].clamp(limits[:, :6, 0], limits[:, :6, 1])
             rail = command[:, 6:7].clamp(limits[:, robot.rail_ids, 0].amax(dim=-1, keepdim=True),
                                          limits[:, robot.rail_ids, 1].amin(dim=-1, keepdim=True))
             target[:, robot.rail_ids] = rail
+
+    def set_grip_preload(self, arm, force_N):
+        """Set the optional force-equivalent closing target for a scripted trial."""
+        maximum = self.workcell["gripper"]["max_preload_n"]
+        self.preload_N[:, arm] = torch.as_tensor(force_N, device=self.device).clamp(0., maximum)
 
     def _parcel_action(self, i, robot, port_state, dq, motor):
         """Construct physical skin-contact inputs from the pad and parcel geometry."""
@@ -177,6 +218,11 @@ class YAMParcelBaseEnv(DirectRLEnv):
         # The available normal force comes from the real simulated motor channel.
         # A closing PD effort is separated from external rail reactions by the port.
         normal = motor.index_select(1, robot.rail_indices).clamp_min(0.)
+        # At the unloaded hard stop, holding effort can come from PhysX's rail
+        # limit alone. Allow only measured parcel-side load to count there.
+        against_limit = (robot.data.joint_pos.torch.index_select(1, robot.rail_indices)
+                         >= self.rail_close - .00008)
+        normal = torch.where(against_limit, torch.minimum(normal, (-robot.rail_load).clamp_min(0.)), normal)
         return ParcelAction(pads, velocities, normal, inward, self.side_feed[:, i].expand_as(normal),
                             side.expand_as(normal).to(dq.dtype), self.empty_action.external_force,
                             self.empty_action.direct_press_N)
@@ -187,13 +233,20 @@ class YAMParcelBaseEnv(DirectRLEnv):
         dq = [robot.data.joint_vel.torch for robot in self.robots]
         motor = [robot.actuators.applied_effort.torch for robot in self.robots]
         cmds, quats, rates = [], [], []
-        for i, (robot, sample) in enumerate(zip(self.robots, kinematics, strict=True)):
-            robot.actuators.target_command.set_position_index(value=self.q_des[i], full_data=True)
+        for i, robot in enumerate(self.scene_robots):
+            target = self.drive_target[i]
+            target.copy_(self.q_des[i])
+            if i < self.arm_count:
+                preload = self.preload_N[:, i]
+                k_p = robot.cfg.actuators["rails"].stiffness
+                target.index_add_(1, robot.rail_indices, (preload / k_p).expand(-1, 2))
+            robot.actuators.target_command.set_position_index(value=target, full_data=True)
             # MIT-style joint feedforward supplies the URDF arm's own weight.
             # The two rails retain their independent position/effort channels.
             gravity = self.gravity_feedforward[i]
             gravity[:, :6].copy_(robot.data.gravity_compensation_forces.torch[:, :6])
             robot.actuators.target_command.set_effort_index(value=gravity, full_data=True)
+        for i, (robot, sample) in enumerate(zip(self.robots, kinematics, strict=True)):
             cmds.append(self._parcel_action(i, robot, sample, dq[i], motor[i]))
             quat = sample.wrist_quat_xyzw
             quats.append(torch.cat((quat[:, 3:], quat[:, :3]), dim=-1))
@@ -229,7 +282,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
 
         opening = torch.stack([(s.pads[:, 1:] - s.pads[:, :1]).norm(dim=-1) for s in kinematics], dim=1)
         obs = self.current_filter.step(dofs_to_motor(motor), dofs_to_motor(q), dofs_to_motor(dq),
-                                       dofs_to_motor(self.q_des), opening)
+                                       dofs_to_motor(self.drive_target[:self.arm_count]), opening)
         self.sensed = torch.cat(tuple(obs), dim=-1)
         for i, (projector, sample) in enumerate(zip(self.projectors, kinematics, strict=True)):
             center = sample.pads.mean(dim=1)
@@ -251,17 +304,39 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.ever_airborne |= airborne & both
         self.hold = torch.where(airborne & both & quiet & intact, self.hold + 1, 0)
         torch.maximum(self.longest_hold, self.hold, out=self.longest_hold)
+        if self.arm_count == 2:
+            contact_a = self.parcel_state.contacts_A[..., ContactState.CAPTURE] == 1.
+            contact_b = self.parcel_state.contacts_B[..., ContactState.CAPTURE] == 1.
+            parcel = self.parcel_state.payload
+            center = self.parcel_sim.payload.com(parcel)
+            at_handover = ((center - self.handover_center).abs() <= self.handover_half).all(dim=1)
+            self.handover_seen |= at_handover & airborne & contact_a.all(dim=1) & contact_b.all(dim=1)
+            corners = self.projectors[0].vertices(parcel)[..., :2]
+            in_target = ((corners - self.place_center).abs() <= self.place_half).all(dim=(1, 2))
+            right_open = ~contact_a.any(dim=1)
+            released = right_open & ~contact_b.any(dim=1)
+            supported = (self.result.support_N[:, 0] > 0.) & (self.result.table_clearance[:, 0] <= .001)
+            self.left_carrying |= self.handover_seen & right_open & contact_b.all(dim=1)
+            self.placed_supported = released & (self.placed_supported | (self.left_carrying & supported & in_target))
+            self.left_carrying &= ~released
+            settled = self.placed_supported & intact & quiet & in_target & supported
+            self.place_streak = torch.where(settled, self.place_streak + 1, 0)
 
     def _get_observations(self):
         q = torch.stack([self.motor_channels(robot.data.joint_pos.torch, robot) for robot in self.robots], dim=1)
         dq = torch.stack([self.motor_channels(robot.data.joint_vel.torch, robot) for robot in self.robots], dim=1)
         actor = torch.cat((q, dq, self.sensed, self.actions.unflatten(1, (self.arm_count, JOINT_CHANNELS)),
                            self.visual), dim=-1).flatten(1)
+        if self.arm_count == 2:
+            location = torch.cat((self.place_center, self.place_half)).expand(self.num_envs, -1)
+            actor = torch.cat((actor, location), dim=1)
         contacts = torch.cat((self.parcel_state.contacts_A.flatten(1), self.parcel_state.contacts_B.flatten(1)), dim=1)
         return {"policy": actor, "critic": torch.cat((actor, self.parcel_sim.get_privileged_state(self.parcel_state),
                                                      contacts), dim=1)}
 
     def _get_rewards(self):
+        if self.arm_count == 2:
+            return (self.place_streak >= 250).to(torch.float32)
         return (self.hold >= 1500).to(torch.float32)
 
     def _get_dones(self):

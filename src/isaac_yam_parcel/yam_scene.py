@@ -8,6 +8,7 @@ from xml.etree import ElementTree as ET
 
 
 SCENE_FILE = Path(__file__).resolve().parents[2] / "configs" / "route_b_yam_scene.json"
+WORKCELL_FILE = SCENE_FILE.with_name("route_b_workcell.yaml")
 YAM_USD = Path(__file__).with_name("assets") / "yam.usdc"
 ARM_JOINTS = tuple(f"joint{i}" for i in range(1, 7))
 RAIL_JOINTS = ("joint7", "joint8")
@@ -16,6 +17,11 @@ RAIL_JOINTS = ("joint7", "joint8")
 def load_scene():
     """Load table-relative positions and local optical frames (right, down, forward)."""
     return json.loads(SCENE_FILE.read_text())
+
+
+def load_workcell():
+    """Return the role and task-zone contract in ABC table coordinates."""
+    return json.loads(WORKCELL_FILE.read_text())
 
 
 def prepare_urdf(source: Path, destination: Path, scene):
@@ -65,7 +71,7 @@ def _xyz(values):
     return " ".join(map(str, values))
 
 
-def arm_cfg(index, scene, usd, prim_path):
+def arm_cfg(index, scene, usd, prim_path, *, ready_joints=None):
     """Build a fixed-base I2RT articulation for a single or batched scene."""
     from isaaclab import sim as sim_utils
     from isaaclab.actuators import IdealPDActuatorCfg
@@ -78,7 +84,9 @@ def arm_cfg(index, scene, usd, prim_path):
             effort_limit=effort, effort_limit_sim=effort, velocity_limit_sim=1.,
         )
 
-    initial = scene["ready_arm_joints_rad"][index] + [scene["ready_rail_m"]] * 2
+    if ready_joints is None:
+        ready_joints = scene["ready_arm_joints_rad"][index]
+    initial = [*ready_joints, scene["ready_rail_m"], scene["ready_rail_m"]]
     return ArticulationCfg(
         prim_path=prim_path,
         spawn=sim_utils.UsdFileCfg(
@@ -118,11 +126,14 @@ def abc_scene_cfg(num_envs, *, dual_arm, usd=YAM_USD, env_spacing=2.0):
 
     usd = Path(usd).resolve(strict=True)
     scene = load_scene()
+    workcell = load_workcell()
     cfg = InteractiveSceneCfg(num_envs=num_envs, env_spacing=env_spacing)
     cfg.table = table_cfg(scene, "{ENV_REGEX_NS}/Table")
-    cfg.arm_a = arm_cfg(0, scene, usd, "{ENV_REGEX_NS}/Yam_A")
-    if dual_arm:
-        cfg.arm_b = arm_cfg(1, scene, usd, "{ENV_REGEX_NS}/Yam_B")
+    active = ("arm_a", "arm_b") if dual_arm else ("arm_a",)
+    for name in active:
+        arm = workcell["arms"][name]
+        setattr(cfg, name, arm_cfg(arm["abc_index"], scene, usd, f"{{ENV_REGEX_NS}}/{arm['prim']}",
+                                   ready_joints=arm["ready_joints_rad"]))
     return cfg
 
 

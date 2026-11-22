@@ -9,7 +9,7 @@ from isaaclab.app import add_launcher_args, launch_simulation
 from isaaclab.envs import DirectRLEnv, DirectRLEnvCfg
 from isaaclab_physx.physics import PhysxCfg
 
-from src.isaac_yam_parcel.yam_scene import RAIL_JOINTS, YamSceneFrames, abc_scene_cfg, load_scene
+from src.isaac_yam_parcel.yam_scene import RAIL_JOINTS, YamSceneFrames, abc_scene_cfg, load_scene, load_workcell
 
 
 class SceneCheckEnv(DirectRLEnv):
@@ -71,7 +71,8 @@ def check(env, dual_arm):
         assert not any(prim.HasAPI(UsdPhysics.RigidBodyAPI) for prim in Usd.PrimRange(table))
 
     minimum_height = []
-    for index, arm in enumerate(expected_arms):
+    for arm in expected_arms:
+        index = load_workcell()["arms"][arm]["abc_index"]
         robot = env.scene[arm]
         poses = robot.data.body_link_pose_w.torch
         frames = YamSceneFrames(scene, robot.body_names, poses)

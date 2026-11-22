@@ -29,7 +29,7 @@ class PadIK(DifferentialIKController):
 
 
 @torch.inference_mode()
-def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
+def acquisition(env, rows, seconds, *, seat_fold=False):
     """Drive the approach using only planned workcell coordinates and YAM FK."""
     env.reset()
     robot = env.robots[0]
@@ -37,12 +37,7 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
     sample = port.read()
     q_ready = sample.wrist_quat_xyzw.clone()
     start = sample.pads.mean(dim=1).clone()
-    workcell_xy = start.new_tensor([-.03, .225]) if near_workcell else start.new_zeros((2,))
-    shift = torch.cat((workcell_xy, start.new_zeros((1,))))
-    initial_state = env.parcel_state
-    env.parcel_state = initial_state._replace(
-        payload=initial_state.payload._replace(pos=initial_state.payload.pos + shift),
-        side_origin=initial_state.side_origin + shift)
+    shift = env.pick_center
     start_rail = robot.data.default_joint_pos.torch[:, robot.rail_ids].mean(dim=1)
     ik = PadIK(DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False,
                                        ik_method="dls", ik_params={"lambda_val": .035}),
@@ -54,19 +49,20 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
     # initial workcell parameters, with no parcel tracking after the start.
     half = env.episode.payload.bag_half_extents.clone()
     top = 2. * half[:, 2]
-    entry = torch.stack((torch.zeros_like(top), half[:, 1] + .037,
+    entry = torch.stack((torch.zeros_like(top), -(half[:, 1] + .037),
                          top + start.new_tensor([row[2] for row in rows])), dim=-1)
     engage = entry.clone()
-    engage[:, 1] = torch.where(top_row, 0., start.new_tensor([row[3] for row in rows]))
+    engage[:, 1] = torch.where(top_row, 0., -start.new_tensor([row[3] for row in rows]))
     entry[:, 1] = torch.where(top_row, 0., entry[:, 1])
     entry[:, 2] = torch.where(top_row, top + .028, entry[:, 2])
     offer = engage.clone()
-    offer[:, 1] = .027
+    offer[:, 1] = -.027
     offer[:, 2] = .235
     entry += shift
     engage += shift
     offer += shift
-    rail_target = start.new_tensor([row[4] for row in rows])
+    requested_preload = start.new_tensor([row[4] for row in rows])
+    rail_target = torch.full_like(start_rail, env.rail_close)
     timestamps = []
     observations = []
     tracking = []
@@ -86,6 +82,8 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
             command[:, 2] -= high_entry * (engage[:, 2] - top + .002) * seat
             rail = torch.where(high_entry, torch.lerp(start_rail, rail_target,
                                                       transition(time, 3.45, 4.32)), rail)
+        preload = requested_preload * transition(time, 3.54, 4.40)
+        env.set_grip_preload(0, preload[:, None])
         sample = port.read()
         pad_center = sample.pads.mean(dim=1)
         jac = torch.cat((sample.pad_jacobian.mean(dim=1), sample.angular_jacobian.mean(dim=1)), dim=1)[..., :6]
@@ -106,7 +104,11 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
                                        state.contacts_A[..., ContactState.SLACK],
                                        env.result.net_feed[:, 0], env.result.press_N[:, :1],
                                        env.result.tension[:, 0],
-                                       env.parcel_sim.payload.com(state.payload)), dim=-1))
+                                       env.parcel_sim.payload.com(state.payload),
+                                       robot.rail_load, (sample.pads[:, 1:] - sample.pads[:, :1]).norm(dim=-1),
+                                       state.torsion.slip_angle[:, 0],
+                                       env.result.support_N, state.torn_flag.flatten(1).any(dim=1, keepdim=True)),
+                                      dim=-1))
         tracking.append(command)
         timestamps.append(time)
 
@@ -114,6 +116,7 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
     goals = torch.stack(tracking).cpu()
     approach_end = min(round(3.2 / env.step_dt), len(timestamps) - 1)
     tail = round(3. / env.step_dt)
+    settle = slice(round(4.45 / env.step_dt), round(4.65 / env.step_dt))
     results = []
     for index, row in enumerate(rows):
         series = data[:, index]
@@ -129,8 +132,14 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
                             peak_gathered_mm=1000 * series[:, 9:11].amax().item(),
                             peak_feed_mm=1000 * series[:, 11:13].amax().item(),
                             peak_press_N=series[:, 13].amax().item(),
-                            peak_package_translation_mm=1000 * (series[:, -3:-1] -
-                                  series[:1, -3:-1]).norm(dim=1).amax().item(),
+                            peak_package_translation_mm=1000 * (series[:, 16:18] -
+                                  series[:1, 16:18]).norm(dim=1).amax().item(),
+                            peak_rail_external_N=series[:, 19:21].abs().amax().item(),
+                            hold_motor_mean_N=series[settle, 7:9].mean().item() if seconds > 4.65 else None,
+                            hold_rail_external_mean_N=series[settle, 19:21].abs().mean().item() if seconds > 4.65 else None,
+                            final_pad_gap_mm=1000. * series[-1, 21].item(),
+                            peak_torsional_slip_rad=series[:, 22].abs().amax().item(),
+                            torn=bool(series[:, 24].any()),
                             approach_end_z_target_mm=1000 * goals[approach_end, index, 2].item(),
                             approach_end_z_actual_mm=1000 * series[approach_end, 6].item(),
                             approach_end_z_error_mm=1000 * (series[approach_end, 6] -
@@ -138,6 +147,24 @@ def acquisition(env, rows, seconds, *, near_workcell, seat_fold=False):
                             pad_min_height_mm=1000 * series[:, 6].amin().item(),
                             finite=bool(series.isfinite().all())))
     return results, dict(times_s=timestamps, observations=data.tolist(), pad_target_m=goals.tolist())
+
+
+def right_arm_gates(result):
+    hard, clothes, low_entry, *high_entry, low_grip, high_grip = result
+    return {
+        "C4_top": 8. <= hard["peak_press_N"] <= 12. and not hard["any_double_capture"]
+        and hard["peak_clearance_mm"] < 1.,
+        "C5_top": 2. <= clothes["peak_press_N"] <= 4. and clothes["any_double_capture"]
+        and clothes["peak_clearance_mm"] > 1.,
+        "C6_low": low_entry["peak_package_translation_mm"] > 1. and not low_entry["any_double_capture"],
+        "C6_high": any(row["longest_hold_s"] >= 3. and row["last3_max_speed_mm_s"] < 20.
+                       and row["last3_min_clearance_mm"] > 1. and row["last3_captured_frames"] == 75
+                       and 2. <= row["hold_rail_external_mean_N"] <= 6. for row in high_entry),
+        "C3_twist": low_grip["any_double_capture"] and low_grip["peak_torsional_slip_rad"] > 1e-6
+        and high_grip["last3_captured_frames"] == 75 and high_grip["last3_min_clearance_mm"] > 1.
+        and high_grip["peak_torsional_slip_rad"] <= 1e-6,
+        "finite_and_intact": all(row["finite"] and not row["torn"] for row in result),
+    }
 
 
 @torch.inference_mode()
@@ -212,7 +239,7 @@ def main():
     parser.add_argument("--native-actuators", action="store_true")
     parser.add_argument("--implicit-arm", action="store_true")
     parser.add_argument("--seconds", type=float, default=12.)
-    parser.add_argument("--near-workcell", action="store_true")
+    parser.add_argument("--near-workcell", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--tracking-probe", action="store_true", help="Measure the 3.20 s C6 entry gate only.")
     parser.add_argument("--seat-fold", action="store_true", help="Try a shallow set-down after a high side entry.")
     parser.add_argument("--trace")
@@ -221,14 +248,16 @@ def main():
     args = parser.parse_args()
     if not args.headless or args.visualizer or args.livestream:
         parser.error("Use --headless and disable visualization/livestream.")
+    if args.dual_arm and not args.benchmark:
+        parser.error("This acquisition replay controls only the right arm. Use --dual-arm with --benchmark.")
     if args.tracking_probe and args.seconds < 3.24:
         parser.error("The tracking probe requires at least 3.24 simulated seconds.")
     if args.implicit_arm and (not args.benchmark or args.native_actuators):
         parser.error("Use --implicit-arm with --benchmark and the standard Lab actuator path.")
-    rows = [("C4", "top", -.012, 0., -.006), ("C5", "top", -.014, 0., -.006),
-            ("C6", "side-low", -.010, .020, -.006), ("C6", "side-high", .006, .020, -.006),
-            ("C6", "side-high", .003, .030, -.003), ("C6", "side-high", .009, .024, -.005),
-            ("C3", "top", -.014, 0., -.012), ("C3", "top", -.014, 0., -.003)]
+    rows = [("C4", "top", -.00565, 0., 0.), ("C5", "top", -.036, 0., 4.),
+            ("C6", "side-low", -.010, .020, 4.), ("C6", "side-high", .006, .020, 4.),
+            ("C6", "side-high", .003, .030, 4.), ("C6", "side-high", .009, .024, 4.),
+            ("C3", "side-high", .006, .020, 8.), ("C3", "side-high", .006, .020, 30.)]
     cfg = yam_parcel_cfg(args.num_envs if args.benchmark else len(rows), dual_arm=args.dual_arm,
                          use_newton_actuators=args.native_actuators)
     env_type = YAMHandoverPlaceEnv if args.dual_arm else YAMPickEnv
@@ -247,8 +276,7 @@ def main():
                 result = benchmark(env, args.benchmark, before)
                 print("ROUTE_B_THROUGHPUT " + json.dumps(dict(result, implicit_arm=args.implicit_arm)), flush=True)
             else:
-                result, trace = acquisition(env, rows, args.seconds, near_workcell=args.near_workcell,
-                                            seat_fold=args.seat_fold)
+                result, trace = acquisition(env, rows, args.seconds, seat_fold=args.seat_fold)
                 if args.trace:
                     with open(args.trace, "w") as file:
                         json.dump(trace, file)
@@ -259,10 +287,9 @@ def main():
                     if not passed:
                         raise SystemExit(1)
                     return
-                c6_pass = any(row["corner"] == "C6" and row["route"] == "side-high" and row["finite"]
-                              and row["longest_hold_s"] >= 3. and row["last3_max_speed_mm_s"] < 20.
-                              and row["last3_captured_frames"] == 75 for row in result)
-                if not c6_pass:
+                gates = right_arm_gates(result)
+                print("ROUTE_B_RIGHT_ARM_GATES " + json.dumps(gates), flush=True)
+                if not all(gates.values()):
                     raise SystemExit(1)
         finally:
             env.close()
