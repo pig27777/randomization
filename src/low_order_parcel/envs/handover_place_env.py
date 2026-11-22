@@ -151,7 +151,7 @@ class HandoverPlaceEnv(ParcelEnv):
         self._clear_history(active)
         self.attempts += active.long()
         tilt, compliance, dy, dz, speed, pinch = action.continuous[:, :6].clamp(-1., 1.).unbind(dim=1)
-        start = self.command
+        start = self._command_snapshot()
         camera_center = self.actual[:, 1] + self.vector([0., .015, .015])
         estimate = camera_center + self.rgb.wrist_target_rel @ self.wrist_frame.transpose(0, 1)
         arm_a = start.center[:, 0]
@@ -195,7 +195,7 @@ class HandoverPlaceEnv(ParcelEnv):
         return -5. * (active & self.torn).float() - 6. * (active & self.dropped).float()
 
     def _active_tug(self, active):
-        origin = self.command
+        origin = self._command_snapshot()
         self.tare = select(active, self.sensed.force, self.tare)
         self.tug_signal = select(active, self.zeros(self.tug_samples, 2), self.tug_signal)
         self.tug_truth = select(active, self.zeros(self.tug_samples, 2), self.tug_truth)
@@ -254,7 +254,7 @@ class HandoverPlaceEnv(ParcelEnv):
         return -6. * (active & self.dropped).float() - 5. * (active & self.torn).float()
 
     def _retract(self, active):
-        start = self.command
+        start = self._command_snapshot()
         for i in range(350):
             t = (i + 1) * DT
             open_jaw = smooth(self.vector(t / .18))
@@ -268,7 +268,7 @@ class HandoverPlaceEnv(ParcelEnv):
 
     def _transfer(self, action, active):
         boost = action.choice == 1
-        start = self.command
+        start = self._command_snapshot()
         extra = scaled(action.continuous[:, 0].clamp(-1., 1.), 2., 10.) * boost
         ramp = torch.where(boost, scaled(action.continuous[:, 1].clamp(-1., 1.), .30, .64), .43)
         if (active & boost).any():
@@ -278,7 +278,7 @@ class HandoverPlaceEnv(ParcelEnv):
                 self._tick(start._replace(grip=grip), active & boost & ~self.torn & ~self.dropped)
                 self._lost(active & boost)
             self._active_tug(active & boost)
-            start = self.command
+            start = self._command_snapshot()
         streak = torch.zeros_like(self.attempts)
         for i in range(4400):
             t = (i + 1) * DT
@@ -305,13 +305,13 @@ class HandoverPlaceEnv(ParcelEnv):
 
     def _place(self, action, active):
         self._clear_history(active)
-        origin = self.command
+        origin = self._command_snapshot()
         speed = scaled(action.continuous[:, 0].clamp(-1., 1.), .025, .11)
         release_ratio = scaled(action.continuous[:, 1].clamp(-1., 1.), .28, .65)
         baseline = self.sensed.force[:, 1, 2] - self.tare[:, 1, 2]
         encoder = self.sensed.position_error[:, 1, 2]
         contact_error = (.25 * encoder.abs()).clamp(.00015, .002)
-        last_y = self.rgb.top_box[:, 1]
+        last_y = self.rgb.top_box[:, 1].clone()
         contact = self.flags()
         release_clock = self.zeros()
         prospective_contact = self.zeros()
@@ -341,7 +341,7 @@ class HandoverPlaceEnv(ParcelEnv):
             if i % 10 == 9:
                 top_y = self.rgb.top_box[:, 1]
                 self.settled = (top_y - last_y).abs() < .0012
-                last_y = top_y
+                last_y = top_y.clone()
                 changed = self.sensed.position_error[:, 1, 2] - encoder > contact_error
                 candidate = active & ~contact & changed & (prospective_contact == 0.)
                 prospective_contact = torch.where(candidate, .18, prospective_contact)
