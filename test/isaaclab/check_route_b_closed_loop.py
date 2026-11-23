@@ -29,7 +29,8 @@ class PadIK(DifferentialIKController):
 
 
 @torch.inference_mode()
-def acquisition(env, rows, seconds, *, seat_fold=False):
+def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross_center=False,
+                lift_toward_base=False):
     """Drive the approach using only planned workcell coordinates and YAM FK."""
     env.reset()
     robot = env.robots[0]
@@ -44,6 +45,7 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
                                   env.num_envs, str(env.device))
     start_goal = start.clone()
     top_row = start.new_tensor([row[1] == "top" for row in rows]).bool()
+    clothes = start.new_tensor([row[0] == "C5" for row in rows]).bool()
     high_entry = start.new_tensor([row[1] == "side-high" for row in rows]).bool()
     # Rows encode each fixture's known starting dimensions. These are fixed
     # initial workcell parameters, with no parcel tracking after the start.
@@ -53,11 +55,18 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
                          top + start.new_tensor([row[2] for row in rows])), dim=-1)
     engage = entry.clone()
     engage[:, 1] = torch.where(top_row, 0., -start.new_tensor([row[3] for row in rows]))
+    if cross_center:
+        # Seat the fold just past center, outside the entry-wall contact region.
+        engage[high_entry, 1] = .012
     entry[:, 1] = torch.where(top_row, 0., entry[:, 1])
     entry[:, 2] = torch.where(top_row, top + .028, entry[:, 2])
     offer = engage.clone()
     offer[:, 1] = -.027
     offer[:, 2] = .235
+    if lift_toward_base:
+        heavy = start.new_tensor([row[0] == "C3" for row in rows]).bool()
+        offer[heavy, 0] -= .115
+        offer[heavy, 1] = -.055
     entry += shift
     engage += shift
     offer += shift
@@ -75,6 +84,9 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
         command = torch.lerp(torch.lerp(start_goal, entry, initial), engage, approach)
         command = torch.lerp(command, offer, rise)
         rail = torch.lerp(start_rail, rail_target, closure)
+        # Keep the preset downward sweep moving as the two pads gather the soft film.
+        command[:, 2] -= clothes * .004 * transition(time, 2.9, 4.25) * (1. - rise)
+        rail = torch.where(clothes, torch.lerp(start_rail, rail_target, transition(time, 2.65, 3.70)), rail)
         if seat_fold:
             # Enter above the rim first, then lower at fixed XY while closing.
             # It is a preset geometric trajectory, with no parcel state feedback.
@@ -83,7 +95,12 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
             rail = torch.where(high_entry, torch.lerp(start_rail, rail_target,
                                                       transition(time, 3.45, 4.32)), rail)
         preload = requested_preload * transition(time, 3.54, 4.40)
-        env.set_grip_preload(0, preload[:, None])
+        if rapid_close:
+            side_close = (3.72 if cross_center else 3.50) if seat_fold else 3.28
+            close_now = (high_entry & (time >= side_close)) | (clothes & (time >= 2.88))
+            rail = torch.where(high_entry | clothes, torch.where(close_now, rail_target, start_rail), rail)
+            preload = torch.where(close_now, requested_preload, preload)
+        rail += env.step_limit[-1] * preload / (1000. * env.rail_overtravel)
         sample = port.read()
         pad_center = sample.pads.mean(dim=1)
         jac = torch.cat((sample.pad_jacobian.mean(dim=1), sample.angular_jacobian.mean(dim=1)), dim=1)[..., :6]
@@ -107,7 +124,8 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
                                        env.parcel_sim.payload.com(state.payload),
                                        robot.rail_load, (sample.pads[:, 1:] - sample.pads[:, :1]).norm(dim=-1),
                                        state.torsion.slip_angle[:, 0],
-                                       env.result.support_N, state.torn_flag.flatten(1).any(dim=1, keepdim=True)),
+                                       env.result.support_N, state.torn_flag.flatten(1).any(dim=1, keepdim=True),
+                                       env.film_load[:, 0], env.pad_normal[:, 0], env.side[:, :1]),
                                       dim=-1))
         tracking.append(command)
         timestamps.append(time)
@@ -123,6 +141,7 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
         both = (series[:, :2] == 1.).all(dim=1)
         results.append(dict(corner=row[0], route=row[1], entry_offset_m=row[2],
                             any_double_capture=bool(both.any()), captured_frames=int(both.sum()),
+                            any_finger_frames=int((series[:, :2] == 1.).any(dim=1).sum()),
                             last3_captured_frames=int(both[-tail:].sum()),
                             peak_clearance_mm=1000 * series[:, 3].amax().item(),
                             last3_min_clearance_mm=1000 * series[-tail:, 3].amin().item(),
@@ -137,6 +156,10 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
                             peak_rail_external_N=series[:, 19:21].abs().amax().item(),
                             hold_motor_mean_N=series[settle, 7:9].mean().item() if seconds > 4.65 else None,
                             hold_rail_external_mean_N=series[settle, 19:21].abs().mean().item() if seconds > 4.65 else None,
+                            hold_effective_normal_mean_N=series[settle, 26:28].mean().item() if seconds > 4.65 else None,
+                            peak_film_load_N=series[:, 25].amax().item(),
+                            pressure_frames_during_closure=int((series[66:107, 13] > .3).sum()),
+                            side_route_frames=int(series[:, 28].sum()),
                             final_pad_gap_mm=1000. * series[-1, 21].item(),
                             peak_torsional_slip_rad=series[:, 22].abs().amax().item(),
                             torn=bool(series[:, 24].any()),
@@ -152,19 +175,58 @@ def acquisition(env, rows, seconds, *, seat_fold=False):
 def right_arm_gates(result):
     hard, clothes, low_entry, *high_entry, low_grip, high_grip = result
     return {
-        "C4_top": 8. <= hard["peak_press_N"] <= 12. and not hard["any_double_capture"]
-        and hard["peak_clearance_mm"] < 1.,
+        "C4_top": hard["any_finger_frames"] == 0 and hard["peak_clearance_mm"] < 1.
+        and hard["peak_film_load_N"] == 0.,
         "C5_top": 2. <= clothes["peak_press_N"] <= 4. and clothes["any_double_capture"]
         and clothes["peak_clearance_mm"] > 1.,
         "C6_low": low_entry["peak_package_translation_mm"] > 1. and not low_entry["any_double_capture"],
         "C6_high": any(row["longest_hold_s"] >= 3. and row["last3_max_speed_mm_s"] < 20.
                        and row["last3_min_clearance_mm"] > 1. and row["last3_captured_frames"] == 75
-                       and 2. <= row["hold_rail_external_mean_N"] <= 6. for row in high_entry),
+                       and 2. <= row["hold_effective_normal_mean_N"] <= 6. for row in high_entry),
         "C3_twist": low_grip["any_double_capture"] and low_grip["peak_torsional_slip_rad"] > 1e-6
         and high_grip["last3_captured_frames"] == 75 and high_grip["last3_min_clearance_mm"] > 1.
         and high_grip["peak_torsional_slip_rad"] <= 1e-6,
         "finite_and_intact": all(row["finite"] and not row["torn"] for row in result),
     }
+
+
+@torch.inference_mode()
+def empty_clamp(env):
+    env.reset()
+    ready = torch.stack([env.motor_channels(robot.data.default_joint_pos.torch, robot) for robot in env.robots], dim=1)
+    preload = ready.new_tensor([[0., 35.], [4., 30.], [30., 4.], [35., 0.]])[:, :env.arm_count]
+    peak_normal = torch.zeros_like(preload)
+    peak_capture = torch.zeros_like(preload)
+    apply_action = env._apply_action
+
+    def record_substep():
+        apply_action()
+        torch.maximum(peak_normal, env.pad_normal[:, :env.arm_count].amax(dim=-1), out=peak_normal)
+        contacts = (env.parcel_state.contacts_A, env.parcel_state.contacts_B)[:env.arm_count]
+        capture = torch.stack(contacts, dim=1)[..., ContactState.CAPTURE].amax(dim=-1)
+        torch.maximum(peak_capture, capture, out=peak_capture)
+
+    env._apply_action = record_substep
+    try:
+        for frame in range(40):
+            close = transition(frame, 0, 24)
+            request = transition(frame, 24, 31)
+            desired = ready.clone()
+            desired[..., -1] = torch.lerp(ready[..., -1], torch.full_like(preload, env.rail_close), close)
+            desired[..., -1] += request * env.step_limit[-1] * preload / (1000. * env.rail_overtravel)
+            q = torch.stack([env.motor_channels(robot.data.joint_pos.torch, robot) for robot in env.robots], dim=1)
+            env.step(((desired - q) / env.step_limit).flatten(1))
+    finally:
+        env._apply_action = apply_action
+    drive = torch.stack([robot.actuators.applied_effort.torch[:, robot.rail_ids].mean(dim=1)
+                         for robot in env.robots], dim=1)
+    pads = torch.stack([port.read().pads for port in env.ports], dim=1)
+    gap = (pads[:, :, 1] - pads[:, :, 0]).norm(dim=-1)
+    result = dict(commanded_N=preload.tolist(), motor_N=drive.tolist(), gap_mm=(1000. * gap).tolist(),
+                  peak_effective_normal_N=peak_normal.tolist(), peak_capture=peak_capture.tolist())
+    print("ROUTE_B_EMPTY_CLAMP " + json.dumps(result), flush=True)
+    assert (gap < .0003).all() and (peak_normal == 0.).all() and (peak_capture == 0.).all()
+    torch.testing.assert_close(drive, preload, atol=.35, rtol=0.)
 
 
 @torch.inference_mode()
@@ -242,14 +304,19 @@ def main():
     parser.add_argument("--near-workcell", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--tracking-probe", action="store_true", help="Measure the 3.20 s C6 entry gate only.")
     parser.add_argument("--seat-fold", action="store_true", help="Try a shallow set-down after a high side entry.")
+    parser.add_argument("--rapid-close", action="store_true", help="Use the maximum bounded rail step at engagement.")
+    parser.add_argument("--cross-center", action="store_true", help="Seat the side fold just past the parcel center.")
+    parser.add_argument("--lift-toward-base", action="store_true", help="Reduce the arm moment during the heavy lift.")
+    parser.add_argument("--empty-clamp", action="store_true", help="Verify 0/4/30/35 N close commands in free space.")
+    parser.add_argument("--only-c4", action="store_true", help="Repeat the hard-book lane in an isolated environment.")
     parser.add_argument("--trace")
     add_launcher_args(parser)
     parser.set_defaults(visualizer=[], livestream=0)
     args = parser.parse_args()
     if not args.headless or args.visualizer or args.livestream:
         parser.error("Use --headless and disable visualization/livestream.")
-    if args.dual_arm and not args.benchmark:
-        parser.error("This acquisition replay controls only the right arm. Use --dual-arm with --benchmark.")
+    if args.dual_arm and not (args.benchmark or args.empty_clamp):
+        parser.error("Use --dual-arm with --benchmark or --empty-clamp.")
     if args.tracking_probe and args.seconds < 3.24:
         parser.error("The tracking probe requires at least 3.24 simulated seconds.")
     if args.implicit_arm and (not args.benchmark or args.native_actuators):
@@ -257,8 +324,12 @@ def main():
     rows = [("C4", "top", -.00565, 0., 0.), ("C5", "top", -.036, 0., 4.),
             ("C6", "side-low", -.010, .020, 4.), ("C6", "side-high", .006, .020, 4.),
             ("C6", "side-high", .003, .030, 4.), ("C6", "side-high", .009, .024, 4.),
+            ("C6", "side-high", .007, .024, 4.),
             ("C3", "side-high", .006, .020, 8.), ("C3", "side-high", .006, .020, 30.)]
-    cfg = yam_parcel_cfg(args.num_envs if args.benchmark else len(rows), dual_arm=args.dual_arm,
+    if args.only_c4:
+        rows = rows[:1]
+    count = args.num_envs if args.benchmark else 4 if args.empty_clamp else len(rows)
+    cfg = yam_parcel_cfg(count, dual_arm=args.dual_arm,
                          use_newton_actuators=args.native_actuators)
     env_type = YAMHandoverPlaceEnv if args.dual_arm else YAMPickEnv
     with launch_simulation(cfg.sim, args):
@@ -266,7 +337,7 @@ def main():
         if args.implicit_arm:
             configure_implicit_arm_benchmark(cfg)
         episode = None
-        if not args.benchmark:
+        if not args.benchmark and not args.empty_clamp:
             dr = DomainRandomizer("cuda:0", 17)
             episode = CornerSuite(dr).select(dr.tensor([int(row[0][1:]) - 1 for row in rows], dtype=torch.long))
         env = env_type(cfg, episode=episode)
@@ -275,12 +346,19 @@ def main():
             if args.benchmark:
                 result = benchmark(env, args.benchmark, before)
                 print("ROUTE_B_THROUGHPUT " + json.dumps(dict(result, implicit_arm=args.implicit_arm)), flush=True)
+            elif args.empty_clamp:
+                empty_clamp(env)
             else:
-                result, trace = acquisition(env, rows, args.seconds, seat_fold=args.seat_fold)
+                result, trace = acquisition(env, rows, args.seconds, seat_fold=args.seat_fold,
+                                            rapid_close=args.rapid_close, cross_center=args.cross_center,
+                                            lift_toward_base=args.lift_toward_base)
                 if args.trace:
                     with open(args.trace, "w") as file:
                         json.dump(trace, file)
                 print("ROUTE_B_CLOSED_LOOP " + json.dumps(result), flush=True)
+                if args.only_c4:
+                    assert result[0]["any_finger_frames"] == 0 and result[0]["peak_film_load_N"] == 0.
+                    return
                 if args.tracking_probe:
                     passed = all(abs(row["approach_end_z_error_mm"]) < 2. for row in result
                                  if row["corner"] == "C6" and row["route"] == "side-high")

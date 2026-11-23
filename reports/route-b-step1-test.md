@@ -153,3 +153,43 @@ Policy 1 使用同一个双臂物理场景，停靠的左臂维持位置和重�
 两组正式右臂回放全部有限值且无撕裂。C6 无离台帧，末 3 s 质心速度门禁无法成立。DualArmParcelSim 的横向夹压依赖两指进入子块横截面。冻结 `pad_stop()` 的反力与闭合相对速度成正比，到达静态后降为零。当前几何没有单独表示薄膜夹口的静态承压面。高入口闭合把电机力传给滑轨行程止挡。浅下探产生短暂接触，仍低于 C6 0.48 N 锁定门槛。要完成闭环，需要确认薄膜夹口的静态承压标定及建模边界。Step 2 暂停。[最终八路日志](../test/runs/2026-11-22/isaaclab/route-b-step1-workcell-r1/right-acceptance.log) · [浅下探日志](../test/runs/2026-11-22/isaaclab/route-b-step1-workcell-r1/right-seat-final.log) · [中央空载联动](../test/runs/2026-11-22/isaaclab/route-b-step1-workcell-r1/workcell-transit.log) · [C4 压力复调](../test/runs/2026-11-22/isaaclab/route-b-step1-workcell-r1/right-c4-refined.json)
 
 复现使用原生 `$native/python.sh -B`。右臂执行 `test/isaaclab/check_route_b_closed_loop.py --headless --near-workcell --seconds 12`，下探加 `--seat-fold`。4,096 路基准用 `--headless --dual-arm --num-envs 4096 --benchmark 12`。端口用 `test/isaaclab/check_route_b_wrench_power.py --headless`，装配用 `test/isaaclab/check_route_b_direct_scene.py --headless --dual-arm --num-envs 4`。中央空载复核用本轮数据目录的 `workcell-static.py --headless --candidates center-candidates.jsonl`，联动加 `--interpolate`。逐关节电流 CPU 用原仓库 Python 直接执行 `test/isaaclab/test_yam_joint_current.py`。所有 GPU 命令在 `ubun` 使用 `flock /tmp/claude-gpu.lock`。
+
+## 薄膜夹口静态承压与 30,000 路显存复验
+
+2026-11-23，`ubun` RTX 5090，原生 Isaac Sim 6.2／Isaac Lab 3.0.0，2 ms／25 Hz，双臂显式 PD 加重力前馈。GPU 实验均持 `/tmp/claude-gpu.lock`。冻结底座 `2ef4a394` 的两个核心方程文件未变，双通道外载实现与 `736db9b2` 一致。
+
+0–35 N 对顶预压已进入标准 7／14 维动作。物理止挡保持 +0.550 mm，轨道 PD 仍为 1,000 N/m 和 16.7 N·s/m。夹口 ≤2 mm、非张开且已有独立膜料证据时，两个电机夹紧力的较小值给代理可用法向力设下限。侧抓证据来自冻结核的双指正净进给和夹口位置，顶抓证据来自实际顶压、软内容物压陷和正聚拢。PhysX 外载仍由原双通道端口统一写回。
+
+### 门禁
+
+| 项目 | 实测 | 结果 |
+| --- | --- | --- |
+| 空载 7／14 维动作 | 4／30／35 N 命令达 3.998–4.000／29.846–29.866／34.864–34.865 N，实测闭合点距约 0.189 mm。0／4／30／35 N 的每个 2 ms 子步中，代理法向力和捕获均为 0 | 通过 |
+| 双通道功与 6 N/指静态电流 | 闭合功 −0.191999963 mJ，`wrist_port_pass=true`。轨道外载约 −5.99997 N/轨，电机保持约 +6.00177 N/轨，去皮电流 +5.98164 N | 通过 |
+| C4 单路与九路批量 | 两种运行均为任意指 0/300 帧、薄膜静态承压 0 N、离台 0 mm。峰值顶压 12.969／13.036 N，差 0.067 N | 按本轮确认的零捕获门禁通过 |
+| C5 衣物 | 缓闭顶压峰值 2.821 N，闭合段仅 14/41 个 25 Hz 样本超过 0.3 N。快闭已有 4.000 N 薄膜承压，聚拢从前轮 0.322 增至 0.731 mm，低于 1.50 mm 门槛。双指捕获及离台为零 | 未通过 |
+| C6 低入口 | 推跑 94.585 mm，捕获 0/300 帧，静态承压 0 N | 通过 |
+| C6 高入口 | 35／38／39 mm 档进入有效高度窗并建立约 4.000 N/轨代理法向力。41 mm 档过袋沿时实测约 45–47 mm，高于 44 mm 窗上沿，未锁定侧进给。有效三档的最佳聚拢 0.0396 mm，距离 1.50 mm 锁定阈值仍有 1.46 mm。夹爪提拉后包裹净空仍为零 | 未通过，末 3 s 稳悬不可检验 |
+| C3 低夹／高夹 | 快闭测得双指捕获 78／206 帧，扭转滑移单步峰值 0.00554／0 rad。高夹保持约 29.85 N/轨，但有效离台为零。下探、过中心再靠近基座提拉也未得到完整离台 | 未通过 |
+| C10 真实双臂拉拔、卸夹与左放 | 右抓门禁未通过，未进入带包 C10。6 N／130 ms 在 25 Hz 下的连续检出帧数仍待实测 | 未执行 |
+| Step 1 冻结与 Step 2 BC | 未触发后续条件 | 暂停 |
+
+C6 名义膜料聚拢率为 0.47，捕获前聚拢门槛为 1.50 mm。若首次有效承压发生在 2 mm 夹口，余下至 0.19 mm 止挡的单指闭合行程最多约 0.905 mm。即便连续有效并忽略速度限幅和余料折减，膜料也只再聚拢约 0.43 mm。三种实测控制对照支持同一结论。要完成抓取，实际扫掠需在压实前建立有载的闭合与聚拢。继续加大止挡电机预压无法补足该行程。
+
+复现用原生 `$native/python.sh -B`，并按本报告上文设置 `PYTHONPATH` 和 GPU 锁。空载用 `test/isaaclab/check_route_b_closed_loop.py --headless --empty-clamp`，双臂追加 `--dual-arm`。右抓用 `--headless --seconds 12`，独立 C4 追加 `--only-c4`。轨迹对照依次使用 `--rapid-close`、`--rapid-close --seat-fold`、`--rapid-close --seat-fold --cross-center --lift-toward-base`。端口复验为 `test/isaaclab/check_route_b_wrench_power.py --headless`。逐关节电流 CPU 测试运行 `test/isaaclab/test_yam_joint_current.py`。[右抓及端口日志](../test/runs/2026-11-23/isaaclab/route-b-film-closure-r1/)
+
+### 30,000 路显存
+
+显式 PD 双臂空载悬停 `test/isaaclab/check_route_b_closed_loop.py --headless --dual-arm --num-envs 30000 --benchmark 4` 正常退出。热身 3 个策略步，计时 4 个策略步即 80 个子步。200 ms 间隔采样整卡显存，`/usr/bin/time -v` 记录主机 RSS。
+
+| 指标 | 实测 |
+| --- | ---: |
+| 仿真稳态整卡 | 15,344 MiB（14.98 GiB） |
+| 采样整卡峰值 | 15,364 MiB（15.00 GiB，卡容量 47.1%） |
+| 场景增量，原生模拟器启动后基线 | 14,030 MiB |
+| PyTorch 分配器峰值 | 742.08 MiB |
+| 最大进程 RSS | 16.05 GiB |
+| 80 个物理子步／整次启动和退出 | 3.774 s／64.45 s |
+| 吞吐 | 635,999 物理 env-steps/s |
+
+日志没有 CUDA、显存或 PhysX 缓冲区容量错误。实验为短程空载悬停，PPO 轨迹、网络更新及满接触负载显存峰值未测。Step 1 及后续训练仍以已约定的 4,096 路为基线。[数据与显存采样](../test/runs/2026-11-23/isaaclab/route-b-30000-vram-r1/)

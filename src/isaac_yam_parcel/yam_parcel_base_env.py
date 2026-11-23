@@ -74,7 +74,6 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.handover_half = origin.new_tensor(handover["half_extents_m"])
         self.parcel_state = self._parcel_table_state()
         self.q_des = [robot.data.default_joint_pos.torch.clone() for robot in self.scene_robots]
-        self.drive_target = [target.clone() for target in self.q_des]
         self.gravity_feedforward = [torch.zeros_like(target) for target in self.q_des]
         self.step_limit = origin.new_tensor([.04] * 6 + [.008])
         self.joint_limits = [robot.data.soft_joint_pos_limits.torch for robot in self.robots]
@@ -87,6 +86,10 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.side = torch.zeros_like(self.enabled)
         self.feed_axis = torch.zeros_like(origin[:, None].expand(-1, 2, -1))
         self.side_feed = origin.new_zeros((self.num_envs, 2, 1))
+        self.net_side_feed = torch.zeros_like(self.side_feed)
+        self.top_press = torch.zeros_like(self.side_feed)
+        self.film_load = torch.zeros_like(self.side_feed)
+        self.pad_normal = origin.new_zeros((self.num_envs, 2, 2))
         self.have_history = torch.zeros_like(self.enabled)
         self.hold = torch.zeros(self.num_envs, dtype=torch.int32, device=self.device)
         self.longest_hold = torch.zeros_like(self.hold)
@@ -96,8 +99,10 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.left_carrying = torch.zeros_like(self.ever_captured)
         self.placed_supported = torch.zeros_like(self.ever_captured)
         self.place_streak = torch.zeros_like(self.hold)
-        self.preload_N = origin.new_zeros((self.num_envs, self.arm_count, 1))
-        self.rail_close = float(self.workcell["gripper"]["close_calibration_m"])
+        gripper = self.workcell["gripper"]
+        self.rail_close = float(gripper["close_calibration_m"])
+        self.film_gap = float(gripper["film_gap_m"])
+        self.rail_overtravel = float(gripper["max_preload_n"]) / self.scene_robots[0].cfg.actuators["rails"].stiffness
         # Align the simulation's closing stop to the CAD zero-gap position.
         # This one-time property write keeps the real source USD and 2 ms loop untouched.
         for robot in self.scene_robots:
@@ -157,8 +162,10 @@ class YAMParcelBaseEnv(DirectRLEnv):
             projector.reset(mask, params=self.episode.rgb)
         self.current_filter.reset(mask, self._current_params())
         for buffer in (self.hold, self.longest_hold, self.ever_captured, self.ever_airborne,
-                       self.handover_seen, self.left_carrying, self.placed_supported, self.place_streak, self.preload_N,
-                       self.side, self.feed_axis, self.side_feed, self.have_history, self.sensed, self.visual):
+                       self.handover_seen, self.left_carrying, self.placed_supported, self.place_streak,
+                       self.side, self.feed_axis, self.side_feed, self.net_side_feed, self.top_press,
+                       self.film_load, self.pad_normal,
+                       self.have_history, self.sensed, self.visual):
             buffer[env_ids] = 0
         self.height[env_ids] = .045
         self.actions[env_ids] = 0.
@@ -175,14 +182,13 @@ class YAMParcelBaseEnv(DirectRLEnv):
             q = self.motor_channels(robot.data.joint_pos.torch, robot)
             command = q + self.actions[:, i * JOINT_CHANNELS:(i + 1) * JOINT_CHANNELS] * self.step_limit
             target[:, :6] = command[:, :6].clamp(limits[:, :6, 0], limits[:, :6, 1])
-            rail = command[:, 6:7].clamp(limits[:, robot.rail_ids, 0].amax(dim=-1, keepdim=True),
-                                         limits[:, robot.rail_ids, 1].amin(dim=-1, keepdim=True))
-            target[:, robot.rail_ids] = rail
-
-    def set_grip_preload(self, arm, force_N):
-        """Set the optional force-equivalent closing target for a scripted trial."""
-        maximum = self.workcell["gripper"]["max_preload_n"]
-        self.preload_N[:, arm] = torch.as_tensor(force_N, device=self.device).clamp(0., maximum)
+            rail = command[:, 6:7]
+            min_rail = limits[:, robot.rail_ids, 0].amax(dim=-1, keepdim=True)
+            # The last part of a closing action requests motor preload against
+            # the calibrated physical stop through the original rail PD drive.
+            preload = ((rail - self.rail_close) / self.step_limit[-1]).clamp(0., 1.)
+            physical_target = torch.maximum(rail, min_rail).clamp_max(self.rail_close)
+            target[:, robot.rail_ids] = physical_target + preload * self.rail_overtravel
 
     def _parcel_action(self, i, robot, port_state, dq, motor):
         """Construct physical skin-contact inputs from the pad and parcel geometry."""
@@ -212,17 +218,39 @@ class YAMParcelBaseEnv(DirectRLEnv):
         approach = (velocity * self.feed_axis[:, i]).sum(dim=-1, keepdim=True)
         inward = dq.index_select(1, robot.rail_indices)
         opens = inward.mean(dim=-1, keepdim=True) < -.025
+        opening = opens | (self.q_des[i][:, robot.rail_ids].mean(dim=-1, keepdim=True)
+                           < robot.data.joint_pos.torch[:, robot.rail_ids].mean(dim=-1, keepdim=True) - .0001)
         side = (was_side | enters) & ~opens
         self.side[:, i:i + 1] = side
         self.side_feed[:, i] = torch.where(side, (self.side_feed[:, i] + approach * DT).clamp_min(0.), 0.)
-        # The available normal force comes from the real simulated motor channel.
-        # A closing PD effort is separated from external rail reactions by the port.
-        normal = motor.index_select(1, robot.rail_indices).clamp_min(0.)
-        # At the unloaded hard stop, holding effort can come from PhysX's rail
-        # limit alone. Allow only measured parcel-side load to count there.
+        history = self.parcel_state.contacts_A if i == 0 else self.parcel_state.contacts_B
+        gathered = (history[..., ContactState.SLACK] > 0.).all(dim=-1, keepdim=True)
+        captured = (history[..., ContactState.CAPTURE] > .5).any(dim=-1, keepdim=True)
+        inside = rim_margin > 0.
+        at_lip = ((body[:, 0, 2:] - height).abs() < .012) & inside
+        side_film = side & (self.net_side_feed[:, i] > 0.) & (at_lip | (captured & gathered))
+        local_pads = (pads - parcel.pos.mean(dim=1, keepdim=True)) @ frame
+        weights = payload.weights_at(local_pads[..., :2])
+        indentation = (weights @ parcel.d_surf.unsqueeze(-1)).squeeze(-1)
+        soft = payload.params.max_indent_ratio > 0.
+        pads_inside = (local_pads[..., :2].abs() <= footprint[:, None]).all(dim=-1)
+        pressing_film = (soft & (self.top_press[:, i] > 0.) & pads_inside.all(dim=-1, keepdim=True)
+                         & (indentation > 1e-6).any(dim=-1, keepdim=True))
+        top_film = ~side & soft & gathered & (pressing_film | captured)
+        pad_gap = (pads[:, 1:] - pads[:, :1]).norm(dim=-1)
+        film = (pad_gap <= self.film_gap) & ~opening & (side_film | top_film)
+
+        close_force = motor.index_select(1, robot.rail_indices).clamp_min(0.)
         against_limit = (robot.data.joint_pos.torch.index_select(1, robot.rail_indices)
                          >= self.rail_close - .00008)
-        normal = torch.where(against_limit, torch.minimum(normal, (-robot.rail_load).clamp_min(0.)), normal)
+        loaded = torch.minimum(close_force, (-robot.rail_load).clamp_min(0.))
+        approaching_film = ~opening & (side_film | (~side & pressing_film))
+        normal = torch.where(~against_limit & approaching_film, close_force, loaded)
+        # The PhysX stop already reacts to the opposed motor force. Its only
+        # additional role is to raise the available normal force of the film.
+        self.film_load[:, i] = torch.where(film, close_force.amin(dim=-1, keepdim=True), 0.)
+        normal = torch.maximum(normal, self.film_load[:, i])
+        self.pad_normal[:, i] = normal
         return ParcelAction(pads, velocities, normal, inward, self.side_feed[:, i].expand_as(normal),
                             side.expand_as(normal).to(dq.dtype), self.empty_action.external_force,
                             self.empty_action.direct_press_N)
@@ -234,13 +262,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
         motor = [robot.actuators.applied_effort.torch for robot in self.robots]
         cmds, quats, rates = [], [], []
         for i, robot in enumerate(self.scene_robots):
-            target = self.drive_target[i]
-            target.copy_(self.q_des[i])
-            if i < self.arm_count:
-                preload = self.preload_N[:, i]
-                k_p = robot.cfg.actuators["rails"].stiffness
-                target.index_add_(1, robot.rail_indices, (preload / k_p).expand(-1, 2))
-            robot.actuators.target_command.set_position_index(value=target, full_data=True)
+            robot.actuators.target_command.set_position_index(value=self.q_des[i], full_data=True)
             # MIT-style joint feedforward supplies the URDF arm's own weight.
             # The two rails retain their independent position/effort channels.
             gravity = self.gravity_feedforward[i]
@@ -268,6 +290,8 @@ class YAMParcelBaseEnv(DirectRLEnv):
             jaw_orientation=torch.stack(quats, dim=1), jaw_angular_velocity=torch.stack(rates, dim=1),
             pad_reaction_out=self.reaction, neck_port_mobility=articulated_mobility)
         self.parcel_state = self.result.state
+        self.net_side_feed.copy_(self.result.net_feed.amin(dim=-1, keepdim=True))
+        self.top_press.copy_(self.result.press_N.unsqueeze(-1))
         self._track_hold()
         for i, (port, sample) in enumerate(zip(self.ports, kinematics, strict=True)):
             port.write(sample, self.result.wrist_wrench[:, i], self.reaction[:, i])
@@ -282,7 +306,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
 
         opening = torch.stack([(s.pads[:, 1:] - s.pads[:, :1]).norm(dim=-1) for s in kinematics], dim=1)
         obs = self.current_filter.step(dofs_to_motor(motor), dofs_to_motor(q), dofs_to_motor(dq),
-                                       dofs_to_motor(self.drive_target[:self.arm_count]), opening)
+                                       dofs_to_motor(self.q_des[:self.arm_count]), opening)
         self.sensed = torch.cat(tuple(obs), dim=-1)
         for i, (projector, sample) in enumerate(zip(self.projectors, kinematics, strict=True)):
             center = sample.pads.mean(dim=1)
