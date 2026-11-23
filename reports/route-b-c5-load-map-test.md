@@ -21,6 +21,14 @@
 | C5 晚闭 2 ms 顶压峰值 / 25 Hz 闭合帧处于 8–12 N | 21.605 N / 0 帧 | 11.848 N / 0 帧 |
 | C4，顶压峰值 12.356 N | 0/300 捕获，0 mm 离台 | 0/300 捕获，0 mm 离台 |
 
-空载 0/4/30/35 N 的代理力与捕获均精确为零。双通道功 −0.191999963 mJ，静态 6 N/指去皮电流 +5.981641 N。CPU 分指检查覆盖单指有载、双指有载、硬书、张开、止挡、空载及侧抓，确认同一无捕获初态下力、力矩和包裹位移逐元素不变。两个冻结核心文件及 `yam_load_port.py` 的路径级 `git diff --exit-code` 通过。
+空载 0/4/30/35 N 的代理力与捕获均精确为零。双通道功 −0.191999963 mJ，静态 6 N/指去皮电流 +5.981641 N。Stage 3 CPU 原回归 15/15，逐轴电流单测 1/1。新增 CPU 分指检查覆盖单指有载、双指有载、硬书、张开、止挡、空载及侧抓，确认同一无捕获初态下力、力矩和包裹位移逐元素不变。两个冻结核心文件及 `yam_load_port.py` 的路径级 `git diff --exit-code` 通过。
 
 原生环境运行 `check_route_b_closed_loop.py --headless --empty-clamp` 和 `check_route_b_wrench_power.py --headless`。三条固定对照的命令使用 `compare.py --headless --selected matched-candidates.json --output ...`，通过 `ROUTE_B_TOP_MAP=0/1` 切换。C5 完整门禁未通过。[A/B、空载及端口汇总](../test/runs/2026-11-23/isaaclab/route-b-c5-load-map-r1/summary.json)
+
+## 20:12 对用户所看录像的复核
+
+C5 预览轨迹在 2.00 s 的指距已降至 39.49 mm，顶压为 0 N。首个至少 0.5 N 的样本出现在 2.80 s，指距当时只有 0.189 mm。该预览的计划闭合区间为 1.50–2.48 s，下压区间为 1.85–3.26 s。独立 A/B 表中的晚闭样本另有提前触袋，因此两个入口需要分别验收。[原预览逐帧数据](../test/runs/2026-11-23/isaaclab/c5-pad-skin-r1/after/trace.json)
+
+20:17 物理台架复验。先开爪下压，要求 8–12 N 连续 100 ms 才放行闭爪。首次实测触袋在 2.80 s，指距 81.21 mm，起始指距 81.09 mm。顶压峰值 5.989 N，因此闭爪联锁始终保持。CPU 输入序列检查确认 0 N 不闭合、三帧合格负载才闭合、中途失压暂停。物理台架的顶压读取用于验证实际机械接触，后续示范控制需使用可部署观测。[本轮复验日志](../test/runs/2026-11-23/isaaclab/route-b-c5-press-then-close-r1/run.log)
+
+20:23 复验按实触袋和离桌余量允许有限 Z 前馈。首次触袋仍为 2.80 s，指距仍为 81.21 mm。最低指垫采样高度降至 3.431 mm，顶压峰值为 6.395 N。整个过程未开启闭合，加载扫掠、双指捕获和离台均为零。CPU 复测覆盖三帧触发、失压暂停、安全余量偏低暂停及旧记录缺少时序证据时拒绝放行。原预览录像未重录。后续验收入口为 `check_route_b_closed_loop.py --headless --only-c5 --seconds 8.4`。[两轮数据](../test/runs/2026-11-23/isaaclab/route-b-c5-press-then-close-r2/summary.json)

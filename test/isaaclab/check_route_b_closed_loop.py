@@ -14,6 +14,51 @@ from src.low_order_parcel.domain_randomizer import CornerSuite, DomainRandomizer
 from src.low_order_parcel.lumped_contact_proxy import ContactState
 
 
+class C5PressThenClose:
+    """Regulate measured top load in the physical acceptance harness."""
+
+    def __init__(self, ready, center, top):
+        self.approach = center.expand_as(ready).clone()
+        self.approach[:, 2] = top + .012
+        self.z = self.approach[:, 2].clone()
+        self.in_band = self.z.new_zeros(len(ready))
+        self.close_started = self.z.new_full((len(ready),), -1.)
+        self.closed_at = self.close_started.clone()
+        self.stroke = self.z.new_zeros(len(ready))
+
+    def __call__(self, env, time, ready, offer, open_rail, closed):
+        command = torch.lerp(ready, self.approach, transition(time, .35, 2.05))
+        if time < 2.15:
+            return command, open_rail
+        dt = env.step_dt
+        force = env.result.press_N[:, 0]
+        pad_floor_gap = env.ports[0].read().pads[..., 2].amin(dim=1)
+        safe_table_gap = pad_floor_gap >= .004
+        in_band = (force >= 8.) & (force <= 12.) & safe_table_gap
+        self.in_band = torch.where(in_band, self.in_band + dt, 0.)
+        latch = (self.close_started < 0.) & (self.in_band >= .1)
+        self.close_started = torch.where(latch, time, self.close_started)
+        # Change Z slowly under load and more quickly when the open pads are in air.
+        dz = ((force - 10.) * .00013).clamp(-.0014, .0014)
+        dz = torch.where(safe_table_gap, dz, dz.clamp_min(.001))
+        # Use limited tracking-error compensation only while the pads are
+        # physically loading the cloth and remain clear of the tabletop.
+        min_z = torch.where(safe_table_gap & (force >= .5), -.006, 0.)
+        self.z = torch.maximum(self.z + dz, min_z)
+        command[:, 2] = self.z
+        width = closed - open_rail
+        self.stroke = torch.minimum(
+            width, self.stroke + dt * .035 * ((self.close_started >= 0.) & in_band))
+        complete = self.stroke >= width - 1e-6
+        self.closed_at = torch.where(complete & (self.closed_at < 0.), time, self.closed_at)
+        phase = torch.where(complete, ((time - self.closed_at - .16) / 2.8).clamp(0., 1.), 0.)
+        rise = .5 - .5 * (torch.pi * phase).cos()
+        command = torch.lerp(command, offer, rise[:, None])
+        preload = env.step_limit[-1] * 15. / (1000. * env.rail_overtravel)
+        rail = open_rail + self.stroke + complete * preload
+        return command, rail
+
+
 @torch.inference_mode()
 def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross_center=False,
                 lift_toward_base=False, loaded_sweep=False, preview_target=None):
@@ -62,6 +107,8 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
     offer += shift
     requested_preload = start.new_tensor([row[4] for row in rows])
     rail_target = torch.full_like(start_rail, env.rail_close)
+    top_press = C5PressThenClose(start_goal, shift, top)
+    phased_c5_enabled = any(row[0] == "C5" and row[1] == "top" for row in rows)
     timestamps = []
     observations = []
     tracking = []
@@ -115,6 +162,11 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
         sample = port.read()
         if preview_target is not None:
             command, rail = preview_target(env, time, start_goal, offer, start_rail, rail_target)
+        elif phased_c5_enabled:
+            c5_command, c5_rail = top_press(env, time, start_goal, offer, start_rail, rail_target)
+            c5_top = clothes & top_row
+            command = torch.where(c5_top[:, None], c5_command, command)
+            rail = torch.where(c5_top, c5_rail, rail)
         pad_center = sample.pads.mean(dim=1)
         jac = torch.cat((sample.pad_jacobian.mean(dim=1), sample.angular_jacobian.mean(dim=1)), dim=1)[..., :6]
         q = robot.data.joint_pos.torch
@@ -158,6 +210,12 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
         sweep_time = series.new_tensor(timestamps[1:])
         loaded_sweep_frames = closing & (sweep_time >= 2.6) & (sweep_time < 4.45)
         in_same_load_band = (series[1:, 13] >= 8.) & (series[1:, 13] <= 12.)
+        phased_c5 = row[0] == "C5" and row[1] == "top" and preview_target is None
+        if phased_c5:
+            started = top_press.close_started[index].item()
+            finished = top_press.closed_at[index].item()
+            loaded_sweep_frames = (closing & (started >= 0.) & (sweep_time >= started)
+                                   & ((finished < 0.) | (sweep_time <= finished + .12)))
         results.append(dict(corner=row[0], route=row[1], entry_offset_m=row[2],
                             any_double_capture=bool(both.any()), captured_frames=int(both.sum()),
                             bilateral_airborne_frames=int((both & (series[:, 3] > .001)
@@ -197,7 +255,26 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
                                                                    goals[approach_end, index, 2]).item(),
                             pad_min_height_mm=1000 * series[:, 6].amin().item(),
                             finite=bool(series.isfinite().all())))
+        if phased_c5:
+            contact = (series[:, 13] >= .5).nonzero().flatten()
+            first_contact = int(contact[0]) if len(contact) else None
+            results[-1].update(
+                first_top_contact_s=timestamps[first_contact] + env.step_dt if len(contact) else None,
+                aperture_at_contact_mm=1000. * series[first_contact, 21].item() if len(contact) else None,
+                open_aperture_mm=1000. * series[0, 21].item(),
+                close_started_s=started if started >= 0. else None,
+                closed_at_s=finished if finished >= 0. else None,
+                contact_before_close=bool(len(contact) and started >= timestamps[first_contact] + env.step_dt + .1
+                                          and series[first_contact, 21] >= .95 * series[0, 21]))
     return results, dict(times_s=timestamps, observations=data.tolist(), pad_target_m=goals.tolist())
+
+
+def c5_gate(clothes):
+    return (clothes.get("contact_before_close", False)
+            and clothes["loaded_sweep_frames"] > 0
+            and clothes["loaded_sweep_frames"] == clothes["loaded_sweep_frames_8_to_12_N"]
+            and clothes["peak_bilateral_gather_mm"] > 1.50
+            and clothes["bilateral_airborne_frames"] > 0)
 
 
 def right_arm_gates(result):
@@ -205,10 +282,7 @@ def right_arm_gates(result):
     return {
         "C4_top": hard["any_finger_frames"] == 0 and hard["peak_clearance_mm"] < 1.
         and hard["peak_film_load_N"] == 0.,
-        "C5_top": (clothes["loaded_sweep_frames"] > 0
-                   and clothes["loaded_sweep_frames"] == clothes["loaded_sweep_frames_8_to_12_N"]
-                   and clothes["peak_bilateral_gather_mm"] > 1.50
-                   and clothes["bilateral_airborne_frames"] > 0),
+        "C5_top": c5_gate(clothes),
         "C6_low": low_entry["peak_package_translation_mm"] > 1. and low_entry["any_finger_frames"] == 0
         and low_entry["peak_film_load_N"] == 0.,
         "C6_high": any(row["longest_hold_s"] >= 3. and row["last3_max_speed_mm_s"] < 20.
@@ -342,6 +416,7 @@ def main():
     parser.add_argument("--loaded-arm-gains", action="store_true", help="Evaluate higher proximal gains within the same effort limits.")
     parser.add_argument("--empty-clamp", action="store_true", help="Verify 0/4/30/35 N close commands in free space.")
     parser.add_argument("--only-c4", action="store_true", help="Repeat the hard-book lane in an isolated environment.")
+    parser.add_argument("--only-c5", action="store_true", help="Verify open-jaw contact and loaded closure in one C5 lane.")
     parser.add_argument("--trace")
     add_launcher_args(parser)
     parser.set_defaults(visualizer=[], livestream=0)
@@ -361,10 +436,14 @@ def main():
             ("C3", "side-high", .006, .020, 8.), ("C3", "side-high", .006, .020, 30.)]
     if args.only_c4:
         rows = rows[:1]
+    if args.only_c5:
+        if args.only_c4 or args.empty_clamp or args.benchmark:
+            parser.error("--only-c5 selects the independent soft-cloth acceptance lane.")
+        rows = rows[1:2]
     count = args.num_envs if args.benchmark else 4 if args.empty_clamp else len(rows)
     cfg = yam_parcel_cfg(count, dual_arm=args.dual_arm,
                          use_newton_actuators=args.native_actuators)
-    if args.loaded_arm_gains:
+    if args.loaded_arm_gains or args.only_c5:
         cfg.scene.arm_a.actuators["proximal"].stiffness = 140.
         cfg.scene.arm_a.actuators["proximal"].damping = 6.6
     env_type = YAMHandoverPlaceEnv if args.dual_arm else YAMPickEnv
@@ -378,6 +457,9 @@ def main():
             episode = CornerSuite(dr).select(dr.tensor([int(row[0][1:]) - 1 for row in rows], dtype=torch.long))
         env = env_type(cfg, episode=episode)
         try:
+            if args.only_c5:
+                # Align FK, contact, and wrench accounting to the lower CAD edge.
+                env.ports[0].frames.offsets[1:, 2] -= env.scene_definition["pad_box_size_m"][2] / 2
             assert not env.sim.has_gui and not env.sim.has_offscreen_render and not env.scene.sensors
             if args.benchmark:
                 result = benchmark(env, args.benchmark, before)
@@ -394,6 +476,12 @@ def main():
                 print("ROUTE_B_CLOSED_LOOP " + json.dumps(result), flush=True)
                 if args.only_c4:
                     assert result[0]["any_finger_frames"] == 0 and result[0]["peak_film_load_N"] == 0.
+                    return
+                if args.only_c5:
+                    passed = c5_gate(result[0])
+                    print("ROUTE_B_C5_GATE " + json.dumps(passed), flush=True)
+                    if not passed:
+                        raise SystemExit(1)
                     return
                 if args.tracking_probe:
                     passed = all(abs(row["approach_end_z_error_mm"]) < 2. for row in result
