@@ -151,7 +151,8 @@ class DualArmParcelSim:
 
     def step(self, state: DualArmState, action: DualArmAction, *,
              jaw_orientation: Tensor | None = None, jaw_angular_velocity: Tensor | None = None,
-             pad_reaction_out: Tensor | None = None, neck_port_mobility=None) -> DualArmStep:
+             pad_reaction_out: Tensor | None = None, neck_port_mobility=None,
+             map_top_pad_load: bool = False, proxy_normal_out: Tensor | None = None) -> DualArmStep:
         """World jaw pose/rate, with optional [B,arm,pad,xyz] articulation reaction buffer."""
         payload, current = self.payload, state.payload
         arm_A, arm_B, enabled, side_feed = action
@@ -220,6 +221,16 @@ class DualArmParcelSim:
         if side_feed is not None:
             side = side | side_feed.unsqueeze(-1)
         normal = torch.where(pad_enabled, normal, 0.)
+        if map_top_pad_load:
+            local_indent = (tip_weights @ surface.depth[:, None, :, None]).squeeze(-1)
+            closing = (inward > 0.).all(dim=-1, keepdim=True)
+            soft = payload.params.max_indent_ratio.unsqueeze(-1) > 0.
+            top_loaded = closing & soft & ~side & engaged & pad_enabled & (local_indent > EPS)
+            # The measured top normal is already included in the wrist reaction.
+            # Use it only as proxy traction capacity, after computing the jaw load.
+            normal = torch.maximum(normal, torch.where(top_loaded, surface_vertical, 0.))
+        if proxy_normal_out is not None:
+            proxy_normal_out.copy_(normal)
         compression = torch.where(side, normal, press)
         excess = (compression - self.min_press).clamp_min(0.)
         half_force = self.F_half[:, None]

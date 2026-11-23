@@ -2,34 +2,16 @@
 
 import argparse
 import json
-import math
 from time import perf_counter
 
 import torch
 from isaaclab.app import add_launcher_args, launch_simulation
-from isaaclab.controllers import DifferentialIKController, DifferentialIKControllerCfg
+from isaaclab.controllers import DifferentialIKControllerCfg
 
+from src.isaac_yam_parcel.joint_ik import PadIK, transition
 from src.isaac_yam_parcel.yam_parcel_base_env import YAMHandoverPlaceEnv, YAMPickEnv, yam_parcel_cfg
 from src.low_order_parcel.domain_randomizer import CornerSuite, DomainRandomizer
 from src.low_order_parcel.lumped_contact_proxy import ContactState
-
-
-def transition(time, start, end):
-    phase = min(1., max(0., (time - start) / (end - start)))
-    return .5 - .5 * math.cos(math.pi * phase)
-
-
-class PadIK(DifferentialIKController):
-    """Track a pad center in metres and give orientation lower task-space weight."""
-
-    angular_weight = None
-
-    def _compute_pose_task(self, ee_pos, ee_quat, jacobian):
-        jac, error = super()._compute_pose_task(ee_pos, ee_quat, jacobian)
-        scale = error.new_tensor([6., 6., 6., 1., 1., 1.])
-        if self.angular_weight is not None:
-            scale = torch.cat((scale[:3].expand(len(error), -1), self.angular_weight[:, None].expand(-1, 3)), dim=-1)
-        return jac * scale.unsqueeze(-1), error * scale
 
 
 @torch.inference_mode()

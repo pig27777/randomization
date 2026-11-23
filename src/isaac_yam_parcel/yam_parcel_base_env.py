@@ -42,6 +42,7 @@ def yam_parcel_cfg(num_envs, *, dual_arm=False, park_left=True, seed=17, use_new
 
 class YAMParcelBaseEnv(DirectRLEnv):
     arm_count = 1
+    map_top_pad_load = True
 
     def __init__(self, cfg, *, episode=None, curriculum_alpha=1.):
         from .yam_load_port import YamLoadPort
@@ -339,7 +340,8 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.result = self.parcel_sim.step(
             self.parcel_state, DualArmAction(*cmds, self.enabled, self.side),
             jaw_orientation=torch.stack(quats, dim=1), jaw_angular_velocity=torch.stack(rates, dim=1),
-            pad_reaction_out=self.reaction, neck_port_mobility=articulated_mobility)
+            pad_reaction_out=self.reaction, neck_port_mobility=articulated_mobility,
+            map_top_pad_load=self.map_top_pad_load, proxy_normal_out=self.pad_normal)
         self.parcel_state = self.result.state
         self.net_side_feed.copy_(self.result.net_feed.amin(dim=-1, keepdim=True))
         self.top_press.copy_(self.result.press_N.unsqueeze(-1))
