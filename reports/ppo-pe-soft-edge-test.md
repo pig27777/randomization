@@ -32,3 +32,7 @@ flock /tmp/claude-gpu.lock "$py" -B "$tools/ppo_edge_pad_probe.py" "$out/pad-pro
 轨迹全步有限，独立检查相邻离台采样连续、尾段持续双侧承载、无撕裂。YAM 回合零缓冲溢出。[受控提拉录像](../test/runs/2026-11-23/policy/ppo-yam-pe-edge-r1/edge-hang.mp4) · [YAM 边缘指令录像](../test/runs/2026-11-23/policy/ppo-yam-pe-edge-r1/policy-grasp.mp4) · [原始状态与日志](../test/runs/2026-11-23/policy/ppo-yam-pe-edge-r1/)
 
 两段 H.264 录像均经 ffprobe 核对尺寸（1152 × 620）和帧数（150／309），并以 `ffmpeg -v error -xerror -i <录像> -f null -` 完整解码通过。
+
+### 夹取点到内容物的距离（2026-11-23 15:36，ubun）
+
+读取受控指垫的 `pad-probe.npz` 全部 3,000 步，以两指垫坐标中点作为夹取点。对四个显示用内容物子块，将该点变换到各块本地坐标，裁剪到盒体三轴边界，取四个点到盒体距离的最小值。盒体半长宽、动态半厚和姿态与录像一致。双侧刚捕获（0.090 s）为 66.13 mm，此时指垫高 122.13 mm、内容物上表面高 56.00 mm。6.000 s 时为 84.66 mm，最后 1 s 范围 83.74–84.90 mm；末帧两指分别核算为 84.655 和 84.657 mm。末帧每指到自己膜代理传力点的距离为 117.40／117.41 mm。传力点初始 y=−45 mm，名义袋边 y=−90 mm。几何距离基于 PPO 的四块外形，薄膜实体弧长无法由这个模型测出。
