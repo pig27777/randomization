@@ -24,3 +24,21 @@ LP_NUM_THREADS=7 "$P" -B "$D/render_attempt.py" right
 250 g 原生模型在闭合时记录到双指接触，在提拉初段短暂带动裙包。4.40 s 双指法向力约 5.20 N 和 4.77 N，包底仍接近台面。4.60 s 两指接触读数均为零，裙包回到台面。冻结代理在 8.00 s 的块体净空约 260 mm。整段以真实接触尝试为口径，保留原生滑脱。左侧闭合期原生接触日志中存在超过 3 mm 的数值接触重叠。按要求跳过全片穿模审计，因此此片是调试回放。
 
 [250 g 直出分屏](../test/runs/2026-11-23/bag/real-grasp-skirt-c-r2/compare_real_grasp_skirt_c.mp4)。
+
+## 夹口可见性复核
+
+2026-11-23，ubun。旧帧在闭合时出现指尖被遮住、袋面残留暗色轮廓。离屏 GL 状态读回显示，MuJoCo 4 的 CAD 层使用零到一反向深度和对应的投影矩阵。自定义内容物与透明膜遍次之前重建了传统 frustum 并反转深度范围，世界位置相同的片元仍得到不同深度。现有不透明绘制顺序和膜的背面、正面混合顺序可以沿用，所有绘制共用 CAD 渲染结束时的投影、视图和深度缓冲。
+
+以已保存的 250 g 几何重渲染，使用两指中点跟随特写。已从最终 MP4 抽查 3.60 s 闭合、4.32 s 开始提拉、4.80 s 左侧滑脱后。闭合和提拉初段的两只指垫可见。左侧的真实滑脱及右侧代理提拉保留。成片经 FFmpeg 全段解码，ffprobe 核对为 H.264/yuv420p、1920 × 720、25 fps、240 帧、9.60 s。本轮只核验了成片可见性和编码。
+
+[修正版分屏](../test/runs/2026-11-23/bag/real-grasp-skirt-c-r2/grasp-visibility-r1/compare_real_grasp_skirt_c.mp4) · [成片夹口抽帧](../test/runs/2026-11-23/bag/real-grasp-skirt-c-r2/grasp-visibility-r1/grasp_visibility_frames.png) · [编码读回](../test/runs/2026-11-23/bag/real-grasp-skirt-c-r2/grasp-visibility-r1/ffprobe.json)。
+
+```sh
+D=test/runs/2026-11-23/bag/real-grasp-skirt-c-r2
+P=.venv-physical-parcel/bin/python
+O=$(mktemp -d)
+LP_NUM_THREADS=6 "$P" -B "$D/render_attempt.py" left --output-dir "$O"
+LP_NUM_THREADS=6 "$P" -B "$D/render_attempt.py" right --output-dir "$O" --reuse-proxy-skin
+"$P" -B "$D/render_attempt.py" compose --output-dir "$O"
+ffmpeg -v error -xerror -i "$O/compare_real_grasp_skirt_c.mp4" -f null -
+```

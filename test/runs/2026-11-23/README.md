@@ -13,3 +13,4 @@
 | route-b-c5-load-map-r1 | ubun RTX 5090，Fix 4.1 与 Plan B。分指载荷回放、顶压映射 A/B 与端口回归。C5 捕获 2/300，离台同步捕获 0。 | [逐步诊断及回归](../../../reports/route-b-c5-load-map-test.md) · [汇总](isaaclab/route-b-c5-load-map-r1/summary.json) |
 | real-grasp-skirt-c-r2 | ubun，250 g 厚裙共享居中顶抓轨迹，原生双指摩擦滑脱，冻结代理稳悬。按要求直出。 | [报告](../../../reports/real-grasp-skirt-c-test.md) · [视频](bag/real-grasp-skirt-c-r2/compare_real_grasp_skirt_c.mp4) |
 | route-b-bin-side-demos-r1 | ubun，Plan B 侧抓，种子 1。首批示范 0/8,192。定位接触归属与搬运偏差后 C6 小批完整入篮 1/2。 | [测试与复现](../../../reports/route-b-side-bc-test.md) · [首批结果](isaaclab/route-b-bin-side-demos-r1/s8192-side/result.json) |
+| grasp-visibility-r1 | ubun，250 g 居中抓取原始记录，修复 PE 与 CAD 深度遮挡并核对三段夹口。 | [报告](../../../reports/real-grasp-skirt-c-test.md#夹口可见性复核) · [视频](bag/real-grasp-skirt-c-r2/grasp-visibility-r1/compare_real_grasp_skirt_c.mp4) |

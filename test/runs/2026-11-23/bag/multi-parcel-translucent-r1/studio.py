@@ -10,7 +10,6 @@ sys.path.insert(0, str(HERE.parent / "pe-yam-film-comparison-r1"))
 from render import make_model, raw_cmd, mj, W, H, crease_normals
 from experience.yam_platform.render_video import GL
 from OpenGL.GL import shaders
-from OpenGL import GLU
 
 VERTEX = """
 #version 120
@@ -68,20 +67,6 @@ def opaque_mesh(vertices, faces):
     return triangles.reshape(-1, 3), np.repeat(normals, 3, axis=0)
 
 
-def camera_setup(camera):
-    near = camera.frustum_near
-    top, bottom = camera.frustum_top, camera.frustum_bottom
-    extent = (top - bottom) * W / H / 2.
-    offset = camera.frustum_center
-    GL.glViewport(0, 0, W, H)
-    GL.glMatrixMode(GL.GL_PROJECTION)
-    GL.glLoadIdentity()
-    GL.glFrustum(offset - extent, offset + extent, bottom, top, near, camera.frustum_far)
-    GL.glMatrixMode(GL.GL_MODELVIEW)
-    GL.glLoadIdentity()
-    GLU.gluLookAt(*camera.pos, *(camera.pos + camera.forward), *camera.up)
-
-
 def draw_mesh(vertices, normals):
     positions = np.ascontiguousarray(vertices, dtype=np.float32)
     directions = np.ascontiguousarray(normals, dtype=np.float32)
@@ -96,12 +81,11 @@ def layer(renderer, model, data, view, option, program, mesh, contents, pigment)
     scene.flags[mj.mjtRndFlag.mjRND_SHADOW] = False
     mj.mjr_render(renderer._rect, scene, renderer._mjr_context)
     camera = mj.mjv_averageCamera(scene.camera[0], scene.camera[1])
-    camera_setup(camera)
+    # Keep the camera matrices and zero-to-one reversed depth of the CAD pass.
     GL.glUseProgram(program)
     GL.glDisable(GL.GL_LIGHTING)
     GL.glEnable(GL.GL_DEPTH_TEST)
     GL.glDepthFunc(GL.GL_GEQUAL)
-    GL.glDepthRange(1., 0.)
     GL.glDepthMask(GL.GL_TRUE)
     GL.glDisable(GL.GL_CULL_FACE)
     GL.glDisable(GL.GL_BLEND)
@@ -128,13 +112,12 @@ def layer(renderer, model, data, view, option, program, mesh, contents, pigment)
     GL.glDisableClientState(GL.GL_VERTEX_ARRAY)
     GL.glDisableClientState(GL.GL_NORMAL_ARRAY)
     GL.glUseProgram(0)
-    GL.glDepthRange(0., 1.)
     rgb = np.empty((H, W, 3), dtype=np.uint8)
     mj.mjr_readPixels(rgb, None, renderer._rect, renderer._mjr_context)
     return Image.fromarray(rgb[::-1])
 
 
-def render(output, films, faces, links, quats, names, pads, contents, content_faces, pigment, *, still=None):
+def render(output, films, faces, links, quats, names, pads, contents, content_faces, pigment, *, still=None, grasp_detail=False):
     model = make_model(films[0], faces)
     model.geom_group[model.geom("surface").id] = 5
     data = mj.MjData(model)
@@ -146,7 +129,14 @@ def render(output, films, faces, links, quats, names, pads, contents, content_fa
     full.azimuth, full.elevation, full.distance = 135, -19, 1.34
     full.lookat[:] = [-.18, -.25, .237]
     detail = mj.MjvCamera()
-    detail.azimuth, detail.elevation, detail.distance = 135, -26, .59
+    if grasp_detail:
+        detail.azimuth, detail.elevation, detail.distance = 90, -26, .30
+        inset_size, inset_origin = (396, 297), (18, 335)
+    else:
+        detail.azimuth, detail.elevation, detail.distance = 135, -26, .59
+        inset_size, inset_origin = (300, 225), (18, 412)
+    inset_x, inset_y = inset_origin
+    inset_w, inset_h = inset_size
     bodies = {i: list(names).index(model.body(i).name) for i in range(model.nbody) if model.body(i).name in names}
     parent = [(g, bodies[b]) for g, b in enumerate(model.geom_bodyid) if b in bodies]
     geom_rotation = np.empty((model.ngeom, 9))
@@ -169,10 +159,11 @@ def render(output, films, faces, links, quats, names, pads, contents, content_fa
                 membrane = (v[faces].reshape(-1, 3), crease_normals(v, faces))
                 insides = [opaque_mesh(cv, cf) for cv, cf in zip(contents[i], content_faces)]
                 frame = layer(renderer, model, data, full, option, program, membrane, insides, pigment)
-                detail.lookat[:] = v.mean(axis=0)
+                detail.lookat[:] = pads[i].mean(axis=0) + [0, 0, .002] if grasp_detail else v.mean(axis=0)
                 inset = layer(renderer, model, data, detail, option, program, membrane, insides, pigment)
-                frame.paste(inset.resize((300,225),Image.Resampling.LANCZOS),(18,412))
-                ImageDraw.Draw(frame).rectangle((17,411,318,637),outline="#d6dce2")
+                frame.paste(inset.resize(inset_size, Image.Resampling.LANCZOS), inset_origin)
+                ImageDraw.Draw(frame).rectangle((inset_x - 1, inset_y - 1, inset_x + inset_w, inset_y + inset_h),
+                                                outline="#d6dce2")
                 if process:
                     process.stdin.write(frame.tobytes())
                 else:

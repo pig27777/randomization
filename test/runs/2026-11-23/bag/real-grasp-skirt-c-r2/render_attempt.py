@@ -139,7 +139,7 @@ def proxy_geometry(path, reference):
                 content_faces=np.tile(solid_faces,(4,1,1)))
 
 
-def record_side(side):
+def record_side(side, output, reuse_proxy_skin):
     reference=np.load(HERE/"q_ref_top_center.npz")
     if side=="left":
         native=np.load(HERE/"native_preview.npz")
@@ -147,17 +147,22 @@ def record_side(side):
         inside=native["contents"][:,None]
         inside_faces=native["content_faces"][None]
     else:
-        raw=np.load(HERE/"proxy_probe.npz")
-        mesh=proxy_geometry(raw,reference)
+        cached=HERE/"proxy_skin_preview.npz"
+        if reuse_proxy_skin:
+            with np.load(cached) as stored:
+                mesh=dict(stored)
+        else:
+            raw=np.load(HERE/"proxy_probe.npz")
+            mesh=proxy_geometry(raw,reference)
+            np.savez_compressed(cached,**mesh)
         v,F,inside,inside_faces=(mesh[k] for k in ("film","faces","contents","content_faces"))
-        np.savez_compressed(HERE/"proxy_skin_preview.npz",**mesh)
     k=len(v)*20
-    render(HERE/f"{side}_contact.mp4",v,F,reference["links"][:k:20],reference["quats"][:k:20],
-           reference["names"],reference["pads"][:k:20],inside,inside_faces,COLOR)
+    render(output/f"{side}_contact.mp4",v,F,reference["links"][:k:20],reference["quats"][:k:20],
+           reference["names"],reference["pads"][:k:20],inside,inside_faces,COLOR,grasp_detail=True)
 
 
-def compose():
-    movie=HERE/"compare_real_grasp_skirt_c.mp4"
+def compose(output):
+    movie=output/"compare_real_grasp_skirt_c.mp4"
     font="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
     filters=("[0:v][1:v]hstack,drawbox=x=0:y=0:w=iw:h=74:color=0x18252f:t=fill,"
              "drawbox=x=0:y=648:w=iw:h=72:color=0x18252f:t=fill,"
@@ -167,16 +172,19 @@ def compose():
              f"drawtext=fontfile={font}:text='250 g folded skirt | shared vertical centre approach':fontsize=17:fontcolor=0xd9e2e7:x=24:y=45,"
              f"drawtext=fontfile={font}:text='250 g folded skirt | model-based contact and capture':fontsize=17:fontcolor=0xd9e2e7:x=984:y=45,"
              f"drawtext=fontfile={font}:text='%{{pts\\:flt}} s   |   Direct export of the contact attempt':fontsize=23:fontcolor=white:x=24:y=667")
-    subprocess.run(["ffmpeg","-v","error","-n","-i",str(HERE/"left_contact.mp4"),
-      "-i",str(HERE/"right_contact.mp4"),"-filter_complex",filters,"-an","-c:v","libx264",
+    subprocess.run(["ffmpeg","-v","error","-n","-i",str(output/"left_contact.mp4"),
+      "-i",str(output/"right_contact.mp4"),"-filter_complex",filters,"-an","-c:v","libx264",
       "-preset","fast","-crf","17","-pix_fmt","yuv420p","-movflags","+faststart",str(movie)],check=True)
 
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("stage",choices=["left","right","compose"])
+    p.add_argument("--output-dir",type=Path,default=HERE)
+    p.add_argument("--reuse-proxy-skin",action="store_true")
     a=p.parse_args()
+    a.output_dir.mkdir(parents=True,exist_ok=True)
     if a.stage=="compose":
-        compose()
+        compose(a.output_dir)
     else:
-        record_side(a.stage)
+        record_side(a.stage,a.output_dir,a.reuse_proxy_skin)
