@@ -32,3 +32,33 @@ flock /tmp/claude-gpu.lock "$P" -B "$N/run_native.py" "$O/native.npz" --seconds 
 "$P" -B "$N/compare_c.py" "$O/native.npz" "$O/box-fit.npz" "$O/skirt_c_8s.png"
 "$P" -B "$N/check_hold.py" "$O/native.npz" "$O/box-fit.npz" "$O/right.npz" "$O/skirt_c_8s.png"
 ```
+
+## 正式分屏复核
+
+2026-11-23 19:28（北京时间），ubun。每侧复用一次已归档的 9.6 s 动力学实跑。左侧沿用 MuJoCo 原生薄壳和有限夹持约束。右侧保留同一冻结代理输出，蒙皮在离台过渡时保持短边有内收余量、底片随四块起抬后再随夹口摆动。第一轮逐帧检查发现离台过渡最大边长比 1.1249。修正过渡后，8.00 s 右侧节点与上一轮单帧相差小于 0.0004 mm。
+
+| 项目 | 验证结果 |
+| --- | --- |
+| 左侧原生薄壳全部物理子步 | 最大边长比 1.04307 |
+| 右侧蒙皮全部显示帧 | 对平铺和初始包覆的最大边长比均为 1.02796，膜与四块相交数和外露角点数均为 0 |
+| 6.56–9.56 s 稳悬 | 左 / 右可见袋底最低净空 225.5 / 226.6 mm，质心峰值速度 0.110 / 0.458 mm/s |
+| 编码及读回 | H.264 / yuv420p，1920 × 720，25 fps，240 帧，9.60 s。FFmpeg 解码全段通过 |
+| 从成片抽取 | 双闭合 2.60 s、双离台 3.84 s、稳悬 8.00 s |
+
+右侧袋底在台面接触期间最深视觉重叠 0.66 mm。稳态薄壳最陡测线 17.5°。历史空载 GPU 数据在片头与本次单环境 CPU 吞吐分别标注。FleX 需求仍由本机的 MuJoCo flex 薄壳替代。冻结方程与训练 DR 配置经 diff 核查一致。
+
+[完整分屏 MP4](../test/runs/2026-11-23/bag/umi-skirt-c-video-r1/compare_flex_vs_proxy_side_by_side.mp4) · [三个关键帧拼图](../test/runs/2026-11-23/bag/umi-skirt-c-video-r1/keyframes.png) · [逐帧检查汇总](../test/runs/2026-11-23/bag/umi-skirt-c-video-r1/video_audit.json) · [编码读回](../test/runs/2026-11-23/bag/umi-skirt-c-video-r1/ffprobe.json)。
+
+从仓库根目录执行，可复用当前已存的动力学轨迹。两个单侧视频和分屏均在同机位离屏以 CPU Mesa llvmpipe 渲染，投影与验收由正式运行锁保护。
+
+```sh
+D=test/runs/2026-11-23/bag/umi-skirt-c-video-r1
+P=.venv-physical-parcel/bin/python
+O=$(mktemp -d)
+flock /tmp/claude-gpu.lock "$P" -B "$D/make_video.py" prepare "$O"
+LP_NUM_THREADS=6 "$P" -B "$D/make_video.py" left "$O"
+LP_NUM_THREADS=6 "$P" -B "$D/make_video.py" right "$O"
+"$P" -B "$D/make_video.py" compose "$O"
+ffprobe -v error -select_streams v:0 -show_streams "$O/compare_flex_vs_proxy_side_by_side.mp4"
+ffmpeg -v error -xerror -i "$O/compare_flex_vs_proxy_side_by_side.mp4" -f null -
+```

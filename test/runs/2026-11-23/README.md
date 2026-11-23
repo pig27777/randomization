@@ -9,3 +9,4 @@
 | route-b-c5-ui-r1 | ubun RTX 5090。修复前 C5 PhysX 界面，180 帧可解码，未形成捕获。 | [C5 视频](isaaclab/route-b-c5-ui-r1/c5-grasp.mp4) · [截图](isaaclab/route-b-c5-ui-r1/c5-close.png) |
 | umi-skirt-c-r1 | ubun，原生 MuJoCo flex / Fix 4.1 四块代理。UMI 39 × 29 × 2 cm 厚裙同轨迹夹衣，稳悬单帧、边长和防穿模复核；待目视确认。 | [命令与报告](../../../reports/umi-skirt-c-test.md) · [同帧图](bag/umi-skirt-c-r1/skirt_c_8s.png) · [DR 审查](../../../reports/umi-four-modes-dr-test.md) |
 | route-b-final-gates-r1 | ubun RTX 5090，Fix 4.1 与 Plan B 单臂 Yam_B。C5 同载荷未放行。端口复验、8,192 路空载和入篮终态逻辑通过。 | [命令与报告](../../../reports/route-b-plan-b-test.md) · [数据](isaaclab/route-b-final-gates-r1/plan-b-step1-summary.json) |
+| umi-skirt-c-video-r1 | ubun，沿用 UMI 工况 C 同轨迹物理记录。完整 9.6 s 左右分屏通过逐帧边长和四块防穿模检查。 | [命令与报告](../../../reports/umi-skirt-c-test.md#正式分屏复核) · [视频](bag/umi-skirt-c-video-r1/compare_flex_vs_proxy_side_by_side.mp4) |
