@@ -60,6 +60,12 @@ def yam_bin_cfg(num_envs, layout, *, seed=1):
         prim_path="{ENV_REGEX_NS}/Yam_B/Geometry/.*", history_length=0, update_period=0.,
         max_contact_data_count_per_prim=4,
     )
+    gripper = "{ENV_REGEX_NS}/Yam_B/Geometry/base/link1/link2/link3/link4/link5/gripper"
+    for side, opposite in (("left", "right"), ("right", "left")):
+        setattr(cfg.scene, f"tip_{side}_mating", ContactSensorCfg(
+            prim_path=f"{gripper}/tip_{side}", filter_prim_paths_expr=[f"{gripper}/tip_{opposite}"],
+            history_length=0, update_period=0., max_contact_data_count_per_prim=4,
+        ))
     for name, (center, half) in zip(("West", "East", "Near", "Far"), bin_wall_boxes(layout["bin"]), strict=True):
         setattr(cfg.scene, f"bin_{name.lower()}", AssetBaseCfg(
             prim_path=f"{{ENV_REGEX_NS}}/BinWall{name}",
@@ -145,6 +151,12 @@ class YAMSingleArmBinEnv(YAMPickEnv):
         self.moving_held = torch.zeros_like(self.entered_bin)
         self.tension = like.new_zeros((self.num_envs, 2))
         self.contacts = self.scene["yam_contacts"]
+        self.mating_contacts = (self.scene["tip_left_mating"], self.scene["tip_right_mating"])
+        self.tip_contact_ids = torch.tensor([self.contacts.body_names.index(name) for name in ("tip_left", "tip_right")],
+                                            device=self.device)
+        sample = self.ports[0].read()
+        distance = ((sample.pads[:, 1] - sample.pads[:, 0]) * sample.rail_axis[:, 0]).sum(dim=-1)
+        self.zero_position_aperture = (distance + self._rail_sum()).median()
 
     def _make_randomizer(self, seed):
         return BinRandomizer(self.device, seed, self.layout)
@@ -241,8 +253,23 @@ class YAMSingleArmBinEnv(YAMPickEnv):
         settled = self.valid_release & no_grip & supported & within & quiet & (self.result.table_clearance[:, 0] <= .001)
         self.bin_streak.copy_(torch.where(settled, self.bin_streak + 1, 0))
 
+    def _rail_sum(self):
+        robot = self.robots[0]
+        return robot.data.joint_pos.torch.index_select(1, robot.rail_indices).sum(dim=1)
+
     def _record_link_contacts(self):
-        force = self.contacts.data.net_normal_forces_w.torch.norm(dim=-1).amax(dim=1)
+        net = self.contacts.data.net_normal_forces_w.torch
+        # Once calibrated from the open, collinear rails, the encoder sum keeps
+        # sub-millimetre accuracy even for clones far from the world origin.
+        gap = self.zero_position_aperture - self._rail_sum()
+        mating = torch.cat([sensor.data.normal_force_matrix_w.torch.sum(dim=2)
+                            for sensor in self.mating_contacts], dim=1)
+        # PhysX reports speculative contact between the two mating sliders before the
+        # CAD pad faces touch. Subtract only the measured force from that exact pair
+        # at a positive, sub-stop gap. Table, basket and other link forces remain.
+        clear_faces = (gap > 0.) & (gap <= self.film_gap)
+        tip = net.index_select(1, self.tip_contact_ids) - torch.where(clear_faces[:, None, None], mating, 0.)
+        force = net.norm(dim=-1).index_copy(1, self.tip_contact_ids, tip.norm(dim=-1)).amax(dim=1)
         torch.maximum(self.peak_contact, force, out=self.peak_contact)
 
     def _success(self):
