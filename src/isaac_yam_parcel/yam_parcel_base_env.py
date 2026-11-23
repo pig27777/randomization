@@ -24,11 +24,12 @@ OBS_PER_ARM = 57
 PLACE_OBS = 4
 
 
-def yam_parcel_cfg(num_envs, *, dual_arm=False, seed=17, use_newton_actuators=False):
+def yam_parcel_cfg(num_envs, *, dual_arm=False, park_left=True, seed=17, use_newton_actuators=False):
     # The left arm remains physically in the same workcell during Policy 1.
-    scene = abc_scene_cfg(num_envs, dual_arm=True)
+    scene = abc_scene_cfg(num_envs, dual_arm=dual_arm or park_left)
     scene.arm_a.class_type = "src.isaac_yam_parcel.yam_load_port:RailLoadedYam"
-    scene.arm_b.class_type = scene.arm_a.class_type
+    if dual_arm or park_left:
+        scene.arm_b.class_type = scene.arm_a.class_type
     arms = 2 if dual_arm else 1
     obs = arms * OBS_PER_ARM + (PLACE_OBS if dual_arm else 0)
     return DirectRLEnvCfg(
@@ -53,11 +54,12 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.render_enabled = self.sim.has_gui
         self.scene_definition = scene = load_scene()
         self.workcell = load_workcell()
-        self.scene_robots = (self.scene["arm_a"], self.scene["arm_b"])
+        self.scene_robots = tuple(self.scene[name] for name in ("arm_a", "arm_b")
+                                  if name in self.scene.articulations)
         self.robots = self.scene_robots[:self.arm_count]
         origin = self.scene.env_origins
         self.ports = tuple(YamLoadPort(robot, scene, origin) for robot in self.robots)
-        self.randomizer = DomainRandomizer(self.device, cfg.seed)
+        self.randomizer = self._make_randomizer(cfg.seed)
         self.curriculum_alpha = curriculum_alpha
         self.fixed_episode = episode is not None
         self.episode = episode if self.fixed_episode else self.randomizer.sample(
@@ -128,6 +130,9 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.result = None
         self.markers = self._make_markers() if self.sim.has_gui else None
 
+    def _make_randomizer(self, seed):
+        return DomainRandomizer(self.device, seed)
+
     def _current_params(self):
         like = self.scene.env_origins.new_empty((self.num_envs, self.arm_count, JOINT_CHANNELS))
         return JointCurrentParams.sample(like, generator=self.randomizer.rng)
@@ -191,7 +196,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
             min_rail = limits[:, robot.rail_ids, 0].amax(dim=-1, keepdim=True)
             # The last part of a closing action requests motor preload against
             # the calibrated physical stop through the original rail PD drive.
-            preload = ((rail - self.rail_close) / self.step_limit[-1]).clamp(0., 1.)
+            preload = ((rail - self.rail_close) / self.step_limit[..., -1:]).clamp(0., 1.)
             physical_target = torch.maximum(rail, min_rail).clamp_max(self.rail_close)
             target[:, robot.rail_ids] = physical_target + preload * self.rail_overtravel
 
@@ -298,6 +303,9 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.fold_reaction[:, i, 1] = reaction
         return force
 
+    def _drive_target(self, i, robot):
+        return self.q_des[i]
+
     def _apply_action(self):
         kinematics = [port.read() for port in self.ports]
         q = [robot.data.joint_pos.torch for robot in self.robots]
@@ -305,7 +313,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
         motor = [robot.actuators.applied_effort.torch for robot in self.robots]
         cmds, quats, rates = [], [], []
         for i, robot in enumerate(self.scene_robots):
-            robot.actuators.target_command.set_position_index(value=self.q_des[i], full_data=True)
+            robot.actuators.target_command.set_position_index(value=self._drive_target(i, robot), full_data=True)
             # MIT-style joint feedforward supplies the URDF arm's own weight.
             # The two rails retain their independent position/effort channels.
             gravity = self.gravity_feedforward[i]

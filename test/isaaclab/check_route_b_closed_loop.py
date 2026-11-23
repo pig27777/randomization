@@ -173,8 +173,13 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
         both = (series[:, :2] == 1.).all(dim=1)
         closing = (series[:-1, 21] - series[1:, 21]) > .0002
         sweep_pressure = series[1:, 13][closing]
+        sweep_time = series.new_tensor(timestamps[1:])
+        loaded_sweep_frames = closing & (sweep_time >= 2.6) & (sweep_time < 4.45)
+        in_same_load_band = (series[1:, 13] >= 8.) & (series[1:, 13] <= 12.)
         results.append(dict(corner=row[0], route=row[1], entry_offset_m=row[2],
                             any_double_capture=bool(both.any()), captured_frames=int(both.sum()),
+                            bilateral_airborne_frames=int((both & (series[:, 3] > .001)
+                                                          & (series[:, 23] == 0.)).sum()),
                             any_finger_frames=int((series[:, :2] == 1.).any(dim=1).sum()),
                             last3_captured_frames=int(both[-tail:].sum()),
                             peak_clearance_mm=1000 * series[:, 3].amax().item(),
@@ -183,6 +188,7 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
                             longest_hold_s=env.longest_hold[index].item() * .002,
                             peak_motor_effort_N=series[:, 7:9].abs().amax().item(),
                             peak_gathered_mm=1000 * series[:, 9:11].amax().item(),
+                            peak_bilateral_gather_mm=1000 * series[:, 9:11].amin(dim=1).amax().item(),
                             peak_feed_mm=1000 * series[:, 11:13].amax().item(),
                             peak_press_N=series[:, 13].amax().item(),
                             peak_package_translation_mm=1000 * (series[:, 16:18] -
@@ -195,6 +201,8 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
                             pressure_frames_during_closure=int((series[66:107, 13] > .3).sum()),
                             closing_frames=int(closing.sum()),
                             closing_frames_2_to_4_N=int(((sweep_pressure >= 2.) & (sweep_pressure <= 4.)).sum()),
+                            loaded_sweep_frames=int(loaded_sweep_frames.sum()),
+                            loaded_sweep_frames_8_to_12_N=int((loaded_sweep_frames & in_same_load_band).sum()),
                             fold_work_min_mJ=1000. * series[:, 29].amin().item(),
                             fold_work_max_mJ=1000. * series[:, 29].amax().item(),
                             side_route_frames=int(series[:, 28].sum()),
@@ -215,8 +223,10 @@ def right_arm_gates(result):
     return {
         "C4_top": hard["any_finger_frames"] == 0 and hard["peak_clearance_mm"] < 1.
         and hard["peak_film_load_N"] == 0.,
-        "C5_top": 2. <= clothes["peak_press_N"] <= 4. and clothes["any_double_capture"]
-        and clothes["peak_clearance_mm"] > 1.,
+        "C5_top": (clothes["loaded_sweep_frames"] > 0
+                   and clothes["loaded_sweep_frames"] == clothes["loaded_sweep_frames_8_to_12_N"]
+                   and clothes["peak_bilateral_gather_mm"] > 1.50
+                   and clothes["bilateral_airborne_frames"] > 0),
         "C6_low": low_entry["peak_package_translation_mm"] > 1. and low_entry["any_finger_frames"] == 0
         and low_entry["peak_film_load_N"] == 0.,
         "C6_high": any(row["longest_hold_s"] >= 3. and row["last3_max_speed_mm_s"] < 20.
