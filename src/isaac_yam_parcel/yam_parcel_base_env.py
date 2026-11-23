@@ -368,6 +368,14 @@ class YAMParcelBaseEnv(DirectRLEnv):
         return torn, self.episode_length_buf >= self.max_episode_length
 
     def _make_markers(self):
+        if self.num_envs == 1 and self.arm_count == 1:
+            from isaaclab_visualizers.newton.newton_visualizer import NewtonGLVisualizer
+            from .visual_skin import NewtonParcelSkin
+            from .yam_scene import YAM_USD
+
+            for viewer in self.sim._visualizers:
+                if isinstance(viewer, NewtonGLVisualizer):
+                    return NewtonParcelSkin(YAM_USD, viewer, str(self.device))
         from isaaclab.markers import VisualizationMarkers, VisualizationMarkersCfg
 
         cfg = VisualizationMarkersCfg(prim_path="/Visuals/Parcel", markers={
@@ -378,6 +386,11 @@ class YAMParcelBaseEnv(DirectRLEnv):
         return VisualizationMarkers(cfg)
 
     def _draw_parcel(self):
+        from .visual_skin import NewtonParcelSkin
+
+        if isinstance(self.markers, NewtonParcelSkin):
+            self.markers.draw(self)
+            return
         from isaaclab.utils.math import quat_from_matrix
 
         model, parcel = self.parcel_sim.payload, self.parcel_state.payload

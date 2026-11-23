@@ -30,7 +30,7 @@ class PadIK(DifferentialIKController):
 
 @torch.inference_mode()
 def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross_center=False,
-                lift_toward_base=False):
+                lift_toward_base=False, preview_target=None):
     """Drive the approach using only planned workcell coordinates and YAM FK."""
     env.reset()
     robot = env.robots[0]
@@ -102,6 +102,8 @@ def acquisition(env, rows, seconds, *, seat_fold=False, rapid_close=False, cross
             preload = torch.where(close_now, requested_preload, preload)
         rail += env.step_limit[-1] * preload / (1000. * env.rail_overtravel)
         sample = port.read()
+        if preview_target is not None:
+            command, rail = preview_target(env, time, start_goal, offer, start_rail, rail_target)
         pad_center = sample.pads.mean(dim=1)
         jac = torch.cat((sample.pad_jacobian.mean(dim=1), sample.angular_jacobian.mean(dim=1)), dim=1)[..., :6]
         q = robot.data.joint_pos.torch
