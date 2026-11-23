@@ -7,3 +7,4 @@
 | ppo-yam-pe-edge-r1 | ubun，YAM URDF PPO pilot 第 3 轮，C5 PE 袋和折叠衣物。指定边缘的检查点顶抓未离台；受控指垫提起后末帧倾角 52.90°。 | [复现与核验](../../../reports/ppo-pe-soft-edge-test.md) · [轨迹与录像](policy/ppo-yam-pe-edge-r1/) |
 | route-b-loaded-fold-r1 | ubun RTX 5090，冻结 Fix 4.1 Route B。压实前侧膜承压、止挡聚拢与重包提拉复验。 | [测试报告与命令](../../../reports/route-b-step1-test.md#有载闭合重包提拉与-c5-界面) · [日志](isaaclab/route-b-loaded-fold-r1/) |
 | route-b-c5-ui-r1 | ubun RTX 5090。修复前 C5 PhysX 界面，180 帧可解码，未形成捕获。 | [C5 视频](isaaclab/route-b-c5-ui-r1/c5-grasp.mp4) · [截图](isaaclab/route-b-c5-ui-r1/c5-close.png) |
+| umi-skirt-c-r1 | ubun，原生 MuJoCo flex / Fix 4.1 四块代理。UMI 39 × 29 × 2 cm 厚裙同轨迹夹衣，稳悬单帧、边长和防穿模复核；待目视确认。 | [命令与报告](../../../reports/umi-skirt-c-test.md) · [同帧图](bag/umi-skirt-c-r1/skirt_c_8s.png) · [DR 审查](../../../reports/umi-four-modes-dr-test.md) |

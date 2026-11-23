@@ -1,0 +1,135 @@
+{
+  "engine": "MuJoCo flex",
+  "dt": 5e-05,
+  "contact_time": 0.0002,
+  "payload_margin": 0.0,
+  "steps": 192000,
+  "wall_s": 369.0530304550193,
+  "steps_s": 520.2504359963553,
+  "mass_kg": 0.065,
+  "box_m": [
+    0.085,
+    0.016,
+    0.038
+  ],
+  "bag_sheet_m": [
+    0.18,
+    0.14
+  ],
+  "cfg": {
+    "config": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.18,
+        0.14
+      ],
+      "payload_size": [
+        0.085,
+        0.016,
+        0.038
+      ],
+      "payload_mass": 0.06221792,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "bendable",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 5e-05,
+      "contact_time": 0.0002,
+      "iterations": 300,
+      "center": [
+        -0.03,
+        -0.225
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "geometry": {
+      "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+      "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+      "vertices": 142,
+      "triangles": 280,
+      "edges": 420,
+      "reference_area_m2": 0.05040000000000001,
+      "film_mass_kg": 0.0027820800000000006,
+      "min_reference_edge_m": 0.017999999999999988,
+      "max_reference_edge_m": 0.026907248094147452,
+      "preparation": {
+        "maximum_edge_strain": 0.04733427000205426,
+        "minimum_wall_gap_m": 0.011717698568651338,
+        "method": "generic front/back plateau + projections + wall gap",
+        "box_face_clearance": true,
+        "box_seam_clearance": false,
+        "payload_intersecting_triangles": 0,
+        "payload_corner_winding": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0000000000000002,
+          1.0,
+          1.0,
+          0.9999999999999999
+        ]
+      }
+    },
+    "nq": 435,
+    "nv": 434,
+    "neq": 0,
+    "payload_collision": "native convex mesh, exact eight-vertex boxes",
+    "bending": "reference dihedral energy, existing bag_model gradient",
+    "compression_axis": "segment-local -z"
+  },
+  "ik_max_mm": 0.09040561859365642,
+  "robot_assets": {
+    "yam_linear_4310.xml": "beb1ccea8eefc3e181a562459fb55626e4beb7ef63eb0ceac55bdf8f24c63434",
+    "LICENSE": "dc46c3a7dc48221aa783e634d15db0f816ba83ba5cdb77bbaa91525c61c7552f",
+    "assets/linear_4310/d405_wrist_linear_4310.stl": "f01bcd92b447c3a44c1ad9345367628d4157fe4c07b545ccbf9bc4ae81115112",
+    "assets/linear_4310/gripper.stl": "d949c401186197d842ca8f9b23bfcbf24bed8461b421df06093c65e4ead21f5d",
+    "assets/linear_4310/tip_left.stl": "03d94f53d7b5e9e1871ea6f3925c68d7a2f894b08e0c575fa0b9ed4024684ff7",
+    "assets/linear_4310/tip_right.stl": "8f620aae9c15e00e2ea4e5bf5e9a49e7edb2d23128b8955cfacc0da8da45c72f",
+    "assets/model2.stl": "5ac61c0313ed00c38655e41681af1b8b307cf8d5ef57209a75f215cea02df754",
+    "assets/model2__10.stl": "b879cc07f547b7a2ac52e428dd206e80a0d4b0e805cb56b9a8230df04a690923",
+    "assets/model2__11.stl": "af220d2a51e8444392aef36e2fe4a6f69aed22bc292a7f38e54da3b4f5253434",
+    "assets/model2__12.stl": "e79614869bd2283f70fafa150ce748d5b6c03377a651448c6fe9893a22f6d1de",
+    "assets/model2__13.stl": "32b62f14f00ea82bfc79b935f7dac32c7cb276a3abc0aae8362cbba3fb1326de",
+    "assets/model2__14.stl": "72d2178789dd5e0358c2caf9dad90b8881e505f4c52a8d6d18c71b5e93e8c84b",
+    "assets/model2__15.stl": "ca8788184d54f30c18482cb9b48dffb010a93dbc029054b6cc515083a740d324",
+    "assets/model2__16.stl": "18bb99691eed524393e8f3a0ff29e79d97ab75689bc92144bbdfafa2cc79d37b",
+    "assets/model2__17.stl": "6513dbd192d2bf3a4f7016231f1ba5eca93916c9ebfdc334e9b435ca1d302ff6",
+    "assets/model2__2.stl": "30dab41f14bae95d737abca3c934eb5d570ab107dff0b40952fbdfb9d07eab79",
+    "assets/model2__3.stl": "9fd96f5ad387fe7dd96eaa65e386637800e2f5637b6167fbad4ecb37d8598f47",
+    "assets/model2__4.stl": "33c0e7ef538e2c4473efa9c4ef2a8441b6094b65090b4dec71abe82001d974df",
+    "assets/model2__5.stl": "09f08e7dead2d6363618471adadb1b94af39e8056676670f3fd21ec06c197b20",
+    "assets/model2__6.stl": "888b5919d10dbfb59b964c3cafc2ddbdac3b5426e20dd13bcaf4baedd5ee15c9",
+    "assets/model2__7.stl": "2d64b18f1e70b0460eb53335d340b7c879976a3093ec67b07bcb7245e371a91d",
+    "assets/model2__8.stl": "db3708da6b14daf3fc9a1909a8325b68f65ff69146cdd20b69a9ddc4ce51f50d",
+    "assets/model2__9.stl": "74969d09b8b7f75cc984c5c7e5526d2941c6724f48b3efa1fa8730cc7820f4f5"
+  }
+}
