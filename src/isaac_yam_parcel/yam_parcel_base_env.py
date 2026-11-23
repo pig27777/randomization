@@ -79,11 +79,14 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.joint_limits = [robot.data.soft_joint_pos_limits.torch for robot in self.robots]
         self.enabled = torch.arange(2, device=self.device).expand(self.num_envs, -1) < self.arm_count
         self.reaction = origin.new_zeros((self.num_envs, 2, 2, 3))
+        self.fold_reaction = torch.zeros_like(self.reaction)
+        self.fold_work = origin.new_zeros((self.num_envs, 2, 1))
         self.empty_action = ParcelAction(self.reaction[:, 1].clone(), self.reaction[:, 1].clone(),
                                          *(origin.new_zeros((self.num_envs, 2)) for _ in range(4)),
                                          torch.zeros_like(origin), origin.new_zeros((self.num_envs, 1)))
         self.identity = origin.new_tensor([1., 0., 0., 0.]).expand(self.num_envs, -1)
         self.side = torch.zeros_like(self.enabled)
+        self.entered_above_lip = torch.zeros_like(self.enabled)
         self.feed_axis = torch.zeros_like(origin[:, None].expand(-1, 2, -1))
         self.side_feed = origin.new_zeros((self.num_envs, 2, 1))
         self.net_side_feed = torch.zeros_like(self.side_feed)
@@ -102,6 +105,8 @@ class YAMParcelBaseEnv(DirectRLEnv):
         gripper = self.workcell["gripper"]
         self.rail_close = float(gripper["close_calibration_m"])
         self.film_gap = float(gripper["film_gap_m"])
+        self.side_fold_gap = float(gripper["side_fold_gap_m"])
+        self.side_fold_damping = float(gripper["side_fold_damping_ns_m"])
         self.rail_overtravel = float(gripper["max_preload_n"]) / self.scene_robots[0].cfg.actuators["rails"].stiffness
         # Align the simulation's closing stop to the CAD zero-gap position.
         # This one-time property write keeps the real source USD and 2 ms loop untouched.
@@ -163,8 +168,8 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.current_filter.reset(mask, self._current_params())
         for buffer in (self.hold, self.longest_hold, self.ever_captured, self.ever_airborne,
                        self.handover_seen, self.left_carrying, self.placed_supported, self.place_streak,
-                       self.side, self.feed_axis, self.side_feed, self.net_side_feed, self.top_press,
-                       self.film_load, self.pad_normal,
+                       self.side, self.entered_above_lip, self.feed_axis, self.side_feed, self.net_side_feed, self.top_press,
+                       self.film_load, self.pad_normal, self.fold_work,
                        self.have_history, self.sensed, self.visual):
             buffer[env_ids] = 0
         self.height[env_ids] = .045
@@ -207,11 +212,12 @@ class YAMParcelBaseEnv(DirectRLEnv):
         footprint = payload.params.bag_half_extents[:, :2]
         rim_margin = (footprint - body[:, 0, :2].abs()).amin(dim=-1, keepdim=True)
         height = payload.half_thickness(parcel.d_surf).amax(dim=1, keepdim=True)
+        lip_offset = body[:, 0, 2:] - height
         near_rim = (rim_margin >= -.015) & (rim_margin < .016)
         moves_in = (body[:, 0, :2] * horizontal).sum(dim=-1, keepdim=True) < 0.
         side_allowed = self.episode.clearance_m.amax(dim=1, keepdim=True) >= .020
         enters = ((speed > .012) & (speed > 2. * local_velocity[:, 0, 2:].abs()) & moves_in
-                  & near_rim & ((body[:, 0, 2:] - height).abs() < .012) & side_allowed)
+                  & near_rim & (lip_offset.abs() < .012) & side_allowed)
         was_side = self.side[:, i:i + 1]
         entering = enters & ~was_side
         self.feed_axis[:, i] = torch.where(entering, direction, self.feed_axis[:, i])
@@ -222,12 +228,14 @@ class YAMParcelBaseEnv(DirectRLEnv):
                            < robot.data.joint_pos.torch[:, robot.rail_ids].mean(dim=-1, keepdim=True) - .0001)
         side = (was_side | enters) & ~opens
         self.side[:, i:i + 1] = side
+        above_lip = self.entered_above_lip[:, i:i + 1]
+        above_lip.copy_(side & (above_lip | (entering & (lip_offset >= 0.))))
         self.side_feed[:, i] = torch.where(side, (self.side_feed[:, i] + approach * DT).clamp_min(0.), 0.)
         history = self.parcel_state.contacts_A if i == 0 else self.parcel_state.contacts_B
         gathered = (history[..., ContactState.SLACK] > 0.).all(dim=-1, keepdim=True)
         captured = (history[..., ContactState.CAPTURE] > .5).any(dim=-1, keepdim=True)
         inside = rim_margin > 0.
-        at_lip = ((body[:, 0, 2:] - height).abs() < .012) & inside
+        at_lip = (lip_offset.abs() < .012) & inside
         side_film = side & (self.net_side_feed[:, i] > 0.) & (at_lip | (captured & gathered))
         local_pads = (pads - parcel.pos.mean(dim=1, keepdim=True)) @ frame
         weights = payload.weights_at(local_pads[..., :2])
@@ -238,22 +246,57 @@ class YAMParcelBaseEnv(DirectRLEnv):
                          & (indentation > 1e-6).any(dim=-1, keepdim=True))
         top_film = ~side & soft & gathered & (pressing_film | captured)
         pad_gap = (pads[:, 1:] - pads[:, :1]).norm(dim=-1)
-        film = (pad_gap <= self.film_gap) & ~opening & (side_film | top_film)
-
         close_force = motor.index_select(1, robot.rail_indices).clamp_min(0.)
-        against_limit = (robot.data.joint_pos.torch.index_select(1, robot.rail_indices)
-                         >= self.rail_close - .00008)
+        rail_position = robot.data.joint_pos.torch.index_select(1, robot.rail_indices)
+        against_limit = rail_position >= self.rail_close - .00008
         loaded = torch.minimum(close_force, (-robot.rail_load).clamp_min(0.))
         approaching_film = ~opening & (side_film | (~side & pressing_film))
         normal = torch.where(~against_limit & approaching_film, close_force, loaded)
-        # The PhysX stop already reacts to the opposed motor force. Its only
-        # additional role is to raise the available normal force of the film.
-        self.film_load[:, i] = torch.where(film, close_force.amin(dim=-1, keepdim=True), 0.)
+        opposed = close_force.amin(dim=-1, keepdim=True)
+        compact = pad_gap <= self.film_gap
+        skin = (weights @ payload.half_thickness(parcel.d_surf).unsqueeze(-1)).squeeze(-1)
+        free_fold = (local_pads[..., 2] > skin).all(dim=-1, keepdim=True)
+        if self.arm_count == 2 and self.result is not None:
+            # A tilted parcel can enter between widely spaced receiving pads
+            # before both pads clear the lip. Confirm the later geometry only
+            # if the other arm is still supporting the airborne parcel.
+            other = self.parcel_state.contacts_B if i == 0 else self.parcel_state.contacts_A
+            supported_by_other = (other[..., ContactState.CAPTURE] > .5).all(dim=-1, keepdim=True)
+            airborne = (self.result.table_clearance > .001) & (self.result.support_N == 0.)
+            above_lip.logical_or_(side_film & free_fold & supported_by_other & airborne & ~opening)
+        side_enabled = ~opening & side_film & above_lip
+        damping = self._compress_side_fold(i, robot, port_state, pad_gap, side_enabled & free_fold)
+        static = torch.where(compact & (side_enabled | (~opening & top_film)), opposed, 0.)
+        self.film_load[:, i] = torch.maximum(damping, static)
         normal = torch.maximum(normal, self.film_load[:, i])
         self.pad_normal[:, i] = normal
-        return ParcelAction(pads, velocities, normal, inward, self.side_feed[:, i].expand_as(normal),
+        # A held rail cannot continue gathering through solver velocity jitter
+        # at the hard stop. Keep its actual velocity in the wrench port.
+        gathering_velocity = torch.where(against_limit, 0., inward)
+        return ParcelAction(pads, velocities, normal, gathering_velocity, self.side_feed[:, i].expand_as(normal),
                             side.expand_as(normal).to(dq.dtype), self.empty_action.external_force,
                             self.empty_action.direct_press_N)
+
+    def _compress_side_fold(self, i, robot, port_state, gap, enabled):
+        """Dissipate pad approach in the loose fold before the compact stop."""
+        pads, speed = port_state.pads, port_state.pad_velocity
+        axis = (pads[:, 1] - pads[:, 0]) / gap.clamp_min(1e-8)
+        closure = (-(speed[:, 1] - speed[:, 0]) * axis).sum(dim=-1, keepdim=True).clamp_min(0.)
+        width = self.side_fold_gap - self.film_gap
+        enter = ((self.side_fold_gap - gap) / (.25 * width)).clamp(0., 1.)
+        compact = ((gap - self.film_gap) / (.25 * width)).clamp(0., 1.)
+        fade = enter.square() * (3. - 2. * enter) * compact.square() * (3. - 2. * compact)
+        damping = self.side_fold_damping * fade * enabled
+        jac = ((port_state.pad_jacobian[:, 1] - port_state.pad_jacobian[:, 0]) * axis.unsqueeze(-1)).sum(dim=1)
+        mobility = torch.linalg.solve_ex(robot.data.mass_matrix.torch, jac.unsqueeze(-1)).result.squeeze(-1)
+        inverse_mass = (jac * mobility).sum(dim=-1, keepdim=True).clamp_min(0.)
+        force = damping * closure / (1. + DT * damping * inverse_mass)
+        self.fold_work[:, i] = -DT * force * (closure - .5 * DT * inverse_mass * force)
+        # Equal, opposite, collinear pad reactions have zero wrench at the wrist.
+        reaction = force * axis
+        self.fold_reaction[:, i, 0] = -reaction
+        self.fold_reaction[:, i, 1] = reaction
+        return force
 
     def _apply_action(self):
         kinematics = [port.read() for port in self.ports]
@@ -293,6 +336,7 @@ class YAMParcelBaseEnv(DirectRLEnv):
         self.net_side_feed.copy_(self.result.net_feed.amin(dim=-1, keepdim=True))
         self.top_press.copy_(self.result.press_N.unsqueeze(-1))
         self._track_hold()
+        self.reaction.add_(self.fold_reaction)
         for i, (port, sample) in enumerate(zip(self.ports, kinematics, strict=True)):
             port.write(sample, self.result.wrist_wrench[:, i], self.reaction[:, i])
         self._observe_ports(kinematics, q, dq, motor)
@@ -368,6 +412,14 @@ class YAMParcelBaseEnv(DirectRLEnv):
         return torn, self.episode_length_buf >= self.max_episode_length
 
     def _make_markers(self):
+        if self.num_envs == 1 and self.arm_count == 1:
+            from isaaclab_visualizers.newton.newton_visualizer import NewtonGLVisualizer
+            from .visual_skin import NewtonParcelSkin
+            from .yam_scene import YAM_USD
+
+            for viewer in self.sim._visualizers:
+                if isinstance(viewer, NewtonGLVisualizer):
+                    return NewtonParcelSkin(YAM_USD, viewer, str(self.device))
         from isaaclab.markers import VisualizationMarkers, VisualizationMarkersCfg
 
         cfg = VisualizationMarkersCfg(prim_path="/Visuals/Parcel", markers={
@@ -378,6 +430,11 @@ class YAMParcelBaseEnv(DirectRLEnv):
         return VisualizationMarkers(cfg)
 
     def _draw_parcel(self):
+        from .visual_skin import NewtonParcelSkin
+
+        if isinstance(self.markers, NewtonParcelSkin):
+            self.markers.draw(self)
+            return
         from isaaclab.utils.math import quat_from_matrix
 
         model, parcel = self.parcel_sim.payload, self.parcel_state.payload
