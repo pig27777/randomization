@@ -1,0 +1,43 @@
+{
+  "machine": "ubun",
+  "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+  "cpu": "x86_64",
+  "started_at": "2026-11-25T18:00:58.317901+08:00",
+  "backend": "flex",
+  "smoke": true,
+  "environment": {
+    "mujoco": "4.0.1",
+    "mujoco-warp": "4.0.1",
+    "warp-lang": "1.19.0",
+    "numpy": "2.5.4"
+  },
+  "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+  "source_sha256": {
+    "test/bag_model/pe_physics.py": "f14a84f89edc0a5c246180aa917d068f347a8b9c0674654168160557d2295754",
+    "test/bag_model/pe_physics_protocol.py": "96feb075bed49ca8a7d4068434276e2399e679fd109fddb57e8d29021bf7a4d7",
+    "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+    "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+  },
+  "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+  "pair_labels": [
+    "film_self",
+    "film_table",
+    "film_payload",
+    "film_contact_probe",
+    "film_platen",
+    "film_left_pad",
+    "film_right_pad",
+    "payload_table",
+    "payload_fixture"
+  ],
+  "wrench_labels": [
+    "contact_probe",
+    "platen",
+    "left_pad",
+    "right_pad",
+    "obstacle",
+    "table",
+    "payload"
+  ],
+  "seed": 0
+}

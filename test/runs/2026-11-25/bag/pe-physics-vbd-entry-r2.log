@@ -1,0 +1,36 @@
+B01: start
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_protocol.py", line 528, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_protocol.py", line 524, in main
+    run_suite(args)
+    ~~~~~~~~~^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_protocol.py", line 493, in run_suite
+    data, result = run_trial(factory, trial, args.seed, args.output)
+                   ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_protocol.py", line 403, in run_trial
+    backend = factory.reset(trial, seed)
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_vbd.py", line 125, in reset
+    return cls(config, seed)
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_vbd.py", line 188, in __init__
+    self.bag = NewtonBag(file, params, support=False, initial_vertices=film["current"], extra=extra,
+               ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                         device=self.device)
+                         ^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/bag_sim/newton_bag.py", line 85, in __init__
+    self.extra = extra(builder, self.contact) if extra is not None else None
+                 ~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/test/bag_model/pe_physics_vbd.py", line 170, in extra
+    material = content_shape_config(contact, params, mu=friction, density=0.)
+  File "/home/ubuntu/workspace/gzl/randomization-bag-physics/bag_sim/newton_bag.py", line 255, in content_shape_config
+    if primitive and params["newton_full_surface_contact"]:
+                     ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'newton_full_surface_contact'

@@ -1,0 +1,1283 @@
+[
+  {
+    "run": "pe-physics-flex-r1",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B01",
+        "duration": 1.2,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.04,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B02-X",
+        "duration": 0.64,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "table": false,
+        "coupon": true,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B02-Y",
+        "duration": 0.64,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "table": false,
+        "coupon": true,
+        "layers": 1,
+        "axis": 1,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B03-A",
+        "duration": 0.55,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": false,
+        "coupon": true,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B03-B",
+        "duration": 0.55,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.046,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": true,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "obstacle": [
+            0.0,
+            0.0,
+            0.015
+          ]
+        }
+      },
+      {
+        "case": "B03-C",
+        "duration": 0.42,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "table": false,
+        "coupon": true,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0002,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B04-PLATES",
+        "duration": 0.6,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            0.011
+          ]
+        }
+      },
+      {
+        "case": "B04-DOUBLE",
+        "duration": 0.56,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0005,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": true,
+        "layers": 2,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            0.01
+          ]
+        }
+      },
+      {
+        "case": "B05-A-200",
+        "duration": 0.5,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.2,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          -0.035,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B05-A-350",
+        "duration": 0.5,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.35,
+        "size": [
+          0.115,
+          0.075,
+          0.022
+        ],
+        "offset": [
+          0.035,
+          0.0
+        ],
+        "self_collision": true,
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-platen-r2",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B04-PLATES",
+        "duration": 0.6,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            0.011
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-fold-r2",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B04-DOUBLE",
+        "duration": 0.56,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0005,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": true,
+        "layers": 2,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            0.01
+          ]
+        }
+      },
+      {
+        "case": "B04-U",
+        "duration": 0.6,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0006,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": true,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [
+          0,
+          0,
+          0,
+          60,
+          120,
+          180,
+          180,
+          180
+        ],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            0.025
+          ]
+        }
+      },
+      {
+        "case": "B04-ACCORDION",
+        "duration": 0.6,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0006,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": true,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [
+          0,
+          60,
+          120,
+          180,
+          180,
+          120,
+          60,
+          0
+        ],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            0.043
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-gravity-r2",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B05-A-200",
+        "duration": 0.5,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.2,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          -0.035,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      },
+      {
+        "case": "B05-A-350",
+        "duration": 0.5,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.35,
+        "size": [
+          0.115,
+          0.075,
+          0.022
+        ],
+        "offset": [
+          0.035,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-load-r2",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B05-B",
+        "duration": 0.72,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": false,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.2,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          -0.035,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.2617993877991494,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            -0.005
+          ]
+        }
+      },
+      {
+        "case": "B05-C",
+        "duration": 0.55,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": false,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.2,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {
+          "platen": [
+            0.0,
+            0.0,
+            -0.005
+          ]
+        }
+      },
+      {
+        "case": "B05-D",
+        "duration": 0.7,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.35,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.035,
+          0.0
+        ],
+        "self_collision": true,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "initial_tools": {}
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-probe-S0-P1-r1",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B06-S0-P1",
+        "duration": 0.9,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "plane_table": false,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.0,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "self_contact_time": 0.001,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "motion_time_scale": 1.0,
+        "initial_tools": {}
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-probe-S2-P0-r1",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B06-S2-P0",
+        "duration": 0.9,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "plane_table": false,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.2,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "self_contact_time": 0.001,
+        "yaw": 0.0,
+        "probe_x": -0.065,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "motion_time_scale": 1.0,
+        "initial_tools": {}
+      }
+    ]
+  },
+  {
+    "run": "pe-physics-flex-probe-S2-P1-r1",
+    "base": {
+      "geometry": "geometry/kraft_edge_sealed_35.npz",
+      "bag_size": [
+        0.35,
+        0.25
+      ],
+      "payload_size": [
+        0.12,
+        0.08,
+        0.03
+      ],
+      "payload_mass": 0.3,
+      "payload_com": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "payload_inertia": null,
+      "mode": "empty",
+      "areal_mass": 0.0552,
+      "membrane": 1200.0,
+      "poisson": 0.3,
+      "bending": 3.956043956043956e-07,
+      "precreased_ratio": 0.01,
+      "bend_damping_ratio": 0.1,
+      "material_thickness": 6e-05,
+      "rayleigh": 0.0001,
+      "radius": 0.00025,
+      "friction": 0.35,
+      "joint_stiffness": 0.08,
+      "joint_damping": 0.003,
+      "compression_k1": 800.0,
+      "compression_k2": 20000.0,
+      "compression_damping": 1.0,
+      "timestep": 2.5e-05,
+      "contact_time": 0.001,
+      "iterations": 300,
+      "center": [
+        0.0,
+        0.0
+      ],
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "self_collision": true,
+      "probe_shape": "sphere",
+      "payload_offset_xy": [
+        0.0,
+        0.0
+      ]
+    },
+    "thresholds": {
+      "edge_ratio": 1.05,
+      "penetration_m": 0.001,
+      "tail_rms_speed_m_s": 0.005
+    },
+    "trials": [
+      {
+        "case": "B06-S2-P1",
+        "duration": 0.9,
+        "dt": 2.5e-05,
+        "iterations": 300,
+        "height": 0.0,
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "table": true,
+        "plane_table": false,
+        "coupon": false,
+        "layers": 1,
+        "axis": 0,
+        "mass": 0.2,
+        "size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "offset": [
+          0.0,
+          0.0
+        ],
+        "self_collision": true,
+        "self_contact_time": 0.001,
+        "yaw": 0.0,
+        "probe_x": 0.0,
+        "fold_angles": [],
+        "camber": 0.0,
+        "tool_mu": 0.45,
+        "motion_time_scale": 1.0,
+        "initial_tools": {}
+      }
+    ]
+  }
+]

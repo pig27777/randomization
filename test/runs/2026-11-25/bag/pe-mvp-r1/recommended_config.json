@@ -1,0 +1,117 @@
+{
+  "qualification": "CPU engineering smoke pass with the named fixtures",
+  "physics": {
+    "geometry": "geometry/kraft_edge_sealed_35.npz",
+    "bag_size": [
+      0.35,
+      0.25
+    ],
+    "payload_size": [
+      0.088,
+      0.068,
+      0.024
+    ],
+    "payload_mass": 0.2,
+    "payload_com": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "payload_inertia": null,
+    "mode": "rigid",
+    "areal_mass": 0.0552,
+    "membrane": 1200.0,
+    "poisson": 0.3,
+    "bending": 3.956043956043956e-07,
+    "precreased_ratio": 0.01,
+    "bend_damping_ratio": 0.1,
+    "material_thickness": 6e-05,
+    "rayleigh": 0.0001,
+    "radius": 0.00025,
+    "friction": 0.35,
+    "joint_stiffness": 0.08,
+    "joint_damping": 0.003,
+    "compression_k1": 800.0,
+    "compression_k2": 20000.0,
+    "compression_damping": 1.0,
+    "timestep": 5e-05,
+    "contact_time": 0.001,
+    "iterations": 300,
+    "center": [
+      0.0,
+      0.0
+    ],
+    "gravity": [
+      0.0,
+      0.0,
+      -9.81
+    ],
+    "self_collision": true,
+    "probe_shape": "sphere",
+    "payload_offset_xy": [
+      0.0,
+      0.0
+    ]
+  },
+  "geometry": {
+    "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+    "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+    "vertices": 142,
+    "triangles": 280,
+    "edges": 420,
+    "reference_area_m2": 0.175,
+    "film_mass_kg": 0.009659999999999997,
+    "min_reference_edge_m": 0.034999999999999976,
+    "max_reference_edge_m": 0.05000510178053471,
+    "preparation": {
+      "maximum_edge_strain": 0.004513932892806105,
+      "minimum_wall_gap_m": 0.0006999999999999992,
+      "method": "generic front/back plateau + projections + wall gap",
+      "box_face_clearance": true,
+      "box_seam_clearance": false,
+      "payload_intersecting_triangles": 0,
+      "payload_corner_winding": [
+        1.0000000000000002,
+        1.0000000000000002,
+        1.0,
+        1.0000000000000002,
+        1.0000000000000002,
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "jaw_face_m": [
+    0.0144,
+    0.0164
+  ],
+  "probe": {
+    "mass_kg": 0.02,
+    "stiffness_N_per_m": 95.0,
+    "damping_Ns_per_m": 2.2
+  },
+  "bench_configs": {
+    "contain-200": "contain-200/config.json",
+    "contain-350": "contain-350/config.json",
+    "try-left": "try-left/config.json",
+    "try-center": "try-center/config.json",
+    "try-right": "try-right/config.json",
+    "film-r3": "film-r3/config.json",
+    "through-r3": "through-r3/config.json"
+  },
+  "cpu_preferred_step_s": 5e-05,
+  "faster_try_cpu_step_s": 0.0002,
+  "gpu_qualification": {
+    "step_s": 0.0002,
+    "moving_probe_contact_worlds": [
+      1,
+      16,
+      64,
+      256
+    ],
+    "scope": "120 ms real moving-probe contact, full single-world Try also passed",
+    "full_through_film_grasp": "FAIL"
+  },
+  "robot_reachability": "The film and through-film grasp succeeded with real underside clearance from a table edge."
+}

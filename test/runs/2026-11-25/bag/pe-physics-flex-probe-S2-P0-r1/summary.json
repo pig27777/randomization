@@ -1,0 +1,166 @@
+[
+  {
+    "case": "B06-S2-P0",
+    "status": "physics_gate_failure",
+    "runtime_s": 137.38096278801095,
+    "samples": 451,
+    "final_time_s": 0.9,
+    "maximum_edge_ratio": 1.0214605254000546,
+    "edge_ratio_p95": 1.0022912211378856,
+    "edge_ratio_p99": 1.007166890537092,
+    "max_principal_ratio": 1.0363360369821544,
+    "crossing_pairs": 31,
+    "payload_intersecting_triangles": 1,
+    "payload_outside_corners": 1,
+    "max_table_depth_mm": 0.9442751185511633,
+    "max_contact_depth_mm": 1.2077016655945154,
+    "peak_self_force_N": 1231.2223332692467,
+    "max_self_active_pairs": 133,
+    "self_peak_depth_mm": 1.0915289837803037,
+    "any_bypass": false,
+    "contact_overflow": 0,
+    "warnings": 0,
+    "energy_peak_growth_J": 0.014890202497959021,
+    "final_rms_mm_s": 56.69200968422187,
+    "probe_peak_normal_N": 5.525692616309665,
+    "contact_onset_mm": 973.3354879821899,
+    "payload_shift_mm": 1.6745486318092178,
+    "loading_stiffness_N_m": 343.86742311448995,
+    "unloading_stiffness_N_m": 1046.4099649649215,
+    "probe_net_work_J": 0.01279672629176186,
+    "violations": [
+      "nonadjacent_film_crossing",
+      "penetration_over_1mm",
+      "payload_surface_crossing"
+    ],
+    "config": {
+      "case": "B06-S2-P0",
+      "duration": 0.9,
+      "dt": 2.5e-05,
+      "iterations": 300,
+      "height": 0.0,
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "table": true,
+      "plane_table": false,
+      "coupon": false,
+      "layers": 1,
+      "axis": 0,
+      "mass": 0.2,
+      "size": [
+        0.1,
+        0.07,
+        0.017
+      ],
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "self_collision": true,
+      "self_contact_time": 0.001,
+      "yaw": 0.0,
+      "probe_x": -0.065,
+      "fold_angles": [],
+      "camber": 0.0,
+      "tool_mu": 0.45,
+      "motion_time_scale": 1.0,
+      "initial_tools": {}
+    },
+    "seed": 0,
+    "probe_force_limit_trigger_s": 0.536,
+    "backend_config": {
+      "config": {
+        "geometry": "geometry/kraft_edge_sealed_35.npz",
+        "bag_size": [
+          0.35,
+          0.25
+        ],
+        "payload_size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "payload_mass": 0.2,
+        "payload_com": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "payload_inertia": null,
+        "mode": "rigid",
+        "areal_mass": 0.0552,
+        "membrane": 1200.0,
+        "poisson": 0.3,
+        "bending": 3.956043956043956e-07,
+        "precreased_ratio": 0.01,
+        "bend_damping_ratio": 0.1,
+        "material_thickness": 6e-05,
+        "rayleigh": 0.0001,
+        "radius": 0.00025,
+        "friction": 0.35,
+        "joint_stiffness": 0.08,
+        "joint_damping": 0.003,
+        "compression_k1": 800.0,
+        "compression_k2": 20000.0,
+        "compression_damping": 1.0,
+        "timestep": 2.5e-05,
+        "contact_time": 0.001,
+        "iterations": 300,
+        "center": [
+          0.0,
+          0.0
+        ],
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "self_collision": true,
+        "probe_shape": "sphere",
+        "payload_offset_xy": [
+          0.0,
+          0.0
+        ]
+      },
+      "geometry": {
+        "source": "bag_sim/geometry/kraft_edge_sealed_35.npz",
+        "source_sha256": "6ccedec0e7a6da943340d1a3fe7069a8b23312e3d994b496080858d9694f9689",
+        "vertices": 142,
+        "triangles": 280,
+        "edges": 420,
+        "reference_area_m2": 0.175,
+        "film_mass_kg": 0.009659999999999997,
+        "min_reference_edge_m": 0.034999999999999976,
+        "max_reference_edge_m": 0.05000510178053471,
+        "preparation": {
+          "maximum_edge_strain": 0.0034188605104013003,
+          "minimum_wall_gap_m": 0.003287295669570223,
+          "method": "generic front/back plateau + projections + wall gap",
+          "box_face_clearance": true,
+          "box_seam_clearance": false,
+          "payload_intersecting_triangles": 0,
+          "payload_corner_winding": [
+            1.0,
+            1.0000000000000002,
+            1.0,
+            1.0,
+            1.0,
+            0.9999999999999997,
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "nq": 468,
+      "nv": 462,
+      "neq": 0,
+      "payload_collision": "native convex mesh, exact eight-vertex boxes",
+      "bending": "reference dihedral energy, existing bag_model gradient",
+      "compression_axis": "segment-local -z"
+    },
+    "diagnostic_only": true
+  }
+]

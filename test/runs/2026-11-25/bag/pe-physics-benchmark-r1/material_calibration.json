@@ -1,0 +1,118 @@
+{
+  "reference": "Uncalibrated engineering PE profile",
+  "status": "Simulation cross-check at available fixtures",
+  "stretching": {
+    "B02-X": {
+      "Flex CPU": {
+        "engineering_strain": [
+          0.00993147727952004,
+          0.019573023118680144,
+          0.028946412131831023
+        ],
+        "clamp_force_N": [
+          0.47999999984156333,
+          0.9599999998782361,
+          1.4400000001372724
+        ],
+        "apparent_axial_stiffness_N": 49.438049687640635
+      },
+      "Newton VBD CUDA": {
+        "engineering_strain": [
+          0.010125428438186646,
+          0.020343825221061707,
+          0.030640508979558945
+        ],
+        "clamp_force_N": [
+          0.4801945090293884,
+          0.960974931716919,
+          1.4415513277053833
+        ],
+        "apparent_axial_stiffness_N": 47.12770484590457
+      },
+      "relative_strain_error_at_matched_command": [
+        0.01952893343133928,
+        0.03938084054301876,
+        0.05852527905746917
+      ]
+    },
+    "B02-Y": {
+      "Flex CPU": {
+        "engineering_strain": [
+          0.010022757039123364,
+          0.019723007820826366,
+          0.02912831749711131
+        ],
+        "clamp_force_N": [
+          0.9599999999999878,
+          1.9200000000000044,
+          2.879999999999989
+        ],
+        "apparent_axial_stiffness_N": 98.19750309723563
+      },
+      "Newton VBD CUDA": {
+        "engineering_strain": [
+          0.010216203414731506,
+          0.020479771412081238,
+          0.03079199583994008
+        ],
+        "clamp_force_N": [
+          0.9601967334747314,
+          1.9205982685089111,
+          2.8810133934020996
+        ],
+        "apparent_axial_stiffness_N": 93.65547381229702
+      },
+      "relative_strain_error_at_matched_command": [
+        0.0193007148485225,
+        0.03836958328717859,
+        0.05711549741909247
+      ]
+    }
+  },
+  "bending": {
+    "Flex CPU": {
+      "trough_time_s": 0.35400000000000004,
+      "trough_tip_m": -0.06952634345809235,
+      "final_tip_m": -0.06093166438544253,
+      "final_rms_m_s": 0.4045638685292151
+    },
+    "Newton VBD CUDA": {
+      "trough_time_s": 0.34800000000000003,
+      "trough_tip_m": -0.06968036741018295,
+      "final_tip_m": -0.06552871465682983,
+      "final_rms_m_s": 0.3218498155720639
+    }
+  },
+  "compression": {
+    "Flex CPU": {
+      "window_s": [
+        0.3,
+        0.4
+      ],
+      "platen_force_median_N": 48.850418979622326,
+      "platen_force_p95_N": 48.94433082149547
+    },
+    "Newton VBD CUDA": {
+      "window_s": [
+        0.3,
+        0.4
+      ],
+      "platen_force_median_N": 24.38186264038086,
+      "platen_force_p95_N": 24.466167449951172
+    }
+  },
+  "friction_slip": "pending physical gate",
+  "heldout_Y": {
+    "scale": 1.0501939261619755,
+    "fitting_case": "B02-X",
+    "anchor_strains": [
+      0.009727233192986962,
+      0.019497231269876236,
+      0.029311192946301468
+    ],
+    "rms_strain_error_before": 0.0010611217746143888,
+    "rms_strain_error_after": 0.00023927168972438724,
+    "peak_edge_ratio": 1.0583243653006646,
+    "status": "physics_gate_failure"
+  }
+}

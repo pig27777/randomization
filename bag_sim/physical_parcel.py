@@ -253,11 +253,13 @@ def compression_force(delta, velocity, cfg):
 class Parcel:
     """CPU model and geometry-aware compiler also used by the YAM adapter."""
 
+    load_envelope = staticmethod(load_envelope)
+
     def __init__(self, cfg=Config()):
         if not mujoco.__version__.startswith("4."):
             raise RuntimeError("Physical parcel requires the MuJoCo 4 environment in envs/physical-parcel-requirements.txt")
         self.cfg = cfg
-        self.envelope = load_envelope(cfg)
+        self.envelope = self.load_envelope(cfg)
         film = self.envelope
         _, _, self.hinges, weights, adjacent, _, _ = _topology(film["reference"], film["faces"])
         self.rest_angles, gradients = dihedrals(film["reference"], self.hinges)
