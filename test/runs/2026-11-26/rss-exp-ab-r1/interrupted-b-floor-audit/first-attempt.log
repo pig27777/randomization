@@ -1,0 +1,34 @@
+B-Left-00-3236548042_g4 film_edge_ratio (136.6s)
+B-Center-00-2593978660_g5 film_edge_ratio (143.5s)
+B-Left-00-3236548042_g7 direct_core_force (206.6s)
+B-Right-00-1135811743_g3 False (221.7s)
+B-Left-00-3236548042_g9 False (222.7s)
+B-Left-00-3236548042_g1 False (236.3s)
+B-Left-00-3236548042_g6 False (238.9s)
+B-Left-00-3236548042_g3 False (242.2s)
+B-Center-00-2593978660_g1 False (246.8s)
+B-Left-00-3236548042_g8 film_edge_ratio (251.7s)
+B-Left-00-3236548042_g2 False (255.5s)
+Traceback (most recent call last):
+  File "/home/ubuntu/miniconda3/lib/python3.14/multiprocessing/pool.py", line 856, in next
+    item = self._items.popleft()
+IndexError: pop from an empty deque
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/rss_exp_ab.py", line 389, in <module>
+    main()
+    ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/rss_exp_ab.py", line 384, in main
+    for name, status in pool.imap_unordered(run_job, ((job, args.output) for job in jobs)):
+                        ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/multiprocessing/pool.py", line 861, in next
+    self._cond.wait(timeout)
+    ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/threading.py", line 369, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+KeyboardInterrupt
+flock: getting lock took 807.661747 seconds
+flock: executing /home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/bin/python
