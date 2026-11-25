@@ -302,3 +302,7 @@ sim.step(); sim.pkg_com(); sim.bag_failure(); sim.footprint()
 随机化录像入口为 `test/bag_model/randomized_physical_parcel_video.py`，两组同时随机采样袋尺寸、E/厚度/密度/摩擦/阻尼与内部物体尺寸/质量/弯曲刚度，分别采用刚体侧抓和三段可弯曲体顶抓，画面显示参数。种子20261116，用户授权本次35 cm抬升和单轨5 mm压紧余量。侧抓最高抬升21.03 cm、连续悬挂2.74秒，窗口止于carry；顶面搓起失败。侧抓原生接触峰值1.1972 mm超过1 mm预算，整体物理验收仍未通过。
 
 用户随后要求只标纸袋、塑料薄膜袋、气泡信封袋类别，录像入口默认已切换到分类标题。`physical_parcel.parcel_profile` 将现有kraft/pe/bubble档案映射为弹性壳预设，YAM适配器的 `bag_profile` 选择类别并加载原纹理；气泡壁复用既有等效缓冲接触律，关系尚未标定。分类视频中纸袋侧抓抬升21.92 cm，气泡信封侧抓失败；塑料薄膜袋两段复用前轮轨迹。[分类录像与结果](../test/runs/2026-11-16/bag/physical-parcel-category-video-r1/)。
+
+### PE 标准夹具基准（2026-11-25）
+
+在相同 142 节点封边参考膜上，CPU Flex 的两轴拉伸和两质量静置包覆 pilot 通过，空袋末段速度仍超 5 mm/s。U 折改成平面台面后消除原盒台面的采样穿越。VBD 空袋的节点运动更低，但两质量静置仍检出膜和内芯几何相交。以上采用同一工程材料和两套求解器自身的接触律，适用范围及实测数据见[物理基准报告](../test/runs/2026-11-25/bag/pe-physics-benchmark-r1/solver_comparison_report.md)。

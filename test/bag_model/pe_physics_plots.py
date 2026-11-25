@@ -230,6 +230,29 @@ def probe(output, runs):
         plt.close(fig)
 
 
+def gentle_probe(output, path):
+    with np.load(path / "raw_trajectories.npz") as archive:
+        time, commanded_z, normal = archive["B06-S2-P1/probe_microsteps"].T
+    active = np.flatnonzero(normal > .01)
+    if not len(active):
+        return
+    peak = int(np.argmax(normal))
+    event = time[peak]
+    selection = (time >= event - .004) & (time <= event + .010)
+    fig, ax = plt.subplots(figsize=(7.0, 3.7))
+    milliseconds = 1000 * (time[selection] - event)
+    ax.plot(milliseconds, normal[selection], color="#18648a", label="Measured reaction")
+    ax.axhline(5., color=".35", linestyle=":", label="Limit")
+    ax.axvline(0., color=".6", linestyle="--")
+    ax.set(xlabel="Time from force peak (ms)", ylabel="Vertical reaction (N)")
+    other = ax.twinx()
+    other.plot(milliseconds, 1000 * commanded_z[selection], color="#b17624", alpha=.85)
+    other.set_ylabel("Commanded probe height (mm)", color="#a2651c")
+    ax.legend(loc="upper right")
+    ax.grid(alpha=.2)
+    save_figure(fig, output / "press-gentle.png")
+
+
 def calibration_checks(runs, stretching, heldout):
     result = dict(reference="Uncalibrated engineering PE profile",
                   status="Simulation cross-check at available fixtures",
@@ -267,6 +290,7 @@ def main():
     parser.add_argument("output", type=Path)
     parser.add_argument("raw", type=Path, help="Consolidated raw_trajectories.npz")
     parser.add_argument("--vbd-calibration", type=Path)
+    parser.add_argument("--gentle-probe", type=Path)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     with np.load(args.raw) as archive:
@@ -281,6 +305,8 @@ def main():
         contact(args.output, runs)
         containment(args.output, runs)
         probe(args.output, runs)
+        if args.gentle_probe is not None:
+            gentle_probe(args.output, args.gentle_probe)
         calibration = stretch(args.output, runs)
         save_json(args.output / "material_calibration.json",
                   calibration_checks(runs, calibration, args.vbd_calibration))

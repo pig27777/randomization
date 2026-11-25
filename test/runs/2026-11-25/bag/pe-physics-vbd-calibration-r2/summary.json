@@ -1,0 +1,181 @@
+[
+  {
+    "case": "B02-Y",
+    "status": "physics_gate_failure",
+    "runtime_s": 69.87914914905559,
+    "samples": 321,
+    "final_time_s": 0.64,
+    "maximum_edge_ratio": 1.0583243653006646,
+    "edge_ratio_p95": 1.0263247334174164,
+    "edge_ratio_p99": 1.0359057806465986,
+    "max_principal_ratio": 1.0659418188860958,
+    "crossing_pairs": 0,
+    "payload_intersecting_triangles": 0,
+    "payload_outside_corners": 0,
+    "max_table_depth_mm": 0.0,
+    "max_contact_depth_mm": 0.0,
+    "peak_self_force_N": 0.0,
+    "max_self_active_pairs": 0,
+    "self_peak_depth_mm": 0.0,
+    "any_bypass": false,
+    "contact_overflow": 0,
+    "warnings": 0,
+    "energy_peak_growth_J": 0.001672544701883626,
+    "final_rms_mm_s": 0.022503687847598444,
+    "peak_strain": 0.029311229164401764,
+    "residual_strain": -4.822181332020392e-08,
+    "peak_load_N": 2.88,
+    "gauge_response": [
+      {
+        "force_N": -0.960270345211029,
+        "strain": 0.009727233192986962
+      },
+      {
+        "force_N": -1.920708179473877,
+        "strain": 0.019497231269876236
+      },
+      {
+        "force_N": -2.8812034130096436,
+        "strain": 0.029311192946301468
+      },
+      {
+        "force_N": 6.263537102313421e-07,
+        "strain": -4.822181332020392e-08
+      }
+    ],
+    "violations": [
+      "edge_ratio_over_1.05"
+    ],
+    "config": {
+      "case": "B02-Y",
+      "duration": 0.64,
+      "dt": 5e-05,
+      "iterations": 300,
+      "height": 0.0,
+      "gravity": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "table": false,
+      "plane_table": false,
+      "coupon": true,
+      "layers": 1,
+      "axis": 1,
+      "mass": 0.0,
+      "size": [
+        0.1,
+        0.07,
+        0.017
+      ],
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "self_collision": true,
+      "self_contact_time": 0.001,
+      "yaw": 0.0,
+      "probe_x": 0.0,
+      "gentle_probe": false,
+      "fold_angles": [],
+      "camber": 0.0,
+      "tool_mu": 0.45,
+      "motion_time_scale": 1.0,
+      "vbd_extensional_scale": 1.0501939261619755,
+      "initial_tools": {}
+    },
+    "seed": 0,
+    "backend_config": {
+      "newton": "1.6.1",
+      "warp": "1.19.0",
+      "device": "NVIDIA GeForce RTX 5090",
+      "params": {
+        "mass_kg": null,
+        "areal_density_gsm": null,
+        "membrane_model": "elastic",
+        "edge_solref_s": 0.0002,
+        "edge_solimp": [
+          0.99,
+          0.999,
+          0.0001
+        ],
+        "young_pa": 21003878.523239512,
+        "poisson": 0.3,
+        "membrane_thickness_m": 6e-05,
+        "membrane_damping": 0.0001,
+        "bending_rigidity_nm": 3.956043956043956e-07,
+        "region_bending_scale": {},
+        "anisotropy_axis": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "anisotropy_ratio": 1.0,
+        "bending_knee_deg": null,
+        "bending_post_ratio": 1.0,
+        "plasticity": false,
+        "plastic_yield_angle_deg": 35.0,
+        "plastic_hardening_ratio": 0.04,
+        "precreased_stiffness_ratio": 0.01,
+        "precreased_panel_ids": [],
+        "precreased_panel_boundaries": true,
+        "memory_ratio": 0.25,
+        "recovery_tau_s": 0.8,
+        "bending_damping_nms": 1e-09,
+        "crease_softening": false,
+        "crease_onset_deg": 25.0,
+        "crease_width_deg": 35.0,
+        "crease_max_softening": 0.65,
+        "collision_radius_m": 0.00025,
+        "collision_patch_faces": 28,
+        "contact_timeconst_s": 0.0002,
+        "cushion": false,
+        "cushion_range_m": 0.0025,
+        "cushion_soft_modulus_pa_per_m": 5000000.0,
+        "cushion_lock_ratio": 10.0,
+        "cushion_damping_ratio": 1.0,
+        "friction": 0.35,
+        "table_friction": 0.35,
+        "self_contact": true,
+        "self_contact_front_panel_ids": [
+          0
+        ],
+        "self_contact_back_panel_ids": [
+          1,
+          2
+        ],
+        "velocity_damping_per_s": 2.0,
+        "gravity": false,
+        "timestep_s": 5e-05,
+        "frame_dt_s": 0.0001,
+        "iterations": 150,
+        "solver": "Newton",
+        "tolerance": 1e-08,
+        "newton_substep_s": 5e-05,
+        "newton_substep_courant": 0.7,
+        "newton_min_substep_s": 5e-05,
+        "newton_iterations": 10,
+        "newton_contact_modulus_pa_per_m": 200000000.0,
+        "newton_self_contact_scale": 2.0,
+        "newton_self_contact_ramp_s": 0.1,
+        "newton_self_contact": true,
+        "newton_self_contact_modulus_pa_per_m": 2000000.0,
+        "newton_full_surface_contact": true
+      },
+      "geometry": {
+        "vertices": 45,
+        "triangles": 64,
+        "reference_area_m2": 0.0032,
+        "film_mass_kg": 0.00017664000000000004
+      },
+      "substep": 5e-05,
+      "extensional_calibration_scale": 1.0501939261619755,
+      "wave_step_membrane_scale": 1.0,
+      "shape_ke": 28302.222222222226,
+      "shape_kd": 0.897853743760745,
+      "rigid_contact": "full-surface analytic primitives, no tool\u2013payload rigid pair",
+      "wrench_readback": "native barycentric particle-side AVBD force law on retained records",
+      "clamp_force": "membrane component from the native VBD law"
+    }
+  }
+]

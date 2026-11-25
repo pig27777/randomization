@@ -1,0 +1,602 @@
+{
+  "assembled_at": "2026-11-25T18:33:17.253236+08:00",
+  "backends": {
+    "flex": [
+      {
+        "run": "pe-physics-flex-r1",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:01:09.055861+08:00",
+        "backend": "flex",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics.py": "f14a84f89edc0a5c246180aa917d068f347a8b9c0674654168160557d2295754",
+          "test/bag_model/pe_physics_protocol.py": "96feb075bed49ca8a7d4068434276e2399e679fd109fddb57e8d29021bf7a4d7",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-platen-r2",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:12:53.625321+08:00",
+        "backend": "flex",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "163c4a979cbf3d1bc583ac466bf634b3d05d9d1676a24228049c8eb7ef909f37",
+          "test/bag_model/pe_physics_plots.py": "c9042d0bd0b99bf11cee6796cfc03884e2c7e6ae84f70a981f2c9c385a1055a4",
+          "test/bag_model/pe_physics_capabilities.py": "c880a2c6f7d3b834fc040e9d77cac6fec6dc88627e11c7a2f726d121489cc689",
+          "test/bag_model/pe_physics.py": "762c60caf3882d097497a8c97e1b6922896f0fbb20c58f9ba1fe76c09be4a0dd",
+          "test/bag_model/pe_physics_protocol.py": "969a1d65ba47d0d16fb02a19d35b643c89a68d2a005e4bcbcec06077c54876d4",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-fold-r2",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:10:55.871461+08:00",
+        "backend": "flex",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "dc884d8b59a53bccdf6e3a92e4c5515bf6c60d420f829bbdc2d4dad91fbfc3ea",
+          "test/bag_model/pe_physics_plots.py": "c9042d0bd0b99bf11cee6796cfc03884e2c7e6ae84f70a981f2c9c385a1055a4",
+          "test/bag_model/pe_physics_capabilities.py": "c880a2c6f7d3b834fc040e9d77cac6fec6dc88627e11c7a2f726d121489cc689",
+          "test/bag_model/pe_physics.py": "762c60caf3882d097497a8c97e1b6922896f0fbb20c58f9ba1fe76c09be4a0dd",
+          "test/bag_model/pe_physics_protocol.py": "969a1d65ba47d0d16fb02a19d35b643c89a68d2a005e4bcbcec06077c54876d4",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-gravity-r2",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:12:08.069896+08:00",
+        "backend": "flex",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "dc884d8b59a53bccdf6e3a92e4c5515bf6c60d420f829bbdc2d4dad91fbfc3ea",
+          "test/bag_model/pe_physics_plots.py": "c9042d0bd0b99bf11cee6796cfc03884e2c7e6ae84f70a981f2c9c385a1055a4",
+          "test/bag_model/pe_physics_capabilities.py": "c880a2c6f7d3b834fc040e9d77cac6fec6dc88627e11c7a2f726d121489cc689",
+          "test/bag_model/pe_physics.py": "762c60caf3882d097497a8c97e1b6922896f0fbb20c58f9ba1fe76c09be4a0dd",
+          "test/bag_model/pe_physics_protocol.py": "969a1d65ba47d0d16fb02a19d35b643c89a68d2a005e4bcbcec06077c54876d4",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-load-r2",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:10:55.877549+08:00",
+        "backend": "flex",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "dc884d8b59a53bccdf6e3a92e4c5515bf6c60d420f829bbdc2d4dad91fbfc3ea",
+          "test/bag_model/pe_physics_plots.py": "c9042d0bd0b99bf11cee6796cfc03884e2c7e6ae84f70a981f2c9c385a1055a4",
+          "test/bag_model/pe_physics_capabilities.py": "c880a2c6f7d3b834fc040e9d77cac6fec6dc88627e11c7a2f726d121489cc689",
+          "test/bag_model/pe_physics.py": "762c60caf3882d097497a8c97e1b6922896f0fbb20c58f9ba1fe76c09be4a0dd",
+          "test/bag_model/pe_physics_protocol.py": "969a1d65ba47d0d16fb02a19d35b643c89a68d2a005e4bcbcec06077c54876d4",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-probe-S0-P1-r1",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:19:39.121089+08:00",
+        "backend": "flex",
+        "phase": "probe-diagnostic",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "163c4a979cbf3d1bc583ac466bf634b3d05d9d1676a24228049c8eb7ef909f37",
+          "test/bag_model/pe_physics_plots.py": "982c67f2dc7bb2b8d8abb7b26ad0a3e6ffc9bea07a44cf6584908954c58baf61",
+          "test/bag_model/pe_physics_capabilities.py": "39d75efa837837fc67347100d1dcf3758f0b319440e2d49a6f1be1dce942bac7",
+          "test/bag_model/pe_physics.py": "2b635b70ecae544bf0f71fb74912d3a6e870caa25aef64c85d3693d1973d9255",
+          "test/bag_model/pe_physics_replay.py": "a4ea9ecd6c21136f248ef706ca41cabfc538162bf686dfb515fc2ba05d642801",
+          "test/bag_model/pe_physics_collect.py": "d8db36a1be1f5862295fd039a79d7f36eac7739423bfb2daa904f6b6c7eaf040",
+          "test/bag_model/pe_physics_protocol.py": "6ef62f4b6c3096f8b2f99e5f2f25f601a657a04ae311b6f3e0858d14c39c6d08",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-probe-S2-P0-r1",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:19:39.132917+08:00",
+        "backend": "flex",
+        "phase": "probe-diagnostic",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "163c4a979cbf3d1bc583ac466bf634b3d05d9d1676a24228049c8eb7ef909f37",
+          "test/bag_model/pe_physics_plots.py": "982c67f2dc7bb2b8d8abb7b26ad0a3e6ffc9bea07a44cf6584908954c58baf61",
+          "test/bag_model/pe_physics_capabilities.py": "39d75efa837837fc67347100d1dcf3758f0b319440e2d49a6f1be1dce942bac7",
+          "test/bag_model/pe_physics.py": "2b635b70ecae544bf0f71fb74912d3a6e870caa25aef64c85d3693d1973d9255",
+          "test/bag_model/pe_physics_replay.py": "a4ea9ecd6c21136f248ef706ca41cabfc538162bf686dfb515fc2ba05d642801",
+          "test/bag_model/pe_physics_collect.py": "d8db36a1be1f5862295fd039a79d7f36eac7739423bfb2daa904f6b6c7eaf040",
+          "test/bag_model/pe_physics_protocol.py": "6ef62f4b6c3096f8b2f99e5f2f25f601a657a04ae311b6f3e0858d14c39c6d08",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-flex-probe-S2-P1-r1",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:19:39.126802+08:00",
+        "backend": "flex",
+        "phase": "probe-diagnostic",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "163c4a979cbf3d1bc583ac466bf634b3d05d9d1676a24228049c8eb7ef909f37",
+          "test/bag_model/pe_physics_plots.py": "982c67f2dc7bb2b8d8abb7b26ad0a3e6ffc9bea07a44cf6584908954c58baf61",
+          "test/bag_model/pe_physics_capabilities.py": "39d75efa837837fc67347100d1dcf3758f0b319440e2d49a6f1be1dce942bac7",
+          "test/bag_model/pe_physics.py": "2b635b70ecae544bf0f71fb74912d3a6e870caa25aef64c85d3693d1973d9255",
+          "test/bag_model/pe_physics_replay.py": "a4ea9ecd6c21136f248ef706ca41cabfc538162bf686dfb515fc2ba05d642801",
+          "test/bag_model/pe_physics_collect.py": "d8db36a1be1f5862295fd039a79d7f36eac7739423bfb2daa904f6b6c7eaf040",
+          "test/bag_model/pe_physics_protocol.py": "6ef62f4b6c3096f8b2f99e5f2f25f601a657a04ae311b6f3e0858d14c39c6d08",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      }
+    ],
+    "vbd": [
+      {
+        "run": "pe-physics-vbd-material-r1",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:13:27.869898+08:00",
+        "backend": "vbd",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4",
+          "newton": "1.6.1"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "163c4a979cbf3d1bc583ac466bf634b3d05d9d1676a24228049c8eb7ef909f37",
+          "test/bag_model/pe_physics_plots.py": "c9042d0bd0b99bf11cee6796cfc03884e2c7e6ae84f70a981f2c9c385a1055a4",
+          "test/bag_model/pe_physics_capabilities.py": "c880a2c6f7d3b834fc040e9d77cac6fec6dc88627e11c7a2f726d121489cc689",
+          "test/bag_model/pe_physics.py": "762c60caf3882d097497a8c97e1b6922896f0fbb20c58f9ba1fe76c09be4a0dd",
+          "test/bag_model/pe_physics_protocol.py": "969a1d65ba47d0d16fb02a19d35b643c89a68d2a005e4bcbcec06077c54876d4",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-vbd-contact-r2",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:25:22.998273+08:00",
+        "backend": "vbd",
+        "phase": "foundation",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4",
+          "newton": "1.6.1"
+        },
+        "revision": "72b558fe5691757ffacb0f7d75678cf6e0a6c625",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "9af716ca42ce8281f61f7056da4e365367baa33359e7db5fd85a1f822e2eae0e",
+          "test/bag_model/pe_physics_plots.py": "04b795a6161403acf0b5b14fe8a5a953d5e8629d860306887d066f341c2b36ef",
+          "test/bag_model/pe_physics_capabilities.py": "39d75efa837837fc67347100d1dcf3758f0b319440e2d49a6f1be1dce942bac7",
+          "test/bag_model/pe_physics.py": "6e5d7b46cfd9038b5039824105ebce764aa7fb6eb1ed14f7648fda1af9479e2c",
+          "test/bag_model/pe_physics_replay.py": "e927770f681cfae989322bc18adb5292760b31523d90e38a02f92896b44ae129",
+          "test/bag_model/pe_physics_collect.py": "b0686081c28150714201bab7952513ee3088367f59d753f9700ec4fafdc7b8d8",
+          "test/bag_model/pe_physics_protocol.py": "6f67c69aadd4ad3a09e8addf227e8ca077e758525e24355bd050c7b52e6b7e69",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "seed": 0
+      },
+      {
+        "run": "pe-physics-vbd-probe-r2",
+        "machine": "ubun",
+        "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+        "cpu": "x86_64",
+        "started_at": "2026-11-25T18:31:22.700726+08:00",
+        "backend": "vbd",
+        "phase": "probe-diagnostic",
+        "smoke": false,
+        "environment": {
+          "mujoco": "4.0.1",
+          "mujoco-warp": "4.0.1",
+          "warp-lang": "1.19.0",
+          "numpy": "2.5.4",
+          "newton": "1.6.1"
+        },
+        "revision": "ce88d2c118136a3d2cb86fa8b0c04647fa56339f",
+        "source_sha256": {
+          "test/bag_model/pe_physics_vbd.py": "9af716ca42ce8281f61f7056da4e365367baa33359e7db5fd85a1f822e2eae0e",
+          "test/bag_model/pe_physics_plots.py": "43c47efdb603edcdb2238b202270d00a47533b74e336547eccd1e33868585b1a",
+          "test/bag_model/pe_physics_capabilities.py": "39d75efa837837fc67347100d1dcf3758f0b319440e2d49a6f1be1dce942bac7",
+          "test/bag_model/pe_physics.py": "9f9de9e9446ae269a17b07d3d6175cc2d62cbcf2ddb17541af2341d104e27db1",
+          "test/bag_model/pe_physics_replay.py": "e927770f681cfae989322bc18adb5292760b31523d90e38a02f92896b44ae129",
+          "test/bag_model/pe_physics_collect.py": "ee9a0c614d4a89244e7fbe7c8b09d0c79884ab45f2f58c26077418e42b2c61ca",
+          "test/bag_model/pe_physics_protocol.py": "ceedd8b2a19c3d20003066fc7452207eae87ce0e582a9ff1a3e7910cae7e7064",
+          "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+          "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+        },
+        "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+        "pair_labels": [
+          "film_self",
+          "film_table",
+          "film_payload",
+          "film_contact_probe",
+          "film_platen",
+          "film_left_pad",
+          "film_right_pad",
+          "payload_table",
+          "payload_fixture"
+        ],
+        "wrench_labels": [
+          "contact_probe",
+          "platen",
+          "left_pad",
+          "right_pad",
+          "obstacle",
+          "table",
+          "payload"
+        ],
+        "probe_microstep_columns": [
+          "time_s",
+          "commanded_height_m",
+          "vertical_reaction_N"
+        ],
+        "seed": 0
+      }
+    ]
+  },
+  "pairwise_input_equality": {
+    "B01": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B02-X": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B02-Y": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B03-A": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B04-DOUBLE": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B04-U": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B05-A-200": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B05-A-350": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    },
+    "B06-S2-P1": {
+      "reference": true,
+      "current": true,
+      "faces": true,
+      "masses": true
+    }
+  }
+}

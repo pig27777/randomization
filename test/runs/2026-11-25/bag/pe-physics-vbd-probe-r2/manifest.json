@@ -1,0 +1,55 @@
+{
+  "machine": "ubun",
+  "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.39",
+  "cpu": "x86_64",
+  "started_at": "2026-11-25T18:31:22.700726+08:00",
+  "backend": "vbd",
+  "phase": "probe-diagnostic",
+  "smoke": false,
+  "environment": {
+    "mujoco": "4.0.1",
+    "mujoco-warp": "4.0.1",
+    "warp-lang": "1.19.0",
+    "numpy": "2.5.4",
+    "newton": "1.6.1"
+  },
+  "revision": "ce88d2c118136a3d2cb86fa8b0c04647fa56339f",
+  "source_sha256": {
+    "test/bag_model/pe_physics_vbd.py": "9af716ca42ce8281f61f7056da4e365367baa33359e7db5fd85a1f822e2eae0e",
+    "test/bag_model/pe_physics_plots.py": "43c47efdb603edcdb2238b202270d00a47533b74e336547eccd1e33868585b1a",
+    "test/bag_model/pe_physics_capabilities.py": "39d75efa837837fc67347100d1dcf3758f0b319440e2d49a6f1be1dce942bac7",
+    "test/bag_model/pe_physics.py": "9f9de9e9446ae269a17b07d3d6175cc2d62cbcf2ddb17541af2341d104e27db1",
+    "test/bag_model/pe_physics_replay.py": "e927770f681cfae989322bc18adb5292760b31523d90e38a02f92896b44ae129",
+    "test/bag_model/pe_physics_collect.py": "ee9a0c614d4a89244e7fbe7c8b09d0c79884ab45f2f58c26077418e42b2c61ca",
+    "test/bag_model/pe_physics_protocol.py": "ceedd8b2a19c3d20003066fc7452207eae87ce0e582a9ff1a3e7910cae7e7064",
+    "bag_sim/physical_parcel.py": "b08f45cb428e2c9a9cb38475a09eb6fa5bdced3f5f546a198e3c6960bd8f6ece",
+    "bag_sim/newton_bag.py": "e48c5aa6407234c3581c424e916af740ee9b1e761f36520c46db2ebae08af75e"
+  },
+  "solver_force_phase": "solver contact/forces before integration, geometry after integration",
+  "pair_labels": [
+    "film_self",
+    "film_table",
+    "film_payload",
+    "film_contact_probe",
+    "film_platen",
+    "film_left_pad",
+    "film_right_pad",
+    "payload_table",
+    "payload_fixture"
+  ],
+  "wrench_labels": [
+    "contact_probe",
+    "platen",
+    "left_pad",
+    "right_pad",
+    "obstacle",
+    "table",
+    "payload"
+  ],
+  "probe_microstep_columns": [
+    "time_s",
+    "commanded_height_m",
+    "vertical_reaction_N"
+  ],
+  "seed": 0
+}

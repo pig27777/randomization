@@ -1,0 +1,147 @@
+[
+  {
+    "case": "B04-U",
+    "status": "physics_gate_failure",
+    "runtime_s": 46.01300194498617,
+    "samples": 541,
+    "final_time_s": 1.08,
+    "maximum_edge_ratio": 1.0442664922834206,
+    "edge_ratio_p95": 1.000921574325857,
+    "edge_ratio_p99": 1.0026305055859501,
+    "max_principal_ratio": 1.0526615846329086,
+    "crossing_pairs": 0,
+    "payload_intersecting_triangles": 0,
+    "payload_outside_corners": 0,
+    "max_table_depth_mm": 1.2966107088127665,
+    "max_contact_depth_mm": 1.5597582633521816,
+    "peak_self_force_N": 2.1129833996821645,
+    "max_self_active_pairs": 110,
+    "self_peak_depth_mm": 0.24631088855004285,
+    "any_bypass": false,
+    "contact_overflow": 0,
+    "warnings": 0,
+    "energy_peak_growth_J": 0.0017929529346190497,
+    "final_rms_mm_s": 7.412054596360241,
+    "violations": [
+      "penetration_over_1mm"
+    ],
+    "config": {
+      "case": "B04-U",
+      "duration": 1.08,
+      "dt": 2.5e-05,
+      "iterations": 300,
+      "height": 0.0006,
+      "gravity": [
+        0.0,
+        0.0,
+        -9.81
+      ],
+      "table": true,
+      "coupon": true,
+      "layers": 1,
+      "axis": 0,
+      "mass": 0.0,
+      "size": [
+        0.1,
+        0.07,
+        0.017
+      ],
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "self_collision": true,
+      "self_contact_time": 0.001,
+      "yaw": 0.0,
+      "probe_x": 0.0,
+      "fold_angles": [
+        0,
+        0,
+        0,
+        60,
+        120,
+        180,
+        180,
+        180
+      ],
+      "camber": 0.0,
+      "tool_mu": 0.45,
+      "motion_time_scale": 1.8,
+      "initial_tools": {
+        "platen": [
+          0.0,
+          0.0,
+          0.025
+        ]
+      }
+    },
+    "seed": 0,
+    "backend_config": {
+      "config": {
+        "geometry": "geometry/kraft_edge_sealed_35.npz",
+        "bag_size": [
+          0.35,
+          0.25
+        ],
+        "payload_size": [
+          0.1,
+          0.07,
+          0.017
+        ],
+        "payload_mass": 0.0,
+        "payload_com": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "payload_inertia": null,
+        "mode": "empty",
+        "areal_mass": 0.0552,
+        "membrane": 1200.0,
+        "poisson": 0.3,
+        "bending": 3.956043956043956e-07,
+        "precreased_ratio": 0.01,
+        "bend_damping_ratio": 0.1,
+        "material_thickness": 6e-05,
+        "rayleigh": 0.0001,
+        "radius": 0.00025,
+        "friction": 0.35,
+        "joint_stiffness": 0.08,
+        "joint_damping": 0.003,
+        "compression_k1": 800.0,
+        "compression_k2": 20000.0,
+        "compression_damping": 1.0,
+        "timestep": 2.5e-05,
+        "contact_time": 0.001,
+        "iterations": 300,
+        "center": [
+          0.0,
+          0.0
+        ],
+        "gravity": [
+          0.0,
+          0.0,
+          -9.81
+        ],
+        "self_collision": true,
+        "probe_shape": "sphere",
+        "payload_offset_xy": [
+          0.0,
+          0.0
+        ]
+      },
+      "geometry": {
+        "vertices": 45,
+        "triangles": 64,
+        "reference_area_m2": 0.0032,
+        "film_mass_kg": 0.00017664000000000004
+      },
+      "nq": 170,
+      "nv": 165,
+      "neq": 0,
+      "payload_collision": null,
+      "bending": "reference dihedral energy, existing bag_model gradient",
+      "compression_axis": "segment-local -z"
+    }
+  }
+]
