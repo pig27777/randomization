@@ -1,0 +1,26 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /home/ubuntu/.cache/warp/1.19.0
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization-yam-pure-sim/test/yam/bag_try.py", line 227, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization-yam-pure-sim/test/yam/bag_try.py", line 213, in main
+    results, signals = run_batch(output)
+                       ~~~~~~~~~^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization-yam-pure-sim/test/yam/bag_try.py", line 95, in run_batch
+    sim = SimYAMInterface(len(places), config={"physics_dt_s": DT}, add_scene=nominal.add_scene,
+                          compile_model=nominal.parcel.compile_model, try_capacity=72,
+                          capacities={"nconmax": 1024, "njmax": 4096, "njmax_nnz": 32768})
+  File "/home/ubuntu/workspace/gzl/randomization-yam-pure-sim/experience/yam_platform/yam_warp.py", line 67, in __init__
+    self.data = mjw.put_data(m, data, nworld=worlds, **(capacities or {}))
+                ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/lib/python3.14/site-packages/mujoco_warp/_src/diff.py", line 200, in wrapper
+    return fn(*args, **kwargs)
+  File "/home/ubuntu/workspace/gzl/randomization/.venv-physical-parcel/lib/python3.14/site-packages/mujoco_warp/_src/io.py", line 2533, in put_data
+    raise ValueError(f"nconmax overflow (nconmax must be >= {mjd.ncon})")
+ValueError: nconmax overflow (nconmax must be >= 1610)

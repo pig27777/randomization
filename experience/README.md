@@ -2,6 +2,8 @@
 
 统一的 YAM 抓取实验平台。机械臂、夹爪、IK、抓取动作、角度矩阵、事件判定、轨迹记录、视频回放和 CPU 测速集中在 randomization 的 experience 目录；袋子和内容物通过模型适配器接入。
 
+Yam_B 的有限力矩、SDK 观测、GPU 历史与纯仿真验收见 [Yam_B 纯仿真接口](YAM_PURE_SIM.md)。
+
 ## 代码地图
 
 | 文件 | 职责 |

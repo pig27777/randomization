@@ -8,6 +8,7 @@
 
 | 主题 | 入口与报告 | 主要实现或数据位置 |
 | --- | --- | --- |
+| Yam_B 纯仿真控制与 ABC 场景 | [验收](yam/REPORT.md) · [接口](../experience/YAM_PURE_SIM.md) | `test/yam/`、`experience/yam_platform/` |
 | 机械臂抓取与模型对比 | [统一平台与接入接口](flex3d/README.md) · [实验报告](flex3d/REPORT.md) | `test/flex3d/`、`test/flex3d/results/` |
 | 内容物响应定义与建模验收 | [R1–R4 测法](content_model/README.md) · [工具入口](content_model/TOOLS.md) · [实验报告](content_model/REPORT.md) | `contents/segment/`（模型）、`test/content_model/`（测试） |
 | 外袋及松装建模 | [入口说明](bag_model/README.md) · [实验报告](bag_model/REPORT.md) | `bag_sim/`（模型）、`test/bag_model/`（测试） |

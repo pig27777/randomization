@@ -67,7 +67,7 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     states=trajectory["qpos"]
     times=trajectory["time"] if "time" in trajectory else np.arange(len(states))*.2+.001
     model=(mujoco.MjModel.from_binary_path(str(run/"model.mjb")) if (run/"model.mjb").exists()
-           else mujoco.MjModel.from_xml_path(str(run/"model.xml")))
+           else mujoco.MjModel.from_xml_path(str((run/"model.xml").resolve())))
     model.vis.global_.offwidth=640;model.vis.global_.offheight=480
     data=mujoco.MjData(model)
     mujoco.mj_kinematics(model,data)
@@ -90,6 +90,9 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
         option.flags[mujoco.mjtVisFlag.mjVIS_FLEXFACE]=False
         option.flags[mujoco.mjtVisFlag.mjVIS_FLEXSKIN]=False
     full=mujoco.MjvCamera();full.lookat[:]=[0,-.02,.20];full.distance=1.35;full.azimuth=-45;full.elevation=-25
+    if result.get('fixed_camera'):
+        full.type=mujoco.mjtCamera.mjCAMERA_FIXED
+        full.fixedcamid=model.camera(result['fixed_camera']).id
     detail=mujoco.MjvCamera();detail.distance=.67;detail.azimuth=-45;detail.elevation=-30
     if focus:
         option.geomgroup[:]=False;detail_option.geomgroup[:]=False
@@ -115,6 +118,7 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
     if cfg.get("envelope",False):title=title.replace(f'pinch {cfg["pinch_coeff"]:g}','native contact')
     if view=='detail':title=f'{model_label} | {cfg["category"]} | {result["outcome"]}'
     if focus:title=f'{cfg.get("shape","box").upper()} tetrahedra | 10x slow | RED = inverted | final frame held 3s'
+    title=result.get('video_title',title)
     font_size=20 if view=='both' else 16
     label=f"drawtext=text='{title}':fontcolor=white:fontsize={font_size}:x=16:y=12:box=1:boxcolor=black@0.65"
     dimensions=result.get('dimensions',{})
@@ -143,6 +147,8 @@ def render(run,output,tetra=False,focus=False,*,fps=20,view='both'):
             detail.lookat[:]=data.geom_xpos[content_geoms].mean(0)
         else:
             detail.lookat[:]=[0,0,.15]
+        if result.get('follow_site'):
+            detail.lookat[:]=data.site(result['follow_site']).xpos
         if focus:
             full.lookat[:]=data.flexvert_xpos.mean(0)
             detail.lookat[:]=data.flexvert_xpos[tets[min_tet]].mean(0)
