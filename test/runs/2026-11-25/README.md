@@ -11,3 +11,4 @@
 | 运行 | 指标与命令 | 结论 |
 | --- | --- | --- |
 | [PE Flex / VBD 标准夹具基准](bag/pe-physics-benchmark-r1/) | `ubun`，RTX 5090，封边膜 142 节点。MuJoCo 4.0.1 / MJWarp 4.0.1，Newton 1.6.1 / Warp 1.19.0。仓库根目录执行 `$PE_PYTHON -B test/bag_model/pe_physics_protocol.py <新目录>`。VBD 加 `--backend vbd`，配置独立 Newton 依赖路径，使用 GPU 锁。 | 基础 pilot 与故障对照已运行。Flex 原基准静止与 U 折未通过，平面台面修复 U 折。VBD 同网格载荷下仍观察到内芯露角。正式 B07–B12 暂停。[主题报告](../../bag_model/REPORT.md#2026-11-25-pe-袋统一物理基准) · [测试报告](../../../reports/pe-physics-benchmark-test.md) |
+| [PE 最小操作与 GPU 接触](bag/pe-mvp-r1/) | `ubun`，原 142 节点 Flex。仓库根目录运行 `$PE_PYTHON -B test/bag_model/bag_mvp.py <case> <新目录>`。GPU 入口 `bag_mvp_gpu.py` 使用同夹具和共享 GPU 锁。 | 四类 CPU 操作通过。GPU 主动接触通过，完整 GPU 夹持仍未通过。[测试报告与复现](../../../reports/pe-mvp-test.md) |

@@ -124,7 +124,7 @@ class VBDBagBackend:
     def reset(cls, config, seed=0):
         return cls(config, seed)
 
-    def __init__(self, config, seed):
+    def __init__(self, config, seed, *, table_box=None):
         if newton.__version__ != "1.6.1":
             raise NotImplementedError("the VBD force readback is qualified for Newton 1.6.1")
         if not wp.is_cuda_available():
@@ -164,6 +164,9 @@ class VBDBagBackend:
             }
             if not config.table:
                 del defs["table"]
+            elif table_box is not None:
+                center, half = table_box
+                defs["table"] = (center, "box", half, BASE.friction)
             if config.mass:
                 defs["payload"] = (film["payload_origin"], "box", np.asarray(config.size) / 2, BASE.friction)
             for name, (center, shape, size, friction) in defs.items():

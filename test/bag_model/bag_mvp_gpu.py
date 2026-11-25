@@ -12,7 +12,7 @@ import numpy as np
 import warp as wp
 
 from bag_mvp import CORNERS, FIXTURES, PAD, PAD_HALF, PAIRS, PROBE_D, PROBE_K, SmokeFlex
-from bag_mvp import (PEAK_DEPTH, geometry, hold_window, jaw_core_overlap,
+from bag_mvp import (PEAK_DEPTH, SAFE_JAW_FORCE, geometry, hold_window, longest,
                      make_trial, metrics, probe_command, save_json)
 from pe_physics import pair_name
 from bag_sim.physical_parcel_gpu import Batch
@@ -22,7 +22,8 @@ BLOCK = 20
 
 @wp.kernel
 def drive(tick: wp.array[int], command: wp.array3d[float], q_adr: wp.array[int], v_adr: wp.array[int],
-          probe: bool, kp: float, kd: float, qpos: wp.array2d[float], qvel: wp.array2d[float],
+          probe: bool, kp: float, kd: float, feedback: bool, dt: float,
+          release: float, minimum: float, jaw: wp.array2d[float], qpos: wp.array2d[float], qvel: wp.array2d[float],
           applied: wp.array2d[float]):
     world = wp.tid()
     row = wp.min(command.shape[0] - 1, tick[world])
@@ -35,6 +36,13 @@ def drive(tick: wp.array[int], command: wp.array3d[float], q_adr: wp.array[int],
         qvel[world, v + 1] = 0.
         applied[world, v + 2] = kp * (command[row, 0, 2] - qpos[world, q + 2]) - kd * qvel[world, v + 2]
     else:
+        time = float(tick[world]) * dt
+        use_gap = feedback and time >= .47
+        rate = jaw[world, 1] if time < release else .14
+        gap = wp.clamp(jaw[world, 0] + rate * dt, minimum, .046) if use_gap else jaw[world, 0]
+        if use_gap:
+            rate = (gap - jaw[world, 0]) / dt
+            jaw[world, 0] = gap
         for side in range(2):
             if wp.isfinite(command[row, side, 0]):
                 q = q_adr[side + 2]
@@ -45,6 +53,12 @@ def drive(tick: wp.array[int], command: wp.array3d[float], q_adr: wp.array[int],
                     qvel[world, v + 3 + i] = 0.
                 for i in range(4):
                     qpos[world, q + 3 + i] = command[row, side, 6 + i]
+                if use_gap:
+                    sign = 2.0 * float(side) - 1.0
+                    mid = .5 * (command[row, 0, 2] + command[row, 1, 2])
+                    speed = .5 * (command[row, 0, 5] + command[row, 1, 5])
+                    qpos[world, q + 2] = mid + sign * (.003 + gap / 2.0)
+                    qvel[world, v + 2] = speed + sign * rate / 2.0
     tick[world] += 1
 
 
@@ -121,21 +135,40 @@ def snapshot(batch, t, ids, local, world):
     return rows
 
 
-def hold_metrics(case, data, size, floor0):
-    raised = data["floor"] - floor0 >= .010
-    active = np.all(data["jaw_normal"] > 0, axis=1) & np.all(data["pairs"][:, [5, 6]] > 0, axis=1)
-    geom = not np.any(data["escaped_center"]) and max(data["outside"].max(),
+def contact_checkpoint(source, backend, dt):
+    accepted = json.loads((source / "summary.json").read_text())
+    if accepted["status"] != "PASS" or accepted["case"] != backend.spec.case or accepted["dt_s"] != dt:
+        raise ValueError("Contact window requires a passing device trace of the same scene and step")
+    with np.load(source / "trace.npz") as trace:
+        time = trace["time"]
+        index = int(np.argmin(np.abs(time - 1.0)))
+        j = backend.m.jnt_qposadr[backend.m.joint("payload_free").id]
+
+        def qpos(i):
+            state = backend.d.qpos.copy()
+            state[backend.film_qpos] = trace["q"][i] - backend.envelope["reference"]
+            state[j:j + 7] = trace["payload"][i]
+            state[backend.tool_q[:, None] + np.arange(7)] = trace["fixtures"][i]
+            return state
+
+        velocity = np.empty(backend.m.nv)
+        mujoco.mj_differentiatePos(backend.m, velocity, time[index + 1] - time[index - 1],
+                                  qpos(index - 1), qpos(index + 1))
+        return dict(qpos=qpos(index), qvel=velocity, time_s=time[index])
+
+
+def contact_window_metrics(case, data):
+    force = data["wrench"][:, 0, 2]
+    geom = not np.any(data["escaped_center"]) and max(data["outside"].max(), data["table_penetration"].max(),
                                                      data["core_penetration"].max()) <= PEAK_DEPTH
-    bypass = bool(jaw_core_overlap(data["payload"], data["fixtures"], size)
-                  or data["pairs"][:, PAIRS.index("payload_fixture")].max()
-                  or data["shelf_intrusion"].max() > .001)
-    passed = bool(np.all(raised) and active.mean() >= .95 and geom and not bypass)
-    return dict(case=case, min_lift_mm=float(1000 * (data["floor"].min() - floor0)),
-                bilateral_fraction=float(active.mean()), pass_geometry=geom, bypass=bypass,
-                status="PASS" if passed else "FAIL")
+    bypass = bool(data["pairs"][:, PAIRS.index("payload_fixture")].max())
+    duration = longest(force >= .08, data["time"])
+    return dict(case=case, mean_N=float(force.mean()), peak_N=float(force.max()), sustained_s=duration,
+                pass_geometry=bool(geom), bypass=bypass,
+                status="PASS" if geom and not bypass and duration >= .02 else "FAIL")
 
 
-def run(case, nworld, output, cpu, dt, seconds, hold_from):
+def run(case, nworld, output, cpu, dt, contact_from, feedback):
     output.mkdir(parents=True, exist_ok=False)
     probe = case.startswith("try")
     variant = "baseline"
@@ -165,21 +198,15 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
         edge = config["support_edge"]
         variant = config.get("variant", "baseline")
         spec = make_trial(case, dt, variant)
-    full_steps = len(commands)
     checkpoint = None
-    if hold_from is not None:
-        accepted = json.loads((hold_from / "summary.json").read_text())
-        if accepted["status"] != "PASS" or accepted["case"] != case or accepted["dt_s"] != dt:
-            raise ValueError("Batch hold needs a passing single-world run of the same fixture and step")
-        with np.load(hold_from / "checkpoint.npz") as data:
-            checkpoint = dict(data)
-        i = round(float(checkpoint["time_s"]) / dt)
-        commands = commands[i:i + round(.12 / dt)]
-    if seconds is not None:
-        commands = commands[:round(seconds / dt)]
-    diagnostic = hold_from is None and len(commands) < full_steps
     init_start = perf_counter()
     backend = SmokeFlex(spec, mesh_pads, edge, variant)
+    if contact_from is not None:
+        checkpoint = contact_checkpoint(contact_from, backend, dt)
+        i = round(float(checkpoint["time_s"]) / dt)
+        commands = commands[i:i + round(.12 / dt)]
+    if feedback and variant != "exposed-underface":
+        raise ValueError("Closed-loop gap applies only to vertically opposed underface jaws")
     with wp.ScopedDevice("cuda:0"):
         batch = Batch(nworld, parcel=backend, randomize=False, contact_capacity=1024, constraint_capacity=4096)
         tick = wp.zeros(nworld, dtype=int)
@@ -189,10 +216,13 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
         ids = wp.array(np.arange(batch.d.naconmax), dtype=int)
         local = wp.zeros(batch.d.naconmax, dtype=wp.spatial_vector)
         world = wp.zeros_like(local)
+        initial_jaw = np.zeros((nworld, 2), dtype=np.float32)
+        initial_jaw[:, 0] = .046
+        jaw = wp.array(initial_jaw, dtype=float)
 
         def step():
-            wp.launch(drive, dim=nworld, inputs=[tick, move, q, v, probe, PROBE_K, PROBE_D,
-                                                 batch.d.qpos, batch.d.qvel, batch.d.qfrc_applied])
+            wp.launch(drive, dim=nworld, inputs=[tick, move, q, v, probe, PROBE_K, PROBE_D, feedback, dt,
+                                                 hold_window(variant)[1], spec.size[2] - .00075, jaw, batch.d.qpos, batch.d.qvel, batch.d.qfrc_applied])
             batch.step()
 
         def reset():
@@ -203,6 +233,7 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
                 velocities = np.broadcast_to(checkpoint["qvel"], tuple(batch.d.qvel.shape)).copy()
                 batch.d.qvel.assign(velocities)
             tick.zero_()
+            jaw.assign(initial_jaw)
 
         reset()
         wp.synchronize_device()
@@ -221,7 +252,7 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
         traces = [[row] for row in snapshot(batch, 0., ids, local, world)]
         memory = [memory_mib()]
         total_sim, physics_wall, readback_wall = 0, 0., 0.
-        interval = max(BLOCK, round(.010 / dt / BLOCK) * BLOCK)
+        interval = BLOCK if feedback else max(BLOCK, round(.010 / dt / BLOCK) * BLOCK)
         save_at = float(np.mean(hold_window(variant)))
         saved = False
         while total_sim < len(commands):
@@ -235,9 +266,16 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
             physics_wall += perf_counter() - start
             total_sim += advance
             start = perf_counter()
-            for trace, row in zip(traces, snapshot(batch, total_sim * dt, ids, local, world)):
+            snapshots = snapshot(batch, total_sim * dt, ids, local, world)
+            if feedback and .47 <= total_sim * dt < hold_window(variant)[1]:
+                state = jaw.numpy()
+                measured = np.array([row["jaw_normal"] for row in snapshots])
+                state[:, 1] = np.where(measured.max(axis=1) > SAFE_JAW_FORCE, .16,
+                                       np.clip(.012 * (measured.mean(axis=1) - 8.), -.055, .16))
+                jaw.assign(state)
+            for trace, row in zip(traces, snapshots):
                 trace.append(row)
-            if not probe and not saved and hold_from is None and total_sim * dt >= save_at:
+            if not probe and not saved and total_sim * dt >= save_at:
                 np.savez_compressed(output / "checkpoint.npz", qpos=batch.d.qpos.numpy()[0],
                                     qvel=batch.d.qvel.numpy()[0], time_s=total_sim * dt, floor0=traces[0][0]["floor"])
                 saved = True
@@ -256,23 +294,17 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
                 np.savez_compressed(output / "trace.npz", **d)
             if total_sim != len(commands):
                 per_world.append(dict(case=case, status="FAIL", reason="nonfinite state or capacity warning"))
-            elif checkpoint is not None:
-                per_world.append(hold_metrics(case, d, spec.size, float(checkpoint["floor0"])))
-            elif diagnostic:
-                per_world.append(dict(case=case, status="NOT TESTED", reason="partial contact replay",
-                                      peak_jaw_N=float(d["jaw_normal"].max()),
-                                      peak_film_pad_contacts=int(d["pairs"][:, [5, 6]].max()),
-                                      peak_payload_lift_mm=1000 * float(d["floor"].max() - d["floor"][0]),
-                                      direct_payload_fixture_contacts=int(d["pairs"][:, -1].max())))
+            elif contact_from is not None:
+                per_world.append(contact_window_metrics(case, d))
             else:
                 per_world.append(metrics(case, d, variant, spec.size))
         health = batch.diagnostics()
         success = sum(row["status"] == "PASS" for row in per_world)
-        status = "NOT TESTED" if diagnostic and total_sim == len(commands) else "PASS" if success == nworld else "FAIL"
-        result = dict(case=case, variant=variant, worlds=nworld, diagnostic_only=diagnostic, completed_steps=total_sim, expected_steps=len(commands),
+        status = "PASS" if success == nworld else "FAIL"
+        result = dict(case=case, variant=variant, worlds=nworld, completed_steps=total_sim, expected_steps=len(commands),
                       dt_s=dt, source_command_dt_s=command_dt,
-                      scope="retained-contact hold" if hold_from else "full action" if not diagnostic else "partial replay",
-                      hold_from=str(hold_from) if hold_from else None, device=str(batch.d.qpos.device), mujoco=mujoco.__version__, warp=wp.__version__,
+                      scope="moving probe contact" if contact_from else "full action",
+                      contact_from=str(contact_from) if contact_from else None, device=str(batch.d.qpos.device), mujoco=mujoco.__version__, warp=wp.__version__,
                       init_s=init_s, warmup_jit_s=warm_s, capture_s=capture_s, physics_wall_s=physics_wall,
                       readback_wall_s=readback_wall, physics_steps_s=total_sim / physics_wall,
                       aggregate_env_steps_s=total_sim * nworld / physics_wall,
@@ -280,7 +312,8 @@ def run(case, nworld, output, cpu, dt, seconds, hold_from):
                       simulated_seconds_per_wall_second=total_sim * dt / physics_wall,
                       sampled_peak_process_mib=max((m for m in memory if m is not None), default=None),
                       physics_pass_worlds=success, overflow=health["overflow_bits"], nonfinite=health["nonfinite"],
-                      control="same replayed CPU jaw commands" if cpu else "same compliant probe drive",
+                      control=("device jaw-force feedback" if feedback else
+                               "same replayed CPU jaw commands" if cpu else "same compliant probe drive"),
                       valid_aggregate_env_steps_s=total_sim * success / physics_wall,
                       status=status, per_world=per_world)
         save_json(output / "summary.json", result)
@@ -294,16 +327,17 @@ def main():
     parser.add_argument("--worlds", type=int, choices=(1, 16, 64, 256), default=1)
     parser.add_argument("--dt", type=float, default=.00005)
     parser.add_argument("--cpu", type=Path)
-    parser.add_argument("--seconds", type=float, help="Limit a single-world contact diagnostic")
-    parser.add_argument("--hold-from", type=Path, help="Benchmark a valid GPU grasp's 120 ms hold window")
+    parser.add_argument("--contact-from", type=Path, help="Benchmark a valid probe's 120 ms moving contact")
+    parser.add_argument("--jaw-feedback", action="store_true")
     args = parser.parse_args()
     if not np.isfinite(args.dt) or args.dt <= 0.:
         parser.error("Time step must be positive and finite")
-    if args.hold_from is not None and (args.case.startswith("try") or args.seconds is not None or args.cpu is None):
-        parser.error("A hold window requires a matching recorded CPU grasp and a passing GPU checkpoint")
-    if args.seconds is not None and (args.worlds != 1 or not np.isfinite(args.seconds) or args.seconds < args.dt):
-        parser.error("A positive replay limit requires one world")
-    run(args.case, args.worlds, args.output, args.cpu, args.dt, args.seconds, args.hold_from)
+    if args.contact_from is not None and (args.case != "try-center" or args.jaw_feedback):
+        parser.error("Contact-window input is for the compliant probe only")
+    if args.jaw_feedback and args.case != "through":
+        parser.error("Jaw feedback requires a full through-film replay")
+    run(args.case, args.worlds, args.output, args.cpu, args.dt, args.contact_from, args.jaw_feedback)
+
 
 
 if __name__ == "__main__":
