@@ -1,6 +1,7 @@
 from pathlib import Path
 import subprocess
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -251,11 +252,24 @@ class PolicyV3Test(unittest.TestCase):
         q, gap, recovery = backend.kinematics.plan.call_args.args
         np.testing.assert_array_equal(q, backend.joint_pos)
         self.assertEqual(gap, .06)
-        self.assertEqual(recovery[0][3], "probe_second")
-        self.assertGreaterEqual(recovery[0][0][2], contact_point[2])
+        self.assertEqual(recovery[0][3], "probe_unload")
+        np.testing.assert_allclose(recovery[0][0], contact_point + [0., 0., .003])
+        self.assertEqual(recovery[1][3], "probe_second")
+        self.assertGreaterEqual(recovery[1][0][2], recovery[0][0][2])
         self.assertEqual(info["probe_cutoff_trigger_N"], 2.08)
         self.assertTrue(info["retracted"])
         self.assertIs(v1, V1)
+
+        from policy_v3.yam_backend import YamBackend
+
+        physical = YamBackend.__new__(YamBackend)
+        physical.scene = SimpleNamespace(is_flex=True)
+        physical.drive = SimpleNamespace(tick=MagicMock(side_effect=MotionStop("contact_force_limit", unsafe=True)))
+        physical.flex_core_counts = MagicMock(return_value=(0, 1))
+        with self.assertRaises(MotionStop) as stop:
+            physical.tick(np.zeros(7), .2, "probe")
+        self.assertEqual(str(stop.exception), "contact_force_limit")
+        self.assertFalse(stop.exception.physics_valid)
 
     def test_flex_and_rigid_share_the_table_without_duplicate_film_contacts(self):
         from yam_platform.yam_model import build_yam_model
@@ -280,7 +294,6 @@ class PolicyV3Test(unittest.TestCase):
             self.assertTrue(permits(pad, film_type, film_affinity))
             self.assertFalse(permits(pad, payload.contype[0], payload.conaffinity[0]))
         import mujoco
-        from types import SimpleNamespace
         from policy_v3.yam_backend import YamBackend
         from policy_v3.yam_scene import CORNERS
 

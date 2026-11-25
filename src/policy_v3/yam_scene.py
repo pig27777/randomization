@@ -73,6 +73,8 @@ class FlexScene:
     payload_geom = "payload_geom_0"
     config = {"physics_dt_s": .0002}
     is_flex = True
+    # Device contact filter applies this only to the two pad–film pairs.
+    pad_film_contact = (.004, .95, .995, .0005)
     half = np.array([.088, .068, .024]) / 2
 
     def __init__(self):

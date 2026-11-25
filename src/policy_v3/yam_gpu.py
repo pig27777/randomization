@@ -3,7 +3,7 @@
 import mujoco
 import numpy as np
 import warp as wp
-from mujoco_warp._src.types import Stage
+from mujoco_warp._src.types import Stage, vec5
 from yam_platform.yam_warp import SimYAMInterface
 from yam_platform.yam_warp_kernels import Commands, Geometry, Motor, coordinates
 
@@ -19,6 +19,35 @@ def limit_gripper(tuning: wp.array2d(dtype=Motor), gap_force: float):
 
 
 @wp.kernel
+def apply_pad_film_contact(ncon: wp.array(dtype=int), geom: wp.array(dtype=wp.vec2i),
+                           flex: wp.array(dtype=wp.vec2i), pads: wp.array(dtype=int),
+                           ref: wp.vec2, imp: vec5, solref: wp.array(dtype=wp.vec2),
+                           solreffriction: wp.array(dtype=wp.vec2), solimp: wp.array(dtype=vec5)):
+    i = wp.tid()
+    if i < ncon[0]:
+        pair, bag = geom[i], flex[i]
+        if (((pair[0] == pads[0] or pair[0] == pads[1]) and bag[1] >= 0) or
+                ((pair[1] == pads[0] or pair[1] == pads[1]) and bag[0] >= 0)):
+            solref[i] = ref
+            solreffriction[i] = ref
+            solimp[i] = imp
+
+
+def install_pad_film_contact(model, pads, profile):
+    time_constant, dmin, dmax, width = profile
+    reference = wp.vec2(time_constant, 1.)
+    impedance = vec5(dmin, dmax, width, .5, 2.)
+
+    def filter_contacts(_model, data):
+        c = data.contact
+        wp.launch(apply_pad_film_contact, data.naconmax,
+                  [data.nacon, c.geom, c.flex, pads, reference, impedance,
+                   c.solref, c.solreffriction, c.solimp], device=pads.device)
+
+    model.callback.contactfilter = filter_contacts
+
+
+@wp.kernel
 def check_substep(
     qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float), overflow: wp.array(dtype=int),
     nacon: wp.array(dtype=int), geom: wp.array(dtype=wp.vec2i), dist: wp.array(dtype=float),
@@ -27,7 +56,7 @@ def check_substep(
     max_stretch: float, ctrl: wp.array2d(dtype=float), stop: wp.array(dtype=int),
     flex: wp.array(dtype=wp.vec2i), stamp: wp.array(dtype=float),
     stop_pair: wp.array(dtype=int), stop_value: wp.array(dtype=float),
-    pads: wp.array(dtype=int), probe_phase: wp.array(dtype=int),
+    pads: wp.array(dtype=int),
 ):
     if stop[0] == 0:
         reason = int(0)
@@ -55,8 +84,7 @@ def check_substep(
                 f = flex[i]
                 pad_film = ((pair[0] == pads[0] or pair[0] == pads[1]) and f[1] >= 0) or (
                     (pair[1] == pads[0] or pair[1] == pads[1]) and f[0] >= 0)
-                depth_limit = .002 if probe_phase[0] != 0 and pad_film else max_depth
-                if reason == 0 and dist[i] < -depth_limit:
+                if reason == 0 and not pad_film and dist[i] < -max_depth:
                     reason = 3
                     if active:
                         reason = 4
@@ -91,9 +119,13 @@ def check_solved_force(
     cutoff: wp.array(dtype=float), trigger: wp.array(dtype=int), trigger_load: wp.array(dtype=float), payload: int,
     dist: wp.array(dtype=float), stamp: wp.array(dtype=float), stop_pair: wp.array(dtype=int),
     stop_value: wp.array(dtype=float),
+    pads: wp.array(dtype=int), flex: wp.array(dtype=wp.vec2i), pad_limit: wp.array(dtype=float),
+    pad_stats: wp.array(dtype=float), probe_force: wp.array(dtype=float),
 ):
     if stop[0] == 0:
         total = float(0.)
+        left, right = float(0.), float(0.)
+        pad_separation = float(0.)
         for i in range(wp.min(nacon[0], geom.shape[0])):
             pair = geom[i]
             row = address[i, 0]
@@ -109,6 +141,13 @@ def check_solved_force(
                 base_contact = (pair[0] == table and b == 2) or (pair[1] == table and a == 2)
                 if not base_contact and (a == 1 or a == 2 or b == 1 or b == 2):
                     total += wp.max(n, 0.)
+                    f = flex[i]
+                    if (pair[0] == pads[0] and f[1] >= 0) or (pair[1] == pads[0] and f[0] >= 0):
+                        left += wp.max(n, 0.)
+                        pad_separation = wp.min(pad_separation, dist[i])
+                    if (pair[0] == pads[1] and f[1] >= 0) or (pair[1] == pads[1] and f[0] >= 0):
+                        right += wp.max(n, 0.)
+                        pad_separation = wp.min(pad_separation, dist[i])
                     if stop[0] == 0 and payload >= 0 and n > 1.e-6 and (pair[0] == payload or pair[1] == payload):
                         stop[0] = 9
                         stop_pair[0] = pair[0]
@@ -117,10 +156,16 @@ def check_solved_force(
                         stop_value[1] = stamp[0]
                         stop_value[2] = n
         peak[0] = wp.max(peak[0], total)
+        probe_force[0] = total
+        pad_stats[0] = wp.max(pad_stats[0], left)
+        pad_stats[1] = wp.max(pad_stats[1], right)
+        pad_stats[2] = wp.min(pad_stats[2], pad_separation)
         if stop[0] == 0 and cutoff[0] > 0. and trigger[0] == 0 and total >= cutoff[0]:
             trigger[0] = 1
             trigger_load[0] = total
-        if stop[0] == 0 and total > limit[0]:
+            trigger_load[1] = stamp[0]
+            trigger_load[2] = pad_separation
+        if stop[0] == 0 and (total > limit[0] or (pad_limit[0] > 0. and wp.max(left, right) > pad_limit[0])):
             stop[0] = 8
     if stop[0] != 0:
         for j in range(ctrl.shape[1]):
@@ -129,16 +174,23 @@ def check_solved_force(
 
 @wp.kernel
 def hold_probe_targets(robot: Geometry, cmds: Commands, qpos: wp.array2d(dtype=float),
-                       trigger: wp.array(dtype=int)):
-    if trigger[0] == 1:
-        for i in range(7):
-            current = coordinates(qpos, robot.pos, 0, i)
-            cmds.requested[0, i] = current
-            cmds.target[0, i] = current
-            cmds.velocity[0, i] = 0.
-            cmds.desired_velocity[0, i] = 0.
-            cmds.feedforward[0, i] = 0.
-        trigger[0] = 2
+                       trigger: wp.array(dtype=int), cutoff: wp.array(dtype=float),
+                       force: wp.array(dtype=float), unload_q: wp.array(dtype=float)):
+    if cutoff[0] > 0.:
+        if trigger[0] == 0 and force[0] <= .5 * cutoff[0]:
+            for i in range(6):
+                unload_q[i] = coordinates(qpos, robot.pos, 0, i)
+        if trigger[0] == 1:
+            for i in range(7):
+                goal = coordinates(qpos, robot.pos, 0, i)
+                if i < 6:
+                    goal = unload_q[i]
+                cmds.requested[0, i] = goal
+                cmds.target[0, i] = goal
+                cmds.velocity[0, i] = 0.
+                cmds.desired_velocity[0, i] = 0.
+                cmds.feedforward[0, i] = 0.
+            trigger[0] = 2
 
 
 class GPUDrive:
@@ -171,10 +223,13 @@ class GPUDrive:
         self.peak_contact = wp.zeros(1, dtype=float, device=sim.device)
         self.force_limit = wp.zeros(1, dtype=float, device=sim.device)
         self.probe_cutoff = wp.zeros(1, dtype=float, device=sim.device)
-        self.probe_phase = wp.zeros(1, dtype=int, device=sim.device)
+        self.probe_force = wp.zeros(1, dtype=float, device=sim.device)
+        self.unload_q = wp.zeros(6, dtype=float, device=sim.device)
         self.flex = scene.is_flex
+        self.pad_limit = wp.zeros(1, dtype=float, device=sim.device)
+        self.pad_stats = wp.zeros(3, dtype=float, device=sim.device)
         self.probe_trigger = wp.zeros(1, dtype=int, device=sim.device)
-        self.probe_trigger_load = wp.zeros(1, dtype=float, device=sim.device)
+        self.probe_trigger_load = wp.zeros(3, dtype=float, device=sim.device)
         self.stop_pair = wp.full(4, -1, dtype=int, device=sim.device)
         self.stop_value = wp.zeros(3, dtype=float, device=sim.device)
         self.limits = limits
@@ -185,7 +240,7 @@ class GPUDrive:
                 limits.flex_penetration_m if scene.is_flex else limits.penetration_m,
                 d.flexvert_xpos, wp.array(edge_array, dtype=wp.vec2i, device=sim.device),
                 wp.array(rest, dtype=float, device=sim.device), limits.flex_edge_stretch, d.ctrl, self.reason,
-                d.contact.flex, d.time, self.stop_pair, self.stop_value, sim.pad_ids, self.probe_phase]
+                d.contact.flex, d.time, self.stop_pair, self.stop_value, sim.pad_ids]
         payload = m.geom(scene.payload_geom).id if scene.is_flex else -1
 
         def guard(_model, _data):
@@ -196,12 +251,15 @@ class GPUDrive:
                 wp.launch(check_solved_force, 1, [d.nacon, d.contact.geom, d.contact.efc_address, d.efc.force,
                           geom_groups, table, self.force_limit, self.reason, self.peak_contact, d.ctrl,
                           self.probe_cutoff, self.probe_trigger, self.probe_trigger_load, payload,
-                          d.contact.dist, d.time, self.stop_pair, self.stop_value],
+                          d.contact.dist, d.time, self.stop_pair, self.stop_value,
+                          sim.pad_ids, d.contact.flex, self.pad_limit, self.pad_stats, self.probe_force],
                           device=sim.device)
-                wp.launch(hold_probe_targets, 1, [sim.robot, sim.cmds, d.qpos, self.probe_trigger], device=sim.device)
+                wp.launch(hold_probe_targets, 1, [sim.robot, sim.cmds, d.qpos, self.probe_trigger,
+                          self.probe_cutoff, self.probe_force, self.unload_q], device=sim.device)
 
         sim.gpu_model.callback.sensor = after_solve
         if scene.is_flex:
+            install_pad_film_contact(sim.gpu_model, sim.pad_ids, scene.pad_film_contact)
             scene.couple(sim, guard)
         else:
             sim.before_solve = guard
@@ -220,8 +278,10 @@ class GPUDrive:
         self.reason.zero_()
         self.peak_contact.zero_()
         self.set_probe_cutoff(0.)
-        self.probe_phase.zero_()
-        self.current_probe_phase = False
+        self.probe_trigger_event = None
+        self.pad_limit.zero_()
+        self.pad_stats.zero_()
+        self.current_pad_limit = 0.
         self.stop_pair.fill_(-1)
         self.stop_value.zero_()
         self.current_force_limit = None
@@ -233,6 +293,10 @@ class GPUDrive:
         self.probe_trigger.zero_()
         self.probe_trigger_load.zero_()
         self.probe_cutoff.fill_(threshold)
+        self.current_probe_cutoff = threshold
+        if threshold:
+            self.probe_trigger_event = None
+            self.unload_q.assign(np.asarray(self.observation[:6], dtype=np.float32))
 
     def penetration_event(self):
         if int(self.reason.numpy()[0]) not in (3, 4, 9):
@@ -256,17 +320,23 @@ class GPUDrive:
             wp.launch(limit_gripper, 1, [sim.motors.tuning, effort / self.gear], device=sim.device)
             self.current_effort = effort
         probing = self.flex and phase == "probe"
-        if probing != self.current_probe_phase:
-            self.probe_phase.fill_(int(probing))
-            self.current_probe_phase = probing
+        pad_limit = 25. if self.flex and phase == "grasp" else 0.
+        if pad_limit != self.current_pad_limit:
+            self.pad_limit.fill_(pad_limit)
+            self.current_pad_limit = pad_limit
         limit = 3.5 if probing else (self.limits.probe_contact_N if phase in ("probe", "reset")
                                      else self.limits.grasp_contact_N)
         if limit != self.current_force_limit:
             self.force_limit.fill_(limit)
             self.current_force_limit = limit
         sim.send_joint_command(command)
+        self.pad_stats.zero_()
         sim.step()
         self._read()
+        if self.current_probe_cutoff and self.probe_trigger_event is None:
+            load, time, distance = self.probe_trigger_load.numpy().tolist()
+            if load:
+                self.probe_trigger_event = dict(load_N=load, time_s=time, pad_film_dist_m=distance)
         reason = int(self.reason.numpy()[0])
         invalid = {
             1: "solver_overflow", 2: "nonfinite_physics", 3: "excessive_contact_penetration",

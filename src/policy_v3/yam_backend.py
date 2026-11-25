@@ -181,8 +181,7 @@ class YamBackend:
                 continue
             pad_film = self.scene.is_flex and ((a in self.pads and c.flex[1] >= 0)
                                                or (b in self.pads and c.flex[0] >= 0))
-            depth_limit = .002 if phase == "probe" and pad_film else max_depth
-            if check and c.dist < -depth_limit:
+            if check and not pad_film and c.dist < -max_depth:
                 raise MotionStop("excessive_contact_penetration", physics_valid=False, unsafe=active and phase == "probe")
             if not active:
                 continue
@@ -201,7 +200,7 @@ class YamBackend:
         if check:
             limit = 3.5 if self.scene.is_flex and phase == "probe" else (
                 self.limits.probe_contact_N if phase in ("reset", "probe") else self.limits.grasp_contact_N)
-            if load > limit:
+            if load > limit or (self.scene.is_flex and phase == "grasp" and max(pads) > 25.):
                 raise MotionStop("contact_force_limit", unsafe=True)
             if self.scene.is_flex:
                 a, b = self.flex_edges
@@ -211,8 +210,14 @@ class YamBackend:
         return load, *pads
 
     def tick(self, command, effort, phase):
-        self.drive.tick(command, effort, lambda: self.contact_loads(check=True, phase=phase), phase)
-        if self.scene.is_flex and phase in ("probe", "grasp") and any(self.flex_core_counts()):
+        audit_film = self.scene.is_flex and phase in ("probe", "grasp")
+        try:
+            self.drive.tick(command, effort, lambda: self.contact_loads(check=True, phase=phase), phase)
+        except MotionStop as stop:
+            if audit_film and stop.physics_valid and any(self.flex_core_counts()):
+                stop.physics_valid = False
+            raise
+        if audit_film and any(self.flex_core_counts()):
             raise MotionStop("film_core_geometry", physics_valid=False, unsafe=phase == "probe")
         self.last_command = command
         self.measured_ticks += 1
@@ -233,9 +238,9 @@ class YamBackend:
                 self.tick(command, effort, stage)
                 if record is not None:
                     record(label, step / len(targets))
-                if contact_cutoff_N is not None and int(self.drive.probe_trigger.numpy()[0]):
+                if contact_cutoff_N is not None and self.drive.probe_trigger_event is not None:
                     self.last_command = np.r_[self.joint_pos, self.drive.observation[24]]
-                    return float(self.drive.probe_trigger_load.numpy()[0])
+                    return self.drive.probe_trigger_event["load_N"]
         finally:
             if contact_cutoff_N is not None:
                 self.drive.set_probe_cutoff(0.)

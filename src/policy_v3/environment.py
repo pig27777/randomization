@@ -92,12 +92,15 @@ class ProbeActionExecutor:
                     actual_q = b.joint_pos.copy()
                     contact_p, contact_r = b.kinematics.pose(actual_q)
                     actual_gap = float(b.last_command[6])
+                    unload_p = contact_p.copy()
+                    unload_p[2] = min(unload_p[2] + .003, b.workspace_upper[2])
                     sweep = points[2] - points[1]
                     sweep[2] = max(0., sweep[2])
-                    follow_p = np.clip(contact_p + sweep, b.workspace_lower, b.workspace_upper)
+                    follow_p = np.clip(unload_p + sweep, b.workspace_lower, b.workspace_upper)
                     retract_p = follow_p.copy()
                     retract_p[2] = max(retract_p[2], current_p[2])
                     motion = b.kinematics.plan(actual_q, actual_gap, [
+                        (unload_p, contact_r, actual_gap, "probe_unload"),
                         (follow_p, contact_r, actual_gap, "probe_second"),
                         (follow_p, contact_r, b.hover_gap, "probe_release"),
                         (retract_p, contact_r, b.hover_gap, "probe_retract"),
