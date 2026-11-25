@@ -1,0 +1,50 @@
+usage: python -m policy_v3.curriculum [-h] [--scene {rigid,flex}]
+                                      [--devices DEVICES] [--seed SEED]
+                                      [--episodes EPISODES]
+                                      [--ppo-episodes PPO_EPISODES]
+                                      [--rounds ROUNDS]
+                                      [--candidates CANDIDATES]
+                                      [--matched-repeats MATCHED_REPEATS]
+                                      [--bce-epochs BCE_EPOCHS]
+                                      [--ppo-epochs PPO_EPOCHS]
+                                      [--epsilon EPSILON]
+                                      [--info-mode {world_common,v0_only,v1_allowed}]
+                                      [--history {all,last,none}]
+                                      [--without-effort] [--camera]
+                                      [--shared-world-candidates]
+                                      [--probe-only] [--factory FACTORY]
+                                      [--records RECORDS [RECORDS ...]]
+                                      [--checkpoint CHECKPOINT]
+                                      {c0,c1,c2,c3,c4,smoke} output
+
+Policy V3 C0–C4 command-line entry point.
+
+positional arguments:
+  {c0,c1,c2,c3,c4,smoke}
+  output
+
+options:
+  -h, --help            show this help message and exit
+  --scene {rigid,flex}
+  --devices DEVICES
+  --seed SEED
+  --episodes EPISODES
+  --ppo-episodes PPO_EPISODES
+  --rounds ROUNDS
+  --candidates CANDIDATES
+  --matched-repeats MATCHED_REPEATS
+  --bce-epochs BCE_EPOCHS
+  --ppo-epochs PPO_EPOCHS
+  --epsilon EPSILON
+  --info-mode {world_common,v0_only,v1_allowed}
+  --history {all,last,none}
+  --without-effort
+  --camera
+  --shared-world-candidates
+                        Freeze candidate input to the shared workcell for
+                        matched modality training
+  --probe-only
+  --factory FACTORY     Optional module:callable providing the Yam backend
+                        contract
+  --records RECORDS [RECORDS ...]
+  --checkpoint CHECKPOINT

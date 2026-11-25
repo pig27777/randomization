@@ -1,0 +1,29 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /tmp/warp_cache_gpu_0/1.19.0
+Module reset_data__locals__reset_xfrc_applied_a0b243d9 a0b243d load on device 'cuda:0' took 0.33 ms  (cached)
+Module reset_data__locals__reset_M_75746178 7574617 load on device 'cuda:0' took 0.25 ms  (cached)
+Module reset_data__locals__reset_mocap_9bfd9313 9bfd931 load on device 'cuda:0' took 0.22 ms  (cached)
+Module reset_data__locals__reset_contact_deb15bb0 deb15bb load on device 'cuda:0' took 0.21 ms  (cached)
+Module reset_data__locals__reset_sleep_bafb6237 bafb623 load on device 'cuda:0' took 0.21 ms  (cached)
+Module reset_data__locals__reset_nworld_e71fb0b3 e71fb0b load on device 'cuda:0' took 0.25 ms  (cached)
+Module yam_platform.yam_warp_kernels 407cdae load on device 'cuda:0' took 0.32 ms  (cached)
+Module mujoco_warp._src.smooth 368b5b3 load on device 'cuda:0' took 0.96 ms  (cached)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/curriculum.py", line 151, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/curriculum.py", line 100, in main
+    result = scripted(args.output, args)
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/curriculum.py", line 31, in scripted
+    b = YamBackend(args.seed, scene=args.scene, device=device, scripted=True, camera=args.camera)
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/yam_backend.py", line 77, in __init__
+    obj_type, obj_id = ((mujoco.mjtObj.mjOBJ_FLEX, model.flex("bag").id) if spec.is_flex else
+                                                   ^^^^^^^^^^
+AttributeError: 'mujoco._structs.MjModel' object has no attribute 'flex'. Did you mean: 'nflex'?

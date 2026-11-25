@@ -1,0 +1,25 @@
+test_c4_updates_then_publishes_and_gpu_environment_isolated (test_v3.PolicyV3Test.test_c4_updates_then_publishes_and_gpu_environment_isolated) ... ok
+test_evaluation_freezes_g_a_in_world_and_matches_four_modalities (test_v3.PolicyV3Test.test_evaluation_freezes_g_a_in_world_and_matches_four_modalities) ... ok
+test_frozen_paths (test_v3.PolicyV3Test.test_frozen_paths) ... ok
+test_group_split_joins_transitive_initial_and_probe_links (test_v3.PolicyV3Test.test_group_split_joins_transitive_initial_and_probe_links) ... ok
+test_info_mode_never_reads_v1 (test_v3.PolicyV3Test.test_info_mode_never_reads_v1) ... ok
+test_invalid_routing (test_v3.PolicyV3Test.test_invalid_routing) ... ok
+test_motor_effort_limit_uses_native_calibration (test_v3.PolicyV3Test.test_motor_effort_limit_uses_native_calibration) ... FAIL
+test_one_try_and_stop_without_retract_or_visual (test_v3.PolicyV3Test.test_one_try_and_stop_without_retract_or_visual) ... ok
+test_padding_raw_and_optional_feedback (test_v3.PolicyV3Test.test_padding_raw_and_optional_feedback) ... ok
+test_tanh_log_prob_saturation_and_actual_ppo_update (test_v3.PolicyV3Test.test_tanh_log_prob_saturation_and_actual_ppo_update) ... ok
+test_v0_training_rejects_v1_selected_candidates (test_v3.PolicyV3Test.test_v0_training_rejects_v1_selected_candidates) ... ok
+
+======================================================================
+FAIL: test_motor_effort_limit_uses_native_calibration (test_v3.PolicyV3Test.test_motor_effort_limit_uses_native_calibration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/tests/policy_v3/test_v3.py", line 245, in test_motor_effort_limit_uses_native_calibration
+    self.assertAlmostEqual(max(measured), limit, places=6)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: np.float64(0.005004629154698765) != 0.08 within 6 places (np.float64(0.07499537084530124) difference)
+
+----------------------------------------------------------------------
+Ran 11 tests in 2.099s
+
+FAILED (failures=1)

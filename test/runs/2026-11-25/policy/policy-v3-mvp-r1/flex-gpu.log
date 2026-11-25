@@ -1,0 +1,36 @@
+Warp 1.19.0 initialized:
+   CUDA Toolkit 13.4, Driver 13.2
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA GeForce RTX 5090" (31 GiB, sm_120, mempool enabled)
+   Kernel cache:
+     /tmp/warp_cache_gpu_0/1.19.0
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/curriculum.py", line 151, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/curriculum.py", line 100, in main
+    result = scripted(args.output, args)
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/curriculum.py", line 31, in scripted
+    b = YamBackend(args.seed, scene=args.scene, device=device, scripted=True, camera=args.camera)
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/yam_backend.py", line 62, in __init__
+    self.drive = GPUDrive(spec, cfg, seed, device, self.motor_Nm_per_N, limits)
+                 ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/yam_gpu.py", line 79, in __init__
+    sim = self.sim = SimYAMInterface(1, config=overrides, seed=seed, device=device,
+                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                     add_scene=scene.add_scene, compile_model=scene.compile_model,
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                     initialize=scene.initialize, capacities=capacities)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/yam_warp.py", line 60, in __init__
+    self.xml, self.model = build_yam_model(cfg, add_scene=add_scene, compile_model=compile_model)
+                           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/experience/yam_platform/yam_model.py", line 61, in build_yam_model
+    model = compile_model(xml)
+  File "/home/ubuntu/workspace/gzl/randomization/bag_sim/physical_parcel.py", line 318, in compile_model
+    model = mujoco.MjModel.from_xml_string(xml)
+ValueError: XML Error: bad format in attribute 'vertex'
+Element 'mesh', line 61

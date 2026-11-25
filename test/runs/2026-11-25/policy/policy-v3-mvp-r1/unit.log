@@ -1,0 +1,29 @@
+test_c4_updates_then_publishes_and_gpu_environment_isolated (test_v3.PolicyV3Test.test_c4_updates_then_publishes_and_gpu_environment_isolated) ... ok
+test_evaluation_freezes_g_a_in_world_and_matches_four_modalities (test_v3.PolicyV3Test.test_evaluation_freezes_g_a_in_world_and_matches_four_modalities) ... ok
+test_frozen_paths (test_v3.PolicyV3Test.test_frozen_paths) ... ok
+test_group_split_joins_transitive_initial_and_probe_links (test_v3.PolicyV3Test.test_group_split_joins_transitive_initial_and_probe_links) ... ok
+test_info_mode_never_reads_v1 (test_v3.PolicyV3Test.test_info_mode_never_reads_v1) ... ok
+test_invalid_routing (test_v3.PolicyV3Test.test_invalid_routing) ... ok
+test_one_try_and_stop_without_retract_or_visual (test_v3.PolicyV3Test.test_one_try_and_stop_without_retract_or_visual) ... ERROR
+test_padding_raw_and_optional_feedback (test_v3.PolicyV3Test.test_padding_raw_and_optional_feedback) ... ok
+test_tanh_log_prob_saturation_and_actual_ppo_update (test_v3.PolicyV3Test.test_tanh_log_prob_saturation_and_actual_ppo_update) ... ok
+
+======================================================================
+ERROR: test_one_try_and_stop_without_retract_or_visual (test_v3.PolicyV3Test.test_one_try_and_stop_without_retract_or_visual)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/tests/policy_v3/test_v3.py", line 211, in test_one_try_and_stop_without_retract_or_visual
+    _, length, v1, info = env.execute_probe(np.zeros(13))
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/environment.py", line 117, in execute_probe
+    self.trace, info = self.probe.execute(self.a_try, self.v0)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/src/policy_v3/environment.py", line 47, in execute
+    last_p, _ = b.kinematics.pose(b.joint_pos)
+                                  ^^^^^^^^^^^
+AttributeError: 'MinimalBackend' object has no attribute 'joint_pos'
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.868s
+
+FAILED (errors=1)
