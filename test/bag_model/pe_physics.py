@@ -98,6 +98,10 @@ class FlexBagBackend(Parcel):
         return prepared_envelope(self.spec, cfg)
 
     def compile_model(self, xml):
+        self.xml = self.fixture_xml(xml)
+        return super().compile_model(self.xml)
+
+    def fixture_xml(self, xml):
         tree = ET.fromstring(xml)
         world = tree.find("worldbody")
         world.find("flexcomp/contact").set("solref", f"{self.spec.self_contact_time} 1")
@@ -129,8 +133,7 @@ class FlexBagBackend(Parcel):
             for vertex in ids:
                 ET.SubElement(eq, "connect", name=f"clamp_{label}_{vertex}", body1=f"bag_{vertex}",
                               anchor="0 0 0", solref=".00015 1", solimp=".9999 .9999 .0001")
-        self.xml = ET.tostring(tree, encoding="unicode")
-        return super().compile_model(self.xml)
+        return ET.tostring(tree, encoding="unicode")
 
     def initialize(self, model, data):
         super().initialize(model, data)
@@ -141,7 +144,7 @@ class FlexBagBackend(Parcel):
             model.eq_data[index, 3:6] = self.envelope["current"][vertex]
         mujoco.mj_forward(model, data)
 
-    def step(self, action):
+    def apply_action(self, action):
         self.last_action = action
         for name, (position, velocity, quaternion) in action["tools"].items():
             joint = self.fixture_joints[name]
@@ -156,6 +159,8 @@ class FlexBagBackend(Parcel):
         ids = self.spec.loaded_nodes(self.envelope)
         if len(ids):
             self.d.qfrc_applied[self.film_dofs[ids]] = action["load"] / len(ids)
+    def step(self, action):
+        self.apply_action(action)
         super().step()
 
     def get_bag_state(self):

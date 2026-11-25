@@ -152,15 +152,17 @@ def contact_health(nacon: wp.array(dtype=int), worldid: wp.array(dtype=int), dis
 
 class Batch:
     def __init__(self, nworld, cfg=Config(), *, seed=7, randomize=True, device="cuda:0",
-                 contact_capacity=256, constraint_capacity=1024):
+                 contact_capacity=256, constraint_capacity=1024, parcel=None):
         if not isinstance(nworld,int) or nworld<1:
             raise ValueError("nworld must be a positive integer")
         self.nworld=nworld
+        if parcel is not None:
+            cfg = parcel.cfg
         self.cfg=cfg
         self.seed=seed
         self.randomize=randomize
         self.device=device
-        self.parcel=Parcel(cfg)
+        self.parcel=Parcel(cfg) if parcel is None else parcel
         p=self.parcel
         self.episode=0
         with wp.ScopedDevice(device):
