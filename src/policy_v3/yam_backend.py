@@ -6,6 +6,7 @@ import math
 import mujoco
 import numpy as np
 
+from bag_sim.wrap import triangle_box_intersections, winding_number
 from yam_platform.robot import rotation_error
 from yam_platform.yam_model import arm_indices, build_yam_model, initial_state, load_config
 
@@ -50,6 +51,7 @@ class YamBackend:
         self.grasp_width_range = (.060, self.max_gap)
         self.grasp_effort_range = (16. * self.motor_Nm_per_N, self.effort_cap_Nm)
         self.probe_displacement_m = np.array([.029, .029, .038])
+        self.probe_cutoff_N = 2. if spec.is_flex else None
         self.common_sampling_region = (PICK + [0, 0, .052], np.array([.045, .039, .024]), np.eye(3))
         _, empty = build_yam_model(cfg, add_scene=add_workcell)
         self.kinematics = WorkcellKinematics(empty, self.workspace_lower, self.workspace_upper)
@@ -110,6 +112,22 @@ class YamBackend:
     def state_identity(self):
         return np.r_[self.drive.data.qpos, self.drive.data.qvel]
 
+    def payload_box_pose(self):
+        # The box half extents use the authored body frame. MuJoCo may
+        # reorient a compiled mesh geom into its inertia principal axes.
+        data = self.drive.data
+        return data.xpos[self.payload_id], data.xmat[self.payload_id].reshape(3, 3)
+
+    def flex_core_counts(self):
+        center, rotation = self.payload_box_pose()
+        points = self.drive.data.flexvert_xpos
+        faces = self.scene.parcel.envelope["faces"]
+        half = self.scene.half
+        corners = CORNERS * half @ rotation.T + center
+        inset = triangle_box_intersections(points, faces, half - .002, center, rotation)
+        outside = np.abs(winding_number(points, faces, corners)) < .5
+        return int(inset.sum()), int(outside.sum())
+
     def private_state(self):
         d = self.drive.data
         p = self.payload_id
@@ -161,7 +179,10 @@ class YamBackend:
                           (b == self.table and a in self.base_geoms))
             if base_table:
                 continue
-            if check and c.dist < -max_depth:
+            pad_film = self.scene.is_flex and ((a in self.pads and c.flex[1] >= 0)
+                                               or (b in self.pads and c.flex[0] >= 0))
+            depth_limit = .002 if phase == "probe" and pad_film else max_depth
+            if check and c.dist < -depth_limit:
                 raise MotionStop("excessive_contact_penetration", physics_valid=False, unsafe=active and phase == "probe")
             if not active:
                 continue
@@ -178,7 +199,8 @@ class YamBackend:
                     if pad in (a, b):
                         pads[j] += n
         if check:
-            limit = self.limits.probe_contact_N if phase in ("reset", "probe") else self.limits.grasp_contact_N
+            limit = 3.5 if self.scene.is_flex and phase == "probe" else (
+                self.limits.probe_contact_N if phase in ("reset", "probe") else self.limits.grasp_contact_N)
             if load > limit:
                 raise MotionStop("contact_force_limit", unsafe=True)
             if self.scene.is_flex:
@@ -190,22 +212,34 @@ class YamBackend:
 
     def tick(self, command, effort, phase):
         self.drive.tick(command, effort, lambda: self.contact_loads(check=True, phase=phase), phase)
+        if self.scene.is_flex and phase in ("probe", "grasp") and any(self.flex_core_counts()):
+            raise MotionStop("film_core_geometry", physics_valid=False, unsafe=phase == "probe")
         self.last_command = command
         self.measured_ticks += 1
 
-    def follow(self, plan, effort, *, record=None, stage="grasp"):
+    def follow(self, plan, effort, *, record=None, stage="grasp", contact_cutoff_N=None):
         before = self.last_command.copy()
-        nominal_step = .04 * self.speed
+        nominal_step = (.16 if contact_cutoff_N is not None else .65) * .04 * self.speed
         targets = []
         for q, gap, label in plan:
             after = np.r_[q, gap]
-            count = max(1, math.ceil(np.max(np.abs(after - before) / (.65 * nominal_step))))
+            count = max(1, math.ceil(np.max(np.abs(after - before) / nominal_step)))
             targets.extend((before + a * (after - before), label) for a in np.arange(1, count + 1) / count)
             before = after
-        for step, (command, label) in enumerate(targets, 1):
-            self.tick(command, effort, stage)
-            if record is not None:
-                record(label, step / len(targets))
+        if contact_cutoff_N is not None:
+            self.drive.set_probe_cutoff(contact_cutoff_N)
+        try:
+            for step, (command, label) in enumerate(targets, 1):
+                self.tick(command, effort, stage)
+                if record is not None:
+                    record(label, step / len(targets))
+                if contact_cutoff_N is not None and int(self.drive.probe_trigger.numpy()[0]):
+                    self.last_command = np.r_[self.joint_pos, self.drive.observation[24]]
+                    return float(self.drive.probe_trigger_load.numpy()[0])
+        finally:
+            if contact_cutoff_N is not None:
+                self.drive.set_probe_cutoff(0.)
+        return None
 
     def history_sample(self, initial, progress):
         obs = self.drive.observation
@@ -286,8 +320,8 @@ class YamBackend:
         center = np.array(BIN["center_m"])
         hxhy = np.array(BIN["inner_half_xy_m"]) - BIN["wall_thickness_m"] / 2
         xyz = positions[-1]
-        solid = CORNERS * self.scene.half @ data.geom_xmat[self.payload_geom].reshape(3, 3).T + data.geom_xpos[
-            self.payload_geom]
+        core_center, core_rotation = self.payload_box_pose()
+        solid = CORNERS * self.scene.half @ core_rotation.T + core_center
         outer = data.flexvert_xpos if self.scene.is_flex else solid
         inside = all(np.all(abs(points[:, :2] - center[:2]) < hxhy)
                      and points[:, 2].max() < BIN["rim_height_m"] for points in (outer, solid))

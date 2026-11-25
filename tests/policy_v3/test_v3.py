@@ -231,6 +231,32 @@ class PolicyV3Test(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             env.execute_grasp(G)
 
+        env.reset()
+        backend.probe_cutoff_N = 2.
+        backend.joint_pos = np.full(6, .1)
+        backend.last_command = np.r_[backend.joint_pos, .06]
+        contact_point = np.array([.01, -.01, .02])
+        backend.kinematics.pose.side_effect = [(np.zeros(3), np.eye(3)), (np.zeros(3), np.eye(3)),
+                                               (contact_point, np.eye(3))]
+        backend.kinematics.plan.side_effect = [
+            [(np.zeros(6), .08, "probe_approach"), (backend.joint_pos, .06, "probe_first")],
+            [(backend.hover_joints, .08, "probe_retract")],
+        ]
+        backend.follow = MagicMock(side_effect=[None, 2.08, None])
+        backend.at_hover = MagicMock(return_value=True)
+        action = np.zeros(13)
+        action[8], action[11] = -.5, -.5
+        _, _, v1, info = env.execute_probe(action)
+        self.assertEqual(backend.follow.call_args_list[1].kwargs["contact_cutoff_N"], 2.)
+        q, gap, recovery = backend.kinematics.plan.call_args.args
+        np.testing.assert_array_equal(q, backend.joint_pos)
+        self.assertEqual(gap, .06)
+        self.assertEqual(recovery[0][3], "probe_second")
+        self.assertGreaterEqual(recovery[0][0][2], contact_point[2])
+        self.assertEqual(info["probe_cutoff_trigger_N"], 2.08)
+        self.assertTrue(info["retracted"])
+        self.assertIs(v1, V1)
+
     def test_flex_and_rigid_share_the_table_without_duplicate_film_contacts(self):
         from yam_platform.yam_model import build_yam_model
         from policy_v3.yam_scene import FlexScene
@@ -249,6 +275,24 @@ class PolicyV3Test(unittest.TestCase):
         self.assertTrue(permits(table, payload.contype[0], payload.conaffinity[0]))
         self.assertFalse(permits(plane, payload.contype[0], payload.conaffinity[0]))
         np.testing.assert_array_equal(plane.solref, scene.parcel.m.geom("table").solref)
+        for name in ("left_pad", "right_pad"):
+            pad = model.geom(name)
+            self.assertTrue(permits(pad, film_type, film_affinity))
+            self.assertFalse(permits(pad, payload.contype[0], payload.conaffinity[0]))
+        import mujoco
+        from types import SimpleNamespace
+        from policy_v3.yam_backend import YamBackend
+        from policy_v3.yam_scene import CORNERS
+
+        data = mujoco.MjData(model)
+        mujoco.mj_kinematics(model, data)
+        backend = YamBackend.__new__(YamBackend)
+        backend.payload_id = model.body(scene.payload_body).id
+        backend.drive = SimpleNamespace(data=data)
+        center, rotation = backend.payload_box_pose()
+        corners = (CORNERS * scene.half) @ rotation.T + center
+        np.testing.assert_allclose(np.ptp(corners, axis=0), 2. * scene.half)
+        self.assertFalse(np.allclose(rotation, data.geom_xmat[payload.id].reshape(3, 3)))
 
     def test_motor_effort_limit_uses_native_calibration(self):
         from policy_v3.yam_backend import YamBackend

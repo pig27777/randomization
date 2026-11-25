@@ -78,7 +78,33 @@ class ProbeActionExecutor:
                                retracted=b.at_hover(), rotation_scale=None)
 
         stop = None
+        cutoff_N = getattr(b, "probe_cutoff_N", None)
+        trigger = None
         try:
+            if cutoff_N is not None:
+                approach = [step for step in motion if step[2] == "probe_approach"]
+                first = [step for step in motion if step[2] == "probe_first"]
+                b.follow(approach, b.probe_effort_Nm, record=record, stage="probe")
+                trigger = b.follow(first, b.probe_effort_Nm, record=record, stage="probe",
+                                   contact_cutoff_N=cutoff_N)
+                motion = [step for step in motion if step[2] not in ("probe_approach", "probe_first")]
+                if trigger is not None:
+                    actual_q = b.joint_pos.copy()
+                    contact_p, contact_r = b.kinematics.pose(actual_q)
+                    actual_gap = float(b.last_command[6])
+                    sweep = points[2] - points[1]
+                    sweep[2] = max(0., sweep[2])
+                    follow_p = np.clip(contact_p + sweep, b.workspace_lower, b.workspace_upper)
+                    retract_p = follow_p.copy()
+                    retract_p[2] = max(retract_p[2], current_p[2])
+                    motion = b.kinematics.plan(actual_q, actual_gap, [
+                        (follow_p, contact_r, actual_gap, "probe_second"),
+                        (follow_p, contact_r, b.hover_gap, "probe_release"),
+                        (retract_p, contact_r, b.hover_gap, "probe_retract"),
+                        (current_p, b.hover_rotation, b.hover_gap, "probe_retract"),
+                    ])
+                    if motion is None or not b.kinematics.connect(motion[-1][0], q0, b.hover_gap, b.hover_gap):
+                        raise MotionStop("guarded_probe_retraction_rejected", unsafe=True)
             motion.append((q0, b.hover_gap, "neutral_hover"))
             b.follow(motion, b.probe_effort_Nm, record=record, stage="probe")
             b.settle_hover(b.probe_effort_Nm, record)
@@ -89,7 +115,7 @@ class ProbeActionExecutor:
             b.stop()
         return trace, dict(stop_reason=str(stop) if stop else None, unsafe=stop.unsafe if stop else False,
                            physics_validity=stop.physics_valid if stop else True,
-                           retracted=stop is None, rotation_scale=scale)
+                           retracted=stop is None, rotation_scale=scale, probe_cutoff_trigger_N=trigger)
 
 
 class MacroBagGraspEnv:

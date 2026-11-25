@@ -98,8 +98,7 @@ class FlexScene:
         defaults.set("class", "policy_v3_pe")
         root.find("default").append(defaults)
         world = root.find("worldbody")
-        # PE uses the qualified stiff planar contact. Keep the ABC table box
-        # for rigid workcell collision and prevent a second film–table pair.
+        # The PE uses its planar support. The ABC box supplies rigid contacts.
         table = world.find("geom[@name='table']")
         table.set("contype", "16")
         table.set("conaffinity", "9")
@@ -114,7 +113,9 @@ class FlexScene:
             elif node.tag == "body" and node.get("name", "").startswith("payload_"):
                 node.set("childclass", "policy_v3_pe")
                 world.append(node)
-        root.find(".//default[@class='collision']/geom").set("conaffinity", "9")
+        # Arm contact keeps the workcell and the film through their affinity,
+        # but the core's bit 8 is not a collision partner of the arm.
+        root.find(".//default[@class='collision']/geom").set("conaffinity", "1")
         for side in ("left", "right"):
             pad = root.find(f".//geom[@name='{side}_pad']")
             name = f"{side}_pad_convex"
