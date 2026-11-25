@@ -469,7 +469,8 @@ def run_trial(factory, trial, seed, output):
         film = backend.envelope
         data.update({key: film[key] for key in ("reference", "current", "faces", "edges", "panels", "masses")})
         if hasattr(backend, "xml"):
-            (output / f"{trial.case}.xml").write_text(backend.xml)
+            xml = "\n".join(line.rstrip() for line in backend.xml.splitlines()) + "\n"
+            (output / f"{trial.case}.xml").write_text(xml)
     result = evaluate(trial, outcome, data, perf_counter() - elapsed)
     result.update(config=asdict(trial), seed=seed)
     if backend is not None and feedback is not None:
@@ -571,7 +572,7 @@ def run_suite(args):
         save_json(args.output / "summary.json", results)
         headers = list(dict.fromkeys(k for r in results for k in r if k not in ("config", "gauge_response", "backend_config")))
         with (args.output / "trial_results.csv").open("w") as stream:
-            writer = csv.DictWriter(stream, fieldnames=headers, extrasaction="ignore")
+            writer = csv.DictWriter(stream, fieldnames=headers, extrasaction="ignore", lineterminator="\n")
             writer.writeheader()
             writer.writerows(results)
 

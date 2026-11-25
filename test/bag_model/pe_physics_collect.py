@@ -83,7 +83,7 @@ def main():
     excluded = {"config", "gauge_response", "backend_config"}
     fields = list(dict.fromkeys(key for row in results for key in row if key not in excluded))
     with (args.output / "trial_results.csv").open("w") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
+        writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         writer.writerows(results)
 
