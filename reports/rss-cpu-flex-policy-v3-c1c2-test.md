@@ -21,3 +21,9 @@
 第四轮 21/30 物理有效与 4 次成功。三条右位长扫触发硬上限，另六条抓取的膜边长比超限。用三条原种子复放较浅的长扫和软回退，全部安全撤回，峰值 1.983–2.422 N。正式候选配额验证为每状态 150 个新种子，三状态相同配额，12 候选均有分配。[第四轮摘要](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/pilot-4/summary.json) · [力护栏回放](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/probe-guard-replay.log) · [配额](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/sampling-balance-check.log)
 
 第五轮在原门槛、侧向停放、长扫 +3 mm、2 N 软回退下通过。27/30 物理有效（90.0%），10/27 成功（37.0%），3 个无效均为膜边长比。150 条入口归档及 V3 转换逐条读回通过，正式 450 条已启动。[第五轮摘要](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/pilot-5/summary.json) · [五轮验证](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/verify-pilots.log)
+
+正式 C1 采齐 450 回合，376 个物理有效、116 次成功。V3 GroupSplit 拆分 315/68/67，有效 BCE 行 265/56/55。第一次 checkpoint 命名因去力标签含斜线中断。修复路径后逐条比较既有归档与原始包，安全重启固定训练并得到三组权重。原回合数据沿用。[正式日志](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/formal.log)
+
+## 最终闭环与图件核验
+
+最近核验为 2026-11-26 07:16 CST。读回 450 条正式数据、三组 CPU 权重和互斥划分。评分示例的三个 RGB 数组逐位相同，三条实测试探历史有物理反力差异。267 个实际分支齐全，含独立 45 个状态的 135 个抓取执行与 C2 排序的 132 个补采执行。检查点指纹、成功判据、空无效标签和配对统计全部通过。21/45 个双策略物理有效对用于条件净差，固定与 Blind 在中央状态无有效回合，状态等权基线保留 NA。四条冻结路径核验退出 0。主图经视检，PDF 为单页矢量，PNG 为 5002 × 2369、450 dpi。[最终核验日志](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/verify-final.log) · [冻结记录](../test/runs/2026-11-26/cpu-flex-policy-v3-c1c2-r1/frozen-check.log)

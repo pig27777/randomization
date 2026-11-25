@@ -10,4 +10,4 @@
 
 ## CPU Flex Policy V3 C1/C2 r1
 
-35 × 25 cm PE 袋、200 g 内芯、50 µs CPU Flex 参考夹具。主机 `ubun`，22 个 CPU 进程。第五轮 30 回合通过，450 条正式连续采集自 02:41 CST 开始。[实验报告](cpu-flex-policy-v3-c1c2-r1/c1c2_report.md) · [测试报告](../../../reports/rss-cpu-flex-policy-v3-c1c2-test.md)
+35 × 25 cm PE 袋、200 g 内芯、50 µs CPU Flex 参考夹具。主机 `ubun`，22 个 CPU 进程。第五轮门禁通过。450 条正式采集、C2 训练、45 个独立状态的闭环已完成。[实验报告](cpu-flex-policy-v3-c1c2-r1/c1c2_report.md) · [测试报告](../../../reports/rss-cpu-flex-policy-v3-c1c2-test.md)

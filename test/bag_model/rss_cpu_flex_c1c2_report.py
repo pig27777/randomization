@@ -52,7 +52,7 @@ def figure(output, closure):
     palette = ("#D1D4D7", "#64676B", "#67A9B8", "#0072B2")
     for j, (mode, color) in enumerate(zip(MODES, palette, strict=True)):
         policy = closure["policies"][mode]
-        value, ci = policy["state_balanced_rate"], policy["ci95"]
+        value, ci = policy["rate"], policy["pooled_ci95"]
         if value is None or ci is None:
             ax.text(j, .05, "NA", ha="center")
             continue
@@ -61,13 +61,14 @@ def figure(output, closure):
         ax.text(j, min(1.075, max(value, ci[1]) + .047),
                 f"{pct(value)}\n{policy['success']}/{policy['valid']}", ha="center", fontsize=8)
     ax.set(title="Held-out physical grasp success", ylim=(0, 1.17), yticks=np.linspace(0, 1, 5),
-           ylabel="State-balanced success (95% paired bootstrap CI)", xticks=range(4),
+           ylabel="Success on physics-valid runs (95% CI)", xticks=range(4),
            xticklabels=("Best Fixed", "Blind", "Informed\nw/o Effort", "Informed"))
     gain = closure["informed_minus_blind"]
     fig.suptitle("Policy V3 · 50 µs CPU Flex · PE reference fixture", fontsize=12)
-    if gain["gain"] is not None:
-        ax.text(.03, .96, f"Informed − Blind  {100*gain['gain']:+.1f} pp\n95% CI {interval(gain['ci95'])}",
-                transform=ax.transAxes, va="top", fontsize=8)
+    if gain["complete_case_gain"] is not None:
+        lo, hi = gain["complete_case_ci95"]
+        ax.set_xlabel(f"Valid pairs · Informed − Blind {100*gain['complete_case_gain']:+.1f} pp\n"
+                      f"95% CI [{100*lo:.1f}, {100*hi:.1f}] pp", labelpad=8, fontsize=8)
     stem = output / "fig_c2_score_shift_and_success"
     fig.savefig(stem.with_suffix(".pdf"), bbox_inches="tight")
     fig.savefig(stem.with_suffix(".png"), bbox_inches="tight", dpi=450)
@@ -94,6 +95,9 @@ def write_report(output, dataset, c2, closure):
                          (("All", dataset), *dataset["splits"].items())]), "",
              "episode_id、initial_state_id 和 probe_state_id 全部完成跨集不相交验证。"
              "三组模型使用完全相同的有效训练记录与监督 BCE 目标。", "",
+             *row_table(("隐藏状态", "总回合", "有效", "正样本", "有效内正样本率"),
+                        [[state, c["trials"], c["valid"], c["positives"], pct(c["positive_rate"])]
+                         for state, c in dataset["states"].items()]), "",
              "### C2 · 留出评分", ""]
     rank = []
     for mode in MODES[1:]:
@@ -115,15 +119,27 @@ def write_report(output, dataset, c2, closure):
         policy = closure["policies"][mode]
         rates = [f"{r['success']}/{r['valid']}" for r in policy["states"].values()]
         result_rows.append([mode, *rates, f"{policy['success']}/{policy['valid']}",
-                            pct(policy["state_balanced_rate"]), interval(policy["ci95"]),
+                            pct(policy["rate"]), interval(policy["pooled_ci95"]), pct(policy["state_balanced_rate"]),
                             interval(policy["unknown_bounds"]), pct(policy["physics_invalid_rate"])])
-    lines += row_table(("策略", *STATES, "总成功/有效", "状态等权成功率", "95% CI", "未知结果界限", "物理无效率"),
+    lines += row_table(("策略", *STATES, "总成功/有效", "合并有效成功率", "95% CI", "状态等权成功率",
+                        "未知结果界限", "物理无效率"),
                        result_rows)
     gain = closure["informed_minus_blind"]
-    lines += ["", f"Informed − Blind 为 {pct(gain['gain'])}，配对 Bootstrap 95% CI {interval(gain['ci95'])}。"
-              f"两策略同时有效 {gain['complete_pairs']}/45，未知结果界限 {interval(gain['unknown_bounds'])}。"
-              "Bootstrap 以初始状态为配对单位，在各隐藏状态中独立重采样，"
-              "每个策略只用有效回合估计该状态的成功率。", ""]
+    lines += ["", f"两策略同时有效 {gain['complete_pairs']}/45。"
+              f"该子集的 Informed − Blind 为 {pct(gain['complete_case_gain'])}，"
+              f"配对 Bootstrap 95% CI {interval(gain['complete_case_ci95'])}。"
+              f"45 个状态的未知结果界限为 {interval(gain['unknown_bounds'])}。"
+              "Bootstrap 以初始状态成对、在各隐藏类内分层重采样。", ""]
+    if gain["gain"] is None:
+        lines += ["至少一个状态的策略在物理有效回合中没有观测，状态等权差值保留为 NA。"
+                  "图中的合并有效成功率可能来自不同状态比例。配对差值限于双方均有有效因果对照的子集。", ""]
+    else:
+        lines += [f"状态等权 Informed − Blind 为 {pct(gain['gain'])}，95% CI {interval(gain['ci95'])}。", ""]
+    causes = sorted({cause for mode in MODES for cause in closure["policies"][mode]["invalid_reasons"]})
+    if causes:
+        lines += [*row_table(("无效归因", *MODES),
+                             [[cause, *(closure["policies"][mode]["invalid_reasons"].get(cause, 0)
+                                        for mode in MODES)] for cause in causes]), ""]
     lines += ["### 行为适应度", ""]
     report_rows = []
     for mode in MODES:
@@ -132,6 +148,20 @@ def write_report(output, dataset, c2, closure):
             report_rows.append([mode, state, status["n"], pct(status["different_from_blind"]),
                                 "NA" if mean is None else ", ".join(f"{x*1000:.1f}" for x in mean)])
     lines += row_table(("策略", "隐藏状态", "选姿数", "不同于 Blind", "袋坐标选姿均值 (mm)"), report_rows)
+    lines += ["", *row_table(("匹配 RGB 示例", "Blind 峰值抓姿", "Informed 峰值抓姿"),
+                             [[case["state"], *(list(CANDIDATES)[int(np.argmax(case["scores"][mode]))]
+                                                if mode in case["scores"] else "NA"
+                                                for mode in ("Blind", "Informed"))]
+                              for case in closure["score_examples"]])]
+    for mode, summary in closure["matched_score_shift"].items():
+        span = summary["max_across_state_probability_span"]
+        if span is not None:
+            n_argmax = len(set(summary["argmax_by_state"].values()))
+            lines += ["", f"{mode} 在三个逐像素一致的初态中有 {n_argmax} 个不同峰值抓姿，"
+                      f"同一候选的最大跨状态分数差为 {span:.3g}。"]
+    lines += ["", *row_table(("策略", "Left–Center TV", "Left–Right TV", "Center–Right TV"),
+                             [[mode, *(number(v) for v in row["cross_state_total_variation"].values())]
+                              for mode, row in closure["adaptation"].items()])]
     lines += ["", "每个候选的选择频率、跨状态总变差距离和按策略的物理无效原因见 JSON。"
               "共用候选时，一个完全相同的积分检查点与动作只执行一次，供对应策略共享。"
               "45 个闭环初始态的种子与全量 C1 分离。", "",

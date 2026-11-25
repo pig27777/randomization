@@ -14,6 +14,8 @@ from pe_physics import save_json
 from rss_cpu_flex_c1c2 import CANDIDATES, FlexMacro, HOVER, Job, PROBE_END, STATES, TRIES, run_grasp
 
 MODES = ("Best Fixed", "Blind", "Informed w/o Effort", "Informed")
+CHECKPOINT_NAMES = {"Blind": "blind.pt", "Informed w/o Effort": "informed-no-effort.pt",
+                    "Informed": "informed.pt"}
 SEED = 60931
 TRIALS = 450
 
@@ -127,7 +129,13 @@ def train(root):
                    states={s: counts([r for _, r in indexed if r["state"] == s]) for s in STATES},
                    records="c1_records.jsonl.gz", raw_packets="collect/")
     save_json(root / "c1_dataset_summary.json", summary)
-    data.write_records(root / "c1_records.jsonl.gz", records)
+    archive = root / "c1_records.jsonl.gz"
+    if archive.exists():
+        previous = data.read_records(archive)
+        if len(previous) != len(records) or any(a.to_dict() != b.to_dict() for a, b in zip(previous, records)):
+            raise ValueError("Existing C1 archive differs from the episode packets")
+    else:
+        data.write_records(archive, records)
     result = dict(models={}, fixed_grasp=fixed, fixed_selection_lower_bound=bounds,
                   selector_selection_split="C1 train only", split_seed=SEED, epochs=22, batch_size=32)
     checkpoints = root / "checkpoints"
@@ -137,7 +145,7 @@ def train(root):
         learner = training.SupervisedTrainEntry(device="cpu", profile=profile, seed=SEED)
         result["models"][mode] = learner.fit(splits, epochs=22, batch_size=32)
         torch.save(dict(encoder=learner.encoder.state_dict(), scorer=learner.scorer.state_dict()),
-                   checkpoints / f"{mode}.pt")
+                   checkpoints / CHECKPOINT_NAMES[mode])
         print(mode, result["models"][mode]["val"], flush=True)
     save_json(root / "c2_metrics.json", result)
 
@@ -147,7 +155,7 @@ def load_scorers(root):
     models = {}
     for mode, profile in profiles(training, geometry).items():
         learner = training.SupervisedTrainEntry(device="cpu", profile=profile)
-        ckpt = torch.load(root / "checkpoints" / f"{mode}.pt", map_location="cpu", weights_only=True)
+        ckpt = torch.load(root / "checkpoints" / CHECKPOINT_NAMES[mode], map_location="cpu", weights_only=True)
         learner.encoder.load_state_dict(ckpt["encoder"])
         learner.scorer.load_state_dict(ckpt["scorer"])
         learner.encoder.eval()
@@ -315,6 +323,19 @@ def adaptation(closed):
     return modes
 
 
+def matched_score_shift(examples):
+    result = {}
+    for mode in MODES[1:]:
+        available = [row for row in examples if mode in row["scores"]]
+        scores = np.asarray([row["scores"][mode] for row in available])
+        result[mode] = dict(examples=len(available),
+                            max_across_state_probability_span=float(np.ptp(scores, axis=0).max())
+                            if len(available) == len(STATES) else None,
+                            argmax_by_state={row["state"]: list(CANDIDATES)[int(np.argmax(q))]
+                                             for row, q in zip(available, scores, strict=True)})
+    return result
+
+
 def closure_metrics(root, plan_):
     closed = []
     for id_, item in plan_["origins"].items():
@@ -336,6 +357,14 @@ def closure_metrics(root, plan_):
     counts_ = np.isfinite(sample).sum(axis=2)
     boot = np.divide(np.nansum(sample, axis=2), counts_, out=np.full(counts_.shape, np.nan), where=counts_ > 0)
     boot = boot.mean(axis=1)
+    pool_counts = counts_.sum(axis=1)
+    pooled = np.divide(np.nansum(sample, axis=(1, 2)), pool_counts,
+                       out=np.full(pool_counts.shape, np.nan), where=pool_counts > 0)
+    paired = values[:, :, -1] - values[:, :, 1]
+    paired_boot = sample[:, :, :, -1] - sample[:, :, :, 1]
+    paired_counts = np.isfinite(paired_boot).sum(axis=(1, 2))
+    paired_means = np.divide(np.nansum(paired_boot, axis=(1, 2)), paired_counts,
+                             out=np.full(len(draws), np.nan), where=paired_counts > 0)
 
     def ci(x):
         x = x[np.isfinite(x)]
@@ -349,7 +378,7 @@ def closure_metrics(root, plan_):
                             invalid_reasons=dict(Counter(k for case in cases for k in case["invalid_reasons"])),
                             state_balanced_rate=(float(np.mean([c["rate"] for c in by_state.values()]))
                                                  if all(c["rate"] is not None for c in by_state.values()) else None),
-                            ci95=ci(boot[:, j]))
+                            ci95=ci(boot[:, j]), pooled_ci95=ci(pooled[:, j]))
     a, b = policy["Informed"]["state_balanced_rate"], policy["Blind"]["state_balanced_rate"]
     diff = a-b if a is not None and b is not None else None
     pairs = []
@@ -362,9 +391,13 @@ def closure_metrics(root, plan_):
             pairs.append(((0. if a is None else float(a)) - (1. if b is None else float(b)),
                           (1. if a is None else float(a)) - (0. if b is None else float(b))))
     return dict(episodes=closed, policies=policy, score_examples=plan_["score_examples"],
+                matched_score_shift=matched_score_shift(plan_["score_examples"]),
                 bootstrap_draws=len(draws), adaptation=adaptation(closed),
                 informed_minus_blind=dict(gain=diff, ci95=ci(boot[:, -1]-boot[:, 1]),
-                                          complete_pairs=int(np.sum(np.isfinite(values[:, :, [-1, 1]]).all(axis=2))),
+                                          complete_pairs=int(np.isfinite(paired).sum()),
+                                          complete_case_gain=float(np.nanmean(paired))
+                                          if np.isfinite(paired).any() else None,
+                                          complete_case_ci95=ci(paired_means),
                                           unknown_bounds=np.mean(pairs, axis=0).tolist()))
 
 

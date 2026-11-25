@@ -37,3 +37,100 @@ C1 每回合从试探开始，1.84 s 安全 Try 后移动到统一 55 mm 悬停�
 第四轮 21/30 物理有效，4/21 成功（19.0%）。无效 9 次，其中 3 次试探超力与 6 次膜边长比超限。第五轮于 02:25 CST 开始，执行修正后的探头控制，并使用独立且按状态均衡的候选安排。[第四轮摘要](pilot-4/summary.json)
 
 第五轮独立入口通过。30 次中 27 次有效（90.0%），10/27 成功（37.0%），三个隐藏状态都有成功。三个无效均为膜边长比超限。正式 450 条于 02:41 CST 开始，配置与第五轮门槛一致，所有正式种子另取。当前归档含五轮试跑，C2 与独立评测将在正式连续采集完成后执行。[第五轮摘要](pilot-5/summary.json) · [门槛读回](verify-pilots.log)
+
+正式 C1 于 06:10 CST 收齐。450 次中 376 条有效、116 次成功。保存 C2 权重时遇到去力模型显示名称里的斜线，改用独立文件名。恢复时复用逐条一致的 C1 gzip 归档，三组模型重新完成固定 22 个 epoch。闭环的独立 Try 已启动。[正式日志](formal.log) · [C1 原始包](c1_raw_packets.tar.gz)
+
+## 正式结果
+
+全部结果来自 50 µs CPU Flex 和 PE MVP 参考夹具。候选以公共初始外袋坐标定义，V3 的 V0_ONLY 接口屏蔽 v1。V3 历史编码保留显式试探力、位置、速度、误差与控制指令，参考夹具未观测的整臂关节字段填零。
+
+### C1 · 采集和分组
+
+| 划分 | 总回合 | 有效 | 正样本 | 正样本率 | 物理无效率 |
+| --- | --- | --- | --- | --- | --- |
+| All | 450 | 376 | 116 | 30.9% | 16.4% |
+| train | 315 | 265 | 87 | 32.8% | 15.9% |
+| val | 68 | 56 | 17 | 30.4% | 17.6% |
+| test | 67 | 55 | 12 | 21.8% | 17.9% |
+
+episode_id、initial_state_id 和 probe_state_id 全部完成跨集不相交验证。三组模型使用完全相同的有效训练记录与监督 BCE 目标。
+
+| 隐藏状态 | 总回合 | 有效 | 正样本 | 有效内正样本率 |
+| --- | --- | --- | --- | --- |
+| Left | 150 | 144 | 47 | 32.6% |
+| Center | 150 | 95 | 14 | 14.7% |
+| Right | 150 | 137 | 55 | 40.1% |
+
+### C2 · 留出评分
+
+| 模型 | 验证 BCE | 验证 AUROC | 验证 Top-1 | 测试 BCE | 测试 AUROC | 测试 Top-1 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Blind | 0.428 | 0.863 | 4/5 · 80.0% | 0.314 | 0.886 | 4/5 · 80.0% |
+| Informed w/o Effort | 0.425 | 0.834 | 4/5 · 80.0% | 0.357 | 0.839 | 3/5 · 60.0% |
+| Informed | 0.425 | 0.836 | 4/5 · 80.0% | 0.357 | 0.837 | 3/5 · 60.0% |
+
+每个验证及测试状态类别预先选两个完成试探的状态。对每个选中的状态物理执行整池候选。Top-1 在至少一正一负且有物理标签的组内，比较实际有效候选中的最高评分与成功标签。原始指标另保留全池原始 argmax 的有效分母及未知界限。
+
+### 闭环 · 独立物理评测
+
+| 策略 | Left | Center | Right | 总成功/有效 | 合并有效成功率 | 95% CI | 状态等权成功率 | 未知结果界限 | 物理无效率 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Best Fixed | 12/13 | 0/0 | 12/15 | 24/28 | 85.7% | [72.0%, 96.6%] | NA | [53.3%, 91.1%] | 37.8% |
+| Blind | 14/14 | 0/0 | 13/15 | 27/29 | 93.1% | [82.8%, 100.0%] | NA | [60.0%, 95.6%] | 35.6% |
+| Informed w/o Effort | 1/15 | 4/14 | 5/7 | 10/36 | 27.8% | [14.7%, 41.0%] | 35.6% | [22.2%, 42.2%] | 20.0% |
+| Informed | 1/15 | 4/14 | 5/7 | 10/36 | 27.8% | [14.7%, 41.0%] | 35.6% | [22.2%, 42.2%] | 20.0% |
+
+两策略同时有效 21/45。该子集的 Informed − Blind 为 -61.9%，配对 Bootstrap 95% CI [-85.0%, -38.1%]。45 个状态的未知结果界限为 [-73.3%, -17.8%]。Bootstrap 以初始状态成对、在各隐藏类内分层重采样。
+
+至少一个状态的策略在物理有效回合中没有观测，状态等权差值保留为 NA。图中的合并有效成功率可能来自不同状态比例。配对差值限于双方均有有效因果对照的子集。
+
+| 无效归因 | Best Fixed | Blind | Informed w/o Effort | Informed |
+| --- | --- | --- | --- | --- |
+| film_edge_ratio | 2 | 16 | 1 | 1 |
+| jaw_inset_core | 15 | 0 | 8 | 8 |
+
+### 行为适应度
+
+| 策略 | 隐藏状态 | 选姿数 | 不同于 Blind | 袋坐标选姿均值 (mm) |
+| --- | --- | --- | --- | --- |
+| Best Fixed | Left | 15 | 100.0% | 3.0, 30.0, 14.0 |
+| Best Fixed | Center | 15 | 100.0% | 3.0, 30.0, 14.0 |
+| Best Fixed | Right | 15 | 100.0% | 3.0, 30.0, 14.0 |
+| Blind | Left | 15 | 0.0% | 0.0, 30.0, 14.0 |
+| Blind | Center | 15 | 0.0% | 0.0, 30.0, 14.0 |
+| Blind | Right | 15 | 0.0% | 0.0, 30.0, 14.0 |
+| Informed w/o Effort | Left | 15 | 100.0% | 28.0, 34.0, 15.0 |
+| Informed w/o Effort | Center | 15 | 100.0% | 28.0, 34.0, 15.0 |
+| Informed w/o Effort | Right | 15 | 100.0% | 28.0, 34.0, 15.0 |
+| Informed | Left | 15 | 100.0% | 28.0, 34.0, 15.0 |
+| Informed | Center | 15 | 100.0% | 28.0, 34.0, 15.0 |
+| Informed | Right | 15 | 100.0% | 28.0, 34.0, 15.0 |
+
+| 匹配 RGB 示例 | Blind 峰值抓姿 | Informed 峰值抓姿 |
+| --- | --- | --- |
+| Center | g5 | g9 |
+| Left | g5 | g9 |
+| Right | g5 | g9 |
+
+Blind 在三个逐像素一致的初态中有 1 个不同峰值抓姿，同一候选的最大跨状态分数差为 0。
+
+Informed w/o Effort 在三个逐像素一致的初态中有 1 个不同峰值抓姿，同一候选的最大跨状态分数差为 7.45e-06。
+
+Informed 在三个逐像素一致的初态中有 1 个不同峰值抓姿，同一候选的最大跨状态分数差为 1.17e-05。
+
+| 策略 | Left–Center TV | Left–Right TV | Center–Right TV |
+| --- | --- | --- | --- |
+| Best Fixed | 0.000 | 0.000 | 0.000 |
+| Blind | 0.000 | 0.000 | 0.000 |
+| Informed w/o Effort | 0.000 | 0.000 | 0.000 |
+| Informed | 0.000 | 0.000 | 0.000 |
+
+每个候选的选择频率、跨状态总变差距离和按策略的物理无效原因见 JSON。共用候选时，一个完全相同的积分检查点与动作只执行一次，供对应策略共享。45 个闭环初始态的种子与全量 C1 分离。
+
+[论文图 PDF](fig_c2_score_shift_and_success.pdf) · [PNG](fig_c2_score_shift_and_success.png) · [数据集](c1_dataset_summary.json) · [离线指标](c2_metrics.json) · [闭环原始指标](closed_loop_eval.json) · [冻结检查](frozen-check.log)
+
+三例的 320 × 240 初始 RGB 经软件渲染逐像素一致，实际试探反力历史的最大成对差为 0.473–0.494 N。冻结的 Informed 策略在独立 45 个状态中均选 g9，Blind 均选 g5。候选评分整体改变，选择没有随隐藏位置迁移。135 次独立闭环物理分支加 132 次留出排序分支共 267 次。Blind 和 Best Fixed 的 15 个中央状态均物理无效，两个策略的状态等权成功率保留 NA。闭环证据来自冻结权重、相同 post-Try 检查点及原生袋膜摩擦接触。[逐像素 RGB](score_example_initial_rgb.npz) · [历史编码核对](matched-history-encoding-check.log) · [物理分支原始包](physical_eval_packets.tar.gz) · [核验](verify-final.log)
+
+### RSS 第四节表述
+
+With identical initial RGB in the matched examples, the probe recorded different force histories, while the learned informed scorer retained the same top-ranked grasp across all three hidden states. In the 50 µs CPU Flex reference-fixture evaluation on 45 fresh states, informed and blind selection succeeded in 10/36 and 27/29 physics-valid runs, respectively. The paired difference over the 21 jointly valid states was −61.9 percentage points (95% bootstrap CI [−85.0, −38.1]). All 15 central-state blind selections were physically invalid, so an equal-state-weighted blind success rate was unobserved.
