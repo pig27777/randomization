@@ -9,4 +9,5 @@
 | [c2-final-1000](c2-final-1000/bce.json) | 上一批 Replay，20 个 BCE epoch，保存固定分组的检查点。 |
 | [c4-final](c4-final/round-0/update.json) | 两 Worker，12 回合，PPO 后接累计 Replay 的单轮 BCE。 |
 | [rigid-gpu](rigid-gpu/scripted.json) | 单卡持锁，外表面 mask 和深度，脚本抓放。 |
-| [冻结检查](frozen.log) · [单测](unit-final.log) · [数据审计](archive-audit.log) | 路径级零差异、11 项单测和历史、时间戳、配对状态与分组检查。 |
+| [flex-probe](flex-probe/scripted.json) | 持锁运行 PE Flex 深试探。22 帧后触发穿透保护，保留停机前轨迹。 |
+| [冻结检查](frozen.log) · [单测](unit-final.log) · [数据审计](archive-audit.log) | 路径级零差异、12 项单测和历史、时间戳、配对状态与分组检查。 |

@@ -20,3 +20,9 @@
 | [机器人刚体与 GPU](yam/pure-sim-r4/) | `ubun`，RTX 5090，Menagerie linear_4310，3.17.0，1 ms，25 Hz。持锁运行 `PYTHONPATH=experience .venv/bin/python -B test/yam/smoke.py <tracking/contact/grasp/gpu> <新目录>`。 | 空载、软硬接触、夹放、nominal 和 DR 批量通过，最高扫至 256 路。[主题报告](../../yam/REPORT.md) · [检查](../../../reports/yam-pure-sim-test.md) |
 | [ABC 工作站](yam/pure-sim-r5/abc/) | 同机器、模型和环境，`smoke.py abc <新目录>`，使用原配置的桌面、双基座、顶视和右腕光学帧。 | 右侧 Yam_B 通过刚体抓放，左侧 Yam_A 停驻。[录像及反馈](yam/pure-sim-r5/media/) |
 | [PE Flex 接入](yam/pure-sim-r6/) | MuJoCo/MJWarp 4.0.1，0.2 ms，三路同轨迹。持锁运行 `PYTHONPATH=.:experience .venv-physical-parcel/bin/python -B test/yam/bag_try.py <新目录> --scan-z-m .0347`。 | 中位触膜约 2.33 N 且无直接内芯接触，左右未触膜，E 未通过。前序结果见 [主题报告](../../yam/REPORT.md)。 |
+
+## 策略
+
+| 运行 | 指标与命令 | 结论 |
+| --- | --- | --- |
+| [Policy V3-MVP](policy/policy-v3-mvp-r1/) | `ubun`，MuJoCo/MJWarp 4.0.1，仓库根目录运行 `.venv-physical-parcel/bin/python -B -m policy_v3.curriculum <阶段> <新目录>`，Python 路径加 `src:experience:.`，单卡用共享锁。 | 刚体 100／1,000 回合采集完成，C2 BCE 下降，两 Worker PPO 与 C4 交替更新完成。袋体和冻结文件检查见[主题报告](../../policy_v3/REPORT.md)与[测试报告](../../../reports/policy-v3-mvp-test.md)。 |

@@ -231,6 +231,25 @@ class PolicyV3Test(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             env.execute_grasp(G)
 
+    def test_flex_and_rigid_share_the_table_without_duplicate_film_contacts(self):
+        from yam_platform.yam_model import build_yam_model
+        from policy_v3.yam_scene import FlexScene
+
+        scene = FlexScene()
+        _, model = build_yam_model(scene.config, add_scene=scene.add_scene, compile_model=scene.compile_model)
+        table, plane = model.geom("table"), model.geom("table_flex_support")
+        payload = model.geom(scene.payload_geom)
+        film_type, film_affinity = model.flex_contype[0], model.flex_conaffinity[0]
+
+        def permits(geom, contact_type, contact_affinity):
+            return bool((geom.contype[0] & contact_affinity) or (geom.conaffinity[0] & contact_type))
+
+        self.assertFalse(permits(table, film_type, film_affinity))
+        self.assertTrue(permits(plane, film_type, film_affinity))
+        self.assertTrue(permits(table, payload.contype[0], payload.conaffinity[0]))
+        self.assertFalse(permits(plane, payload.contype[0], payload.conaffinity[0]))
+        np.testing.assert_array_equal(plane.solref, scene.parcel.m.geom("table").solref)
+
     def test_motor_effort_limit_uses_native_calibration(self):
         from policy_v3.yam_backend import YamBackend
 
@@ -289,7 +308,7 @@ class PolicyV3Test(unittest.TestCase):
             self.assertEqual(env["OMP_NUM_THREADS"], "2")
             self.assertEqual(env["OPENBLAS_NUM_THREADS"], "2")
         with self.assertRaises(ValueError):
-            SingleMultiGPUWorker(("0", "0"))
+            SingleMultiGPUWorker(("0", "00"))
 
 
 if __name__ == "__main__":

@@ -40,8 +40,17 @@ def scripted(output, args):
             action[8] = -.45
             action[9] = .30
             action[-1] = -.50
+            if b.scene.is_flex:
+                # Use a shallow software check clear of the near basket wall.
+                fixture_xy = b.common_sampling_region[0][:2] + [0., -.015]
+                local_xy = (fixture_xy - v0.center[:2]) @ v0.rotation[:2, :2]
+                action[:2] = np.clip(local_xy / v0.half_extent[:2], -1., 1.)
+                action[8] = -.04
+                action[9] = .12
+                action[-1] = .30
             history, length, v1, info = env.execute_probe(action)
-            outcome.update(probe=info, valid_len=length, v1=v1.to_dict() if v1 is not None else None)
+            outcome.update(probe=info, a_try=action.tolist(), valid_len=length,
+                           v1=v1.to_dict() if v1 is not None else None)
             np.savez_compressed(output / "probe.npz", H_try=history, H_try_raw=env.raw_history,
                                 timestamps=env.trace.timestamps, trajectory_world=env.trace.tcp_world,
                                 phases=env.trace.stages, valid_len=length)

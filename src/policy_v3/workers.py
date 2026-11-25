@@ -71,11 +71,12 @@ def worker_environment(device, worker=0):
 
 class SingleMultiGPUWorker:
     def __init__(self, devices=("cpu",)):
-        self.devices = tuple(devices)
-        gpu = [d for d in self.devices if d != "cpu"]
-        if (not self.devices or len(set(gpu)) != len(gpu)
-                or any(not d.isdecimal() for d in gpu) or (gpu and len(gpu) != len(self.devices))):
+        devices = tuple(devices)
+        gpu = [d for d in devices if d != "cpu"]
+        if (not devices or any(not d.isdecimal() for d in gpu) or (gpu and len(gpu) != len(devices))
+                or len({int(d) for d in gpu}) != len(gpu)):
             raise ValueError("Specify all cpu workers or distinct physical GPU numbers")
+        self.devices = tuple(str(int(d)) if d != "cpu" else d for d in devices)
 
     def collect(self, checkpoint, token, version, config, episodes, seed, output, *, learned):
         if episodes < len(self.devices) or episodes % config.matched_repeats:

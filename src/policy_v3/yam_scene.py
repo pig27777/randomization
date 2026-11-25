@@ -97,12 +97,23 @@ class FlexScene:
         defaults = parcel.find("default")
         defaults.set("class", "policy_v3_pe")
         root.find("default").append(defaults)
+        world = root.find("worldbody")
+        # PE uses the qualified stiff planar contact. Keep the ABC table box
+        # for rigid workcell collision and prevent a second film–table pair.
+        table = world.find("geom[@name='table']")
+        table.set("contype", "16")
+        table.set("conaffinity", "9")
+        support = parcel.find("worldbody/geom[@name='table']")
+        support.attrib.update(name="table_flex_support", contype="0", conaffinity="2",
+                              rgba="0 0 0 0")
+        support.set("class", "policy_v3_pe")
+        world.append(support)
         for node in parcel.find("worldbody"):
             if node.tag == "flexcomp":
-                root.find("worldbody").append(node)
+                world.append(node)
             elif node.tag == "body" and node.get("name", "").startswith("payload_"):
                 node.set("childclass", "policy_v3_pe")
-                root.find("worldbody").append(node)
+                world.append(node)
         root.find(".//default[@class='collision']/geom").set("conaffinity", "9")
         for side in ("left", "right"):
             pad = root.find(f".//geom[@name='{side}_pad']")
