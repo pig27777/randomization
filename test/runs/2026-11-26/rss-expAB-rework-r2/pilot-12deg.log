@@ -1,0 +1,21 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/miniconda3/lib/python3.14/multiprocessing/pool.py", line 856, in next
+    item = self._items.popleft()
+IndexError: pop from an empty deque
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/rss_exp_ab.py", line 533, in <module>
+    if __name__ == "__main__":
+        ^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/rss_exp_ab.py", line 528, in main
+    with mp.get_context("spawn").Pool(args.workers) as pool:
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/multiprocessing/pool.py", line 861, in next
+    self._cond.wait(timeout)
+    ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/threading.py", line 369, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+KeyboardInterrupt

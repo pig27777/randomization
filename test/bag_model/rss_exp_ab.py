@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import mujoco
 import numpy as np
 
-from bag_mvp import (DT, PAD_HALF, PROBE_D, PROBE_K, Grasp, SmokeFlex,
+from bag_mvp import (DT, PAD_HALF, PROBE_D, PROBE_K, SmokeFlex,
                      jaw_core_overlap, make_trial, probe_command, quaternion)
 from bag_sim.physical_parcel import Parcel
 from bag_sim.wrap import point_triangle_distance, triangle_box_intersections, winding_number
@@ -23,29 +23,43 @@ from pe_physics_protocol import CORNERS, ramp
 STATES = {"Left": -.055, "Center": 0., "Right": .055}
 TRIES = {"Try_Center": (-.010, .020), "Try_Left": (-.065, .020), "Try_Scan": (-.095, .190)}
 SEED_ROOT = 20261126
+B_REWORK_SEED_ROOT = 2026112611
 SIZE = (.088, .068, .024)
 AUDIT_DT = .005
 SHELF_Y = .015
 TRY_DURATION = 1.84
 EFFORT_CAP = 2.
 FORCE_LIMIT = 3.5
-CLOSE_DWELL = .58
-BASE_HOLD_START = 1.74
-JAW_TARGET = 4.
+CLOSE_START = .80
+LIFT_START = 1.82
+LIFT_END = 2.72
+HOLD_END = LIFT_END + 1.
+SETDOWN_TIME = 1.14
+SETDOWN_TRAVEL = .280
+SUPPORT_PAUSE = .095
+MAX_SUPPORT_PAUSES = 3
+RELEASE_CLEARANCE = .042
+RELEASE_SETTLE = .55
+SETDOWN_COMPRESSION_LIMIT = .45
+B_DURATION = HOLD_END + SETDOWN_TIME + MAX_SUPPORT_PAUSES * SUPPORT_PAUSE + .28 + RELEASE_SETTLE + AUDIT_DT
+LIFT_DISTANCE = .190
+JAW_TARGET = 7.5
+JAW_FORCE_LIMIT = 9.
+JAW_MASS = .20
 JAW_FEEDBACK_DT = .0005
 
 # Public bag-frame jaw midpoint, closing axis, and outward approach vector.
 # The pad frame uses x=closing, z=approach, y=z×x.
 GRASPS = {
-    "g1": ((-.055, 0., .019), (0., 1., 0.), (0., 0., 1.), .116),
-    "g2": ((0., 0., .019), (0., 1., 0.), (0., 0., 1.), .116),
-    "g3": ((.055, 0., .019), (0., 1., 0.), (0., 0., 1.), .116),
-    "g4": ((-.055, .030, .014), (0., 0., 1.), (0., 1., 0.), .046),
-    "g5": ((0., .030, .014), (0., 0., 1.), (0., 1., 0.), .046),
-    "g6": ((.055, .030, .014), (0., 0., 1.), (0., 1., 0.), .046),
-    "g7": ((.166, .050, .005), (0., 0., 1.), (0., 1., 0.), .030),
-    "g8": ((-.166, .050, .005), (0., 0., 1.), (0., 1., 0.), .030),
-    "g9": ((.028, .034, .015), (0., -.156, .988), (0., .988, .156), .048),
+    "g1": ((-.055, .023, .015), (.139, 0., .990), (0., 1., 0.), .092),
+    "g2": ((0., .023, .015), (.139, 0., .990), (0., 1., 0.), .092),
+    "g3": ((.055, .023, .015), (.139, 0., .990), (0., 1., 0.), .092),
+    "g4": ((-.055, .030, .014), (0., 0., 1.), (0., 1., 0.), .088),
+    "g5": ((0., .030, .014), (0., 0., 1.), (0., 1., 0.), .088),
+    "g6": ((.055, .030, .014), (0., 0., 1.), (0., 1., 0.), .088),
+    "g7": ((.156, .044, .005), (0., 0., 1.), (0., 1., 0.), .088),
+    "g8": ((-.156, .044, .005), (0., 0., 1.), (0., 1., 0.), .088),
+    "g9": ((.028, .035, .015), (0., -.070, .998), (0., .998, .070), .088),
 }
 CHANNELS = tuple(f"{field}_{axis}" for field in ("position_m", "velocity_m_s", "error_m")
                  for axis in "xyz") + ("applied_z_N", "reaction_x_N", "reaction_y_N", "reaction_z_N",
@@ -65,7 +79,8 @@ class Job:
     @property
     def seed(self):
         exp = {"A": 1, "B": 2}[self.experiment] + (10 if self.phase == "pilot" else 0)
-        return int(np.random.SeedSequence([SEED_ROOT, exp, list(STATES).index(self.state),
+        root = B_REWORK_SEED_ROOT if self.experiment == "B" and self.phase != "pilot" else SEED_ROOT
+        return int(np.random.SeedSequence([root, exp, list(STATES).index(self.state),
                                            self.replicate]).generate_state(1)[0])
 
     @property
@@ -101,7 +116,7 @@ class PairedFlex(SmokeFlex):
             variant = "baseline"
         else:
             spec = make_trial("through", DT, "near-seam")
-            spec = replace(spec, duration=spec.duration + CLOSE_DWELL)
+            spec = replace(spec, duration=B_DURATION)
             variant = "near-seam"
         super().__init__(replace(spec, mass=job.mass), variant=variant)
         self.core_q = self.m.joint("payload_free").qposadr[0]
@@ -134,6 +149,7 @@ class PairedFlex(SmokeFlex):
                           pos="0 0 -.20", contype="1", conaffinity="10")
             for name in ("left_pad", "right_pad"):
                 world.find(f"body[@name='{name}']/geom").set("solref", ".002 1")
+                world.find(f"body[@name='{name}']/inertial").set("mass", str(JAW_MASS))
         return ET.tostring(tree, encoding="unicode")
 
     def audit_collision_mask(self):
@@ -147,6 +163,8 @@ class PairedFlex(SmokeFlex):
             raise RuntimeError("Expected native fixture/film and core/film contacts are disabled")
         self.core_geom = core
         self.fixture_geoms = frozenset(tools)
+        if self.job.experiment == "B":
+            self.support_geoms = frozenset(self.m.geom(name).id for name in ("table", "floor"))
 
     def direct_fixture_contact(self):
         # The shared generic payload_fixture counter also groups payload
@@ -160,17 +178,55 @@ class PairedFlex(SmokeFlex):
                 return True
         return False
 
+    def support_force(self):
+        """Vertical load at the external table and catch-floor supports."""
+        load = 0.
+        force = np.empty(6)
+        for i, contact in enumerate(self.d.contact):
+            if contact.efc_address < 0:
+                continue
+            first, second = contact.geom
+            if first in self.support_geoms or second in self.support_geoms:
+                mujoco.mj_contactForce(self.m, self.d, i, force)
+                direction = 1. if first in self.support_geoms else -1.
+                load += direction * (force[:3] @ contact.frame[2::3])
+        return load
 
-class PublicPoseGrasp(Grasp):
-    def __init__(self, backend, edge):
-        super().__init__(backend, edge)
-        # The reference exposed-underface variant supplies the faster
-        # force-feedback closure, with a longer common lift for loose film.
-        self.variant = "exposed-underface"
-        self.hold_start = BASE_HOLD_START
-        self.release = self.hold_start + 1.
-        self.measured_hold_start = self.hold_start + CLOSE_DWELL
-        self.measured_release = self.release + CLOSE_DWELL
+
+class PublicPoseGrasp:
+    def __init__(self, backend):
+        self.backend = backend
+        self.origin = None
+        self.force = np.zeros(2)
+        self.release_at = None
+        self.release_height = None
+        self.last_height = 0.
+        self.load = 0.
+        self.support_load = 0.
+        self.reference_loads = []
+        self.hold_load = None
+        self.hold_height = None
+        self.lift_relief = 0.
+        self.setdown = None
+        self.support_pause = None
+        self.support_waited = 0.
+        self.next_support_depth = .003
+        self.failed_support_pauses = 0
+        self.setdown_compression_limited = False
+        self.min_span = 2 * PAD_HALF + .00025
+        self.low_force_start = None
+        self.reclose_locked = False
+        self.names = ("left_pad", "right_pad")
+        self.q = backend.tool_q[2:4, None] + np.arange(3)
+        self.v = backend.tool_v[2:4, None] + np.arange(3)
+        self.signs = np.array([-1., 1.])
+        self.effort = np.zeros(2)
+
+    def sample_support(self, time):
+        reaction = self.backend.support_force()
+        self.support_load += .22 * (reaction - self.support_load)
+        if .16 <= time < .24:
+            self.reference_loads.append(reaction)
 
     def aim(self):
         mid, axis, outward, self.open_gap = GRASPS[self.backend.job.action]
@@ -178,32 +234,161 @@ class PublicPoseGrasp(Grasp):
         self.axis = self.backend.rotation @ (np.array(axis) / np.linalg.norm(axis))
         approach = self.backend.rotation @ (np.array(outward) / np.linalg.norm(outward))
         lateral = np.cross(approach, self.axis)
-        self.orientation = quaternion(np.column_stack((self.axis, lateral, approach)))
-        self.reach = self.origin + .045 * approach
-        self.min_gap = .00025
-        self.jaw_gap = self.open_gap
+        frame = np.column_stack((self.axis, lateral, approach))
+        self.orientation = quaternion(frame)
+        pad_extent_y = np.abs(frame[1]) @ [PAD_HALF, *PAD / 2]
+        # The support lip is public and fixed in world coordinates. Keep the
+        # pad faces outside it when the bag pose brings a candidate inward.
+        self.origin[1] = max(self.origin[1], SHELF_Y + pad_extent_y + .001)
+        # Descend outside the nominal side envelope before inserting an open
+        # horizontal pinch. A top approach has no horizontal component.
+        self.standoff = self.origin + .125 * approach
+        self.overhead = self.standoff.copy()
+        self.overhead[2] = max(.090, self.standoff[2])
+        self.approach = approach
+        self.weight = float(np.mean(self.reference_loads))
+        if not np.isfinite(self.weight) or self.weight < .45:
+            raise RuntimeError(f"Unable to measure the resting load: {self.weight}")
 
-    def command(self, time, dt):
-        # Use the same additional pre-lift closing window for every pose.
-        virtual_time = time - min(max(0., time - .87), CLOSE_DWELL)
-        # Re-center the reference controller's 8 N error around the common
-        # 4 N target. Logged reactions remain the measured native forces.
-        force = self.force
-        self.force = force + (8. - JAW_TARGET)
-        try:
-            moves = super().command(virtual_time, dt)
-        finally:
-            self.force = force
-        lift, speed = ramp(virtual_time, .87, BASE_HOLD_START)
-        extra_position, extra_velocity = [0., 0., .115 * lift], [0., 0., .115 * speed]
-        return {name: (position + extra_position, velocity + extra_velocity, orientation)
-                for name, (position, velocity, orientation) in moves.items()}
+    def lift_path(self, time):
+        if self.release_height is not None:
+            return self.release_height, 0.
+        if self.reclose_locked and time < HOLD_END:
+            self.release_height = self.last_height
+            self.release_at = (int(time / AUDIT_DT) + 1) * AUDIT_DT
+            return self.release_height, 0.
+        if time < HOLD_END:
+            lift, rate = ramp(time, LIFT_START, LIFT_END)
+            old_relief = self.lift_relief
+            response = float(np.clip(.11 * (self.load - self.weight - 1.0), -.055, .30))
+            self.lift_relief = float(np.clip(old_relief + DT * response, 0., LIFT_DISTANCE * lift))
+            return LIFT_DISTANCE * lift - self.lift_relief, LIFT_DISTANCE * rate - (self.lift_relief - old_relief) / DT
+        if self.hold_load is None:
+            self.hold_load = self.load
+            self.hold_height = self.last_height
+            if self.support_load >= .90 * self.weight or self.hold_load < .45:
+                self.release_at = HOLD_END
+                self.release_height = self.hold_height
+                return self.release_height, 0.
+        if self.setdown is None:
+            progress, rate = ramp(time - self.support_waited, HOLD_END, HOLD_END + SETDOWN_TIME)
+            depth = SETDOWN_TRAVEL * progress
+            # A compressive wrist load against the instrumented support is
+            # already contact. Reverse before pinning the suspended film.
+            pressed = (self.load < -SETDOWN_COMPRESSION_LIMIT
+                       and self.support_load >= .85 * self.weight)
+            if pressed:
+                self.setdown_compression_limited = True
+                if self.support_pause is not None:
+                    depth = self.support_pause[1]
+                self.setdown = time, self.hold_height - depth, True
+                self.release_at = (round(time / AUDIT_DT) + 55) * AUDIT_DT
+        if self.setdown is None:
+            if (self.support_pause is None and depth >= self.next_support_depth
+                    and self.support_load >= .85 * self.weight
+                    and self.failed_support_pauses < MAX_SUPPORT_PAUSES):
+                self.support_pause = time, depth
+            supported = False
+            if self.support_pause is not None:
+                pause_start, depth = self.support_pause
+                if time < pause_start + SUPPORT_PAUSE:
+                    return self.hold_height - depth, 0.
+                self.support_pause = None
+                self.support_waited += time - pause_start
+                supported = self.support_load >= .80 * self.weight and self.load < .4 * self.weight
+                if not supported:
+                    self.failed_support_pauses += 1
+                    self.next_support_depth = depth + .012
+                    return self.hold_height - depth, 0.
+            if supported or progress == 1.:
+                self.setdown = time, self.hold_height - depth, supported
+                self.release_at = (round(time / AUDIT_DT) + 55) * AUDIT_DT
+            else:
+                return self.hold_height - depth, -SETDOWN_TRAVEL * rate
+        touch_time, touch_height, supported = self.setdown
+        # Confirm support with the arm stationary, then back off before opening.
+        # Feedback is the summed vertical pad reaction.
+        backoff, rate = ramp(time, touch_time, touch_time + .25)
+        clearance = RELEASE_CLEARANCE if supported else 0.
+        return touch_height + clearance * backoff, clearance * rate
 
-    def refresh_force(self):
+    def drive(self, time):
+        backend = self.backend
+        if time < .24:
+            backend.drive({}, None)
+            return
+        if self.origin is None:
+            self.aim()
+        if time < CLOSE_START:
+            descend, descend_speed = ramp(time, .24, .52)
+            insert, insert_speed = ramp(time, .52, CLOSE_START)
+            down = self.standoff - self.overhead
+            forward = self.origin - self.standoff
+            center = self.overhead + descend * down + insert * forward
+            speed = descend_speed * down + insert_speed * forward
+            offsets = self.signs * (PAD_HALF + self.open_gap / 2)
+            backend.drive({name: (center + offset * self.axis, speed, self.orientation)
+                           for name, offset in zip(self.names, offsets)}, None)
+            return
+
+        lift, lift_speed = self.lift_path(time)
+        self.last_height = lift
+        center = self.origin + [0., 0., lift]
+        speed = np.array([0., 0., lift_speed])
+        d = backend.d
+        releasing = self.release_at is not None and time >= self.release_at - 1e-10
+        if releasing:
+            retreat, rate = ramp(time, self.release_at + .33, self.release_at + .53)
+            center += .060 * retreat * self.approach
+            speed += .060 * rate * self.approach
+
+        # Prescribe the arm path and pad orientation. The closing-axis
+        # positions and velocities remain dynamic under bounded motor effort.
+        offset = (d.qpos[self.q] - center) @ self.axis
+        normal_vel = d.qvel[self.v] @ self.axis
+        target_vel = speed @ self.axis
+        if offset[1] - offset[0] < self.min_span:
+            offset = offset.mean() + self.signs * self.min_span / 2
+            if normal_vel[1] < normal_vel[0]:
+                normal_vel[:] = normal_vel.mean()
+        max_span = self.open_gap + 2 * PAD_HALF
+        tangent_speed = speed - target_vel * self.axis
+        common = 850. * -offset.mean() + 20. * (target_vel - normal_vel.mean())
+        inward_speed = -self.signs * (normal_vel - target_vel)
+        if releasing:
+            outward = np.clip(24. * (max_span - (offset[1] - offset[0])), 0., .15)
+            grip = 70. * (-outward - inward_speed)
+        else:
+            grip = JAW_TARGET - 85. * inward_speed
+            over = self.force >= JAW_TARGET
+            grip[over] = np.minimum(grip[over], JAW_TARGET - 2. * (self.force[over] - JAW_TARGET))
+        self.effort = np.clip(common - self.signs * grip, -JAW_FORCE_LIMIT, JAW_FORCE_LIMIT)
+        if offset[1] - offset[0] <= self.min_span + 1e-12 and self.effort[0] > self.effort[1]:
+            self.effort[:] = self.effort.mean()
+        backend.apply_action(dict(tools={
+            name: (center + p * self.axis, tangent_speed + v * self.axis, self.orientation)
+            for name, p, v in zip(self.names, offset, normal_vel)
+        }, load=np.zeros(3), clamps={}))
+        d.qfrc_applied[self.v] = self.effort[:, None] * self.axis
+        Parcel.step(backend)
+
+    def refresh_force(self, time):
         left, right = self.backend.tool_v[2:4]
         constraint = self.backend.d.qfrc_constraint
         self.force = np.maximum(0., [-constraint[left:left + 3] @ self.axis,
                                      constraint[right:right + 3] @ self.axis])
+        measured_load = float(-(constraint[left + 2] + constraint[right + 2]))
+        self.load += .025 * (measured_load - self.load)
+        if LIFT_START <= time < HOLD_END and not self.reclose_locked:
+            if self.force.max() >= 2.:
+                self.low_force_start = None
+            elif self.low_force_start is None:
+                self.low_force_start = time
+            elif time - self.low_force_start >= .015:
+                # A lost grasp must not close again on the moving loose film.
+                left_pos, right_pos = self.backend.d.qpos[self.q]
+                self.min_span = max(self.min_span, (right_pos - left_pos) @ self.axis)
+                self.reclose_locked = True
 
 
 def audit(backend, grasp):
@@ -267,7 +452,7 @@ def jaw_forces(backend, grasp):
 def simulate(job):
     start = perf_counter()
     backend = PairedFlex(job)
-    grasp = PublicPoseGrasp(backend, SHELF_Y) if job.experiment == "B" else None
+    grasp = PublicPoseGrasp(backend) if job.experiment == "B" else None
     d = backend.d
     q, v = backend.tool_q[0], backend.tool_v[0]
     checks, history = [], []
@@ -284,8 +469,14 @@ def simulate(job):
             check = audit(backend, grasp)
             check["time"] = time
             if grasp:
+                grasp.sample_support(time)
                 grasp.force, film = jaw_forces(backend, grasp)
-                check.update(jaw_N=grasp.force.tolist(), bilateral=bool(np.all(film & (grasp.force > 0.))))
+                check.update(jaw_N=grasp.force.tolist(), jaw_motor_N=grasp.effort.tolist(), load_N=grasp.load,
+                             support_N=grasp.support_load, lift_relief_m=grasp.lift_relief,
+                             bilateral=bool(np.all(film & (grasp.force > 0.))),
+                             reclose_locked=grasp.reclose_locked)
+                if grasp.origin is not None:
+                    check["gap_m"] = float(np.diff(d.qpos[grasp.q] @ grasp.axis)[0] - 2 * PAD_HALF)
                 if backend.direct_fixture_contact():
                     check["invalid"].append("direct_core_force")
                 if not np.isfinite(grasp.force).all():
@@ -299,15 +490,16 @@ def simulate(job):
             pos = d.qpos[q:q + 3]
             history.append(np.r_[pos, d.qvel[v:v + 3], command - pos, d.qfrc_applied[v + 2],
                                  d.qfrc_constraint[v:v + 3], command, time])
-        if i == steps:
+        if i == steps or (grasp and grasp.release_at is not None
+                          and time >= grasp.release_at + RELEASE_SETTLE - 1e-10):
             break
         if grasp:
             if grasp.origin is not None and i % round(JAW_FEEDBACK_DT / DT) == 0:
-                grasp.refresh_force()
+                grasp.refresh_force(time)
                 if not np.isfinite(grasp.force).all():
                     invalid = ["nonfinite_force"]
                     break
-            backend.drive(grasp.command(time, DT), None)
+            grasp.drive(time)
         else:
             x, vx, z = schedule[i]
             command = np.array([x, 0., z])
@@ -340,15 +532,27 @@ def simulate(job):
     if not grasp:
         summary.update(peak_reaction_N=contact_peak, peak_effort_N=peak)
     else:
-        h = [c for c in checks if grasp.measured_hold_start - 1e-8 <= c["time"] <= grasp.measured_release + 1e-8]
+        h = [c for c in checks if LIFT_END - 1e-8 <= c["time"] <= HOLD_END + 1e-8]
         full_hold = len(h) == round(1. / AUDIT_DT) + 1 and all("clearance" in c for c in h)
         floor = checks[0].get("clearance")
         clearance = min(c["clearance"] for c in h) - floor if full_hold else None
         bilateral = sum(c["bilateral"] for c in h) / len(h) if full_hold else None
-        drop = h[-1]["clearance"] - checks[-1]["clearance"] if full_hold and "clearance" in checks[-1] else None
-        success = not invalid and full_hold and clearance >= .010 and bilateral >= .95 and drop >= .010
+        release = next((c for c in checks if grasp.release_at is not None
+                        and abs(c["time"] - grasp.release_at) < 1e-8), {})
+        drop = (release["clearance"] - checks[-1]["clearance"]
+                if "clearance" in release and "clearance" in checks[-1] else None)
+        success = (not invalid and full_hold and clearance >= .010 and bilateral >= .95
+                   and drop is not None and drop >= .010)
+        closing = [c for c in checks if CLOSE_START <= c["time"] < LIFT_START]
         summary.update(success=bool(success) if not invalid else None, hold_min_lift_m=clearance,
                        bilateral_fraction=bilateral, release_drop_m=drop,
+                       bilateral_close_fraction=sum(c["bilateral"] for c in closing) / len(closing) if closing else None,
+                       release_time_s=grasp.release_at,
+                       setdown_contact=None if grasp.setdown is None else bool(grasp.setdown[2]),
+                       setdown_compression_limited=grasp.setdown_compression_limited,
+                       reclose_locked=grasp.reclose_locked,
+                       hold_jaw_median_N=np.median([c["jaw_N"] for c in h], axis=0).tolist() if full_hold else None,
+                       peak_jaw_motor_N=max(abs(f) for c in checks for f in c["jaw_motor_N"]),
                        commanded_pose_world=None if grasp.origin is None else
                        np.r_[grasp.origin, grasp.orientation].tolist(),
                        peak_jaw_N=max((max(c.get("jaw_N") or [0.]) for c in checks), default=0.))
@@ -380,16 +584,22 @@ def main():
     parser.add_argument("--experiment", choices=("A", "B", "both"), default="both")
     parser.add_argument("--backend", choices=("cpu-flex",), default="cpu-flex")
     parser.add_argument("--workers", type=int, default=min(22, len(os.sched_getaffinity(0))))
+    parser.add_argument("--pilot-actions", nargs="+", choices=tuple(GRASPS))
     args = parser.parse_args()
+    if args.pilot_actions and (args.phase, args.experiment) != ("pilot", "B"):
+        parser.error("--pilot-actions requires --phase pilot --experiment B")
     args.output.mkdir(parents=True, exist_ok=True)
     jobs = []
     for experiment, actions, n in (("A", TRIES, 15), ("B", GRASPS, 8)):
         if args.experiment not in (experiment, "both") or (args.phase == "heavy" and experiment == "A"):
             continue
         if args.phase == "pilot":
-            pairs = [(state, act) for state in STATES for act in actions] if experiment == "A" else [
-                ("Center", act) for act in actions]
-            jobs.extend(Job(experiment, state, act, 0, args.phase) for state, act in pairs)
+            pairs = list(zip(STATES, ("g4", "g5", "g6"))) if experiment == "B" else []
+            pairs += [(state, act) for state in STATES for act in actions if experiment == "A"
+                      or (state, act) in (("Left", "g1"), ("Center", "g2"), ("Right", "g3"),
+                                          ("Center", "g7"), ("Center", "g8"), ("Right", "g9"))]
+            jobs.extend(Job(experiment, state, act, 0, args.phase) for state, act in pairs
+                        if not args.pilot_actions or act in args.pilot_actions)
         else:
             mass = .35 if args.phase == "heavy" else .20
             jobs.extend(Job(experiment, state, act, rep, args.phase, mass) for rep in range(n)

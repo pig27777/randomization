@@ -1,0 +1,22 @@
+Left g5 2.395 True False []
+Center g9 2.815 True False []
+Left g1 3.895 False None ['jaw_inset_core']
+Center g3 3.125 False None ['film_edge_ratio']
+Center g1 3.04 True False []
+Traceback (most recent call last):
+  File "<stdin>", line 23, in <module>
+  File "/home/ubuntu/miniconda3/lib/python3.14/concurrent/futures/process.py", line 712, in _chain_from_iterable_of_lists
+    for element in iterable:
+                   ^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/concurrent/futures/_base.py", line 645, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/concurrent/futures/_base.py", line 312, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/concurrent/futures/_base.py", line 454, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/concurrent/futures/_base.py", line 396, in __get_result
+    raise self._exception
+concurrent.futures.process.BrokenProcessPool: A process in the process pool was terminated abruptly while the future was running or pending.

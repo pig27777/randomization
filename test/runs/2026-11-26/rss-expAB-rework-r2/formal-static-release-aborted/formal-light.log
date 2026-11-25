@@ -1,0 +1,46 @@
+B-Center-00-3459397096_g6 film_edge_ratio (372.3s)
+B-Right-00-1634052167_g2 film_edge_ratio (374.1s)
+B-Center-00-3459397096_g9 False (457.7s)
+B-Center-00-3459397096_g5 True (507.2s)
+B-Left-00-128221270_g8 film_edge_ratio (533.3s)
+B-Right-00-1634052167_g3 True (542.7s)
+B-Left-00-128221270_g7 False (560.7s)
+B-Left-00-128221270_g4 True (562.8s)
+B-Left-00-128221270_g1 True (571.5s)
+B-Center-00-3459397096_g2 True (598.3s)
+B-Right-00-1634052167_g4 film_edge_ratio (602.9s)
+B-Center-00-3459397096_g8 film_edge_ratio (621.7s)
+B-Center-00-3459397096_g7 film_edge_ratio (637.9s)
+B-Right-00-1634052167_g5 film_edge_ratio (285.8s)
+B-Center-00-3459397096_g1 False (677.0s)
+B-Left-00-128221270_g3 True (689.3s)
+B-Left-00-128221270_g6 False (720.8s)
+B-Right-00-1634052167_g1 film_edge_ratio (723.7s)
+B-Left-00-128221270_g9 True (746.3s)
+B-Center-00-3459397096_g4 film_edge_ratio (748.6s)
+B-Left-00-128221270_g2 film_edge_ratio (752.2s)
+B-Center-00-3459397096_g3 film_edge_ratio (784.3s)
+B-Left-00-128221270_g5 film_edge_ratio (793.8s)
+B-Left-01-2243753544_g1 jaw_inset_core (287.9s)
+B-Right-00-1634052167_g6 True (458.3s)
+Traceback (most recent call last):
+  File "/home/ubuntu/miniconda3/lib/python3.14/multiprocessing/pool.py", line 856, in next
+    item = self._items.popleft()
+IndexError: pop from an empty deque
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/rss_exp_ab.py", line 561, in <module>
+    pending.replace(final)
+    ^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/bag_model/rss_exp_ab.py", line 556, in main
+    np.save(path / f"{name}.npy", history)
+                        ^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/multiprocessing/pool.py", line 861, in next
+    self._cond.wait(timeout)
+    ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/ubuntu/miniconda3/lib/python3.14/threading.py", line 369, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+KeyboardInterrupt

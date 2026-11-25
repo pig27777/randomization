@@ -93,6 +93,22 @@ def standardized(train, test):
     return [(values - center) / scale for values in (train, test)]
 
 
+def fit_logistic(x, y, n_classes):
+    model = nn.Linear(x.shape[1], n_classes)
+    nn.init.zeros_(model.weight)
+    nn.init.zeros_(model.bias)
+    optimizer = torch.optim.LBFGS(model.parameters(), max_iter=100, line_search_fn="strong_wolfe")
+
+    def closure():
+        optimizer.zero_grad()
+        loss = nn.functional.cross_entropy(model(x), y) + .05 * model.weight.square().sum()
+        loss.backward()
+        return loss
+
+    optimizer.step(closure)
+    return model
+
+
 def predict(train, labels, test, n_classes, decoder, seed, v3):
     torch.manual_seed(seed)
     train, test = standardized(train, test)
@@ -100,18 +116,7 @@ def predict(train, labels, test, n_classes, decoder, seed, v3):
     y = torch.as_tensor(labels, dtype=torch.long)
     if decoder == "Logistic":
         x, z = x.flatten(1), z.flatten(1)
-        model = nn.Linear(x.shape[1], n_classes)
-        nn.init.zeros_(model.weight)
-        nn.init.zeros_(model.bias)
-        optimizer = torch.optim.LBFGS(model.parameters(), max_iter=100, line_search_fn="strong_wolfe")
-
-        def closure():
-            optimizer.zero_grad()
-            loss = nn.functional.cross_entropy(model(x), y) + .05 * model.weight.square().sum()
-            loss.backward()
-            return loss
-
-        optimizer.step(closure)
+        model = fit_logistic(x, y, n_classes)
         with torch.no_grad():
             return model(z).argmax(1).numpy()
     history, models = v3
@@ -344,12 +349,12 @@ def mass_matrix(path):
 
 def export(fig, output, stem):
     fig.savefig(output / f"{stem}.pdf", bbox_inches="tight")
-    fig.savefig(output / f"{stem}.png", dpi=450, bbox_inches="tight")
+    fig.savefig(output / f"{stem}.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
 def figures_a(metrics, trace, output):
-    fig, axes = plt.subplots(2, 2, figsize=(10.5, 5.2), gridspec_kw={"width_ratios": [1., 1.2]},
+    fig, axes = plt.subplots(2, 2, figsize=(7.2, 4.75), gridspec_kw={"width_ratios": [1., 1.15]},
                              layout="constrained")
     force = CHANNELS.index("reaction_z_N")
     for axis, action in zip(axes[:, 0], ("Try_Scan", "Try_Left")):
@@ -360,30 +365,61 @@ def figures_a(metrics, trace, output):
             if len(x):
                 sec = trace[take][0, :, -1]
                 mean, sd = x.mean(axis=0), x.std(axis=0, ddof=1) if len(x) > 1 else np.zeros(x.shape[1])
-                axis.plot(sec, mean, lw=1.5, color=color, label=f"{state} (n={len(x)})")
+                axis.plot(sec, mean, lw=1.5, color=color, label=state)
                 axis.fill_between(sec, mean - sd, mean + sd, color=color, alpha=.15, linewidth=0)
         axis.set(title=action.replace("_", " "), ylabel="Vertical reaction (N)", xlim=(0, 1.84))
         axis.margins(y=.14)
         axis.legend(loc="upper left", fontsize=7, frameon=False, ncol=3)
     axes[-1, 0].set_xlabel("Time (s)")
     hues = ("#24496E", "#6CA9B5", "#CFD8E3")
-    for axis, decoder in zip(axes[:, 1], DECODERS):
-        x = np.arange(len(TRIES))
-        for j, (ablation, hue) in enumerate(zip(ABLATIONS, hues)):
-            cells = [metrics["models"]["3-way"][decoder][a][ablation] for a in TRIES]
-            for i, cell in enumerate(cells):
-                mean, std = cell["accuracy_mean"], cell["accuracy_std"]
-                at = x[i] + (j - 1) * .24
-                if mean is None:
-                    axis.text(at, .035, "NA", fontsize=7, ha="center")
-                    continue
-                axis.bar(at, mean, width=.22, color=hue, yerr=std or 0., capsize=2,
-                         error_kw={"linewidth": .75, "capthick": .75})
-        axis.axhline(1/3, linestyle="--", color=".45", lw=.8)
-        axis.set(ylim=(0, 1.20), yticks=[0, .25, .5, .75, 1.], ylabel="3-way accuracy", title=decoder,
-                 xticks=x, xticklabels=[a.replace("_", " ") for a in TRIES])
-    axes[0, 1].legend(handles=[Patch(color=h, label=a) for h, a in zip(hues, ABLATIONS)],
-                      fontsize=7, ncol=3, loc="upper center", frameon=False)
+    from matplotlib.ticker import PercentFormatter
+
+    axis = axes[0, 1]
+    decoder = "V3 causal TCN"
+    x = np.arange(len(TRIES))
+    for j, (ablation, hue) in enumerate(zip(ABLATIONS, hues)):
+        cells = [metrics["models"]["3-way"][decoder][a][ablation] for a in TRIES]
+        for i, cell in enumerate(cells):
+            mean, std = cell["accuracy_mean"], cell["accuracy_std"]
+            at = x[i] + (j - 1) * .24
+            if mean is None:
+                axis.text(at, .035, "NA", fontsize=7, ha="center")
+                continue
+            axis.bar(at, mean, width=.22, color=hue, yerr=std or 0., capsize=2,
+                     error_kw={"linewidth": .75, "capthick": .75})
+    scan = metrics["models"]["3-way"][decoder]["Try_Scan"]
+    test = next(r for r in metrics["paired_ablation_comparisons"] if
+                (r["task"], r["decoder"], r["action"], r["ablation"]) ==
+                ("3-way", decoder, "Try_Scan", "w/o History"))
+    if test["p_holm"] is not None:
+        axis.text(2., 1.12, f"{pct(scan['Full']['accuracy_mean'])} → "
+                  f"{pct(scan['w/o History']['accuracy_mean'])}\nHolm p = {test['p_holm']:.3g}",
+                  fontsize=7, ha="center", va="center")
+    axis.set(title=decoder, xticks=x, xticklabels=[a.replace("_", " ") for a in TRIES])
+    axis.legend(handles=[Patch(color=h, label=a) for h, a in zip(hues, ABLATIONS)],
+                fontsize=7, ncol=3, loc="upper center", frameon=False)
+
+    axis = axes[1, 1]
+    prefixes = metrics["exploratory_prefixes"]
+    times = sorted(map(float, prefixes))
+    for action, color, marker in zip(TRIES, COLORS, ("o", "s", "^")):
+        means = [prefixes[str(t)][action]["accuracy_mean"] for t in times]
+        axis.plot(times, means, marker=marker, color=color, ms=4, lw=1.4, label=action.replace("_", " "))
+    test = next(r for r in metrics["exploratory_prefix_comparisons"]
+                if (r["end_s"], r["action_a"], r["action_b"]) == (.56, "Try_Left", "Try_Center"))
+    if test["p_holm"] is not None:
+        left, center = (prefixes["0.56"][a]["accuracy_mean"] for a in ("Try_Left", "Try_Center"))
+        axis.axvline(.56, color=".55", ls=":", lw=.9)
+        axis.text(.59, .67, f"{pct(left)} vs. {pct(center)}\nHolm p = {test['p_holm']:.4f}",
+                  fontsize=7, va="center")
+    axis.legend(fontsize=7, ncol=3, loc="lower right", frameon=False)
+    axis.set(title="Early-prefix accuracy (logistic)", xlabel="Probe duration (s)", xticks=times,
+             xlim=(times[0] - .03, times[-1] + .04))
+    for axis in axes[:, 1]:
+        axis.axhline(1/3, linestyle="--", color=".50", lw=.8, zorder=0)
+        axis.set(ylim=(0, 1.38 if axis is axes[0, 1] else 1.17),
+                 yticks=[0, .25, .5, .75, 1.], ylabel="3-way accuracy")
+        axis.yaxis.set_major_formatter(PercentFormatter(1))
     export(fig, output, "fig_expA_identifiability")
 
 
@@ -391,10 +427,10 @@ def pct(v, decimals=1):
     return "NA" if v is None else f"{v:.{decimals}%}"
 
 
-def figures_b(light, heavy, output):
+def figures_b(light, heavy, output, approach_label="Top"):
     datasets = [("200 g", light)] + ([("350 g", heavy)] if heavy else [])
-    fig, axes = plt.subplots(len(datasets), 2, figsize=(10.2, 2.65 * len(datasets)),
-                             gridspec_kw={"width_ratios": [3.8, 1.3]}, squeeze=False, layout="constrained")
+    fig, axes = plt.subplots(len(datasets), 2, figsize=(7.2, 2.9 * len(datasets)),
+                             gridspec_kw={"width_ratios": [3., 1.27]}, squeeze=False, layout="constrained")
     for (name, data), (ax, info) in zip(datasets, axes):
         matrix = data["matrices"]["evaluation"]
         cells = [[matrix[s][g] for g in GRASPS] for s in STATES]
@@ -408,26 +444,40 @@ def figures_b(light, heavy, output):
                 fg = "white" if c["q"] is not None and c["q"] > .55 else "#162235"
                 ax.text(j+.5, i+.5, f"{pct(c['q'], 0)}\n{c['success']}/{c['valid']}", ha="center", va="center",
                         color=fg, fontsize=8)
-        ax.set(xticks=np.arange(len(GRASPS))+.5, xticklabels=list(GRASPS), xlabel="Candidate grasp",
+        ax.set(xticks=np.arange(len(GRASPS))+.5, xticklabels=list(GRASPS),
                yticks=np.arange(len(STATES))+.5, yticklabels=list(STATES), ylabel="Hidden state",
                title=f"{name} core · Independent evaluation")
         ax.invert_yaxis()
         ax.tick_params(length=0)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
+        geometry = ax.secondary_xaxis(-.11)
+        geometry.set_xticks([1.5, 4.5, 7., 8.5], [f"{approach_label}\n−X / 0 / +X", "Side\n−X / 0 / +X",
+                                                   "Outer\n+X / −X", "Tilted"])
+        geometry.tick_params(length=0, labelsize=7)
+        geometry.spines["bottom"].set_visible(False)
         info.axis("off")
         evaluation = data["evaluation"]
         ci = evaluation["delta_hidden_ci95"]
         sensitivity = data["lower_bound_selection"]["evaluation"]
         alt_ci = sensitivity["delta_hidden_ci95"]
-        lines = ["Complete-cell selection", f"Oracle        {pct(evaluation['J_oracle'])}",
-                 f"Vision         {pct(evaluation['J_vision'])}", f"Best fixed   {pct(evaluation['J_fixed'])}",
-                 f"$\\Delta_{{\\mathrm{{hidden}}}}$            {pct(evaluation['delta_hidden'])}",
-                 "95% CI        " + (f"[{pct(ci[0])}, {pct(ci[1])}]" if ci else "NA"),
-                 f"Physics invalid  {data['invalid']}/{data['trials']}",
-                 f"Lower-bound selection: Δ {pct(sensitivity['delta_hidden'])}",
-                 "95% CI        " + (f"[{pct(alt_ci[0])}, {pct(alt_ci[1])}]" if alt_ci else "NA")]
-        for i, line in enumerate(lines):
-            info.text(.02, .96 - i * .108, line, transform=info.transAxes, fontsize=8.5 if i else 10,
-                      fontweight="bold" if i in (0, 4) else "normal", va="top")
+        interval = lambda bounds: f"[{pct(bounds[0])}, {pct(bounds[1])}]" if bounds else "NA"
+        delta_label = "$\\Delta_{\\mathrm{hidden}}$"
+        lines = [
+            (.95, "Complete-cell selection", ""),
+            (.83, "Oracle", pct(evaluation["J_oracle"])),
+            (.73, "Vision", pct(evaluation["J_vision"])),
+            (.63, "Best fixed", pct(evaluation["J_fixed"])),
+            (.53, delta_label, pct(evaluation["delta_hidden"])),
+            (.43, "95% CI", interval(ci)),
+            (.29, "Lower-bound selection", ""),
+            (.19, delta_label, pct(sensitivity["delta_hidden"])),
+            (.09, "95% CI", interval(alt_ci)),
+            (-.07, "Physics invalid", f"{data['invalid']}/{data['trials']}"),
+        ]
+        for y, label, value in lines:
+            info.text(.02, y, label, fontsize=8, fontweight="bold" if not value else "normal", va="center")
+            info.text(.97, y, value, fontsize=8, ha="right", va="center")
     export(fig, output, "fig_expB_adaptation_gap")
 
 
