@@ -1,0 +1,19 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 280, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 272, in main
+    result = run(args)
+             ^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 165, in run
+    b, qids, dids, desired, pads, centres = robot_scene()
+                                            ^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 92, in robot_scene
+    builder.add_usd(str(YAM_USD), xform=transform, floating=False, load_visual_shapes=False,
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/newton/_src/sim/builder.py", line 4308, in add_usd
+    return parse_usd(
+           ^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/newton/_src/utils/import_usd.py", line 4198, in parse_usd
+    builder.approximate_meshes(method=remeshing_method, shape_indices=rest, keep_visual_shapes=False)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/newton/_src/sim/builder.py", line 8358, in approximate_meshes
+    raise ValueError(
+ValueError: Shape 2: method 'convex_hull' replaces the mesh with non-mesh geometry; SDF / hydroelastic configuration cannot be preserved.

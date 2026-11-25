@@ -1,0 +1,67 @@
+Built 1010 bag vertices, pads [[-0.07225069403648376, -0.22490569949150085, 0.1899999976158142], [0.01225057989358902, -0.2250949740409851, 0.19000020623207092]], bag [-0.029876863583922386, -0.17000046372413635, 0.11600010097026825]
+Traceback (most recent call last):
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 343, in <module>
+    main()
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 335, in main
+    result = run(args)
+             ^^^^^^^^^
+  File "/home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py", line 254, in run
+    wp.launch(max_stretch, dim=len(edges), inputs=[s0.particle_q, edge_dev, rest_dev, maximum],
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 11292, in launch
+    module_exec = kernel.module.load(device, block_dim)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 4736, in load
+    raise e
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 4733, in load
+    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 4495, in _compile
+    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, is_cpu)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 1732, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 4365, in _run_codegen
+    builder = ModuleBuilder(
+              ^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 3121, in __init__
+    self.build_kernel(kernel)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/context.py", line 3240, in build_kernel
+    kernel.adj.build(self)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 1732, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 2200, in build
+    raise type(original_exc)(*new_args).with_traceback(original_exc.__traceback__) from None
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 2181, in build
+    adj.eval(adj.tree.body[0])
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 6075, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 3354, in emit_FunctionDef
+    adj.eval(f)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 6075, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 3402, in emit_If
+    adj.eval(stmt)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 6075, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 3402, in emit_If
+    adj.eval(stmt)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 6075, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 3402, in emit_If
+    adj.eval(stmt)
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 6075, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 4043, in emit_For
+    adj.materialize_redefinitions(adj.loop_symbols[-1])
+  File "/home/ubuntu/Dev/Envs/isaaclab/lib/python3.12/site-packages/warp/_src/codegen.py", line 3829, in materialize_redefinitions
+    raise WarpCodegenError(
+warp._src.codegen.WarpCodegenError: Error while parsing function "direct_core_contacts" at /home/ubuntu/Dev/Projects/random/test/isaaclab/benchmark_newton_yam_bag.py:91:
+                        loaded = True
+;Error mutating a constant loaded inside a dynamic loop, use the following syntax: pi = float(3.141) to declare a dynamic variable
