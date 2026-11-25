@@ -1,0 +1,30 @@
+1C-empty reset: 952 vertices, 1900 triangles, 0.0005 s dt
+Traceback (most recent call last):
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-25/rss-premises-verify-r1/preflight.py", line 391, in <module>
+    wp.config.enable_backward = False
+    ^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-25/rss-premises-verify-r1/preflight.py", line 387, in main
+    parser.error("dt must divide the 25 Hz control period")
+    ^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/gzl/randomization/test/runs/2026-11-25/rss-premises-verify-r1/preflight.py", line 202, in run
+    NewtonManager.backend = SimpleNamespace(model=model)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab_contrib/isaaclab_contrib/coupling/coupler.py", line 95, in _build_solver
+    solver = cls._build_proxy_coupled_solver(model, entries, proxies, solver_cfg)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab_contrib/isaaclab_contrib/coupling/coupler.py", line 408, in _build_proxy_coupled_solver
+    coupling_values = cls._filter_solver_kwargs(SolverCoupledProxy.Config, solver_cfg)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1442, in _filter_solver_kwargs
+    kwargs = {k: v for k, v in to_dict(solver_cfg).items() if k in valid}
+                               ^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab/isaaclab/utils/dict.py", line 73, in class_to_dict
+    data[key] = type(value)([class_to_dict(v) for v in value])
+                             ^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab/isaaclab/utils/dict.py", line 67, in class_to_dict
+    data[key] = callable_to_string(value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/workspace/czx/system0/sim/IsaacLab/source/isaaclab/isaaclab/utils/string.py", line 141, in callable_to_string
+    lambda_line = inspect.getsourcelines(value)[0][0].strip().split("lambda")[1].strip().split(",")[0]
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
