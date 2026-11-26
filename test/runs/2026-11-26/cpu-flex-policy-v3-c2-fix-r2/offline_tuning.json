@@ -1,0 +1,2049 @@
+{
+  "auc": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.1,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.7530878894031048,
+        "argmax_by_state": {
+          "Left": "g5",
+          "Center": "g10",
+          "Right": "g10"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.009921997785568237,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.14506950974464417,
+      "film_grad_l2": 0.21854561567306519,
+      "scorer_grad_l2": 0.416306734085083,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.0034264884889125824,
+      "z_pair_l2": [
+        0.572729229927063,
+        0.5863152146339417,
+        0.5612881779670715
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 19,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.41694480180740356,
+        "heldout_auc": 0.8733031674208145
+      },
+      "Informed w/o Effort": {
+        "epoch": 79,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4373686909675598,
+        "heldout_auc": 0.9095022624434389
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3965769410133362,
+        "heldout_auc": 0.9200603318250377
+      }
+    }
+  },
+  "candidate-balanced": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.13139307498931885,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.1465955674648285,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.33753645420074463,
+      "film_grad_l2": 0.15351618826389313,
+      "scorer_grad_l2": 0.28228044509887695,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.10188719630241394,
+      "z_pair_l2": [
+        3.191211223602295,
+        2.462967872619629,
+        3.618489980697632
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 24,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.44531065225601196,
+        "heldout_auc": 0.8808446455505279
+      },
+      "Informed w/o Effort": {
+        "epoch": 22,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35114002227783203,
+        "heldout_auc": 0.9064856711915535
+      },
+      "Informed": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.36018985509872437,
+        "heldout_auc": 0.9140271493212669
+      }
+    }
+  },
+  "candidate-id": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.07581028342247009,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.08398270606994629,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.6905716061592102,
+      "film_grad_l2": 0.29822710156440735,
+      "scorer_grad_l2": 0.5554772019386292,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.005949614103883505,
+      "z_pair_l2": [
+        0.6651776432991028,
+        0.8026737570762634,
+        0.7916706204414368
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 8,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3856183886528015,
+        "heldout_auc": 0.8883861236802413
+      },
+      "Informed w/o Effort": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3357354700565338,
+        "heldout_auc": 0.9230769230769231
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.34363943338394165,
+        "heldout_auc": 0.9155354449472096
+      }
+    }
+  },
+  "centered-pool": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.23143836855888367,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.24530473351478577,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.37280118465423584,
+      "film_grad_l2": 0.1713021695613861,
+      "scorer_grad_l2": 0.30681607127189636,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.10855075716972351,
+      "z_pair_l2": [
+        3.454336404800415,
+        2.4699478149414062,
+        3.6372437477111816
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 24,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4393448829650879,
+        "heldout_auc": 0.8808446455505279
+      },
+      "Informed w/o Effort": {
+        "epoch": 17,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35186082124710083,
+        "heldout_auc": 0.9049773755656109
+      },
+      "Informed": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35104554891586304,
+        "heldout_auc": 0.9079939668174962
+      }
+    }
+  },
+  "command-template": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.1,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.00025260448455810547,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.023134887218475342,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.16420488059520721,
+      "film_grad_l2": 0.20139369368553162,
+      "scorer_grad_l2": 0.3703361451625824,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.004563154652714729,
+      "z_pair_l2": [
+        0.42724940180778503,
+        0.7728723287582397,
+        0.7309684753417969
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 12,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3930497169494629,
+        "heldout_auc": 0.8205128205128205
+      },
+      "Informed w/o Effort": {
+        "epoch": 7,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3988470137119293,
+        "heldout_auc": 0.8235294117647058
+      },
+      "Informed": {
+        "epoch": 9,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3701399862766266,
+        "heldout_auc": 0.9110105580693816
+      }
+    }
+  },
+  "contrast-encoder": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.052242785692214966,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0476679801940918,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.489276260137558,
+      "film_grad_l2": 0.2478163093328476,
+      "scorer_grad_l2": 0.4643682837486267,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.031114347279071808,
+      "z_pair_l2": [
+        1.5451899766921997,
+        2.098336935043335,
+        1.4731945991516113
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 8,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3856183886528015,
+        "heldout_auc": 0.8883861236802413
+      },
+      "Informed w/o Effort": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.33502230048179626,
+        "heldout_auc": 0.9411764705882353
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3565741181373596,
+        "heldout_auc": 0.9019607843137255
+      }
+    }
+  },
+  "deep-grasp": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.1,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0008547306060791016,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.08718925714492798,
+        "argmax_by_state": {
+          "Left": "g4",
+          "Center": "g4",
+          "Right": "g4"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.20767132937908173,
+      "film_grad_l2": 0.2971697747707367,
+      "scorer_grad_l2": 0.5686283707618713,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.02888745255768299,
+      "z_pair_l2": [
+        1.069245457649231,
+        2.1837360858917236,
+        1.5516433715820312
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 22,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.40746116638183594,
+        "heldout_auc": 0.7963800904977375
+      },
+      "Informed w/o Effort": {
+        "epoch": 13,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4070195257663727,
+        "heldout_auc": 0.8009049773755657
+      },
+      "Informed": {
+        "epoch": 15,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3781709372997284,
+        "heldout_auc": 0.8944193061840121
+      }
+    }
+  },
+  "linear-head": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0026912689208984375,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0647323727607727,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.3375137448310852,
+      "film_grad_l2": 0.27149248123168945,
+      "scorer_grad_l2": 0.43360117077827454,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.008339534513652325,
+      "z_pair_l2": [
+        0.7429002523422241,
+        0.8352247476577759,
+        1.0734453201293945
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 8,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39469966292381287,
+        "heldout_auc": 0.8114630467571644
+      },
+      "Informed w/o Effort": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39835524559020996,
+        "heldout_auc": 0.8672699849170438
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35104718804359436,
+        "heldout_auc": 0.918552036199095
+      }
+    }
+  },
+  "residual-scale": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.06379956007003784,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0907142162322998,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.32430964708328247,
+      "film_grad_l2": 0.26385292410850525,
+      "scorer_grad_l2": 0.4235532283782959,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.013473298400640488,
+      "z_pair_l2": [
+        0.7218711972236633,
+        1.2248458862304688,
+        1.363438367843628
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 8,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39469966292381287,
+        "heldout_auc": 0.8114630467571644
+      },
+      "Informed w/o Effort": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3506682515144348,
+        "heldout_auc": 0.9095022624434389
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3531211018562317,
+        "heldout_auc": 0.9140271493212669
+      }
+    }
+  },
+  "residual24": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.35243189334869385,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.2997550070285797,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.38117319345474243,
+      "film_grad_l2": 0.17801795899868011,
+      "scorer_grad_l2": 0.3780972957611084,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.1259024441242218,
+      "z_pair_l2": [
+        3.9039723873138428,
+        2.5035929679870605,
+        3.840693950653076
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 32,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3887096345424652,
+        "heldout_auc": 0.8748114630467572
+      },
+      "Informed w/o Effort": {
+        "epoch": 19,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.36575227975845337,
+        "heldout_auc": 0.8914027149321267
+      },
+      "Informed": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3613117039203644,
+        "heldout_auc": 0.9049773755656109
+      }
+    }
+  },
+  "residual32": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.35,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.19917842745780945,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.2085985243320465,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.4532686769962311,
+      "film_grad_l2": 0.21004986763000488,
+      "scorer_grad_l2": 0.4173549711704254,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.06434296816587448,
+      "z_pair_l2": [
+        2.6656596660614014,
+        2.3219451904296875,
+        2.4563395977020264
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 28,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.38463619351387024,
+        "heldout_auc": 0.8838612368024132
+      },
+      "Informed w/o Effort": {
+        "epoch": 18,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.33536940813064575,
+        "heldout_auc": 0.9260935143288085
+      },
+      "Informed": {
+        "epoch": 15,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3719848096370697,
+        "heldout_auc": 0.8974358974358975
+      }
+    }
+  },
+  "slow-head": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.11270630359649658,
+        "argmax_by_state": {
+          "Left": "g5",
+          "Center": "g5",
+          "Right": "g5"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.11752259731292725,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.4431869387626648,
+      "film_grad_l2": 0.1881006807088852,
+      "scorer_grad_l2": 0.41328468918800354,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.03530648723244667,
+      "z_pair_l2": [
+        1.851739764213562,
+        2.266871929168701,
+        1.2651561498641968
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 32,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3887096345424652,
+        "heldout_auc": 0.8748114630467572
+      },
+      "Informed w/o Effort": {
+        "epoch": 22,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.34284377098083496,
+        "heldout_auc": 0.918552036199095
+      },
+      "Informed": {
+        "epoch": 15,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.36798644065856934,
+        "heldout_auc": 0.8959276018099548
+      }
+    }
+  },
+  "small-bypass": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.07194530963897705,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.09798094630241394,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.5471983551979065,
+      "film_grad_l2": 0.234177365899086,
+      "scorer_grad_l2": 0.4556107223033905,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.00840594433248043,
+      "z_pair_l2": [
+        0.7013506889343262,
+        0.9248267412185669,
+        1.036202073097229
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 8,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39469966292381287,
+        "heldout_auc": 0.8114630467571644
+      },
+      "Informed w/o Effort": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3460494577884674,
+        "heldout_auc": 0.9034690799396682
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.34724172949790955,
+        "heldout_auc": 0.9170437405731523
+      }
+    }
+  },
+  "support03": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g10",
+          "Center": "g10",
+          "Right": "g10"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.24666619300842285,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.16304922103881836,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.4165157079696655,
+      "film_grad_l2": 0.22814729809761047,
+      "scorer_grad_l2": 0.35387736558914185,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.09602566063404083,
+      "z_pair_l2": [
+        3.2565152645111084,
+        2.4778029918670654,
+        3.303178548812866
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 85,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3893665373325348,
+        "heldout_auc": 0.8838612368024132
+      },
+      "Informed w/o Effort": {
+        "epoch": 20,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35433658957481384,
+        "heldout_auc": 0.9110105580693816
+      },
+      "Informed": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3878815174102783,
+        "heldout_auc": 0.9064856711915535
+      }
+    }
+  },
+  "width24-dropout10": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.1,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.002380669116973877,
+        "argmax_by_state": {
+          "Left": "g4",
+          "Center": "g4",
+          "Right": "g4"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.08688783645629883,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.25364235043525696,
+      "film_grad_l2": 0.13161170482635498,
+      "scorer_grad_l2": 0.329617440700531,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.005525119602680206,
+      "z_pair_l2": [
+        0.3748864531517029,
+        0.6529377102851868,
+        1.0121101140975952
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 40,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3990308344364166,
+        "heldout_auc": 0.7903469079939668
+      },
+      "Informed w/o Effort": {
+        "epoch": 17,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3948681652545929,
+        "heldout_auc": 0.8265460030165912
+      },
+      "Informed": {
+        "epoch": 17,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3398783504962921,
+        "heldout_auc": 0.9079939668174962
+      }
+    }
+  },
+  "width32": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.0,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.010378897190093994,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.07513630390167236,
+        "argmax_by_state": {
+          "Left": "g9",
+          "Center": "g9",
+          "Right": "g9"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.3777775466442108,
+      "film_grad_l2": 0.1916065216064453,
+      "scorer_grad_l2": 0.38922905921936035,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.008284048177301884,
+      "z_pair_l2": [
+        0.7450408339500427,
+        0.8720024228096008,
+        1.034568428993225
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 32,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.397211492061615,
+        "heldout_auc": 0.8024132730015083
+      },
+      "Informed w/o Effort": {
+        "epoch": 14,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4027291238307953,
+        "heldout_auc": 0.8054298642533937
+      },
+      "Informed": {
+        "epoch": 11,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35023409128189087,
+        "heldout_auc": 0.9019607843137255
+      }
+    }
+  },
+  "windowed": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.1,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0010200142860412598,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.019495606422424316,
+        "argmax_by_state": {
+          "Left": "g11",
+          "Center": "g11",
+          "Right": "g11"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.12447131425142288,
+      "film_grad_l2": 0.20320957899093628,
+      "scorer_grad_l2": 0.3710249662399292,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.0029789081308990717,
+      "z_pair_l2": [
+        0.43156108260154724,
+        0.49946391582489014,
+        0.6497818231582642
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 12,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3930497169494629,
+        "heldout_auc": 0.8205128205128205
+      },
+      "Informed w/o Effort": {
+        "epoch": 7,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39858749508857727,
+        "heldout_auc": 0.8159879336349924
+      },
+      "Informed": {
+        "epoch": 9,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.37690263986587524,
+        "heldout_auc": 0.918552036199095
+      }
+    }
+  },
+  "retune-1": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.35,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.17825692892074585,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.188457190990448,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.3702658414840698,
+      "film_grad_l2": 0.1738605797290802,
+      "scorer_grad_l2": 0.2871776223182678,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.08684903383255005,
+      "z_pair_l2": [
+        3.076077938079834,
+        2.2636799812316895,
+        3.2289345264434814
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 25,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4451986849308014,
+        "heldout_auc": 0.8808446455505279
+      },
+      "Informed w/o Effort": {
+        "epoch": 24,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3475184142589569,
+        "heldout_auc": 0.9064856711915535
+      },
+      "Informed": {
+        "epoch": 18,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3594181537628174,
+        "heldout_auc": 0.9095022624434389
+      }
+    }
+  },
+  "retune-2": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.09621739387512207,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.13367706537246704,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.4503231644630432,
+      "film_grad_l2": 0.23005670309066772,
+      "scorer_grad_l2": 0.44246336817741394,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.05155560374259949,
+      "z_pair_l2": [
+        2.1398513317108154,
+        1.9783331155776978,
+        2.5209617614746094
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 21,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.45654699206352234,
+        "heldout_auc": 0.8883861236802413
+      },
+      "Informed w/o Effort": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3533304035663605,
+        "heldout_auc": 0.918552036199095
+      },
+      "Informed": {
+        "epoch": 12,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3901650607585907,
+        "heldout_auc": 0.9034690799396682
+      }
+    }
+  },
+  "retune-3": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.35,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.10093837976455688,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.2729371190071106,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.37490153312683105,
+      "film_grad_l2": 0.08887285739183426,
+      "scorer_grad_l2": 0.2401968240737915,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.07084277272224426,
+      "z_pair_l2": [
+        2.600935459136963,
+        2.0641438961029053,
+        3.0622150897979736
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 23,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4554781913757324,
+        "heldout_auc": 0.889894419306184
+      },
+      "Informed w/o Effort": {
+        "epoch": 17,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3547298312187195,
+        "heldout_auc": 0.9110105580693816
+      },
+      "Informed": {
+        "epoch": 17,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.38722488284111023,
+        "heldout_auc": 0.8808446455505279
+      }
+    }
+  },
+  "retune-4": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.13542556762695312,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.08488929271697998,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.3506813943386078,
+      "film_grad_l2": 0.18137307465076447,
+      "scorer_grad_l2": 0.2931300103664398,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.05587163195014,
+      "z_pair_l2": [
+        2.1023545265197754,
+        2.360830783843994,
+        2.469334602355957
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 8,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.44606974720954895,
+        "heldout_auc": 0.8808446455505279
+      },
+      "Informed w/o Effort": {
+        "epoch": 7,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3516070246696472,
+        "heldout_auc": 0.9034690799396682
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3624719977378845,
+        "heldout_auc": 0.9079939668174962
+      }
+    }
+  },
+  "retune-5": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.35,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.001,
+      "decay": 0.01
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.08381986618041992,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.09206107258796692,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.44435152411460876,
+      "film_grad_l2": 0.23333564400672913,
+      "scorer_grad_l2": 0.3645074963569641,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.05354253202676773,
+      "z_pair_l2": [
+        2.094608783721924,
+        2.457747220993042,
+        2.2343547344207764
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 14,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.45651760697364807,
+        "heldout_auc": 0.8778280542986425
+      },
+      "Informed w/o Effort": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3457847237586975,
+        "heldout_auc": 0.9215686274509803
+      },
+      "Informed": {
+        "epoch": 6,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.35088279843330383,
+        "heldout_auc": 0.9230769230769231
+      }
+    }
+  },
+  "support-1": {
+    "gate_passed": false,
+    "selected": false,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01,
+      "support_weight": 0.7
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g5",
+          "Center": "g5",
+          "Right": "g5"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.3000761568546295,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.21022820472717285,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.4895995557308197,
+      "film_grad_l2": 0.24388892948627472,
+      "scorer_grad_l2": 0.41639140248298645,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.1283884048461914,
+      "z_pair_l2": [
+        3.771594762802124,
+        3.077057361602783,
+        3.6445376873016357
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 100,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39213037490844727,
+        "heldout_auc": 0.861236802413273
+      },
+      "Informed w/o Effort": {
+        "epoch": 23,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.36243492364883423,
+        "heldout_auc": 0.8989441930618401
+      },
+      "Informed": {
+        "epoch": 20,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.38630419969558716,
+        "heldout_auc": 0.8989441930618401
+      }
+    }
+  },
+  "support-2": {
+    "gate_passed": true,
+    "selected": true,
+    "width": 24,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01,
+      "support_weight": 1.5
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g5",
+          "Center": "g5",
+          "Right": "g5"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.4291890561580658,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.2751866281032562,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g11",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.6686490774154663,
+      "film_grad_l2": 0.2622973322868347,
+      "scorer_grad_l2": 0.5590406656265259,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.17994336783885956,
+      "z_pair_l2": [
+        4.280142307281494,
+        4.157083988189697,
+        4.027744293212891
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 100,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3972841799259186,
+        "heldout_auc": 0.8597285067873304
+      },
+      "Informed w/o Effort": {
+        "epoch": 27,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.37021496891975403,
+        "heldout_auc": 0.9034690799396682
+      },
+      "Informed": {
+        "epoch": 27,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.4038184583187103,
+        "heldout_auc": 0.9004524886877828
+      }
+    }
+  },
+  "support-3": {
+    "gate_passed": true,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01,
+      "support_weight": 0.7
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g5",
+          "Center": "g5",
+          "Right": "g5"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.16340166330337524,
+        "argmax_by_state": {
+          "Left": "g10",
+          "Center": "g10",
+          "Right": "g12"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.28377968072891235,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g11",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.4587397575378418,
+      "film_grad_l2": 0.23904989659786224,
+      "scorer_grad_l2": 0.4249495565891266,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.06569255888462067,
+      "z_pair_l2": [
+        2.2911505699157715,
+        2.497140645980835,
+        2.726605176925659
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 85,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39486685395240784,
+        "heldout_auc": 0.8597285067873304
+      },
+      "Informed w/o Effort": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3759273886680603,
+        "heldout_auc": 0.9200603318250377
+      },
+      "Informed": {
+        "epoch": 16,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3902175724506378,
+        "heldout_auc": 0.9004524886877828
+      }
+    }
+  },
+  "support-4": {
+    "gate_passed": true,
+    "selected": false,
+    "width": 32,
+    "dropout": 0.2,
+    "training": {
+      "seed": 60931,
+      "epochs": 100,
+      "batch_size": 32,
+      "patience": 18,
+      "lr": 0.001,
+      "scorer_lr": 0.0003,
+      "decay": 0.01,
+      "support_weight": 1.5
+    },
+    "matched_score_shift": {
+      "Blind": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.0,
+        "argmax_by_state": {
+          "Left": "g5",
+          "Center": "g5",
+          "Right": "g5"
+        }
+      },
+      "Informed w/o Effort": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.732917383313179,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g12",
+          "Right": "g5"
+        }
+      },
+      "Informed": {
+        "examples": 3,
+        "max_across_state_probability_span": 0.465434193611145,
+        "argmax_by_state": {
+          "Left": "g12",
+          "Center": "g11",
+          "Right": "g12"
+        }
+      }
+    },
+    "diagnostics": {
+      "encoder_grad_l2": 0.6610293984413147,
+      "film_grad_l2": 0.22681058943271637,
+      "scorer_grad_l2": 0.5387358665466309,
+      "z_dim": 32,
+      "z_cross_state_variance": 0.10590565204620361,
+      "z_pair_l2": [
+        2.982851505279541,
+        3.262256622314453,
+        3.310756206512451
+      ]
+    },
+    "validation": {
+      "Blind": {
+        "epoch": 95,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3993498384952545,
+        "heldout_auc": 0.8627450980392157
+      },
+      "Informed w/o Effort": {
+        "epoch": 24,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.39887794852256775,
+        "heldout_auc": 0.8989441930618401
+      },
+      "Informed": {
+        "epoch": 21,
+        "examples": 56,
+        "positives": 17,
+        "bce": 0.3936854898929596,
+        "heldout_auc": 0.8989441930618401
+      }
+    }
+  }
+}

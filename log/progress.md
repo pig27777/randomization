@@ -1350,3 +1350,10 @@ C3、C4 示范覆盖仍未完成，BC 与 PPO 未启动。[示范测试报告](.
 - 独立评测差为 33.3 和 22.2 个百分点，下界法的 95% CI 为 [0.0, 33.3] 个百分点。重载对照条件未触发。
 - A 复用 135 条轨迹，确认完整历史反力差与末帧微小残差。Mild 加噪后末帧左右解码约 47%–54%。
 - [报告与论文图](../test/runs/2026-11-26/rss-expAB-rework-r2/rework_report.md) · [测试报告](../reports/rss-expAB-rework-r2-test.md)
+
+
+### 2026-11-26 CPU Flex Policy V3 C2 r2
+
+- 复用 C1 有效划分 265／56／55。匹配 RGB 的 Informed 分差 0.275，峰值 g12／g11／g12，Center—侧位 TV 均为 0.467。
+- 45 个状态复用 90 个闭环分支、新增 52 个。Informed 总计 30/35，Center 4/6，Blind 在 Center 的 15 次均无效。
+- 28 个共同有效配对差 −3.6 个百分点，95% CI [−11.1, 0.0]，全样本未知界限 [−28.9, +28.9]。[实验报告和图](../test/runs/2026-11-26/cpu-flex-policy-v3-c2-fix-r2/c2_fix_report.md) · [测试报告](../reports/rss-cpu-flex-policy-v3-c2-fix-test.md)

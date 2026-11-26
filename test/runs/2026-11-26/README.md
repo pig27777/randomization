@@ -11,3 +11,8 @@
 ## CPU Flex Policy V3 C1/C2 r1
 
 35 × 25 cm PE 袋、200 g 内芯、50 µs CPU Flex 参考夹具。主机 `ubun`，22 个 CPU 进程。第五轮门禁通过。450 条正式采集、C2 训练、45 个独立状态的闭环已完成。[实验报告](cpu-flex-policy-v3-c1c2-r1/c1c2_report.md) · [测试报告](../../../reports/rss-cpu-flex-policy-v3-c1c2-test.md)
+
+
+## CPU Flex Policy V3 C2 r2
+
+主机 `ubun`，MuJoCo 4.0.1、50 µs CPU Flex，22 个单线程进程。复用 r1 C1 和 GroupSplit，通过 FiLM 匹配 RGB 门禁，完成 45 个独立状态的闭环，新增 52 个真实物理分支。训练与评测入口、冻结配置及论文结果见[实验报告](cpu-flex-policy-v3-c2-fix-r2/c2_fix_report.md)和[测试报告](../../../reports/rss-cpu-flex-policy-v3-c2-fix-test.md)。
