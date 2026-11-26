@@ -1,0 +1,10 @@
+git diff --exit-code fix4.1-route-b-base -- src/low_order_parcel/lumped_contact_proxy.py src/low_order_parcel/unified_payload.py
+PASS fix4.1-route-b-base
+git diff --exit-code 2ef4a394 -- src/low_order_parcel/lumped_contact_proxy.py src/low_order_parcel/unified_payload.py
+PASS 2ef4a394
+git diff --exit-code 736db9b2 -- src/isaac_yam_parcel/yam_load_port.py src/low_order_parcel/neck_damping.py
+PASS 736db9b2
+git diff --exit-code 2229e650 -- configs src/isaac_yam_parcel/yam_parcel_base_env.py src/isaac_yam_parcel/yam_bin_env.py src/isaac_yam_parcel/joint_bc_ppo.py src/low_order_parcel/macro_parcel_sim.py experience/yam_platform bag_sim/physical_parcel.py bag_sim/physical_parcel_gpu.py bag_sim/flex_residual.py
+PASS 2229e650
+git diff --exit-code 52fbb71f -- configs src/low_order_parcel src/isaac_yam_parcel src/policy_v3 tests/policy_v3 experience/yam_platform bag_sim
+PASS 52fbb71f

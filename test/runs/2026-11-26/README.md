@@ -20,3 +20,7 @@
 ## Yam_B GPU 求解器提速与捏膜提拉 r1
 
 主机 `ubun`，RTX 5090，MuJoCo / MJWarp 4.0.1。800 µs 悬停达标，捏膜与同配置的三位置试探尚未放行训练。命令、接触复测和证据见[实验报告](yam-gpu-speedup-lift-r1/speedup_and_lift_report.md)与[测试记录](../../../reports/yam-gpu-speedup-lift-test.md)。
+
+## Yam_B Policy V3 双柔索代理预训练
+
+`ubun`，周一 Fix 4.1 四块内容物、双柔索。持锁复放 65 g 与 250 g 原轨迹，悬停柔索直接承担近 100% 重量，C0 接触传力门禁失败。复跑命令及阶段状态见[实验报告](yam-surrogate-v1-rl/v1_rl_report.md)与[测试报告](../../../reports/yam-surrogate-v1-rl-test.md)。

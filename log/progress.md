@@ -1363,3 +1363,8 @@ C3、C4 示范覆盖仍未完成，BC 与 PPO 未启动。[示范测试报告](.
 - 800 µs Newton 悬停 64 路 4.36×，256 路 56.52 env-steps/s，1,637 MiB。
 - A2 500 µs 左位通过，nominal 666.7 µs 中右通过。捏膜 0/16 入篮，C1–C3 未放行。
 - [实验报告](../test/runs/2026-11-26/yam-gpu-speedup-lift-r1/speedup_and_lift_report.md) · [测试报告](../reports/yam-gpu-speedup-lift-test.md)
+
+### 2026-11-27 Yam_B Policy V3 双柔索代理预训练
+
+- 周一 65 g 和 250 g 的 2 ms 轨迹逐元素复现。悬停柔索承担 99.998% 和 99.997% 的重量。
+- C0 接触传力失败。冻结路径通过，Policy V3 16/16 通过。[实验报告](../test/runs/2026-11-26/yam-surrogate-v1-rl/v1_rl_report.md) · [测试报告](../reports/yam-surrogate-v1-rl-test.md)
