@@ -1357,3 +1357,9 @@ C3、C4 示范覆盖仍未完成，BC 与 PPO 未启动。[示范测试报告](.
 - 复用 C1 有效划分 265／56／55。匹配 RGB 的 Informed 分差 0.275，峰值 g12／g11／g12，Center—侧位 TV 均为 0.467。
 - 45 个状态复用 90 个闭环分支、新增 52 个。Informed 总计 30/35，Center 4/6，Blind 在 Center 的 15 次均无效。
 - 28 个共同有效配对差 −3.6 个百分点，95% CI [−11.1, 0.0]，全样本未知界限 [−28.9, +28.9]。[实验报告和图](../test/runs/2026-11-26/cpu-flex-policy-v3-c2-fix-r2/c2_fix_report.md) · [测试报告](../reports/rss-cpu-flex-policy-v3-c2-fix-test.md)
+
+### 2026-11-27 Yam_B GPU 求解器提速与捏膜提拉 r1
+
+- 800 µs Newton 悬停 64 路 4.36×，256 路 56.52 env-steps/s，1,637 MiB。
+- A2 500 µs 左位通过，nominal 666.7 µs 中右通过。捏膜 0/16 入篮，C1–C3 未放行。
+- [实验报告](../test/runs/2026-11-26/yam-gpu-speedup-lift-r1/speedup_and_lift_report.md) · [测试报告](../reports/yam-gpu-speedup-lift-test.md)
